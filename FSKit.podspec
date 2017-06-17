@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'FSKit'
-  s.version          = '0.1.3'
+  s.version          = '0.1.4'
   s.summary          = 'FSKit is a gift for iOS developer'
 
 # This description is used to generate tags and improve search results.
@@ -37,6 +37,6 @@ Pod::Spec.new do |s|
   # }
 
   # s.public_header_files = 'Pod/Classes/**/*.h'
-  s.frameworks = 'UIKit', 'MapKit','CommonCrypto','CoreLocation','sys','objc','mach','arpa','net','AdSupport','CoreTelephony','AVFoundation'
+  s.frameworks = 'UIKit', 'MapKit','CoreLocation','AdSupport','CoreTelephony','AVFoundation'
   # s.dependency 'AFNetworking', '~> 2.3'
 end
