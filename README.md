@@ -22,7 +22,7 @@ pod "FSKit"
 
 ## Author
 
-topchuan, fudongdong@guazi.com
+Fudon, 1245102331@qq.com
 
 ## License
 

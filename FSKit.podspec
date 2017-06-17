@@ -9,7 +9,7 @@
 Pod::Spec.new do |s|
   s.name             = 'FSKit'
   s.version          = '0.1.0'
-  s.summary          = 'A short description of FSKit.'
+  s.summary          = 'FSKit is a gift for iOS developer'
 
 # This description is used to generate tags and improve search results.
 #   * Think: What does it do? Why did you write it? What is the focus?
@@ -18,14 +18,14 @@ Pod::Spec.new do |s|
 #   * Finally, don't worry about the indent, CocoaPods strips it!
 
   s.description      = <<-DESC
-TODO: Add long description of the pod here.
-                       DESC
+    I'd like to do something for iOS.
+    DESC
 
-  s.homepage         = 'https://github.com/topchuan/FSKit'
+  s.homepage         = 'https://github.com/fuchina/FSKit'
   # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
-  s.author           = { 'topchuan' => 'fudongdong@guazi.com' }
-  s.source           = { :git => 'https://github.com/topchuan/FSKit.git', :tag => s.version.to_s }
+  s.author           = { 'fudon' => '1245102331@qq.com' }
+  s.source           = { :git => 'https://github.com/fuchina/FSKit.git', :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
   s.ios.deployment_target = '8.0'

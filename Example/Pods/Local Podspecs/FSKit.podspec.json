@@ -1,0 +1,22 @@
+{
+  "name": "FSKit",
+  "version": "0.1.0",
+  "summary": "A short description of FSKit.",
+  "description": "TODO: Add long description of the pod here.",
+  "homepage": "https://github.com/topchuan/FSKit",
+  "license": {
+    "type": "MIT",
+    "file": "LICENSE"
+  },
+  "authors": {
+    "topchuan": "fudongdong@guazi.com"
+  },
+  "source": {
+    "git": "https://github.com/topchuan/FSKit.git",
+    "tag": "0.1.0"
+  },
+  "platforms": {
+    "ios": "8.0"
+  },
+  "source_files": "FSKit/Classes/**/*"
+}
