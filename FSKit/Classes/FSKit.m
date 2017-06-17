@@ -692,7 +692,7 @@ static CGRect oldframe;
     return 0;
 }
 
-+ (long long)getTotalDiskSize   // 获取磁盘总量
++ (NSInteger)getTotalDiskSize   // 获取磁盘总量
 {
     struct statfs buf;
     unsigned long long freeSpace = -1;
@@ -700,10 +700,10 @@ static CGRect oldframe;
     {
         freeSpace = (unsigned long long)(buf.f_bsize * buf.f_blocks);
     }
-    return freeSpace;
+    return (NSInteger)freeSpace;
 }
 
-+ (long long)getAvailableDiskSize   // 获取磁盘可用量
++ (NSInteger)getAvailableDiskSize   // 获取磁盘可用量
 {
     struct statfs buf;
     unsigned long long freeSpace = -1;
@@ -711,7 +711,7 @@ static CGRect oldframe;
     {
         freeSpace = (unsigned long long)(buf.f_bsize * buf.f_bavail);
     }
-    return freeSpace;
+    return (NSInteger)freeSpace;
 }
 
 + (double)rad:(double)d
