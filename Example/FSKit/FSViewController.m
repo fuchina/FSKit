@@ -7,6 +7,7 @@
 //
 
 #import "FSViewController.h"
+#import "FSKit-umbrella.h"
 
 @interface FSViewController ()
 
@@ -17,7 +18,23 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-	// Do any additional setup after loading the view, typically from a nib.
+    
+    UIButton *btn = [UIButton buttonWithType:UIButtonTypeSystem];
+    btn.frame = CGRectMake(10, 100, 300, 44);
+    btn.backgroundColor = [UIColor redColor];
+    [btn setTitle:@"Click" forState:UIControlStateNormal];
+    [btn addTarget:self action:@selector(click) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:btn];
+}
+
+- (void)click
+{
+    [FSKit alertView1WithTitle:@"Title" message:@"Message" btnTitle:@"OK" handler:^(UIAlertAction *action) {
+        NSString *string = @"";
+        if (FSValidateString(string)) {
+            NSLog(@"OK");
+        }
+    } completion:nil];
 }
 
 - (void)didReceiveMemoryWarning

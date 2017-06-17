@@ -10,6 +10,8 @@
 #endif
 #endif
 
+#import "FSKit.h"
+#import "FuSoft.h"
 
 FOUNDATION_EXPORT double FSKitVersionNumber;
 FOUNDATION_EXPORT const unsigned char FSKitVersionString[];
