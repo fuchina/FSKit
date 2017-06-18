@@ -145,7 +145,6 @@
 + (NSString *)stringDeleteNewLineAndWhiteSpace:(NSString *)string;
 + (NSString *)adID;
 + (NSString *)pathForResource:(NSString *)name type:(NSString *)type;
-//+ (NSString *)tripleDES:(NSString *)plainText encryptOrDecrypt:(CCOperation)encryptOrDecrypt encryptOrDecryptKey:(NSString *)encryptOrDecryptKey;
 + (NSString *)timeStamp;
 + (NSString *)macaddress;
 + (NSString *)identifierForVendorFromKeyChain;

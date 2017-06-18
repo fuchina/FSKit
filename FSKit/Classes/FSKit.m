@@ -24,8 +24,6 @@
 #import <AVFoundation/AVFoundation.h>
 #import <sys/mount.h>
 
-#define DESKEY @"D6D2402F1C98E208FF2E863AA29334BD65AE1932A821502D9E5673CDE3C713ACFE53E2103CD40ED6BEBB101B484CAE83D537806C6CB611AEE86ED2CA8C97BBE95CF8476066D419E8E833376B850172107844D394016715B2E47E0A6EECB3E83A361FA75FA44693F90D38C6F62029FCD8EA395ED868F9D718293E9C0E63194E87"
-
 static CGRect oldframe;
 
 @implementation FSKit
@@ -2841,34 +2839,6 @@ static CGRect oldframe;
     NSMutableDictionary *keychainQuery = [self getKeychainQuery:service];
     SecItemDelete((__bridge CFDictionaryRef)keychainQuery);
 }
-
-+ (NSString*)generate3DesKey:(NSString*)seed timestamp:(NSString*)timestamp
-{
-    NSString * keyStr = [NSString stringWithFormat:@"%@_%d_%@",
-                         seed, rand(), timestamp];      // 这个值会是固定的吗?
-    NSString * key = [self md5:keyStr];
-    key = [key substringToIndex:24];
-    return key;
-}
-
-+ (NSString *)encryptKye
-{
-    return @"345243523653445765874";
-}
-
-//+ (NSString*)getRsaEncryptParams:(SecKeyRef)publicKey params:(NSString*)params timestamp:(NSString*)timestamp
-//{
-//    NSString* key = [self generate3DesKey:[self encryptKye] timestamp:timestamp];
-//    NSString* encryptParams3des = [self tripleDES:params encryptOrDecrypt:kCCEncrypt encryptOrDecryptKey:key];
-//
-//    NSData* keyEncryptData = [self rsaEncryptString:publicKey data:key];
-//    NSString* keyEncryptStr = [self DataToHex:keyEncryptData];
-//    if(keyEncryptStr == nil || keyEncryptStr.length == 0){
-//        return nil;
-//    }
-//    NSString* encryptParams = [NSString stringWithFormat:@"Z%@z%@", keyEncryptStr, encryptParams3des];
-//    return encryptParams;
-//}
 
 + (NSString *)DataToHex:(NSData *)data {
     
