@@ -514,6 +514,9 @@ static CGRect oldframe;
         [self showMessage:@"fontInt不能为0"];
         return 0;
     }
+    if (![self isValidateString:text]) {
+        return 0;
+    }
     NSMutableAttributedString *attrStr = [[NSMutableAttributedString alloc] initWithString:text];
     NSRange allRange = [text rangeOfString:text];
     [attrStr addAttribute:NSFontAttributeName
