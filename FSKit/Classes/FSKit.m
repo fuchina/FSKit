@@ -3446,6 +3446,33 @@ static CGRect oldframe;
     return [pingyin substringToIndex:1];
 }
 
+// 银行卡每4个隔空格
++ (NSString *)forthCarNumber:(NSString *)text
+{
+    if (![text isKindOfClass:[NSString class]]) {
+        text = text.description;
+    }
+    text = [text stringByReplacingOccurrencesOfString:@" " withString:@""];
+    if (![self isValidateString:text]) {
+        return nil;
+    }
+    
+    NSMutableArray *value = [[NSMutableArray alloc] init];
+    NSInteger length = text.length;
+    NSInteger numbers = length / 4;
+    NSInteger rest = length % 4;
+    for (int x = 0; x < numbers; x ++) {
+        NSString *subStr = [text substringWithRange:NSMakeRange(x * 4, 4)];
+        [value addObject:subStr];
+    }
+    if (rest) {
+        NSString *last = [text substringWithRange:NSMakeRange(length - rest, rest)];
+        [value addObject:last];
+    }
+    return [value componentsJoinedByString:@" "];
+}
+
+
 /**
  *  计算上次日期距离现在多久
  *

@@ -197,6 +197,7 @@
 + (NSAttributedString *)attributedStringFor:(NSString *)sourceString strings:(NSArray *)colorStrings color:(UIColor *)color fontStrings:(NSArray *)fontStrings font:(UIFont *)font;
 
 + (NSString *)firstCharacterWithString:(NSString *)string;
++ (NSString *)forthCarNumber:(NSString *)text;
 
 //     strikeLabel.attributedText = attribtStr;
 - (NSAttributedString *)middleLineForLabel:(NSString *)text;    // 中划线
