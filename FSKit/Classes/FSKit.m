@@ -79,7 +79,7 @@ static CGRect oldframe;
         }
     }];
     
-    UIAlertAction *archiveAction = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil];
+    UIAlertAction *archiveAction = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:cancelHandler];
     [controller addAction:firstAction];
     [controller addAction:archiveAction];
     [self presentAlertViewController:controller completion:completion];
