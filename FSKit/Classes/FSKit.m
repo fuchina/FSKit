@@ -943,6 +943,14 @@ static CGRect oldframe;
     return NSSelectorFromString(setterSelStr);
 }
 
++ (void)setValue:(id)value forPropertyName:(NSString *)name ofObject:(id)object
+{
+    SEL setterSelector = [self setterSELWithAttibuteName:name];
+    if ([object respondsToSelector:setterSelector]) {
+        [object performSelector:setterSelector onThread:[NSThread currentThread] withObject:value waitUntilDone:[NSThread isMainThread]];
+    }
+}
+
 + (NSString *)valueForGetSelectorWithPropertyName:(NSString *)name object:(id)instance
 {
     if (![name isKindOfClass:[NSString class]]) {
