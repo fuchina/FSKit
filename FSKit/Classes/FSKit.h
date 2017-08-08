@@ -40,7 +40,6 @@
 + (void)showMessage:(NSString *)message;
 + (void)showAlertWithMessage:(NSString *)message;
 
-+ (BOOL)isValidateMobile:(NSString *)mobile;
 + (BOOL)isValidateEmail:(NSString *)str;
 + (BOOL)isPureInt:(NSString *)string;
 + (BOOL)isPureFloat:(NSString*)string;
@@ -60,12 +59,9 @@
 + (BOOL)isValidateUserPasswd :(NSString *)str;
 + (BOOL)isChar:(NSString *)str;
 + (BOOL)isNumber:(NSString *)str;
-+ (BOOL)isDateAEarlierThanDateB:(NSDate *)aDate bDate:(NSDate *)bDate;
 + (BOOL)isString:(NSString *)aString containString:(NSString *)bString;
 + (BOOL)isStringContainsStringAndNumber:(NSString *)sourceString;
 + (int)isTheSameDayA:(NSDate *)aDate b:(NSDate *)bDate;
-+ (BOOL)isDateA:(NSDate *)aDate earlierToB:(NSDate *)bDate;
-+ (BOOL)checkTextFieldHasValidInput:(UITextField *)textField;
 + (BOOL)isURLString:(NSString *)sourceString;//0
 // 判断字符串是否含有中文
 + (BOOL)isHaveChineseInString:(NSString *)string;
@@ -77,7 +73,6 @@
 + (BOOL)isValidateDictionary:(NSDictionary *)dictionary;
 + (BOOL)floatEqual:(float)aNumber bNumber:(float)bNumber;
 
-+ (CGFloat)absoluteValue:(CGFloat)value;
 // 五险一金后工资应缴税额
 + (CGFloat)taxForSalaryAfterSocialSecurity:(CGFloat)money;
 // 根据税后推算税前
@@ -86,8 +81,7 @@
 + (NSArray *)taxRateForMoney:(CGFloat)money;
 
 + (NSTimeInterval)mmSecondsSince1970;
-+ (NSInteger)secondsSince1970;
-+ (NSTimeInterval)chinaSecondsSince1970;
++ (NSInteger)integerSecondsSince1970;
 + (NSInteger)weekdayStringFromDate:(NSDate *)inputDate;
 + (NSDateComponents *)yearMonthDayFromDate:(NSDate *)date;
 
@@ -256,8 +250,6 @@
 
 + (NSNumber *)keyedUnarchiverWithNumber:(NSString *)fileName;
 + (NSNumber *)fileSize:(NSString *)filePath;
-+ (NSValue *)rangeValue:(NSRange)range;
-
 + (UIColor *)randomColor;
 + (UIColor *)colorWithHexString:(NSString *)color;               // 根据16进制字符串获得颜色类对象
 

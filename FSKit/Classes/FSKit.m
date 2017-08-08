@@ -116,8 +116,7 @@ static CGRect oldframe;
     }
 }
 
-+ (void)copyToPasteboard:(NSString *)copyString
-{
++ (void)copyToPasteboard:(NSString *)copyString{
     if (copyString == nil) {
         return;
     }
@@ -125,16 +124,14 @@ static CGRect oldframe;
     [pasteboard setString:copyString];
 }
 
-+ (void)playSongs:(NSString *)songs type:(NSString *)fileType
-{
++ (void)playSongs:(NSString *)songs type:(NSString *)fileType{
     SystemSoundID soundID;
     AudioServicesCreateSystemSoundID((__bridge CFURLRef)[NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:songs ofType:fileType]], &soundID);
     AudioServicesPlaySystemSound(soundID);
     AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);// 播放震动
 }
 
-+ (void)xuanzhuanView:(UIView *)view
-{
++ (void)xuanzhuanView:(UIView *)view{
     CGContextRef context=UIGraphicsGetCurrentContext();
     [UIView beginAnimations:nil context:context];
     [UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
@@ -144,20 +141,17 @@ static CGRect oldframe;
     [UIView commitAnimations];
 }
 
-+ (void)userDefaultsKeepData:(id)instance  withKey:(NSString *)key
-{
++ (void)userDefaultsKeepData:(id)instance  withKey:(NSString *)key{
     NSUserDefaults *fdd = [NSUserDefaults standardUserDefaults];
     [fdd setObject:instance forKey:key];
     [fdd synchronize];
 }
 
-+ (id)userDefaultsDataWithKey:(NSString *)key
-{
++ (id)userDefaultsDataWithKey:(NSString *)key{
     return [[NSUserDefaults standardUserDefaults] objectForKey:key];
 }
 
-+ (void)showFullScreenImage:(UIImageView *)avatarImageView
-{
++ (void)showFullScreenImage:(UIImageView *)avatarImageView{
     UIImage *image = avatarImageView.image;
     UIWindow *window = [UIApplication sharedApplication].keyWindow;
     UIView *backgroundView = [[UIView alloc]initWithFrame:CGRectMake(0,0,[UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height)];
@@ -181,8 +175,7 @@ static CGRect oldframe;
     }];
 }
 
-+ (void)hideImage:(UITapGestureRecognizer*)tap
-{
++ (void)hideImage:(UITapGestureRecognizer*)tap{
     UIView *backgroundView=tap.view;
     UIImageView *imageView=(UIImageView*)[tap.view viewWithTag:1];
     [UIView animateWithDuration:0.3 animations:^{
@@ -194,8 +187,7 @@ static CGRect oldframe;
     }];
 }
 
-+ (void)clearUserDefaults
-{
++ (void)clearUserDefaults{
     NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
     NSDictionary *dict = [defs dictionaryRepresentation];
     for(id key in dict) {
@@ -204,27 +196,22 @@ static CGRect oldframe;
     [defs synchronize];
 }
 
-+ (void)letScreenLock:(BOOL)lock
-{
++ (void)letScreenLock:(BOOL)lock{
     [UIApplication sharedApplication].idleTimerDisabled = !lock;
 }
 
-+ (void)gotoAppCentPageWithAppId:(NSString *)appID
-{
++ (void)gotoAppCentPageWithAppId:(NSString *)appID{
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:[[NSString alloc] initWithFormat:@"itms-apps://itunes.apple.com/WebObjects/MZStore.woa/wa/viewContentsUserReviews?type=Purple+Software&id=%@",appID]]];
 }
 
-+ (void)setStatusBarBackgroundColor:(UIColor *)color
-{
++ (void)setStatusBarBackgroundColor:(UIColor *)color{
     UIView *statusBar = [[[UIApplication sharedApplication] valueForKey:@"statusBarWindow"] valueForKey:@"statusBar"];
-    if ([statusBar respondsToSelector:@selector(setBackgroundColor:)])
-    {
+    if ([statusBar respondsToSelector:@selector(setBackgroundColor:)]){
         statusBar.backgroundColor = color;
     }
 }
 
-+ (void)showMessage:(NSString *)message
-{
++ (void)showMessage:(NSString *)message{
     if (![message respondsToSelector:@selector(length)] || [message length] == 0) {
         return;
     }
@@ -237,8 +224,7 @@ static CGRect oldframe;
     [self alert:UIAlertControllerStyleAlert title:@"提示" message:message actionTitles:@[@"确定"] styles:@[@(UIAlertActionStyleDefault)] handler:nil cancelTitle:@"取消" cancel:nil completion:nil];
 }
 
-+ (void)showMessageInMainThread:(NSString *)message
-{
++ (void)showMessageInMainThread:(NSString *)message{
     UIView *backView = [[UIView alloc] initWithFrame:CGRectMake(0, 64, WIDTHFC, HEIGHTFC - 64)];
     
     CGFloat width = WIDTHFC - 60;
@@ -267,8 +253,7 @@ static CGRect oldframe;
     });
 }
 
-+ (double)usedMemory
-{
++ (double)usedMemory{
     task_basic_info_data_t taskInfo;
     mach_msg_type_number_t infoCount = TASK_BASIC_INFO_COUNT;
     kern_return_t kernReturn = task_info(mach_task_self(),
@@ -282,8 +267,7 @@ static CGRect oldframe;
     return taskInfo.resident_size / 1024.0 / 1024.0;
 }
 
-+ (double)availableMemory
-{
++ (double)availableMemory{
     vm_statistics_data_t vmStats;
     mach_msg_type_number_t infoCount = HOST_VM_INFO_COUNT;
     kern_return_t kernReturn = host_statistics(mach_host_self(),
@@ -321,8 +305,7 @@ static CGRect oldframe;
     return folderSize / 1024.0;
 }
 
-+ (long long)fileSizeAtPath:(NSString*)filePath
-{
++ (long long)fileSizeAtPath:(NSString*)filePath{
     NSFileManager* manager = [NSFileManager defaultManager];
     if ([manager fileExistsAtPath:filePath]){
         return [[manager attributesOfItemAtPath:filePath error:nil] fileSize];
@@ -330,10 +313,8 @@ static CGRect oldframe;
     return 0;
 }
 
-+ (CGFloat)textHeight:(NSString *)text fontInt:(NSInteger)fontInt labelWidth:(CGFloat)labelWidth
-{
++ (CGFloat)textHeight:(NSString *)text fontInt:(NSInteger)fontInt labelWidth:(CGFloat)labelWidth{
     if (fontInt == 0) {
-        [self showMessage:@"fontInt不能为0"];
         return 0;
     }
     if (![self isValidateString:text]) {
@@ -374,8 +355,7 @@ static CGRect oldframe;
 }
 
 //磁盘总空间
-+ (CGFloat)diskOfAllSizeBytes
-{
++ (CGFloat)diskOfAllSizeBytes{
     CGFloat size = 0.0;
     NSError *error;
     NSDictionary *dic = [[NSFileManager defaultManager] attributesOfFileSystemForPath:NSHomeDirectory() error:&error];
@@ -388,8 +368,7 @@ static CGRect oldframe;
 }
 
 //磁盘可用空间
-+ (CGFloat)diskOfFreeSizeBytes
-{
++ (CGFloat)diskOfFreeSizeBytes{
     CGFloat size = 0.0;
     NSError *error;
     NSDictionary *dic = [[NSFileManager defaultManager] attributesOfFileSystemForPath:NSHomeDirectory() error:&error];
@@ -417,8 +396,7 @@ static CGRect oldframe;
 }
 
 // 获取当前设备可用内存(单位：MB）
-+ (double)availableMemoryNew
-{
++ (double)availableMemoryNew{
     vm_statistics_data_t vmStats;
     mach_msg_type_number_t infoCount = HOST_VM_INFO_COUNT;
     kern_return_t kernReturn = host_statistics(mach_host_self(),
@@ -434,8 +412,7 @@ static CGRect oldframe;
 }
 
 // 获取当前任务所占用的内存（单位：MB）
-+ (double)currentAppMemory
-{
++ (double)currentAppMemory{
     task_basic_info_data_t taskInfo;
     mach_msg_type_number_t infoCount = TASK_BASIC_INFO_COUNT;
     kern_return_t kernReturn = task_info(mach_task_self(),
@@ -447,12 +424,10 @@ static CGRect oldframe;
         ) {
         return NSNotFound;
     }
-    
     return taskInfo.resident_size;
 }
 
-+ (CGSize)keyboardNotificationScroll:(NSNotification *)notification baseOn:(CGFloat)baseOn
-{
++ (CGSize)keyboardNotificationScroll:(NSNotification *)notification baseOn:(CGFloat)baseOn{
     NSDictionary *info = [notification userInfo];
     NSValue *value = [info objectForKey:UIKeyboardFrameEndUserInfoKey];
     CGSize keyboardSize = [value CGRectValue].size;
@@ -585,8 +560,7 @@ static CGRect oldframe;
     return mArray;
 }
 
-+ (NSArray *)addCookies:(NSArray *)nameArray value:(NSArray *)valueArray cookieDomain:(NSString *)cookName
-{
++ (NSArray *)addCookies:(NSArray *)nameArray value:(NSArray *)valueArray cookieDomain:(NSString *)cookName{
     if (nameArray.count != valueArray.count) {
         return nil;
     }
@@ -607,8 +581,7 @@ static CGRect oldframe;
     return cookieArray;
 }
 
-+ (NSArray *)deviceInfos
-{
++ (NSArray *)deviceInfos{
     NSString *name = @"name";
     NSString *value = @"value";
     NSMutableArray *array = [[NSMutableArray alloc] init];
@@ -700,8 +673,7 @@ static CGRect oldframe;
     }
 }
 
-+ (long long)getAvailableMemorySize
-{
++ (long long)getAvailableMemorySize{
     vm_statistics_data_t vmStats;
     mach_msg_type_number_t infoCount = HOST_VM_INFO_COUNT;
     kern_return_t kernReturn = host_statistics(mach_host_self(), HOST_VM_INFO, (host_info_t)&vmStats, &infoCount);
@@ -727,14 +699,12 @@ static CGRect oldframe;
     return nil;
 }
 
-+ (NSString *)appVersionNumber
-{
++ (NSString *)appVersionNumber{
     NSDictionary* infoDict =[[NSBundle mainBundle] infoDictionary];
     return [infoDict objectForKey:@"CFBundleShortVersionString"];
 }
 
-+ (NSString *)appName
-{
++ (NSString *)appName{
     NSString *name = [[[NSBundle mainBundle] infoDictionary] objectForKey:(NSString*)kCFBundleNameKey];
     if (name.length == 0) {
         NSDictionary* infoDict =[[NSBundle mainBundle] infoDictionary];
@@ -743,8 +713,7 @@ static CGRect oldframe;
     return name;
 }
 
-+ (NSArray<NSString *> *)propertiesForClass:(Class)className
-{
++ (NSArray<NSString *> *)propertiesForClass:(Class)className{
     NSMutableArray *array = [[NSMutableArray alloc] init];
     unsigned int propertyCount = 0;
     objc_property_t *properties = class_copyPropertyList(className, &propertyCount);
@@ -758,23 +727,20 @@ static CGRect oldframe;
     return array;
 }
 
-+ (SEL)setterSELWithAttibuteName:(NSString*)attributeName
-{
++ (SEL)setterSELWithAttibuteName:(NSString*)attributeName{
     NSString *capital = [[attributeName substringToIndex:1] uppercaseString];
     NSString *setterSelStr = [NSString stringWithFormat:@"set%@%@:",capital,[attributeName substringFromIndex:1]];
     return NSSelectorFromString(setterSelStr);
 }
 
-+ (void)setValue:(id)value forPropertyName:(NSString *)name ofObject:(id)object
-{
++ (void)setValue:(id)value forPropertyName:(NSString *)name ofObject:(id)object{
     SEL setterSelector = [self setterSELWithAttibuteName:name];
     if ([object respondsToSelector:setterSelector]) {
         [object performSelector:setterSelector onThread:[NSThread currentThread] withObject:value waitUntilDone:[NSThread isMainThread]];
     }
 }
 
-+ (NSString *)valueForGetSelectorWithPropertyName:(NSString *)name object:(id)instance
-{
++ (NSString *)valueForGetSelectorWithPropertyName:(NSString *)name object:(id)instance{
     if (![name isKindOfClass:[NSString class]]) {
         return nil;
     }
@@ -788,17 +754,14 @@ static CGRect oldframe;
     return nil;
 }
 
-+ (UIColor *)randomColor
-{
++ (UIColor *)randomColor{
     CGFloat r = arc4random_uniform(256) / 255.0;
     CGFloat g = arc4random_uniform(256) / 255.0;
     CGFloat b = arc4random_uniform(256) / 255.0;
-    
     return [UIColor colorWithRed:r green:g blue:b alpha:1];
 }
 
-+ (UIColor *)colorWithHexString: (NSString *)color
-{
++ (UIColor *)colorWithHexString: (NSString *)color{
     NSString *cString = [[color stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] uppercaseString];
     if ([cString length] < 6) {
         return [UIColor clearColor];
@@ -824,16 +787,14 @@ static CGRect oldframe;
     return [UIColor colorWithRed:((float) r / 255.0f) green:((float) g / 255.0f) blue:((float) b / 255.0f) alpha:1.0f];
 }
 
-+ (UIFont *)angleFontWithRate:(CGFloat)rate fontSize:(NSInteger)fontSize
-{
++ (UIFont *)angleFontWithRate:(CGFloat)rate fontSize:(NSInteger)fontSize{
     CGAffineTransform matrix = CGAffineTransformMake(1, 0, tanf(rate * (CGFloat)M_PI / 180), 1, 0, 0);
     UIFontDescriptor *desc = [UIFontDescriptor fontDescriptorWithName:[UIFont systemFontOfSize:fontSize].fontName matrix:matrix];
     UIFont *font = [UIFont fontWithDescriptor:desc size:fontSize];
     return font;
 }
 
-+ (NSDate *)dateFromStringByHotline:(NSString *)string
-{
++ (NSDate *)dateFromStringByHotline:(NSString *)string{
     if ([string isKindOfClass:[NSNull class]]) {
         return nil;
     }
@@ -854,8 +815,7 @@ static CGRect oldframe;
     return localeDate;
 }
 
-+ (NSDate *)dateFromStringByHotlineWithoutSeconds:(NSString *)string
-{
++ (NSDate *)dateFromStringByHotlineWithoutSeconds:(NSString *)string{
     if ([string isKindOfClass:[NSNull class]]) {
         return nil;
     }
@@ -870,30 +830,26 @@ static CGRect oldframe;
     return date;
 }
 
-+ (NSDate *)chinaDateByDate:(NSDate *)date
-{
++ (NSDate *)chinaDateByDate:(NSDate *)date{
     NSTimeZone *zone = [NSTimeZone systemTimeZone];
-    NSInteger interval = [zone secondsFromGMTForDate: date];
+    NSInteger interval = [zone secondsFromGMTForDate:date];
     return [date dateByAddingTimeInterval: interval];
 }
 
-+ (NSDate *)chinaDateByTimeInterval:(NSString *)timeInterval
-{
++ (NSDate *)chinaDateByTimeInterval:(NSString *)timeInterval{
     NSDate *date = [NSDate dateWithTimeIntervalSince1970:[timeInterval doubleValue]];
     NSTimeZone *zone = [NSTimeZone timeZoneForSecondsFromGMT:8 * 3600];
     NSInteger interval = [zone secondsFromGMTForDate: date];
     return [date dateByAddingTimeInterval: interval];
 }
 
-+ (NSDateComponents *)componentForDate:(NSDate *)date
-{
++ (NSDateComponents *)componentForDate:(NSDate *)date{
     NSCalendar *calendar = [NSCalendar calendarWithIdentifier:NSCalendarIdentifierGregorian];
     NSDateComponents *components = [calendar components:NSCalendarUnitYear | NSCalendarUnitMonth | NSCalendarUnitDay | NSCalendarUnitHour | NSCalendarUnitMinute | NSCalendarUnitSecond | NSCalendarUnitWeekOfMonth | NSCalendarUnitWeekday | NSCalendarUnitWeekOfMonth | NSCalendarUnitWeekOfYear fromDate:date];
     return components;
 }
 
-+ (NSInteger)daythOfYearForDate:(NSDate *)date
-{
++ (NSInteger)daythOfYearForDate:(NSDate *)date{
     if (date == nil) {
         date = [NSDate date];
     }
@@ -944,27 +900,21 @@ static CGRect oldframe;
     return dashedLine;
 }
 
-+ (UIImage *)QRImageFromString:(NSString *)sourceString
-{
++ (UIImage *)QRImageFromString:(NSString *)sourceString{
     if (sourceString == nil) {
         sourceString = @"";
     }
-    
     CIFilter *filter = [CIFilter filterWithName:@"CIQRCodeGenerator"];
     [filter setDefaults];
-    
     NSData *data = [sourceString dataUsingEncoding:NSUTF8StringEncoding];
     [filter setValue:data forKey:@"inputMessage"];
-    
     CIImage *ciImage = [filter outputImage];
     //UIImage *unsharpImage = [UIImage imageWithCIImage:ciImage];//不清晰
-    
     UIImage *image = [self createNonInterpolatedUIImageFormCIImage:ciImage withSize:960];
     return image;
 }
 
-+ (UIImage *)createNonInterpolatedUIImageFormCIImage:(CIImage *)image withSize:(CGFloat)size
-{
++ (UIImage *)createNonInterpolatedUIImageFormCIImage:(CIImage *)image withSize:(CGFloat)size{
     CGRect extent = CGRectIntegral(image.extent);
     CGFloat scale = MIN(size/CGRectGetWidth(extent), size/CGRectGetHeight(extent));
     size_t width = CGRectGetWidth(extent) * scale;
@@ -982,8 +932,7 @@ static CGRect oldframe;
     return [UIImage imageWithCGImage:scaledImage];
 }
 
-+ (UIImage *)imageFromColor:(UIColor *)color
-{
++ (UIImage *)imageFromColor:(UIColor *)color{
     CGRect rect = CGRectMake(0, 0, 1, 10);
     UIGraphicsBeginImageContext(rect.size);
     CGContextRef context = UIGraphicsGetCurrentContext();
@@ -994,8 +943,7 @@ static CGRect oldframe;
     return img;
 }
 
-+ (UIImage *)imageFromColor:(UIColor *)color size:(CGSize)size
-{
++ (UIImage *)imageFromColor:(UIColor *)color size:(CGSize)size{
     CGRect rect = CGRectMake(0, 0, size.width, size.height);
     UIGraphicsBeginImageContext(rect.size);
     CGContextRef context = UIGraphicsGetCurrentContext();
@@ -1006,8 +954,7 @@ static CGRect oldframe;
     return img;
 }
 
-+ (UIImage*)circleImage:(UIImage*)image withParam:(CGFloat)inset
-{
++ (UIImage*)circleImage:(UIImage*)image withParam:(CGFloat)inset{
     UIGraphicsBeginImageContext(image.size);
     CGContextRef context =UIGraphicsGetCurrentContext();
     
@@ -1029,8 +976,7 @@ static CGRect oldframe;
     return newimg;
 }
 
-+ (NSURL *)convertTxtEncoding:(NSURL *)fileUrl
-{
++ (NSURL *)convertTxtEncoding:(NSURL *)fileUrl{
     NSString *filePath = [fileUrl path];
     NSFileManager* manager = [NSFileManager defaultManager];
     if ([manager fileExistsAtPath:filePath]){
@@ -1486,24 +1432,15 @@ static CGRect oldframe;
     }
 }
 
-+ (NSTimeInterval)mmSecondsSince1970
-{
++ (NSTimeInterval)mmSecondsSince1970{
     return [[NSDate date] timeIntervalSince1970];
 }
 
-+ (NSInteger)secondsSince1970
-{
++ (NSInteger)integerSecondsSince1970{
     return (NSInteger)[[NSDate date] timeIntervalSince1970];
 }
 
-+ (NSTimeInterval)chinaSecondsSince1970
-{
-    NSTimeInterval seconds = [[NSDate date] timeIntervalSince1970];
-    return seconds + 8 * 3600;
-}
-
-+ (NSInteger)weekdayStringFromDate:(NSDate*)inputDate
-{
++ (NSInteger)weekdayStringFromDate:(NSDate*)inputDate{
     NSArray *weekdays = [NSArray arrayWithObjects: @(0), @(7), @(1), @(2), @(3), @(4), @(5), @(6), nil];
     NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
     NSTimeZone *timeZone = [[NSTimeZone alloc] initWithName:@"Asia/Shanghai"];
@@ -1554,14 +1491,6 @@ static CGRect oldframe;
     }
     freeifaddrs(interfaces);
     return address;
-}
-
-+ (BOOL)isValidateMobile:(NSString *)mobile
-{
-    //手机号以13， 15，18开头，八个 \d 数字字符
-    NSString *phoneRegex = @"^((13[0-9])|(14[0-9])|(15[^4,\\D])|(17[0-9])|(18[0,0-9]))\\d{8}$";
-    NSPredicate *phoneTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@",phoneRegex];
-    return [phoneTest evaluateWithObject:mobile];
 }
 
 + (NSDateComponents *)chineseDate:(NSDate *)date
@@ -2070,8 +1999,7 @@ static CGRect oldframe;
     return success;
 }
 
-+ (BOOL)removeFile:(NSString *)filePath
-{
++ (BOOL)removeFile:(NSString *)filePath{
     if (filePath.length == 0) {
         return NO;
     }
@@ -2083,32 +2011,24 @@ static CGRect oldframe;
     return NO;
 }
 
-+ (BOOL)isChinese:(NSString *)string
-{
++ (BOOL)isChinese:(NSString *)string{
     NSString *chinese = @"^[\\u4E00-\\u9FA5\\uF900-\\uFA2D]+$";
     NSPredicate *phoneTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@",chinese];
     return [phoneTest evaluateWithObject:string];
 }
 
-+ (BOOL)isValidateEmail : (NSString *) email
-{
++ (BOOL)isValidateEmail:(NSString *)email{
     if((0 != [email rangeOfString:@"@"].length) &&
-       (0 != [email rangeOfString:@"."].length))
-    {
+       (0 != [email rangeOfString:@"."].length)){
         NSCharacterSet* tmpInvalidCharSet = [[NSCharacterSet alphanumericCharacterSet] invertedSet];
         NSMutableCharacterSet* tmpInvalidMutableCharSet = [tmpInvalidCharSet mutableCopy];
         [tmpInvalidMutableCharSet removeCharactersInString:@"_-"];
-        
-        
-        NSRange range1 = [email rangeOfString:@"@"
-                                      options:NSCaseInsensitiveSearch];
+        NSRange range1 = [email rangeOfString:@"@" options:NSCaseInsensitiveSearch];
         
         //取得用户名部分
         NSString* userNameString = [email substringToIndex:range1.location];
         NSArray* userNameArray   = [userNameString componentsSeparatedByString:@"."];
-        
-        for(NSString* string in userNameArray)
-        {
+        for(NSString* string in userNameArray){
             NSRange rangeOfInavlidChars = [string rangeOfCharacterFromSet: tmpInvalidMutableCharSet];
             if(rangeOfInavlidChars.length != 0 || [string isEqualToString:@""])
                 return NO;
@@ -2117,22 +2037,18 @@ static CGRect oldframe;
         //取得域名部分
         NSString *domainString = [email substringFromIndex:range1.location+1];
         NSArray *domainArray   = [domainString componentsSeparatedByString:@"."];
-        
-        for(NSString *string in domainArray)
-        {
+        for(NSString *string in domainArray){
             NSRange rangeOfInavlidChars=[string rangeOfCharacterFromSet:tmpInvalidMutableCharSet];
             if(rangeOfInavlidChars.length !=0 || [string isEqualToString:@""])
-                return NO;
+            return NO;
         }
         return YES;
-    }
-    else {
+    }else{
         return NO;
     }
 }
 
-+ (BOOL)isValidateUserPasswd :(NSString *)str
-{
++ (BOOL)isValidateUserPasswd:(NSString *)str{
     NSRegularExpression *regularexpression = [[NSRegularExpression alloc]
                                               initWithPattern:@"^[a-zA-Z0-9]{6,16}$"
                                               options:NSRegularExpressionCaseInsensitive
@@ -2140,15 +2056,13 @@ static CGRect oldframe;
     NSUInteger numberofMatch = [regularexpression numberOfMatchesInString:str
                                                                   options:NSMatchingReportProgress
                                                                     range:NSMakeRange(0, str.length)];
-    if(numberofMatch > 0)
-    {
+    if(numberofMatch > 0){
         return YES;
     }
     return NO;
 }
 
-+ (BOOL)isChar:(NSString *)str
-{
++ (BOOL)isChar:(NSString *)str{
     NSRegularExpression *regularexpression = [[NSRegularExpression alloc]
                                               initWithPattern:@"^[a-zA-Z]*$"    //^[0-9]*$
                                               options:NSRegularExpressionCaseInsensitive
@@ -2156,15 +2070,13 @@ static CGRect oldframe;
     NSUInteger numberofMatch = [regularexpression numberOfMatchesInString:str
                                                                   options:NSMatchingReportProgress
                                                                     range:NSMakeRange(0, str.length)];
-    if(numberofMatch > 0)
-    {
+    if(numberofMatch > 0){
         return YES;
     }
     return NO;
 }
 
-+ (BOOL)isNumber:(NSString *)str
-{
++ (BOOL)isNumber:(NSString *)str{
     NSRegularExpression *regularexpression = [[NSRegularExpression alloc]
                                               initWithPattern:@"^[0-9]*$"
                                               options:NSRegularExpressionCaseInsensitive
@@ -2172,25 +2084,13 @@ static CGRect oldframe;
     NSUInteger numberofMatch = [regularexpression numberOfMatchesInString:str
                                                                   options:NSMatchingReportProgress
                                                                     range:NSMakeRange(0, str.length)];
-    if(numberofMatch > 0)
-    {
+    if(numberofMatch > 0){
         return YES;
     }
     return NO;
 }
 
-+ (BOOL)isDateAEarlierThanDateB:(NSDate *)aDate bDate:(NSDate *)bDate
-{
-    NSTimeInterval aTime = [aDate timeIntervalSince1970];
-    NSTimeInterval bTime = [bDate timeIntervalSince1970];
-    if (aTime < bTime) {
-        return YES;
-    }
-    return NO;
-}
-
-+ (BOOL)isString:(NSString *)aString containString:(NSString *)bString
-{
++ (BOOL)isString:(NSString *)aString containString:(NSString *)bString{
     for (int x = 0; x < aString.length; x ++) {
         NSRange range = NSMakeRange(x,1);
         NSString *subString = [aString substringWithRange:range];
@@ -2201,8 +2101,7 @@ static CGRect oldframe;
     return NO;
 }
 
-+ (BOOL)isStringContainsStringAndNumber:(NSString *)sourceString
-{
++ (BOOL)isStringContainsStringAndNumber:(NSString *)sourceString{
     if ([sourceString isKindOfClass:[NSString class]]) {
         if (sourceString.length == 0) {
             return NO;
@@ -2224,8 +2123,7 @@ static CGRect oldframe;
     return NO;
 }
 
-+ (int)isTheSameDayA:(NSDate *)aDate b:(NSDate *)bDate
-{
++ (int)isTheSameDayA:(NSDate *)aDate b:(NSDate *)bDate{
     // 是返回1 不是返回2 其他返回0
     if (aDate == nil  || bDate == nil) {
         return 0;
@@ -2248,35 +2146,13 @@ static CGRect oldframe;
     return 2;
 }
 
-+ (BOOL)isDateA:(NSDate *)aDate earlierToB:(NSDate *)bDate
-{
-    if (aDate == nil  || bDate == nil) {
-        return NO;
-    }
-    
-    NSTimeInterval aTimeInterval = [aDate timeIntervalSince1970];
-    NSTimeInterval bTimeInterval = [bDate timeIntervalSince1970];
-    if (aTimeInterval < bTimeInterval) {
-        return YES;
-    }
-    return NO;
-}
-
-+ (BOOL)checkTextFieldHasValidInput:(UITextField *)textField
-{
-    NSString *text = [self cleanString:textField.text];
-    return text.length;
-}
-
-+ (BOOL)isURLString:(NSString *)sourceString
-{
++ (BOOL)isURLString:(NSString *)sourceString{
     NSString *matchString = @"((http[s]{0,1}|ftp)://[a-zA-Z0-9\\.\\-]+\\.([a-zA-Z]{2,4})(:\\d+)?(/[a-zA-Z0-9\\.\\-~!@#$%^&*+?:_/=<>]*)?)|(www.[a-zA-Z0-9\\.\\-]+\\.([a-zA-Z]{2,4})(:\\d+)?(/[a-zA-Z0-9\\.\\-~!@#$%^&*+?:_/=<>]*)?)";
     NSPredicate *phoneTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@",matchString];
     return [phoneTest evaluateWithObject:sourceString];
 }
 
-+ (BOOL)isHaveChineseInString:(NSString *)string
-{
++ (BOOL)isHaveChineseInString:(NSString *)string{
     for(NSInteger i = 0; i < [string length]; i++){
         int a = [string characterAtIndex:i];
         if (a > 0x4e00 && a < 0x9fff) {
@@ -2286,8 +2162,7 @@ static CGRect oldframe;
     return NO;
 }
 
-+ (BOOL)isAllNum:(NSString *)string
-{
++ (BOOL)isAllNum:(NSString *)string{
     unichar c;
     for (int i=0; i<string.length; i++) {
         c=[string characterAtIndex:i];
@@ -2310,38 +2185,25 @@ static CGRect oldframe;
     return ![[settings objectForKey:(NSString *)kCFProxyTypeKey] isEqualToString:@"kCFProxyTypeNone"];
 }
 
-+ (BOOL)isValidateString:(NSString *)string
-{
++ (BOOL)isValidateString:(NSString *)string{
     return [string isKindOfClass:[NSString class]] && string.length;
 }
 
-+ (BOOL)isValidateArray:(NSArray *)array
-{
++ (BOOL)isValidateArray:(NSArray *)array{
     return [array isKindOfClass:[NSArray class]] && array.count;
 }
 
-+ (BOOL)isValidateDictionary:(NSDictionary *)dictionary
-{
++ (BOOL)isValidateDictionary:(NSDictionary *)dictionary{
     return [dictionary isKindOfClass:[NSDictionary class]] && dictionary.count;
 }
 
-+ (BOOL)floatEqual:(float)aNumber bNumber:(float)bNumber
-{
++ (BOOL)floatEqual:(float)aNumber bNumber:(float)bNumber{
     NSNumber *a=[NSNumber numberWithFloat:aNumber];
     NSNumber *b=[NSNumber numberWithFloat:bNumber];
     return [a compare:b] == NSOrderedSame;
 }
 
-+ (CGFloat)absoluteValue:(CGFloat)value
-{
-    if (value < 0.00001) {
-        return -value;
-    }
-    return value;
-}
-
-+ (CGFloat)taxForSalaryAfterSocialSecurity:(CGFloat)money
-{
++ (CGFloat)taxForSalaryAfterSocialSecurity:(CGFloat)money{
     CGFloat deltaMoney = money - 3500;
     if (deltaMoney <= 0) {
         return 0;
@@ -2392,8 +2254,7 @@ static CGRect oldframe;
     return selectArrays;
 }
 
-+ (NSArray *)taxRateForMoney:(CGFloat)money
-{
++ (NSArray *)taxRateForMoney:(CGFloat)money{
     if (money <= 1500) {
         return @[@0.03,@0];
     }else if (money <= 4500){
@@ -2417,8 +2278,7 @@ static CGRect oldframe;
 //    return flag;
 //}
 
-+ (NSNumber *)fileSize:(NSString *)filePath
-{
++ (NSNumber *)fileSize:(NSString *)filePath{
     if (filePath.length == 0) {
         return nil;
     }
@@ -2426,11 +2286,6 @@ static CGRect oldframe;
     NSDictionary *attrDic = [fileManager attributesOfItemAtPath:filePath error:nil];
     NSNumber *fileSize = [attrDic objectForKey:NSFileSize];
     return fileSize;
-}
-
-+ (NSValue *)rangeValue:(NSRange)range
-{
-    return [NSValue valueWithRange:range];
 }
 
 + (NSString *)localFilePath:(NSString *)fileName
