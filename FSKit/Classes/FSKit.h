@@ -8,7 +8,6 @@
 
 #import <UIKit/UIKit.h>
 #import "FuSoft.h"
-#import <CommonCrypto/CommonCryptor.h>
 #import <CoreLocation/CoreLocation.h>
 
 @interface FSKit : NSObject

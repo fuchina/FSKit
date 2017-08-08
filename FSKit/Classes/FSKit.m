@@ -7,9 +7,7 @@
 //
 
 #import "FSKit.h"
-#import <UIKit/UIKit.h>
 #import <objc/runtime.h>
-#import "FuSoft.h"
 #import <sys/sysctl.h>
 #import <mach/mach.h>
 #import <ifaddrs.h>
