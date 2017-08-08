@@ -30,130 +30,42 @@ static CGRect oldframe;
 
 //#import "FuSoft-Swift.h"        // Swift工程
 
-+ (void)presentAlertViewController:(UIAlertController *)alertController completion:(void (^)(void))completion
-{
-    UIWindow *keyWindow = [UIApplication sharedApplication].keyWindow;
++ (void)presentAlertViewController:(UIAlertController *)alertController completion:(void (^)(void))completion{
+    UIWindow *keyWindow = [UIApplication sharedApplication].windows.lastObject;
     [keyWindow.rootViewController presentViewController:alertController animated:YES completion:completion];
 }
 
-+ (void)alertView1WithTitle:(NSString *)title message:(NSString *)message btnTitle:(NSString *)btnTitle handler:(void (^)(UIAlertAction *action))handler completion:(void (^)(void))completion
-{
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title?title:@"提示" message:message preferredStyle:UIAlertControllerStyleAlert];
-    BOOL validateString = [self isValidateString:btnTitle];
-    UIAlertAction *aAction = [UIAlertAction actionWithTitle:validateString?btnTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        if (handler) {
-            handler(action);
-        }
-    }];
-    [alertController addAction:aAction];
-    [self presentAlertViewController:alertController completion:completion];
-}
-
-+ (void)alertViewWithTitle:(NSString *)title message:(NSString *)message btnTitle:(NSString *)btnTitle handler:(void (^)(UIAlertAction *action))okHandler cancelTitle:(NSString *)cancelTitle handler:(void (^)(UIAlertAction *action))handler completion:(void (^)(void))completion
-{
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];
-    
-    UIAlertAction *okAction = [UIAlertAction actionWithTitle:btnTitle style:UIAlertActionStyleDefault handler:okHandler];
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:cancelTitle style:UIAlertActionStyleCancel handler:handler];
-    [alertController addAction:cancelAction];
-    [alertController addAction:okAction];
-    [self presentAlertViewController:alertController completion:completion];
-}
-
-+ (void)alertViewWithTitle:(NSString *)title message:(NSString *)message destructTitle:(NSString *)btnTitle handler:(void (^)(UIAlertAction *action))destructHandler cancelTitle:(NSString *)cancelTitle handler:(void (^)(UIAlertAction *action))cancelHandler completion:(void (^)(void))completion
-{
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:cancelTitle style:UIAlertActionStyleCancel handler:cancelHandler];
-    UIAlertAction *okAction = [UIAlertAction actionWithTitle:btnTitle style:UIAlertActionStyleDestructive handler:destructHandler];
-    [alertController addAction:cancelAction];
-    [alertController addAction:okAction];
-    [self presentAlertViewController:alertController completion:completion];
-}
-
-+ (void)actionSheet1WithTitle:(NSString *)title firstTitle:(NSString *)firstTitle style:(UIAlertActionStyle)style firstHandler:(void (^)(UIAlertAction *action))firstHandler cancelHandler:(void (^)(UIAlertAction *action))cancelHandler completion:(void (^)(void))completion
-{
-    UIAlertController *controller = [UIAlertController alertControllerWithTitle:nil message:title preferredStyle:UIAlertControllerStyleActionSheet];
-    UIAlertAction *firstAction = [UIAlertAction actionWithTitle:firstTitle style:style handler:^(UIAlertAction * _Nonnull action) {
-        if (firstHandler) {
-            firstHandler(action);
-        }
-    }];
-    
-    UIAlertAction *archiveAction = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:cancelHandler];
-    [controller addAction:firstAction];
++ (void)alert:(UIAlertControllerStyle)style title:(NSString *)title message:(NSString *)message actionTitles:(NSArray<NSString *> *)titles styles:(NSArray<NSNumber *> *)styles handler:(void (^)(UIAlertAction *action))handler cancelTitle:(NSString *)cancelTitle cancel:(void (^)(UIAlertAction *action))cancel completion:(void (^)(void))completion{
+    if (titles.count != styles.count) {
+        return;
+    }
+    UIAlertController *controller = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:style];
+    for (int x = 0; x < titles.count; x ++) {
+        UIAlertAction *action = [UIAlertAction actionWithTitle:titles[x] style:[styles[x] integerValue] handler:^(UIAlertAction * _Nonnull action) {
+            if (handler) {
+                handler(action);
+            }
+        }];
+        [controller addAction:action];
+    }
+    UIAlertAction *archiveAction = [UIAlertAction actionWithTitle:cancelTitle style:UIAlertActionStyleCancel handler:cancel];
     [controller addAction:archiveAction];
     [self presentAlertViewController:controller completion:completion];
 }
 
-+ (void)actionSheet2WithTitle:(NSString *)title firstTitle:(NSString *)firstTitle style:(UIAlertActionStyle)firstStyle firstHandler:(void (^)(UIAlertAction *action))firstHandler secondTitle:(NSString *)secondTitle style:(UIAlertActionStyle)secondStyle handler:(void (^)(UIAlertAction *action))secondHandler cancelHandler:(void (^)(UIAlertAction *action))cancelHandler completion:(void (^)(void))completion
-{
-    UIAlertController *controller = [UIAlertController alertControllerWithTitle:nil message:title preferredStyle:UIAlertControllerStyleActionSheet];
-    UIAlertAction *firstAction = [UIAlertAction actionWithTitle:firstTitle style:firstStyle handler:^(UIAlertAction * _Nonnull action) {
-        if (firstHandler) {
-            firstHandler(action);
++ (void)alertInput:(NSInteger)number title:(NSString *)title message:(NSString *)message ok:(NSString *)okTitle handler:(void (^)(UIAlertController *bAlert,UIAlertAction *action))handler cancel:(NSString *)cancelTitle handler:(void (^)(UIAlertAction *action))cancelHandler textFieldConifg:(void (^)(UITextField *textField))configurationHandler completion:(void (^)(void))completion{
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];
+    if (number > 0) {
+        for (int x = 0; x < number; x ++) {
+            [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField){
+                if (configurationHandler) {
+                    textField.tag = x;
+                    configurationHandler(textField);
+                }
+            }];
         }
-    }];
-    UIAlertAction *secondAction = [UIAlertAction actionWithTitle:secondTitle style:secondStyle handler:^(UIAlertAction * _Nonnull action) {
-        if (secondHandler) {
-            secondHandler(action);
-        }
-    }];
-    UIAlertAction *archiveAction = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil];
-    [controller addAction:firstAction];
-    [controller addAction:secondAction];
-    [controller addAction:archiveAction];
+    }
     
-    [self presentAlertViewController:controller completion:completion];
-}
-
-+ (void)actionSheet3WithTitle:(NSString *)title firstTitle:(NSString *)firstTitle style:(UIAlertActionStyle)firstStyle firstHandler:(void (^)(UIAlertAction *action))firstHandler secondTitle:(NSString *)secondTitle style:(UIAlertActionStyle)secondStyle handler:(void (^)(UIAlertAction *action))secondHandler thirdTitle:(NSString *)third style:(UIAlertActionStyle)thirdStyle handler:(void (^)(UIAlertAction *action))thrHandler  cancelHandler:(void (^)(UIAlertAction *action))cancelHandler completion:(void (^)(void))completion
-{
-    UIAlertController *controller = [UIAlertController alertControllerWithTitle:nil message:title preferredStyle:UIAlertControllerStyleActionSheet];
-    UIAlertAction *firstAction = [UIAlertAction actionWithTitle:firstTitle style:firstStyle handler:^(UIAlertAction * _Nonnull action) {
-        if (firstHandler) {
-            firstHandler(action);
-        }
-    }];
-    UIAlertAction *secondAction = [UIAlertAction actionWithTitle:secondTitle style:secondStyle handler:^(UIAlertAction * _Nonnull action) {
-        if (secondHandler) {
-            secondHandler(action);
-        }
-    }];
-    
-    UIAlertAction *thirdAction = [UIAlertAction actionWithTitle:third style:thirdStyle handler:^(UIAlertAction * _Nonnull action) {
-        if (thrHandler) {
-            thrHandler(action);
-        }
-    }];
-    UIAlertAction *archiveAction = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil];
-    [controller addAction:firstAction];
-    [controller addAction:secondAction];
-    [controller addAction:thirdAction];
-    [controller addAction:archiveAction];
-    
-    [self presentAlertViewController:controller completion:completion];
-}
-
-+ (void)alertViewWithTitle:(NSString *)title message:(NSString *)message cancelTitle:(NSString *)cancelTitle handler:(void (^ __nullable)(UIAlertAction *action))cancelHandler okTitle:(NSString *)okTitle handler:(void (^ __nullable)(UIAlertAction *action))handler destructTitle:destructTitle handler:(void (^ __nullable)(UIAlertAction *action))destructHandler completion:(void (^ __nullable)(void))completion
-{
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:cancelTitle style:UIAlertActionStyleCancel handler:cancelHandler];
-    UIAlertAction *okAction = [UIAlertAction actionWithTitle:okTitle style:UIAlertActionStyleDestructive handler:handler];
-    UIAlertAction *destructAction = [UIAlertAction actionWithTitle:destructTitle style:UIAlertActionStyleDestructive handler:destructHandler];
-    [alertController addAction:cancelAction];
-    [alertController addAction:okAction];
-    [alertController addAction:destructAction];
-    [self presentAlertViewController:alertController completion:completion];
-}
-
-+ (void)alertViewInputWithTitle:(NSString *)title message:(NSString *)message cancelTitle:(NSString *)cancelTitle handler:(void (^ __nullable)(UIAlertAction *action))cancelHandler okTitle:(NSString *)okTitle handler:(void (^ __nullable)(UIAlertController *bAlert,UIAlertAction *action))handler textFieldConifg:(void (^ __nullable)(UITextField *textField))configurationHandler completion:(void (^ __nullable)(void))completion
-{
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];
-    [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField){
-        if (configurationHandler) {
-            configurationHandler(textField);
-        }
-    }];
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:cancelTitle style:UIAlertActionStyleCancel handler:cancelHandler];
     UIAlertAction *okAction = [UIAlertAction actionWithTitle:okTitle style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         if (handler) {
@@ -165,95 +77,7 @@ static CGRect oldframe;
     [self presentAlertViewController:alertController completion:completion];
 }
 
-+ (void)alertViewInputsWithTitle:(NSString *)title message:(NSString *)message cancelTitle:(NSString *)cancelTitle handler:(void (^ __nullable)(UIAlertAction *action))cancelHandler okTitle:(NSString *)okTitle handler:(void (^ __nullable)(UIAlertController *bAlert,UIAlertAction *action))handler textFieldConifg:(void (^ __nullable)(UITextField *textField))configurationHandler textFieldConifg:(void (^ __nullable)(UITextField *textField))configuration completion:(void (^ __nullable)(void))completion
-{
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];
-    [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField){
-        if (configurationHandler) {
-            configurationHandler(textField);
-        }
-    }];
-    [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField){
-        if (configuration) {
-            configuration(textField);
-        }
-    }];
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:cancelTitle style:UIAlertActionStyleCancel handler:cancelHandler];
-    UIAlertAction *okAction = [UIAlertAction actionWithTitle:okTitle style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        if (handler) {
-            handler(alertController,action);
-        }
-    }];
-    [alertController addAction:cancelAction];
-    [alertController addAction:okAction];
-    [self presentAlertViewController:alertController completion:completion];
-}
-
-+ (void)alertView3InputsWithTitle:(NSString *)title message:(NSString *)message cancelTitle:(NSString *)cancelTitle handler:(void (^ __nullable)(UIAlertAction *action))cancelHandler okTitle:(NSString *)okTitle handler:(void (^ __nullable)(UIAlertController *bAlert,UIAlertAction *action))handler textFieldConifg:(void (^ __nullable)(UITextField *textField))firstConfig textFieldConifg:(void (^ __nullable)(UITextField *textField))secondConfig textFieldConifg:(void (^ __nullable)(UITextField *textField))thirdConfig completion:(void (^ __nullable)(void))completion
-{
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];
-    [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField){
-        if (firstConfig) {
-            firstConfig(textField);
-        }
-    }];
-    [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField){
-        if (secondConfig) {
-            secondConfig(textField);
-        }
-    }];
-    [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField){
-        if (thirdConfig) {
-            thirdConfig(textField);
-        }
-    }];
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:cancelTitle style:UIAlertActionStyleCancel handler:cancelHandler];
-    UIAlertAction *okAction = [UIAlertAction actionWithTitle:okTitle style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        if (handler) {
-            handler(alertController,action);
-        }
-    }];
-    [alertController addAction:cancelAction];
-    [alertController addAction:okAction];
-    [self presentAlertViewController:alertController completion:completion];
-}
-
-+ (void)alertViewFourInputsWithTitle:(NSString *)title message:(NSString *)message cancelTitle:(NSString *)cancelTitle handler:(void (^ __nullable)(UIAlertAction *action))cancelHandler okTitle:(NSString *)okTitle handler:(void (^ __nullable)(UIAlertController *bAlert,UIAlertAction *action))handler textFieldConifg:(void (^ __nullable)(UITextField *textField))firstConfig textFieldConifg:(void (^ __nullable)(UITextField *textField))secondConfig textFieldConifg:(void (^ __nullable)(UITextField *textField))thirdConfig textFieldConifg:(void (^ __nullable)(UITextField *textField))forthConfig completion:(void (^ __nullable)(void))completion
-{
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];
-    [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField){
-        if (firstConfig) {
-            firstConfig(textField);
-        }
-    }];
-    [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField){
-        if (secondConfig) {
-            secondConfig(textField);
-        }
-    }];
-    [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField){
-        if (thirdConfig) {
-            thirdConfig(textField);
-        }
-    }];
-    [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField){
-        if (forthConfig) {
-            forthConfig(textField);
-        }
-    }];
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:cancelTitle style:UIAlertActionStyleCancel handler:cancelHandler];
-    UIAlertAction *okAction = [UIAlertAction actionWithTitle:okTitle style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        if (handler) {
-            handler(alertController,action);
-        }
-    }];
-    [alertController addAction:cancelAction];
-    [alertController addAction:okAction];
-    [self presentAlertViewController:alertController completion:completion];
-}
-
-+ (void)pushToViewControllerWithClass:(NSString *)className navigationController:(UINavigationController *)navigationController param:(NSDictionary *)param configBlock:(void (^)(id vc))configBlockParam
-{
++ (void)pushToViewControllerWithClass:(NSString *)className navigationController:(UINavigationController *)navigationController param:(NSDictionary *)param configBlock:(void (^)(id vc))configBlockParam{
     Class Controller = NSClassFromString(className);
     if (Controller) {
         UIViewController *viewController = [[Controller alloc] init];
@@ -272,8 +96,7 @@ static CGRect oldframe;
     }
 }
 
-+ (void)presentToViewControllerWithClass:(NSString *)className controller:(UIViewController *)viewController param:(NSDictionary *)param configBlock:(void (^)(UIViewController *vc))configBlockParam presentCompletion:(void(^)(void))completion
-{
++ (void)presentToViewControllerWithClass:(NSString *)className controller:(UIViewController *)viewController param:(NSDictionary *)param configBlock:(void (^)(UIViewController *vc))configBlockParam presentCompletion:(void(^)(void))completion{
     Class Controller = NSClassFromString(className);
     if (Controller) {
         UIViewController *presentViewController = [[Controller alloc] init];
@@ -410,9 +233,8 @@ static CGRect oldframe;
     });
 }
 
-+ (void)showAlertWithMessage:(NSString *)message
-{
-    [self alertView1WithTitle:@"提示" message:message btnTitle:@"确定" handler:nil completion:nil];
++ (void)showAlertWithMessage:(NSString *)message{
+    [self alert:UIAlertControllerStyleAlert title:@"提示" message:message actionTitles:@[@"确定"] styles:@[@(UIAlertActionStyleDefault)] handler:nil cancelTitle:@"取消" cancel:nil completion:nil];
 }
 
 + (void)showMessageInMainThread:(NSString *)message

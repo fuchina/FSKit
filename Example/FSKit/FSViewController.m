@@ -27,14 +27,16 @@
     [self.view addSubview:btn];
 }
 
-- (void)click
-{
-    [FSKit alertView1WithTitle:@"Title" message:@"Message" btnTitle:@"OK" handler:^(UIAlertAction *action) {
-        NSString *string = @"";
-        if (FSValidateString(string)) {
-            NSLog(@"OK");
-        }
-    } completion:nil];
+- (void)click{
+    [FSKit alertInput:2 title:@"Title" message:@"Message" ok:@"OK" handler:^(UIAlertController *bAlert, UIAlertAction *action) {
+        NSLog(@"OK");
+    } cancel:@"Cancel" handler:^(UIAlertAction *action) {
+        NSLog(@"Cancel");
+    } textFieldConifg:^(UITextField *textField) {
+        textField.placeholder = [[NSString alloc] initWithFormat:@"%@",@(textField.tag)];
+    } completion:^{
+        NSLog(@"Completion");
+    }];
 }
 
 - (void)didReceiveMemoryWarning
