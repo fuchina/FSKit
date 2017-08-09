@@ -29,7 +29,7 @@ static CGRect oldframe;
 //#import "FuSoft-Swift.h"        // Swift工程
 
 + (void)presentAlertViewController:(UIAlertController *)alertController completion:(void (^)(void))completion{
-    UIWindow *keyWindow = [UIApplication sharedApplication].windows.lastObject;
+    UIWindow *keyWindow = [UIApplication sharedApplication].keyWindow;
     [keyWindow.rootViewController presentViewController:alertController animated:YES completion:completion];
 }
 
