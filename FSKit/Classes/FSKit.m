@@ -29,8 +29,14 @@ static CGRect oldframe;
 //#import "FuSoft-Swift.h"        // Swift工程
 
 + (void)presentAlertViewController:(UIAlertController *)alertController completion:(void (^)(void))completion{
-    UIWindow *keyWindow = [UIApplication sharedApplication].keyWindow;
-    [keyWindow.rootViewController presentViewController:alertController animated:YES completion:completion];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIWindow *keyWindow = [UIApplication sharedApplication].keyWindow;
+        UIViewController *controller = keyWindow.rootViewController;
+        while (controller.presentedViewController) {
+            controller = controller.presentedViewController;
+        }
+        [controller presentViewController:alertController animated:YES completion:completion];
+    });
 }
 
 + (void)alert:(UIAlertControllerStyle)style title:(NSString *)title message:(NSString *)message actionTitles:(NSArray<NSString *> *)titles styles:(NSArray<NSNumber *> *)styles handler:(void (^)(UIAlertAction *action))handler cancelTitle:(NSString *)cancelTitle cancel:(void (^)(UIAlertAction *action))cancel completion:(void (^)(void))completion{

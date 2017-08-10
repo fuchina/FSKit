@@ -1,15 +1,15 @@
 PODS:
-  - FSKit (0.1.5)
+  - FSKit (1.0.2)
 
 DEPENDENCIES:
   - FSKit (from `../`)
 
 EXTERNAL SOURCES:
   FSKit:
-    :path: "../"
+    :path: ../
 
 SPEC CHECKSUMS:
-  FSKit: c971a62bd4e928dab783f900bf207a4dc1768c70
+  FSKit: 3bc0dd3d3812bf1df4d815c06825a23db54982b3
 
 PODFILE CHECKSUM: c0a76966c72444a002681a23ff2d062d0f91f1d1
 
