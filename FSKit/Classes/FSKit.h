@@ -7,7 +7,6 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "FuSoft.h"
 #import <CoreLocation/CoreLocation.h>
 
 @interface FSKit : NSObject

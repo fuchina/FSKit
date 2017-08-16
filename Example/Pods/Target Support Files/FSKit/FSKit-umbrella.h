@@ -10,7 +10,12 @@
 #endif
 #endif
 
+#import "FSDBMaster.h"
+#import "FSEntity.h"
+#import "FSFile.h"
 #import "FSKit.h"
+#import "FSPdf.h"
+#import "FSTuple.h"
 #import "FuSoft.h"
 
 FOUNDATION_EXPORT double FSKitVersionNumber;

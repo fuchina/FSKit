@@ -23,8 +23,8 @@
     "UIKit",
     "MapKit",
     "CoreLocation",
-    "AdSupport",
     "CoreTelephony",
     "AVFoundation"
-  ]
+  ],
+  "libraries": "sqlite3"
 }

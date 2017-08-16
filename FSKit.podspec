@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'FSKit'
-  s.version          = '1.0.2'
+  s.version          = '1.0.3'
   s.summary          = 'FSKit is a gift for iOS developer'
 
 # This description is used to generate tags and improve search results.
@@ -18,7 +18,7 @@ Pod::Spec.new do |s|
 #   * Finally, don't worry about the indent, CocoaPods strips it!
 
   s.description      = <<-DESC
-    I'd like to do something for iOS.
+    勿以恶小而为之，勿以善小而不为
     DESC
 
   s.homepage         = 'https://github.com/fuchina/FSKit'
@@ -37,6 +37,7 @@ Pod::Spec.new do |s|
   # }
 
   # s.public_header_files = 'Pod/Classes/**/*.h'
-  s.frameworks = 'UIKit', 'MapKit','CoreLocation','AdSupport','CoreTelephony','AVFoundation'
+  s.frameworks = 'UIKit', 'MapKit','CoreLocation','CoreTelephony','AVFoundation'
+  s.libraries  = 'sqlite3'
   # s.dependency 'AFNetworking', '~> 2.3'
 end

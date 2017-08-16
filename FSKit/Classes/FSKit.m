@@ -16,7 +16,6 @@
 #include <net/if.h>
 #include <net/if_dl.h>
 #import <CommonCrypto/CommonDigest.h>
-#import <AdSupport/ASIdentifierManager.h>
 #import <CoreTelephony/CTCarrier.h>
 #import <CoreTelephony/CTTelephonyNetworkInfo.h>
 #import <AVFoundation/AVFoundation.h>
@@ -229,18 +228,19 @@ static CGRect oldframe;
 }
 
 + (void)showMessageInMainThread:(NSString *)message{
-    UIView *backView = [[UIView alloc] initWithFrame:CGRectMake(0, 64, WIDTHFC, HEIGHTFC - 64)];
+    CGSize size = [UIScreen mainScreen].bounds.size;
+    UIView *backView = [[UIView alloc] initWithFrame:CGRectMake(0, 64, size.width, size.height - 64)];
     
-    CGFloat width = WIDTHFC - 60;
+    CGFloat width = size.width - 60;
     CGFloat height = MAX([self textHeight:message fontInt:15 labelWidth:width], 36);
     
-    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(WIDTHFC / 2 - width / 2, HEIGHTFC / 2 - height / 2, width, height)];
+    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(size.width / 2 - width / 2, size.height / 2 - height / 2, width, height)];
     label.text = message;
-    label.backgroundColor = RGBCOLOR(0, 0, 0, .8);
+    label.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:.8f];
     label.textColor = [UIColor whiteColor];
     label.textAlignment = NSTextAlignmentCenter;
     label.numberOfLines = 0;
-    label.font = FONTFC(15);
+    label.font = [UIFont systemFontOfSize:15];
     label.layer.masksToBounds = YES;
     label.layer.cornerRadius = 3;
     [backView addSubview:label];
@@ -436,10 +436,11 @@ static CGRect oldframe;
     NSValue *value = [info objectForKey:UIKeyboardFrameEndUserInfoKey];
     CGSize keyboardSize = [value CGRectValue].size;
     
+    CGSize size = [UIScreen mainScreen].bounds.size;
     if ([notification.name isEqualToString:UIKeyboardWillShowNotification]) {
-        return CGSizeMake(WIDTHFC, MAX(keyboardSize.height + baseOn, HEIGHTFC));
+        return CGSizeMake(size.width, MAX(keyboardSize.height + baseOn, size.height));
     }else if ([notification.name isEqualToString:UIKeyboardWillHideNotification]){
-        return  CGSizeMake(WIDTHFC, MAX(baseOn, HEIGHTFC));
+        return  CGSizeMake(size.width, MAX(baseOn, size.height));
     }
     return CGSizeZero;
 }
@@ -1306,12 +1307,12 @@ static CGRect oldframe;
     return [self compressImage:image targetWidth:width];
 }
 
-+ (UIImage *)compressImage:(UIImage *)image width:(NSInteger)minWidth minHeight:(NSInteger)minHeight
-{
++ (UIImage *)compressImage:(UIImage *)image width:(NSInteger)minWidth minHeight:(NSInteger)minHeight{
     if (![image isKindOfClass:[UIImage class]]) {
         return nil;
     }
-    if (image.size.width < WIDTHFC) {
+    CGSize size = [UIScreen mainScreen].bounds.size;
+    if (image.size.width < size.width) {
         return image;
     }
     NSInteger compressRate = 0;
@@ -1325,12 +1326,11 @@ static CGRect oldframe;
 }
 
 
-+ (UIImage *)compressImage:(UIImage *)image
-{
++ (UIImage *)compressImage:(UIImage *)image{
     if (![image isKindOfClass:[UIImage class]]) {
         return nil;
     }
-    if (image.size.width < WIDTHFC) {
+    if (image.size.width < [UIScreen mainScreen].bounds.size.width){
         return image;
     }
     NSInteger compressRate = 0;
@@ -1343,12 +1343,11 @@ static CGRect oldframe;
     return [self compressImage:image targetWidth:width];
 }
 
-+ (UIImage *)compressImage:(UIImage *)image width:(NSInteger)width
-{
++ (UIImage *)compressImage:(UIImage *)image width:(NSInteger)width{
     if (![image isKindOfClass:[UIImage class]]) {
         return nil;
     }
-    if (image.size.width < WIDTHFC) {
+    if (image.size.width < [UIScreen mainScreen].bounds.size.width) {
         return image;
     }
     NSInteger compressRate = 0;
@@ -1362,8 +1361,7 @@ static CGRect oldframe;
     return [self compressImage:image targetWidth:targetWidth];
 }
 
-+ (UIImage*)imageForUIView:(UIView*)view
-{
++ (UIImage*)imageForUIView:(UIView*)view{
     //    UIGraphicsBeginImageContext(view.bounds.size);// 只会生成屏幕所见的部分
     CGSize size = view.bounds.size;
     if ([view isKindOfClass:[UIScrollView class]]) {
@@ -1381,8 +1379,7 @@ static CGRect oldframe;
 }
 
 
-+ (NSInteger)computeSampleSize:(UIImage *)image minSideLength:(NSInteger)minSideLength maxNumOfPixels:(NSInteger)maxNumOfPixels
-{
++ (NSInteger)computeSampleSize:(UIImage *)image minSideLength:(NSInteger)minSideLength maxNumOfPixels:(NSInteger)maxNumOfPixels{
     NSInteger initialSize = [self computeInitialSampleSize:image minSideLength:minSideLength maxNumOfPixels:maxNumOfPixels];
     NSInteger roundedSize = 0;
     if (initialSize <= 8) {
@@ -1396,8 +1393,7 @@ static CGRect oldframe;
     return roundedSize;
 }
 
-+ (NSInteger)computeInitialSampleSize:(UIImage *)image minSideLength:(NSInteger)minSideLength maxNumOfPixels:(NSInteger)maxNumOfPixels
-{
++ (NSInteger)computeInitialSampleSize:(UIImage *)image minSideLength:(NSInteger)minSideLength maxNumOfPixels:(NSInteger)maxNumOfPixels{
     double w = image.size.width;
     double h = image.size.height;
     
@@ -1415,18 +1411,15 @@ static CGRect oldframe;
     }
 }
 
-+ (BOOL)isNeedCompress:(NSData *)imageData
-{
++ (BOOL)isNeedCompress:(NSData *)imageData{
     return imageData.length > 500 * 1024;
 }
 
-+ (BOOL)isPortait:(UIImage *)image
-{
++ (BOOL)isPortait:(UIImage *)image{
     return image.size.height >= image.size.width;
 }
 
-+ (NSString *)KMGUnit:(NSInteger)size
-{
++ (NSString *)KMGUnit:(NSInteger)size{
     if (size >= (1024 * 1024 * 1024)) {
         return [[NSString alloc] initWithFormat:@"%.2f G",size / (1024 * 1024 * 1024.0f)];
     }else if (size >= (1024 * 1024)){
@@ -1454,8 +1447,7 @@ static CGRect oldframe;
     return [[weekdays objectAtIndex:theComponents.weekday] integerValue];
 }
 
-+ (NSDateComponents *)yearMonthDayFromDate:(NSDate *)date
-{
++ (NSDateComponents *)yearMonthDayFromDate:(NSDate *)date{
     if (date == nil) {
         return nil;
     }
@@ -1475,8 +1467,7 @@ static CGRect oldframe;
     //    return @[@(theComponents.year),@(theComponents.month),@(theComponents.day),@(theComponents.hour),@(theComponents.minute),@(theComponents.second),@(theComponents.weekday)];
 }
 
-+ (NSString *)iPAddress
-{
++ (NSString *)iPAddress{
     NSString *address = @"error";
     struct ifaddrs *interfaces = NULL;
     struct ifaddrs *temp_addr = NULL;
@@ -1497,8 +1488,7 @@ static CGRect oldframe;
     return address;
 }
 
-+ (NSDateComponents *)chineseDate:(NSDate *)date
-{
++ (NSDateComponents *)chineseDate:(NSDate *)date{
     if (![date isKindOfClass:[NSDate class]]) {
         return nil;
     }
@@ -1507,8 +1497,7 @@ static CGRect oldframe;
     return components;
 }
 
-+ (NSArray<NSString *> *)chineseCalendarForDate:(NSDate *)date
-{
++ (NSArray<NSString *> *)chineseCalendarForDate:(NSDate *)date{
     if (![date isKindOfClass:[NSDate class]]) {
         return nil;
     }
@@ -1516,8 +1505,7 @@ static CGRect oldframe;
     return @[[self chineseCalendarYear:components.year - 1],[self chineseCalendarMonth:components.month - 1],[self chineseCalendarDay:components.day - 1]];
 }
 
-+ (NSString *)chineseCalendarYear:(NSInteger)index
-{
++ (NSString *)chineseCalendarYear:(NSInteger)index{
     NSArray *chineseYears = @[@"甲子",  @"乙丑",  @"丙寅",  @"丁卯",  @"戊辰",  @"己巳",  @"庚午",  @"辛未",  @"壬申",  @"癸酉",
                               @"甲戌",   @"乙亥",  @"丙子",  @"丁丑",  @"戊寅",  @"己卯",  @"庚辰",  @"辛己",  @"壬午",  @"癸未",
                               @"甲申",   @"乙酉",  @"丙戌",  @"丁亥",  @"戊子",  @"己丑",  @"庚寅",  @"辛卯",  @"壬辰",  @"癸巳",
@@ -1527,14 +1515,12 @@ static CGRect oldframe;
     return chineseYears[index % chineseYears.count];
 }
 
-+ (NSString *)chineseCalendarMonth:(NSInteger)index
-{
++ (NSString *)chineseCalendarMonth:(NSInteger)index{
     NSArray *chineseYears = @[@"正月", @"二月", @"三月", @"四月", @"五月", @"六月", @"七月", @"八月",@"九月", @"十月", @"冬月", @"腊月"];
     return chineseYears[index % chineseYears.count];
 }
 
-+ (NSString *)chineseCalendarDay:(NSInteger)index
-{
++ (NSString *)chineseCalendarDay:(NSInteger)index{
     NSArray *chineseYears = @[  @"初一", @"初二", @"初三", @"初四", @"初五", @"初六", @"初七", @"初八", @"初九", @"初十",
                                 @"十一", @"十二", @"十三", @"十四", @"十五", @"十六", @"十七", @"十八", @"十九", @"二十",
                                 @"廿一", @"廿二", @"廿三", @"廿四", @"廿五", @"廿六", @"廿七", @"廿八", @"廿九", @"三十"];
