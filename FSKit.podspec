@@ -18,7 +18,7 @@ Pod::Spec.new do |s|
 #   * Finally, don't worry about the indent, CocoaPods strips it!
 
   s.description      = <<-DESC
-    勿以恶小而为之，勿以善小而不为
+    勿以恶小而为之，勿以善小而不为。虽然这是一句很朴素的话，却值得我去实践。
     DESC
 
   s.homepage         = 'https://github.com/fuchina/FSKit'
