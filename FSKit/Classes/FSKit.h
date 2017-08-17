@@ -148,7 +148,6 @@
 + (NSString *)tenThousandNumberString:(NSString *)value;
 + (NSString *)urlEncodedString:(NSString *)urlString;
 + (NSString *)urlDecodedString:(NSString *)urlString;
-+ (NSString *)replaceString:(NSMutableString *)string byString:(NSString *)replaceString;
 + (NSString *)placeholderStringFor:(NSString *)sourceString;
 + (NSString *)addStringWithSpace:(NSString *)aString bString:(NSString *)bString;
 + (NSString *)base64StringForText:(NSString *)text;     // 将字符串转换为base64编码
