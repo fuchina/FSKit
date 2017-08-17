@@ -15,7 +15,7 @@
 + (id)userDefaultsDataWithKey:(NSString *)key;
 + (id)objectFromJSonstring:(NSString *)jsonString;
 
-+ (void)popToController:(NSString *)className navigationController:(UINavigationController *)navigationController animated:(BOOL)animated;
++ (BOOL)popToController:(NSString *)className navigationController:(UINavigationController *)navigationController animated:(BOOL)animated;
 
 // 根据action.title映射titles中的字段来判断点击事件   UIAlertActionStyleDefault
 + (void)alert:(UIAlertControllerStyle)style title:(NSString *)title message:(NSString *)message actionTitles:(NSArray<NSString *> *)titles styles:(NSArray<NSNumber *> *)styles handler:(void (^)(UIAlertAction *action))handler cancelTitle:(NSString *)cancelTitle cancel:(void (^)(UIAlertAction *action))cancel completion:(void (^)(void))completion;

@@ -1708,15 +1708,16 @@ static CGRect oldframe;
     return dataClass;
 }
 
-+ (void)popToController:(NSString *)className navigationController:(UINavigationController *)navigationController animated:(BOOL)animated
-{
++ (BOOL)popToController:(NSString *)className navigationController:(UINavigationController *)navigationController animated:(BOOL)animated{
+    BOOL success = NO;
     for (int x = 0; x < navigationController.viewControllers.count; x ++) {
         UIViewController *controller = navigationController.viewControllers[x];
         if ([controller isKindOfClass:NSClassFromString(className)]) {
             [navigationController popToViewController:controller animated:animated];
-            return;
+            return YES;
         }
     }
+    return success;
 }
 
 + (NSData *)dataFromString:(NSString *)string
