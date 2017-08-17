@@ -19,8 +19,7 @@
 static NSString *_db_extension = @".sqlite";
 
 static const char *_SQLManagerQueue = "FSDBMasterQueue";
-@implementation FSDBMaster
-{
+@implementation FSDBMaster{
     dispatch_queue_t    _queue;
     NSString            *_dbName;
 }
@@ -41,8 +40,7 @@ static FSDBMaster *_instance = nil;
     return master;
 }
 
-- (instancetype)init
-{
+- (instancetype)init{
     self = [super init];
     if (self) {
         _queue = dispatch_queue_create(_SQLManagerQueue, DISPATCH_QUEUE_SERIAL);
@@ -51,8 +49,7 @@ static FSDBMaster *_instance = nil;
     return self;
 }
 
-- (void)generateHandlerWithDBName:(NSString *)dbName
-{
+- (void)generateHandlerWithDBName:(NSString *)dbName{
     if (!([dbName isKindOfClass:[NSString class]] && dbName.length)) {
         return;
     }
@@ -89,8 +86,7 @@ static FSDBMaster *_instance = nil;
     return path;
 }
 
-- (void)createTable:(NSString *)tableName className:(Class)className
-{
+- (void)createTable:(NSString *)tableName className:(Class)className{
     if (className == nil) {
         return;
     }
@@ -206,8 +202,7 @@ static FSDBMaster *_instance = nil;
     return nil;
 }
 
-- (int)countForTable:(NSString *)tableName
-{
+- (int)countForTable:(NSString *)tableName{
     if (!([tableName isKindOfClass:[NSString class]] && tableName.length)) {
         return 0;
     }
@@ -267,8 +262,7 @@ static FSDBMaster *_instance = nil;
  char **f_name 包含查找到每个记录的字段名称
  */
 
-int checkTableCallBack(void *param, int f_num, char **f_value, char **f_name)
-{
+int checkTableCallBack(void *param, int f_num, char **f_value, char **f_name){
     NSString *p = [[NSString alloc] initWithUTF8String:param];// 传过来的参数
     NSInteger number = 0;
     if (f_num) {
@@ -284,8 +278,7 @@ int checkTableCallBack(void *param, int f_num, char **f_value, char **f_name)
     return 0;
 }
 
-- (id)entityWithStmt:(sqlite3_stmt *)stmt className:(NSString *)className tableName:(NSString *)tableName
-{
+- (id)entityWithStmt:(sqlite3_stmt *)stmt className:(NSString *)className tableName:(NSString *)tableName{
     if (className.length == 0) {
         return nil;
     }
@@ -308,8 +301,7 @@ int checkTableCallBack(void *param, int f_num, char **f_value, char **f_name)
 }
 
 //获取表中所有字段名和类型
--(NSArray<NSDictionary *> *)tableFieldNames:(NSString *)tableName
-{
+-(NSArray<NSDictionary *> *)tableFieldNames:(NSString *)tableName{
     NSMutableArray *array = [[NSMutableArray alloc] init];
     NSString *getColumn = [NSString stringWithFormat:@"PRAGMA table_info(%@)",tableName];
     sqlite3_stmt *statement;
@@ -327,8 +319,7 @@ int checkTableCallBack(void *param, int f_num, char **f_value, char **f_name)
     return array;
 }
 
-- (NSArray<NSString *> *)allTables
-{
+- (NSArray<NSString *> *)allTables{
     NSMutableArray *array = [[NSMutableArray alloc] init];
     sqlite3_stmt *statement;
     const char *getTableInfo = "select * from sqlite_master where type='table' order by name";
@@ -348,8 +339,7 @@ int checkTableCallBack(void *param, int f_num, char **f_value, char **f_name)
     }
 }
 
-- (NSArray<NSString *> *)keywords
-{
+- (NSArray<NSString *> *)keywords{
     static NSArray *list = nil;
     if (!list) {
         list = @[@"select",@"insert",@"update",@"delete",@"from",@"creat",@"where",@"desc",@"order",@"by",@"group",@"table",@"alter",@"view",@"index"];
