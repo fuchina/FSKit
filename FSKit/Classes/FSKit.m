@@ -25,8 +25,6 @@ static CGRect oldframe;
 
 @implementation FSKit
 
-//#import "FuSoft-Swift.h"        // Swift工程
-
 + (void)presentAlertViewController:(UIAlertController *)alertController completion:(void (^)(void))completion{
     dispatch_async(dispatch_get_main_queue(), ^{
         UIWindow *keyWindow = [UIApplication sharedApplication].keyWindow;
@@ -155,27 +153,27 @@ static CGRect oldframe;
 }
 
 + (void)showFullScreenImage:(UIImageView *)avatarImageView{
-    UIImage *image = avatarImageView.image;
-    UIWindow *window = [UIApplication sharedApplication].keyWindow;
-    UIView *backgroundView = [[UIView alloc]initWithFrame:CGRectMake(0,0,[UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height)];
-    
-    oldframe = [avatarImageView convertRect:avatarImageView.bounds toView:window];
-    backgroundView.backgroundColor=[UIColor blackColor];
-    backgroundView.alpha=0;
-    UIImageView *imageView=[[UIImageView alloc]initWithFrame:oldframe];
-    imageView.image=image;
-    imageView.tag=1;
-    [backgroundView addSubview:imageView];
-    [window addSubview:backgroundView];
-    
-    UITapGestureRecognizer *tap=[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(hideImage:)];
-    [backgroundView addGestureRecognizer: tap];
-    [UIView animateWithDuration:0.3 animations:^{
-        imageView.frame=CGRectMake(0,([UIScreen mainScreen].bounds.size.height-image.size.height*[UIScreen mainScreen].bounds.size.width/image.size.width)/2, [UIScreen mainScreen].bounds.size.width, image.size.height*[UIScreen mainScreen].bounds.size.width/image.size.width);
-        backgroundView.alpha=1;
-    }completion:^(BOOL finished) {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIImage *image = avatarImageView.image;
+        UIWindow *window = [UIApplication sharedApplication].keyWindow;
+        UIView *backgroundView = [[UIView alloc]initWithFrame:CGRectMake(0,0,[UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height)];
         
-    }];
+        oldframe = [avatarImageView convertRect:avatarImageView.bounds toView:window];
+        backgroundView.backgroundColor=[UIColor blackColor];
+        backgroundView.alpha=0;
+        UIImageView *imageView=[[UIImageView alloc]initWithFrame:oldframe];
+        imageView.image=image;
+        imageView.tag=1;
+        [backgroundView addSubview:imageView];
+        [window addSubview:backgroundView];
+        
+        UITapGestureRecognizer *tap=[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(hideImage:)];
+        [backgroundView addGestureRecognizer: tap];
+        [UIView animateWithDuration:0.3 animations:^{
+            imageView.frame=CGRectMake(0,([UIScreen mainScreen].bounds.size.height-image.size.height*[UIScreen mainScreen].bounds.size.width/image.size.width)/2, [UIScreen mainScreen].bounds.size.width, image.size.height*[UIScreen mainScreen].bounds.size.width/image.size.width);
+            backgroundView.alpha=1;
+        }completion:nil];
+    });
 }
 
 + (void)hideImage:(UITapGestureRecognizer*)tap{
@@ -225,6 +223,10 @@ static CGRect oldframe;
 
 + (void)showAlertWithMessage:(NSString *)message{
     [self alert:UIAlertControllerStyleAlert title:@"提示" message:message actionTitles:@[@"确定"] styles:@[@(UIAlertActionStyleDefault)] handler:nil cancelTitle:@"取消" cancel:nil completion:nil];
+}
+
++ (void)showAlertWithTitle:(NSString *)title message:(NSString *)message{
+    [self alert:UIAlertControllerStyleAlert title:title message:message actionTitles:@[@"确定"] styles:@[@(UIAlertActionStyleDefault)] handler:nil cancelTitle:@"取消" cancel:nil completion:nil];
 }
 
 + (void)showMessageInMainThread:(NSString *)message{
@@ -286,8 +288,7 @@ static CGRect oldframe;
     return ((vm_page_size *vmStats.free_count) / 1024.0) / 1024.0;
 }
 
-+ (float)folderSizeAtPath:(NSString*)folderPath extension:(NSString *)extension
-{
++ (float)folderSizeAtPath:(NSString*)folderPath extension:(NSString *)extension{
     NSFileManager* manager = [NSFileManager defaultManager];
     if (![manager fileExistsAtPath:folderPath])
         return 0;
@@ -338,8 +339,7 @@ static CGRect oldframe;
     return ceilf(rect.size.height);
 }
 
-+ (double)distanceBetweenCoordinate:(CLLocationCoordinate2D)coordinateA toCoordinateB:(CLLocationCoordinate2D)coordinateB
-{
++ (double)distanceBetweenCoordinate:(CLLocationCoordinate2D)coordinateA toCoordinateB:(CLLocationCoordinate2D)coordinateB{
     static double EARTH_RADIUS = 6378.137;//地球半径
     
     double lat1 = coordinateA.latitude;
@@ -385,8 +385,7 @@ static CGRect oldframe;
 }
 
 //获取文件夹下所有文件的大小
-+ (long long)folderSizeAtPath:(NSString *)folderPath
-{
++ (long long)folderSizeAtPath:(NSString *)folderPath{
     NSFileManager *fileManager = [NSFileManager defaultManager];
     if (![fileManager fileExistsAtPath:folderPath]) return 0;
     NSEnumerator *filesEnumerator = [[fileManager subpathsAtPath:folderPath] objectEnumerator];
@@ -451,8 +450,7 @@ static CGRect oldframe;
  month:期数，也就是月数，如10年，输入120
  返回值：总还款除以贷款的倍数
  */
-+ (CGFloat)DEBJWithYearRate:(CGFloat)rate monthes:(NSInteger)month
-{
++ (CGFloat)DEBJWithYearRate:(CGFloat)rate monthes:(NSInteger)month{
     if (rate < 0.01) {
         return 1;
     }
@@ -474,8 +472,7 @@ static CGRect oldframe;
  month:期数，也就是月数，如10年，输入120
  返回值：总还款除以贷款的倍数
  */
-+ (CGFloat)DEBXWithYearRate:(CGFloat)rate monthes:(NSInteger)month
-{
++ (CGFloat)DEBXWithYearRate:(CGFloat)rate monthes:(NSInteger)month{
     if (rate < 0.01) {
         return 1;
     }
@@ -486,8 +483,7 @@ static CGRect oldframe;
     return monthPay * month / money;
 }
 
-+ (CGFloat)freeStoragePercentage
-{
++ (CGFloat)freeStoragePercentage{
     CGFloat total = [self getTotalDiskSize];
     if (total > 1) {
         return [self getAvailableDiskSize] / total;
@@ -495,8 +491,7 @@ static CGRect oldframe;
     return 0;
 }
 
-+ (NSInteger)getTotalDiskSize   // 获取磁盘总量
-{
++ (NSInteger)getTotalDiskSize{   // 获取磁盘总量
     struct statfs buf;
     unsigned long long freeSpace = -1;
     if (statfs("/var", &buf) >= 0)
@@ -506,8 +501,7 @@ static CGRect oldframe;
     return (NSInteger)freeSpace;
 }
 
-+ (NSInteger)getAvailableDiskSize   // 获取磁盘可用量
-{
++ (NSInteger)getAvailableDiskSize{   // 获取磁盘可用量
     struct statfs buf;
     unsigned long long freeSpace = -1;
     if (statfs("/var", &buf) >= 0)
@@ -517,13 +511,11 @@ static CGRect oldframe;
     return (NSInteger)freeSpace;
 }
 
-+ (double)rad:(double)d
-{
++ (double)rad:(double)d{
     return d * 3.141592653 / 180.0;
 }
 
-+ (NSArray *)maxandMinNumberInArray:(NSArray *)array
-{
++ (NSArray *)maxandMinNumberInArray:(NSArray *)array{
     if (array.count == 0) {
         return nil;
     }
@@ -544,8 +536,7 @@ static CGRect oldframe;
     return @[@(max),@(min)];
 }
 
-+ (NSArray *)maopaoArray:(NSArray *)array
-{
++ (NSArray *)maopaoArray:(NSArray *)array{
     if (array.count == 0) {
         return nil;
     }
@@ -646,8 +637,7 @@ static CGRect oldframe;
  CTRadioAccessTechnologyeHRPD
  CTRadioAccessTechnologyLTE
  */
-+ (NSString *)networkTypeForType:(NSString *)type
-{
++ (NSString *)networkTypeForType:(NSString *)type{
     if ([type isEqualToString:CTRadioAccessTechnologyGPRS]) {
         return @"GPRS(2.5G)";
     }else if ([type isEqualToString:CTRadioAccessTechnologyEdge]){
@@ -709,13 +699,14 @@ static CGRect oldframe;
     return [infoDict objectForKey:@"CFBundleShortVersionString"];
 }
 
-+ (NSString *)appName{
++ (NSString *)appBundleName{
     NSString *name = [[[NSBundle mainBundle] infoDictionary] objectForKey:(NSString*)kCFBundleNameKey];
-    if (name.length == 0) {
-        NSDictionary* infoDict =[[NSBundle mainBundle] infoDictionary];
-        name = [infoDict objectForKey:@"CFBundleDisplayName"];
-    }
     return name;
+}
+
++ (NSString *)appName{
+    NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];
+    return [infoDictionary objectForKey:@"CFBundleDisplayName"];
 }
 
 + (NSArray<NSString *> *)propertiesForClass:(Class)className{
@@ -884,8 +875,7 @@ static CGRect oldframe;
 + (UIView *)createDashedLineWithFrame:(CGRect)lineFrame
                            lineLength:(int)length
                           lineSpacing:(int)spacing
-                            lineColor:(UIColor *)color
-{
+                            lineColor:(UIColor *)color{
     UIView *dashedLine = [[UIView alloc] initWithFrame:lineFrame];
     dashedLine.backgroundColor = [UIColor clearColor];
     CAShapeLayer *shapeLayer = [CAShapeLayer layer];
@@ -1017,8 +1007,7 @@ static CGRect oldframe;
     }
 }
 
-+ (NSURL *)fileURLForBuggyWKWebView8:(NSURL *)fileURL
-{
++ (NSURL *)fileURLForBuggyWKWebView8:(NSURL *)fileURL{
     NSError *error = nil;
     if (!fileURL.fileURL || ![fileURL checkResourceIsReachableAndReturnError:&error]) {
         return nil;
@@ -1036,8 +1025,7 @@ static CGRect oldframe;
     return dstURL;
 }
 
-+ (id)storyboardInstantiateViewControllerWithStoryboardID:(NSString *)storybbordID
-{
++ (id)storyboardInstantiateViewControllerWithStoryboardID:(NSString *)storybbordID{
     if (storybbordID == nil) {
         return nil;
     }
@@ -1045,8 +1033,7 @@ static CGRect oldframe;
     return [sb instantiateViewControllerWithIdentifier:storybbordID];
 }
 
-+ (UIImage *)imageCompressForWidth:(UIImage *)sourceImage targetWidth:(CGFloat)defineWidth
-{
++ (UIImage *)imageCompressForWidth:(UIImage *)sourceImage targetWidth:(CGFloat)defineWidth{
     if (sourceImage.size.width < defineWidth) {
         return sourceImage;
     }
@@ -1063,8 +1050,7 @@ static CGRect oldframe;
     return newImage;
 }
 
-+ (UIImage *)compressImage:(UIImage *)sourceImage targetWidth:(CGFloat)targetWidth
-{
++ (UIImage *)compressImage:(UIImage *)sourceImage targetWidth:(CGFloat)targetWidth{
     CGFloat sourceWidth = sourceImage.size.width;
     CGFloat sourceHeight = sourceImage.size.height;
     CGFloat targetHeight = (targetWidth / sourceWidth) * sourceHeight;
@@ -1086,8 +1072,7 @@ static CGRect oldframe;
 // 色调 --> CIPhotoEffectTonal                           冲印 --> CIPhotoEffectProcess
 // 岁月 --> CIPhotoEffectTransfer                        铬黄 --> CIPhotoEffectChrome
 // CILinearToSRGBToneCurve, CISRGBToneCurveToLinear, CIGaussianBlur, CIBoxBlur, CIDiscBlur, CISepiaTone, CIDepthOfField
-+ (UIImage *)filterWithOriginalImage:(UIImage *)image filterName:(NSString *)name
-{
++ (UIImage *)filterWithOriginalImage:(UIImage *)image filterName:(NSString *)name{
     CIContext *context = [CIContext contextWithOptions:nil];
     CIImage *inputImage = [[CIImage alloc] initWithImage:image];
     CIFilter *filter = [CIFilter filterWithName:name];
@@ -1105,8 +1090,7 @@ static CGRect oldframe;
 // CIDiscBlur     ---> 环形卷积模糊(Available in iOS 9.0 and later)
 // CIMedianFilter ---> 中值模糊, 用于消除图像噪点, 无需设置radius(Available in iOS 9.0 and later)
 // CIMotionBlur   ---> 运动模糊, 用于模拟相机移动拍摄时的扫尾效果(Available in iOS 9.0 and later)
-+ (UIImage *)blurWithOriginalImage:(UIImage *)image blurName:(NSString *)name radius:(NSInteger)radius
-{
++ (UIImage *)blurWithOriginalImage:(UIImage *)image blurName:(NSString *)name radius:(NSInteger)radius{
     CIContext *context = [CIContext contextWithOptions:nil];
     CIImage *inputImage = [[CIImage alloc] initWithImage:image];
     CIFilter *filter;
@@ -1138,8 +1122,7 @@ static CGRect oldframe;
 + (UIImage *)colorControlsWithOriginalImage:(UIImage *)image
                                  saturation:(CGFloat)saturation
                                  brightness:(CGFloat)brightness
-                                   contrast:(CGFloat)contrast
-{
+                                   contrast:(CGFloat)contrast{
     CIContext *context = [CIContext contextWithOptions:nil];
     CIImage *inputImage = [[CIImage alloc] initWithImage:image];
     CIFilter *filter = [CIFilter filterWithName:@"CIColorControls"];
@@ -1157,8 +1140,7 @@ static CGRect oldframe;
 }
 
 //Avilable in iOS 8.0 and later
-+ (UIVisualEffectView *)effectViewWithFrame:(CGRect)frame
-{
++ (UIVisualEffectView *)effectViewWithFrame:(CGRect)frame{
     UIBlurEffect *effect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleLight];
     UIVisualEffectView *effectView = [[UIVisualEffectView alloc] initWithEffect:effect];
     effectView.frame = frame;
@@ -1166,8 +1148,7 @@ static CGRect oldframe;
 }
 
 //全屏截图
-+ (UIImage *)shotFullScreen
-{
++ (UIImage *)shotFullScreen{
     //    UIWindow *window = [UIApplication sharedApplication].keyWindow;
     //    UIGraphicsBeginImageContext(window.bounds.size);
     //    [window.layer renderInContext:UIGraphicsGetCurrentContext()];
@@ -1177,14 +1158,10 @@ static CGRect oldframe;
     
     UIWindow *screenWindow = [[UIApplication sharedApplication] keyWindow];
     UIGraphicsBeginImageContextWithOptions(screenWindow.frame.size, NO, 0.0); // no ritina
-    
     CGContextRef context = UIGraphicsGetCurrentContext();
-    
     CGContextSaveGState(context);
     for (UIWindow *window in [[UIApplication sharedApplication] windows]) {
-        
-        if(window == screenWindow)
-        {
+        if(window == screenWindow){
             break;
         }else{
             [window.layer renderInContext:context];
@@ -1203,52 +1180,38 @@ static CGRect oldframe;
     UIGraphicsEndImageContext();
     
     float iOSVersion = [UIDevice currentDevice].systemVersion.floatValue;
-    if(iOSVersion < 8.0)
-    {
+    if(iOSVersion < 8.0){
         image = [self rotateUIInterfaceOrientationImage:image];
     }
     return image;
 }
 
 + (UIImage *)rotateUIInterfaceOrientationImage:(UIImage *)image{
-    
     UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
     switch (orientation) {
-        case UIInterfaceOrientationLandscapeRight:
-        {
+        case UIInterfaceOrientationLandscapeRight:{
             image = [UIImage imageWithCGImage:image.CGImage scale:1 orientation:UIImageOrientationLeft];
-        }
-            break;
-        case UIInterfaceOrientationLandscapeLeft:
-        {
+        }break;
+        case UIInterfaceOrientationLandscapeLeft:{
             image = [UIImage imageWithCGImage:image.CGImage scale:1 orientation:UIImageOrientationRight];
-        }
-            break;
-        case UIInterfaceOrientationPortraitUpsideDown:
-        {
+        }break;
+        case UIInterfaceOrientationPortraitUpsideDown:{
             image = [UIImage imageWithCGImage:image.CGImage scale:1 orientation:UIImageOrientationDown];
-        }
-            break;
-        case UIInterfaceOrientationPortrait:
-        {
+        }break;
+        case UIInterfaceOrientationPortrait:{
             image = [UIImage imageWithCGImage:image.CGImage scale:1 orientation:UIImageOrientationUp];
-        }
-            break;
-        case UIInterfaceOrientationUnknown:
-        {
-        }
-            break;
-            
+        }break;
+        case UIInterfaceOrientationUnknown:{
+        }break;
         default:
-            break;
+        break;
     }
     
     return image;
 }
 
 //截取view中某个区域生成一张图片
-+ (UIImage *)shotWithView:(UIView *)view scope:(CGRect)scope
-{
++ (UIImage *)shotWithView:(UIView *)view scope:(CGRect)scope{
     CGImageRef imageRef = CGImageCreateWithImageInRect([self shotWithView:view].CGImage, scope);
     UIGraphicsBeginImageContext(scope.size);
     CGContextRef context = UIGraphicsGetCurrentContext();
@@ -1264,8 +1227,7 @@ static CGRect oldframe;
 }
 
 //截取view生成一张图片
-+ (UIImage *)shotWithView:(UIView *)view
-{
++ (UIImage *)shotWithView:(UIView *)view{
     UIGraphicsBeginImageContext(view.bounds.size);
     [view.layer renderInContext:UIGraphicsGetCurrentContext()];
     UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
@@ -1273,10 +1235,8 @@ static CGRect oldframe;
     return image;
 }
 
-+ (UIImage *)captureScrollView:(UIScrollView *)scrollView
-{
++ (UIImage *)captureScrollView:(UIScrollView *)scrollView{
     CGRect frame = scrollView.frame;
-    
     //设置控件显示的区域大小     key:显示
     scrollView.frame = CGRectMake(0, scrollView.frame.origin.y, scrollView.contentSize.width, scrollView.contentSize.height);
     
@@ -1290,8 +1250,7 @@ static CGRect oldframe;
     return viewImage;
 }
 
-+ (UIImage *)compressImageData:(NSData *)imageData
-{
++ (UIImage *)compressImageData:(NSData *)imageData{
     UIImage *image = [[UIImage alloc] initWithData:imageData];
     if (![self isNeedCompress:imageData]) {
         return image;
@@ -1324,7 +1283,6 @@ static CGRect oldframe;
     NSInteger width = image.size.width / compressRate;
     return [self compressImage:image targetWidth:width];
 }
-
 
 + (UIImage *)compressImage:(UIImage *)image{
     if (![image isKindOfClass:[UIImage class]]) {
@@ -1377,7 +1335,6 @@ static CGRect oldframe;
     UIGraphicsEndImageContext();
     return image;
 }
-
 
 + (NSInteger)computeSampleSize:(UIImage *)image minSideLength:(NSInteger)minSideLength maxNumOfPixels:(NSInteger)maxNumOfPixels{
     NSInteger initialSize = [self computeInitialSampleSize:image minSideLength:minSideLength maxNumOfPixels:maxNumOfPixels];
@@ -1527,8 +1484,7 @@ static CGRect oldframe;
     return chineseYears[index % chineseYears.count];
 }
 
-+ (NSArray *)arrayFromArray:(NSArray *)array withString:(NSString *)string
-{
++ (NSArray *)arrayFromArray:(NSArray *)array withString:(NSString *)string{
     if (array == nil || string == nil) {
         return nil;
     }
@@ -1553,16 +1509,7 @@ static CGRect oldframe;
     return result;
 }
 
-+ (NSArray *)arrayFromJsonstring:(NSString *)string
-{
-    NSData *data = [self dataFromString:string];
-    NSError *error;
-    id result = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:&error];
-    return result;
-}
-
-+ (NSArray *)arrayReverseWithArray:(NSArray *)array
-{
++ (NSArray *)arrayReverseWithArray:(NSArray *)array{
     NSMutableArray *temp = [[NSMutableArray alloc] init];
     for (NSInteger x = array.count - 1; x >= 0; x --) {
         [temp addObject:array[x]];
@@ -1570,8 +1517,7 @@ static CGRect oldframe;
     return temp;
 }
 
-+ (NSString *)randomNumberWithDigit:(int)digit
-{
++ (NSString *)randomNumberWithDigit:(int)digit{
     NSUInteger value = arc4random();
     NSMutableString *string = [[NSMutableString alloc] initWithFormat:@"%lu",(unsigned long)value];
     NSMutableString *strLst;
@@ -1591,8 +1537,7 @@ static CGRect oldframe;
     return strLst;
 }
 
-+ (BOOL)isPureInt:(NSString *)string
-{
++ (BOOL)isPureInt:(NSString *)string{
     if (string.length == 0) {
         return NO;
     }
@@ -1601,8 +1546,7 @@ static CGRect oldframe;
     return [scan scanInt:&val] && [scan isAtEnd];
 }
 
-+ (BOOL)isPureFloat:(NSString*)string
-{
++ (BOOL)isPureFloat:(NSString*)string{
     if ((string.length == 0)) {
         return NO;
     }
@@ -1611,16 +1555,14 @@ static CGRect oldframe;
     return [scan scanFloat:&val] && [scan isAtEnd];
 }
 
-+ (BOOL)isLeapYear:(int)year
-{
++ (BOOL)isLeapYear:(int)year{
     if ((year % 4  == 0 && year % 100 != 0)  || year % 400 == 0)
         return YES;
     else
         return NO;
 }
 
-+ (NSArray *)arrayByOneCharFromString:(NSString *)string
-{
++ (NSArray *)arrayByOneCharFromString:(NSString *)string{
     if (string.length == 0) {
         return nil;
     }
@@ -1631,8 +1573,7 @@ static CGRect oldframe;
     return array;
 }
 
-+ (NSString *)blankInChars:(NSString *)string byCellNo:(int)num
-{
++ (NSString *)blankInChars:(NSString *)string byCellNo:(int)num{
     if (string.length == 0) {
         return nil;
     }
@@ -1645,7 +1586,6 @@ static CGRect oldframe;
     NSMutableArray *temp = [[NSMutableArray alloc] init];
     
     for (int x = 0; x < array.count;  x++) {
-        
         [temp addObject:array[x]];
         if (temp.count == num ) {
             [last addObject:temp];
@@ -1669,10 +1609,8 @@ static CGRect oldframe;
     return lastString;
 }
 
-+ (NSString *)jsonStringWithObject:(id)dic
-{
-    if ([NSJSONSerialization isValidJSONObject:dic])
-    {
++ (NSString *)jsonStringWithObject:(id)dic{
+    if ([NSJSONSerialization isValidJSONObject:dic]){
         NSError *error;
         //        NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dic options:NSJSONWritingPrettyPrinted error:&error];
         NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dic options:kNilOptions error:&error];
@@ -1682,8 +1620,7 @@ static CGRect oldframe;
     return nil;
 }
 
-+ (NSString *)JSONString:(NSString *)aString
-{
++ (NSString *)JSONString:(NSString *)aString{
     NSMutableString *s = [NSMutableString stringWithString:aString];
     [s replaceOccurrencesOfString:@"\"" withString:@"\\\"" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [s length])];
     [s replaceOccurrencesOfString:@"/" withString:@"\\/" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [s length])];
@@ -1695,14 +1632,11 @@ static CGRect oldframe;
     return [NSString stringWithString:s];
 }
 
-+ (id)objectFromJSonstring:(NSString *)jsonString;
-{
++ (id)objectFromJSonstring:(NSString *)jsonString{
     if (jsonString.length == 0) {
         return nil;
     }
-    
     NSError *error;
-    //    NSData *data = [jsonString dataUsingEncoding:NSUTF8StringEncoding];
     NSData *data = [jsonString dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:NO];
     id dataClass = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingAllowFragments error:&error];
     return dataClass;
@@ -1720,25 +1654,11 @@ static CGRect oldframe;
     return success;
 }
 
-+ (NSData *)dataFromString:(NSString *)string
-{
-    return [string dataUsingEncoding:NSUTF8StringEncoding];
++ (NSString *)dataToString:(NSData *)data withEncoding:(NSStringEncoding)encode{
+    return [[NSString alloc] initWithData:data encoding:encode];
 }
 
-+ (NSString *)dataToString:(NSData *)data
-{
-    return [[NSString alloc] initWithData:data
-                                 encoding:NSUTF8StringEncoding];
-}
-
-+ (NSString *)dataToString:(NSData *)data withEncoding:(NSStringEncoding)encode
-{
-    return [[NSString alloc] initWithData:data
-                                 encoding:encode];
-}
-
-+ (NSString *)homeDirectoryPath:(NSString *)fileName
-{
++ (NSString *)homeDirectoryPath:(NSString *)fileName{
     if (fileName.length == 0) {
         return nil;
     }
@@ -1747,8 +1667,7 @@ static CGRect oldframe;
     return filePath;
 }
 
-+ (NSString *)documentsPath:(NSString *)fileName
-{
++ (NSString *)documentsPath:(NSString *)fileName{
     if (fileName.length == 0) {
         return nil;
     }
@@ -1758,8 +1677,7 @@ static CGRect oldframe;
     return filePath;
 }
 
-+ (NSString *)temporaryDirectoryFile:(NSString *)fileName
-{
++ (NSString *)temporaryDirectoryFile:(NSString *)fileName{
     if (fileName.length == 0) {
         return nil;
     }
@@ -1768,8 +1686,7 @@ static CGRect oldframe;
     return filePath;
 }
 
-+ (BOOL)keyedArchiverWithArray:(NSArray *)array toFilePath:(NSString *)fileName
-{
++ (BOOL)keyedArchiverWithArray:(NSArray *)array toFilePath:(NSString *)fileName{
     if (array.count == 0 || fileName.length == 0) {
         return NO;
     }
@@ -1783,8 +1700,7 @@ static CGRect oldframe;
     return NO;
 }
 
-+ (NSArray *)keyedUnarchiverWithArray:(NSString *)fileName
-{
++ (NSArray *)keyedUnarchiverWithArray:(NSString *)fileName{
     if (fileName.length == 0) {
         return nil;
     }
@@ -1794,8 +1710,7 @@ static CGRect oldframe;
     return [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
 }
 
-+ (BOOL)keyedArchiverWithData:(NSData *)data toFilePath:(NSString *)fileName
-{
++ (BOOL)keyedArchiverWithData:(NSData *)data toFilePath:(NSString *)fileName{
     if (data.length == 0 || fileName.length == 0) {
         return NO;
     }
@@ -1809,8 +1724,7 @@ static CGRect oldframe;
     return NO;
 }
 
-+ (NSData *)keyedUnarchiverWithData:(NSString *)fileName
-{
++ (NSData *)keyedUnarchiverWithData:(NSString *)fileName{
     if (fileName.length == 0) {
         return nil;
     }
@@ -1820,8 +1734,7 @@ static CGRect oldframe;
     return [NSKeyedUnarchiver unarchiveObjectWithFile:filePath ];
 }
 
-+ (NSData*)rsaEncryptString:(SecKeyRef)key data:(NSString*) data
-{
++ (NSData*)rsaEncryptString:(SecKeyRef)key data:(NSString*)data{
     if (key == nil) {
         return nil;
     }
@@ -1851,8 +1764,7 @@ static CGRect oldframe;
 }
 
 //压缩图片到指定文件大小
-+ (NSData *)compressOriginalImage:(UIImage *)image toMaxDataSizeKBytes:(CGFloat)size
-{
++ (NSData *)compressOriginalImage:(UIImage *)image toMaxDataSizeKBytes:(CGFloat)size{
     NSData *data = UIImageJPEGRepresentation(image, 1.0);
     CGFloat dataKBytes = data.length/1000.0;
     CGFloat maxQuality = 0.9f;
@@ -1870,8 +1782,7 @@ static CGRect oldframe;
     return data;
 }
 
-+ (BOOL)keyedArchiverWithNumber:(NSNumber *)number toFilePath:(NSString *)fileName
-{
++ (BOOL)keyedArchiverWithNumber:(NSNumber *)number toFilePath:(NSString *)fileName{
     if (number == nil || fileName.length == 0) {
         return NO;
     }
@@ -1885,8 +1796,7 @@ static CGRect oldframe;
     return NO;
 }
 
-+ (NSNumber *)keyedUnarchiverWithNumber:(NSString *)fileName
-{
++ (NSNumber *)keyedUnarchiverWithNumber:(NSString *)fileName{
     if (fileName.length == 0) {
         return nil;
     }
@@ -1896,8 +1806,7 @@ static CGRect oldframe;
     return  [NSKeyedUnarchiver unarchiveObjectWithFile:filePath ];
 }
 
-+ (BOOL)keyedArchiverWithString:(NSString *)string toFilePath:(NSString *)fileName
-{
++ (BOOL)keyedArchiverWithString:(NSString *)string toFilePath:(NSString *)fileName{
     if (string.length == 0 || fileName.length == 0) {
         return NO;
     }
@@ -1911,8 +1820,7 @@ static CGRect oldframe;
     return NO;
 }
 
-+ (NSString *)keyedUnarchiverWithString:(NSString *)fileName
-{
++ (NSString *)keyedUnarchiverWithString:(NSString *)fileName{
     if (fileName.length == 0) {
         return nil;
     }
@@ -1922,8 +1830,7 @@ static CGRect oldframe;
     return [NSKeyedUnarchiver unarchiveObjectWithFile:filePath ];
 }
 
-+ (BOOL)keyedArchiverWithDictionary:(NSDictionary *)dic toFilePath:(NSString *)fileName
-{
++ (BOOL)keyedArchiverWithDictionary:(NSDictionary *)dic toFilePath:(NSString *)fileName{
     if (dic.count == 0 || fileName.length == 0) {
         return NO;
     }
@@ -1937,8 +1844,7 @@ static CGRect oldframe;
     return NO;
 }
 
-+ (NSDictionary *)keyedUnarchiverWithDictionary:(NSString *)fileName
-{
++ (NSDictionary *)keyedUnarchiverWithDictionary:(NSString *)fileName{
     if (fileName.length == 0) {
         return nil;
     }
@@ -1948,8 +1854,7 @@ static CGRect oldframe;
     return  [NSKeyedUnarchiver unarchiveObjectWithFile:filePath ];
 }
 
-+ (BOOL)createFile:(NSString *)fileName withContent:(NSString *)string
-{
++ (BOOL)createFile:(NSString *)fileName withContent:(NSString *)string{
     if (fileName.length == 0 || string.length == 0) {
         return NO;
     }
@@ -1961,8 +1866,7 @@ static CGRect oldframe;
     return [fileManager createFileAtPath:filePath contents:data attributes:nil];
 }
 
-+ (BOOL)moveFile:(NSString *)filePath toPath:(NSString *)newPath
-{
++ (BOOL)moveFile:(NSString *)filePath toPath:(NSString *)newPath{
     if (filePath.length == 0 || newPath.length == 0) {
         return NO;
     }
@@ -1970,8 +1874,7 @@ static CGRect oldframe;
     return [fileManager moveItemAtPath:filePath toPath:newPath error:nil];
 }
 
-+ (BOOL)renameFile:(NSString *)filePath toPath:(NSString *)newPath
-{
++ (BOOL)renameFile:(NSString *)filePath toPath:(NSString *)newPath{
     if (filePath.length == 0 || newPath.length == 0) {
         return NO;
     }
@@ -1979,8 +1882,7 @@ static CGRect oldframe;
     return [fileManager moveItemAtPath:filePath toPath:newPath error:nil];
 }
 
-+ (BOOL)copyFile:(NSString *)filePath toPath:(NSString *)newPath
-{
++ (BOOL)copyFile:(NSString *)filePath toPath:(NSString *)newPath{
     if (filePath.length == 0 || newPath.length == 0) {
         return NO;
     }
@@ -2164,8 +2066,7 @@ static CGRect oldframe;
     return YES;
 }
 
-+ (BOOL)networkSettedProxy
-{
++ (BOOL)networkSettedProxy{
     NSDictionary *proxySettings = (__bridge NSDictionary *)(CFNetworkCopySystemProxySettings());
     NSArray *proxies = (__bridge NSArray *)(CFNetworkCopyProxiesForURL((__bridge CFURLRef _Nonnull)([NSURL URLWithString:@"http://www.baidu.com"]), (__bridge CFDictionaryRef _Nonnull)(proxySettings)));
     //    NSLog(@"\n%@",proxies);
@@ -2205,8 +2106,7 @@ static CGRect oldframe;
     return deltaMoney * taxRate - quickNumber;
 }
 
-+ (NSArray *)taxRatesWithMoneyAfterTax:(CGFloat)money
-{
++ (NSArray *)taxRatesWithMoneyAfterTax:(CGFloat)money{
     NSArray *rateArray = @[
                            @[@0.03,@0,@0,@1500],
                            @[@0.1,@105,@1500,@4500],
@@ -2279,8 +2179,7 @@ static CGRect oldframe;
     return fileSize;
 }
 
-+ (NSString *)localFilePath:(NSString *)fileName
-{
++ (NSString *)localFilePath:(NSString *)fileName{
     if (fileName.length == 0) {
         return nil;
     }
@@ -2288,8 +2187,7 @@ static CGRect oldframe;
     return filePath;
 }
 
-+ (NSString *)md5:(NSString *)str
-{
++ (NSString *)md5:(NSString *)str{
     if (str.length == 0) {
         return nil;
     }
@@ -2305,19 +2203,11 @@ static CGRect oldframe;
             ];
 }
 
-+ (NSString *)stringDeleteNewLineAndWhiteSpace:(NSString *)string
-{
++ (NSString *)stringDeleteNewLineAndWhiteSpace:(NSString *)string{
     return [string stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 }
 
-+ (NSString *)adID
-{
-    //    return [[[ASIdentifierManager sharedManager] advertisingIdentifier] UUIDString];
-    return nil;
-}
-
-+ (NSString *)pathForResource:(NSString *)name type:(NSString *)type
-{
++ (NSString *)pathForResource:(NSString *)name type:(NSString *)type{
     return [[NSBundle mainBundle] pathForResource:name ofType:type];
 }
 
@@ -2387,17 +2277,7 @@ static CGRect oldframe;
 //    return result;
 //}
 
-+ (NSString *)timeStamp
-{
-    NSDate* date = [NSDate date];
-    NSDateFormatter* formatter = [[NSDateFormatter alloc] init];
-    [formatter setDateFormat:@"yyyy-MM-dd HH:MM:SS"];
-    NSString* str = [formatter stringFromDate:date];
-    return str;
-}
-
-+ (NSString *)macaddress
-{
++ (NSString *)macaddress{
     int                 mib[6];
     size_t              len;
     char                *buf;
@@ -2438,12 +2318,10 @@ static CGRect oldframe;
     NSString *outstring = [NSString stringWithFormat:@"%02X:%02X:%02X:%02X:%02X:%02X",
                            *ptr, *(ptr+1), *(ptr+2), *(ptr+3), *(ptr+4), *(ptr+5)];
     free(buf);
-    
     return outstring;
 }
 
-+ (NSString *)identifierForVendorFromKeyChain
-{
++ (NSString *)identifierForVendorFromKeyChain{
     NSString *identifierStr = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
     NSString * const KEY_USERNAME_PASSWORD = @"com.junnet.HyPhonePass";
     NSString * const KEY_PASSWORD = @"com.junnet.HyPhonePass";
@@ -2459,8 +2337,7 @@ static CGRect oldframe;
     }
 }
 
-+ (NSString *)asciiCodeWithString:(NSString *)string
-{
++ (NSString *)asciiCodeWithString:(NSString *)string{
     NSMutableString *str = [[NSMutableString alloc] init];
     for (int x = 0; x < string.length; x ++) {
         NSString *aStr = [string substringWithRange:NSMakeRange(x, 1)];
@@ -2469,8 +2346,7 @@ static CGRect oldframe;
     return str;
 }
 
-+ (NSString *)stringFromASCIIString:(NSString *)string
-{
++ (NSString *)stringFromASCIIString:(NSString *)string{
     unsigned short asciiCode = [string intValue];
     return [[NSString alloc] initWithFormat:@"%C",asciiCode];
 }
@@ -2520,18 +2396,15 @@ static CGRect oldframe;
 }
 
 + (NSString *)DataToHex:(NSData *)data {
-    
     Byte *bytes = (Byte *)[data bytes];
     NSMutableDictionary  *temp = [[NSMutableDictionary alloc] init];
     [temp setObject:@"" forKey:@"value"];
     
-    for(int i=0;i<[data length];i++)
-    {
+    for(int i=0;i<[data length];i++){
         NSString *hexStr = @"";
         NSString *newHexStr = [[NSString alloc] initWithFormat:@"%x",bytes[i]&0xff];///16进制数
         
-        if([newHexStr length] == 1)
-        {
+        if([newHexStr length] == 1){
             hexStr = [[NSString alloc] initWithFormat:@"%@0%@",[temp objectForKey:@"value"],newHexStr];
             [temp setObject:hexStr forKey:@"value"];
             //            [hexStr release];    //  注释被保留的原因是在非ARC模式下，会内存泄漏；如果alloc时采用autorelese，数据量大时会导致崩溃
@@ -2546,8 +2419,7 @@ static CGRect oldframe;
     return [temp objectForKey:@"value"];
 }
 
-+ (NSString *)cleanString:(NSString *)str
-{
++ (NSString *)cleanString:(NSString *)str{
     if (str == nil) {
         return @"";
     }
@@ -2564,8 +2436,7 @@ static CGRect oldframe;
     return cleanString;
 }
 
-+ (NSString *)placeholderString:(NSString *)string font:(NSInteger)font back:(NSInteger)back
-{
++ (NSString *)placeholderString:(NSString *)string font:(NSInteger)font back:(NSInteger)back{
     if (string.length == 0) {
         return nil;
     }
@@ -2591,30 +2462,15 @@ static CGRect oldframe;
     return nil;
 }
 
-+ (NSString *)stringByDate:(NSDate *)date
-{
++ (NSString *)stringByDate:(NSDate *)date{
     NSTimeZone *zone = [NSTimeZone systemTimeZone];
-    NSInteger interval = [zone secondsFromGMTForDate: date];
+    NSInteger interval = [zone secondsFromGMTForDate:date];
     NSDate *localeDate = [date  dateByAddingTimeInterval: interval];
     NSString *string = [[NSString alloc] initWithFormat:@"%@",localeDate];
     return string;
 }
 
-+ (NSString *)bankStyleDataThree:(id)data
-{
-    if (!data) {
-        return @"0.00";
-    }
-    
-    NSString *str = [[NSString alloc] initWithFormat:@"%@",data];
-    if (str.length == 0) {
-        return @"0.00";
-    }
-    
-    if ([data isKindOfClass:[NSNull class]]) {
-        return @"0.00";
-    }
-    
++ (NSString *)bankStyleDataThree:(id)data{
     if ([data isKindOfClass:[NSNumber class]]) {
         NSNumberFormatter *numberFormatter = [[NSNumberFormatter alloc] init];
         [numberFormatter setPositiveFormat:@"###,##0.00;"];    // 100,000.00
@@ -2634,8 +2490,7 @@ static CGRect oldframe;
     }
 }
 
-+ (NSString *)bankStyleData:(id)data
-{
++ (NSString *)bankStyleData:(id)data{
     if (!data) {
         return @"0.00";
     }
@@ -2669,8 +2524,7 @@ static CGRect oldframe;
     }
 }
 
-+ (NSString *)zeroHandle:(id)data
-{
++ (NSString *)zeroHandle:(id)data{
     if (!data) {
         return @"";
     }
@@ -2708,8 +2562,7 @@ static CGRect oldframe;
     }
 }
 
-+ (NSString *)fourNoFiveYes:(float)number afterPoint:(int)position  // 只入不舍
-{
++ (NSString *)fourNoFiveYes:(float)number afterPoint:(int)position{  // 只入不舍
     NSDecimalNumberHandler  *roundingBehavior = [NSDecimalNumberHandler decimalNumberHandlerWithRoundingMode:NSRoundUp scale:position raiseOnExactness:NO raiseOnOverflow:NO raiseOnUnderflow:NO raiseOnDivideByZero:NO];
     NSDecimalNumber *ouncesDecimal;
     NSDecimalNumber *roundedOunces;
@@ -2718,8 +2571,7 @@ static CGRect oldframe;
     return [NSString stringWithFormat:@"%@",roundedOunces];
 }
 
-+ (double)forwardValue:(double)number afterPoint:(int)position  // 只入不舍
-{
++ (double)forwardValue:(double)number afterPoint:(int)position{  // 只入不舍
     NSNumber *classNumber = [NSNumber numberWithDouble:number];
     NSString *classString = [classNumber stringValue];
     
@@ -2739,16 +2591,14 @@ static CGRect oldframe;
     return [roundedOunces doubleValue];
 }
 
-+ (NSString *)newFloat:(float)value withNumber:(int)numberOfPlace
-{
++ (NSString *)newFloat:(float)value withNumber:(int)numberOfPlace{
     NSString *formatStr = @"%0.";
     formatStr = [formatStr stringByAppendingFormat:@"%df", numberOfPlace];
     formatStr = [NSString stringWithFormat:formatStr, value];
     return formatStr;
 }
 
-+ (NSString *)backBankData:(NSString *)text
-{
++ (NSString *)backBankData:(NSString *)text{
     if (text.length == 0) {
         return nil;
     }
@@ -2761,40 +2611,35 @@ static CGRect oldframe;
     return nil;
 }
 
-+ (NSString *)decimalNumberMutiplyWithString:(NSString *)multiplierValue  valueB:(NSString *)multiplicandValue
-{
++ (NSString *)decimalNumberMutiplyWithString:(NSString *)multiplierValue  valueB:(NSString *)multiplicandValue{
     NSDecimalNumber *multiplierNumber = [NSDecimalNumber decimalNumberWithString:multiplierValue];
     NSDecimalNumber *multiplicandNumber = [NSDecimalNumber decimalNumberWithString:multiplicandValue];
     NSDecimalNumber *product = [multiplicandNumber decimalNumberByMultiplyingBy:multiplierNumber];
     return [product stringValue];
 }
 
-+ (NSString *)highAdd:(NSString *)aValue add:(NSString *)bValue
-{
++ (NSString *)highAdd:(NSString *)aValue add:(NSString *)bValue{
     NSDecimalNumber *addendNumber = [NSDecimalNumber decimalNumberWithString:aValue];
     NSDecimalNumber *augendNumber = [NSDecimalNumber decimalNumberWithString:bValue];
     NSDecimalNumber *sumNumber = [addendNumber decimalNumberByAdding:augendNumber];
     return [sumNumber stringValue];
 }
 
-+ (NSString *)highSubtract:(NSString *)fontValue add:(NSString *)backValue
-{
++ (NSString *)highSubtract:(NSString *)fontValue add:(NSString *)backValue{
     NSDecimalNumber *addendNumber = [NSDecimalNumber decimalNumberWithString:fontValue];
     NSDecimalNumber *augendNumber = [NSDecimalNumber decimalNumberWithString:backValue];
     NSDecimalNumber *sumNumber = [addendNumber decimalNumberBySubtracting:augendNumber];
     return [sumNumber stringValue];
 }
 
-+ (NSString *)highMultiply:(NSString *)aValue add:(NSString *)bValue
-{
++ (NSString *)highMultiply:(NSString *)aValue add:(NSString *)bValue{
     NSDecimalNumber *addendNumber = [NSDecimalNumber decimalNumberWithString:aValue];
     NSDecimalNumber *augendNumber = [NSDecimalNumber decimalNumberWithString:bValue];
     NSDecimalNumber *sumNumber = [addendNumber decimalNumberByMultiplyingBy:augendNumber];
     return [sumNumber stringValue];
 }
 
-+ (NSString *)highDivide:(NSString *)aValue add:(NSString *)bValue
-{
++ (NSString *)highDivide:(NSString *)aValue add:(NSString *)bValue{
     NSDecimalNumber *addendNumber = [NSDecimalNumber decimalNumberWithString:aValue];
     NSDecimalNumber *augendNumber = [NSDecimalNumber decimalNumberWithString:bValue];
     NSDecimalNumber *sumNumber = [addendNumber decimalNumberByDividingBy:augendNumber];
@@ -2809,8 +2654,7 @@ static CGRect oldframe;
     }
 }
 
-+ (NSString *)placeholderStringFor:(NSString *)sourceString with:(NSString *)placeholderString
-{
++ (NSString *)placeholderStringFor:(NSString *)sourceString with:(NSString *)placeholderString{
     if ([sourceString isKindOfClass:[NSNull class]] || (sourceString == nil)) {
         return placeholderString;
     }
@@ -2831,8 +2675,7 @@ static CGRect oldframe;
     return [[NSString alloc] initWithFormat:@"%@  %@",aString,bString];
 }
 
-+ (NSString *)base64StringForText:(NSString *)text
-{
++ (NSString *)base64StringForText:(NSString *)text{
     if (text && [text isKindOfClass:NSString.class]) {
         NSData *data = [text dataUsingEncoding:NSUTF8StringEncoding];
         return [data base64EncodedStringWithOptions:NSDataBase64Encoding64CharacterLineLength];
@@ -2841,23 +2684,19 @@ static CGRect oldframe;
     }
 }
 
-+ (NSString *)textFromBase64String:(NSString *)text
-{
++ (NSString *)textFromBase64String:(NSString *)text{
     if (text == nil) {
         return nil;
     }
-    
     NSData *data = [[NSData alloc] initWithBase64EncodedString:text options:NSDataBase64DecodingIgnoreUnknownCharacters];
     return [[NSString alloc]initWithData:data encoding:NSUTF8StringEncoding];
 }
 
-+ (NSString *)base64Code:(NSData *)data
-{
++ (NSString *)base64Code:(NSData *)data{
     return [data base64EncodedStringWithOptions:0];
 }
 
-+ (NSString *)sessionID:(NSURLResponse *)response
-{
++ (NSString *)sessionID:(NSURLResponse *)response{
     NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse*)response;
     NSDictionary *dic = httpResponse.allHeaderFields;
     NSString *sessionid = [dic objectForKey:@"Set-Cookie"];
@@ -2870,8 +2709,7 @@ static CGRect oldframe;
     return subSession;
 }
 
-+ (NSString *)hostNameFromUrlString:(NSString *)urlString
-{
++ (NSString *)hostNameFromUrlString:(NSString *)urlString{
     if (urlString.length == 0) {
         return urlString;
     }
@@ -2882,8 +2720,7 @@ static CGRect oldframe;
     return nil;
 }
 
-+ (NSString *)ymdhsByTimeInterval:(NSTimeInterval)fTI
-{
++ (NSString *)ymdhsByTimeInterval:(NSTimeInterval)fTI{
     NSDate *date = [[NSDate alloc] initWithTimeIntervalSince1970:fTI];
     
     NSTimeZone* localzone = [NSTimeZone localTimeZone];
@@ -2893,13 +2730,11 @@ static CGRect oldframe;
     return [dateFormatter stringFromDate:date];
 }
 
-+ (NSString *)ymdhsByTimeIntervalString:(NSString *)timeInterval
-{
++ (NSString *)ymdhsByTimeIntervalString:(NSString *)timeInterval{
     return [self ymdhsByTimeInterval:[timeInterval doubleValue]];
 }
 
-+ (NSString *)countOverTime:(NSTimeInterval)time
-{
++ (NSString *)countOverTime:(NSTimeInterval)time{
     NSInteger seconds = time;
     NSMutableString *overdueTimeString = [[NSMutableString alloc] init];
     NSInteger day = seconds/(60*60*24);
@@ -2917,8 +2752,7 @@ static CGRect oldframe;
     return overdueTimeString;
 }
 
-+ (NSString *)pinyinForHans:(NSString *)chinese
-{
++ (NSString *)pinyinForHans:(NSString *)chinese{
     //将NSString装换成NSMutableString
     NSMutableString *pinyin = [chinese mutableCopy];
     //将汉字转换为拼音(带音标)
@@ -2929,8 +2763,7 @@ static CGRect oldframe;
     return pinyin;
 }
 
-+ (NSString *)convertNumbers:(NSString *)string
-{
++ (NSString *)convertNumbers:(NSString *)string{
     if (![self isValidateString:string]) {
         return nil;
     }
@@ -2951,8 +2784,7 @@ static CGRect oldframe;
     return [self pinyinForHansClear:name];
 }
 
-+ (NSString *)pinyinForHansClear:(NSString *)chinese        // 获取汉字的拼音，没有空格
-{
++ (NSString *)pinyinForHansClear:(NSString *)chinese{        // 获取汉字的拼音，没有空格
     //将NSString装换成NSMutableString
     NSMutableString *pinyin = [chinese mutableCopy];
     //将汉字转换为拼音(带音标)
@@ -2963,8 +2795,7 @@ static CGRect oldframe;
     return [self cleanString:pinyin];
 }
 
-+ (NSString*)reverseWordsInString:(NSString*)str
-{
++ (NSString*)reverseWordsInString:(NSString*)str{
     NSMutableString *reverString = [NSMutableString stringWithCapacity:str.length];
     [str enumerateSubstringsInRange:NSMakeRange(0, str.length) options:NSStringEnumerationReverse | NSStringEnumerationByComposedCharacterSequences  usingBlock:^(NSString *substring, NSRange substringRange, NSRange enclosingRange, BOOL *stop) {
         [reverString appendString:substring];
@@ -2972,16 +2803,14 @@ static CGRect oldframe;
     return reverString;
 }
 
-+ (NSString *)twoChar:(NSInteger)value
-{
++ (NSString *)twoChar:(NSInteger)value{
     if (value < 10) {
         return [[NSString alloc] initWithFormat:@"0%@",@(value)];
     }
     return [[NSString alloc] initWithFormat:@"%@",@(value)];
 }
 
-+ (NSString *)scanQRCode:(UIImage *)image
-{
++ (NSString *)scanQRCode:(UIImage *)image{
     CIDetector*detector = [CIDetector detectorOfType:CIDetectorTypeQRCode context:nil options:@{ CIDetectorAccuracy : CIDetectorAccuracyHigh }];
     NSArray *features = [detector featuresInImage:[CIImage imageWithCGImage:image.CGImage]];
     
@@ -2996,8 +2825,7 @@ static CGRect oldframe;
     return result;
 }
 
-+ (NSString *)dataToHex:(NSData *)data
-{
++ (NSString *)dataToHex:(NSData *)data{
     if (!data || [data length] == 0) {
         return nil;
     }
@@ -3016,7 +2844,7 @@ static CGRect oldframe;
     return string;
 }
 
-+ (NSData *)convertHexStrToData:(NSString *)str {
++ (NSData *)convertHexStrToData:(NSString *)str{
     if (!str || [str length] == 0) {
         return nil;
     }
@@ -3043,16 +2871,14 @@ static CGRect oldframe;
     return hexData;
 }
 
-+ (NSString *)readableForTimeInterval:(NSTimeInterval)timeInterval
-{
++ (NSString *)readableForTimeInterval:(NSTimeInterval)timeInterval{
     NSDate *bDate = [[NSDate alloc] initWithTimeIntervalSince1970:timeInterval];
     NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
     [formatter setDateFormat:@"yyyy-MM-dd"];
     return [formatter stringFromDate:bDate];
 }
 
-+ (NSString *)stringWithDate:(NSDate *)date formatter:(NSString *)formatter
-{
++ (NSString *)stringWithDate:(NSDate *)date formatter:(NSString *)formatter{
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     [dateFormatter setDateFormat:formatter?:@"yyyy-MM-dd HH:mm:ss"];
     return [dateFormatter stringFromDate:date];
@@ -3076,8 +2902,7 @@ static CGRect oldframe;
     return attributedStr;
 }
 
-+ (NSAttributedString *)attributedStringFor:(NSString *)sourceString strings:(NSArray *)colorStrings color:(UIColor *)color fontStrings:(NSArray * __nullable)fontStrings font:(UIFont * __nullable)font
-{
++ (NSAttributedString *)attributedStringFor:(NSString *)sourceString strings:(NSArray *)colorStrings color:(UIColor *)color fontStrings:(NSArray * __nullable)fontStrings font:(UIFont * __nullable)font{
     NSMutableArray *colorRangs = [[NSMutableArray alloc] initWithCapacity:colorStrings.count];
     NSMutableArray *textRangs = [[NSMutableArray alloc] initWithCapacity:fontStrings.count];
     for (NSString *colorStr in colorStrings) {
@@ -3095,26 +2920,22 @@ static CGRect oldframe;
     return [self attributedStringFor:sourceString colorRange:colorRangs color:color textRange:textRangs font:font];
 }
 
-- (NSAttributedString *)middleLineForLabel:(NSString *)text
-{
+- (NSAttributedString *)middleLineForLabel:(NSString *)text{
     //中划线
     NSDictionary *attribtDic = @{NSStrikethroughStyleAttributeName: [NSNumber numberWithInteger:NSUnderlineStyleSingle]};
     NSMutableAttributedString *attribtStr = [[NSMutableAttributedString alloc] initWithString:text attributes:attribtDic];
     return attribtStr;
 }
 
-- (NSAttributedString *)underLineForLabel:(NSString *)text
-{
+- (NSAttributedString *)underLineForLabel:(NSString *)text{
     // 下划线
     NSDictionary *attribtDic = @{NSUnderlineStyleAttributeName: [NSNumber numberWithInteger:NSUnderlineStyleSingle]};
     NSMutableAttributedString *attribtStr = [[NSMutableAttributedString alloc] initWithString:text attributes:attribtDic];
     return attribtStr;
 }
 
-
 //获取字符串(或汉字)首字母
-+ (NSString *)firstCharacterWithString:(NSString *)string
-{
++ (NSString *)firstCharacterWithString:(NSString *)string{
     NSMutableString *str = [NSMutableString stringWithString:string];
     CFStringTransform((CFMutableStringRef)str, NULL, kCFStringTransformMandarinLatin, NO);
     CFStringTransform((CFMutableStringRef)str, NULL, kCFStringTransformStripDiacritics, NO);
@@ -3123,8 +2944,7 @@ static CGRect oldframe;
 }
 
 // 银行卡每4个隔空格
-+ (NSString *)forthCarNumber:(NSString *)text
-{
++ (NSString *)forthCarNumber:(NSString *)text{
     if (![text isKindOfClass:[NSString class]]) {
         text = text.description;
     }
@@ -3162,8 +2982,7 @@ static CGRect oldframe;
 + (NSString *)timeIntervalFromLastTime:(NSString *)lastTime
                         lastTimeFormat:(NSString *)format1
                          ToCurrentTime:(NSString *)currentTime
-                     currentTimeFormat:(NSString *)format2
-{
+                     currentTimeFormat:(NSString *)format2{
     //上次时间
     NSDateFormatter *dateFormatter1 = [[NSDateFormatter alloc]init];
     dateFormatter1.dateFormat = format1;
@@ -3213,27 +3032,21 @@ static CGRect oldframe;
     return @"";
 }
 
-+ (BOOL)isValidPassword:(NSString*)password
-{
++ (BOOL)isValidPassword:(NSString*)password{
     BOOL valid = YES;
-    if([password length] < 6 || [password length] > 30)
-    {
+    if([password length] < 6 || [password length] > 30){
         return NO;
     }
     
-    for(int i=0; i<[password length]; i++)
-    {
+    for(int i=0; i<[password length]; i++){
         unichar curChar = [password characterAtIndex:i];
-        if(curChar >= '0' && curChar <= '9')
-        {
+        if(curChar >= '0' && curChar <= '9'){
             continue;
         }
-        if(curChar >='a' && curChar <= 'z')
-        {
+        if(curChar >='a' && curChar <= 'z'){
             continue;
         }
-        if(curChar >= 'A' && curChar <= 'Z')
-        {
+        if(curChar >= 'A' && curChar <= 'Z'){
             continue;
         }
         valid = NO;
@@ -3242,8 +3055,7 @@ static CGRect oldframe;
     return valid;
 }
 
-+ (void)call:(NSString *)phone
-{
++ (void)call:(NSString *)phone{
     if (phone != nil) {
         NSString *telUrl = [NSString stringWithFormat:@"telprompt:%@",phone];
         NSURL *url = [[NSURL alloc] initWithString:telUrl];
@@ -3251,8 +3063,7 @@ static CGRect oldframe;
     }
 }
 
-+ (void)callPhoneWithNoNotice:(NSString *)phone
-{
++ (void)callPhoneWithNoNotice:(NSString *)phone{
     if (phone == nil) {
         return;
     }
@@ -3266,8 +3077,7 @@ static CGRect oldframe;
 //    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:str]];
 //}
 
-+ (NSString *)deviceModel
-{
++ (NSString *)deviceModel{
     struct utsname systemInfo;
     uname(&systemInfo);
     NSString *deviceString = [NSString stringWithCString:systemInfo.machine encoding:NSUTF8StringEncoding];
@@ -3319,8 +3129,7 @@ static CGRect oldframe;
     return deviceString;
 }
 
-+ (NSString *)easySeeTimesBySeconds:(NSInteger)timeInterVal
-{
++ (NSString *)easySeeTimesBySeconds:(NSInteger)timeInterVal{
     NSDate *date = [[NSDate alloc] initWithTimeIntervalSince1970:timeInterVal];
     NSCalendar *greCalendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
     NSDateComponents *dateComponents = [greCalendar components:NSCalendarUnitYear | NSCalendarUnitMonth | NSCalendarUnitDay | NSCalendarUnitHour | NSCalendarUnitMinute | NSCalendarUnitSecond fromDate:date];
@@ -3350,22 +3159,14 @@ static CGRect oldframe;
     return valueString;
 }
 
-//+ (NSString *)base64Code:(NSData *)data
-//{
-//    return [GTMBase64 stringByEncodingData:data];
-//}
-
-+ (NSString *)tenThousandNumber:(double)value
-{
++ (NSString *)tenThousandNumber:(double)value{
     if (value <= 100000) {
         return [[NSString alloc] initWithFormat:@"%.2f",value];
     }
-    
     return [[NSString alloc] initWithFormat:@"%.2f万",value / 10000];
 }
 
-+ (NSString *)tenThousandNumberString:(NSString *)value
-{
++ (NSString *)tenThousandNumberString:(NSString *)value{
     double number = [value doubleValue];
     if (number <= 100000) {
         return value;
@@ -3373,28 +3174,15 @@ static CGRect oldframe;
     return [[NSString alloc] initWithFormat:@"%.2f万",number / 10000];
 }
 
-+ (NSString *)urlEncodedString:(NSString *)urlString
-{
++ (NSString *)urlEncodedString:(NSString *)urlString{
     return (NSString *)CFBridgingRelease(CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault,(CFStringRef)urlString,NULL,CFSTR("!*'();:@&=+$,/?%#[]"),kCFStringEncodingUTF8));
 }
 
-+ (NSString *)urlDecodedString:(NSString *)urlString
-{
++ (NSString *)urlDecodedString:(NSString *)urlString{
     return (NSString *)CFBridgingRelease(CFURLCreateStringByReplacingPercentEscapesUsingEncoding(kCFAllocatorDefault,(CFStringRef)urlString,CFSTR(""),kCFStringEncodingUTF8));
 }
 
-+ (NSString *)replaceString:(NSMutableString *)string byString:(NSString *)replaceString
-{
-    // 必须是NSMutableString
-    if (replaceString.length == 0) {
-        replaceString = @"";
-    }
-    [string replaceOccurrencesOfString:@"\n" withString:replaceString options:NSCaseInsensitiveSearch range:NSMakeRange(0, [string length])];
-    return string;
-}
-
-+ (void)openAppByURLString:(NSString *)str
-{
++ (void)openAppByURLString:(NSString *)str{
     NSString *string = [NSString stringWithFormat:@"%@://://",str];
     NSURL *myURL_APP_A = [NSURL URLWithString:string];
     if ([[UIApplication sharedApplication] canOpenURL:myURL_APP_A]) {
@@ -3402,8 +3190,7 @@ static CGRect oldframe;
     }
 }
 
-+ (void)flashLampShow:(BOOL)show
-{
++ (void)flashLampShow:(BOOL)show{
     AVCaptureDevice *device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
     if ([device hasTorch]) {//判断是否有闪光灯
         if (show) {
@@ -3415,15 +3202,6 @@ static CGRect oldframe;
             [device setTorchMode: AVCaptureTorchModeOff];
             [device unlockForConfiguration];
         }
-    }
-}
-
-+ (void)gotoDownloadApp:(NSString *)str
-{
-    NSString *urlStr = [NSString stringWithFormat:@"itms-apps://itunes.apple.com/us/app/id%@?mt=8", str];
-    NSURL *url = [NSURL URLWithString:urlStr];
-    if ([[UIApplication sharedApplication] canOpenURL:url]) {
-        [[UIApplication sharedApplication] openURL:url];
     }
 }
 
