@@ -2872,6 +2872,9 @@ static CGRect oldframe;
 }
 
 + (NSString *)stringWithDate:(NSDate *)date formatter:(NSString *)formatter{
+    if (![date isKindOfClass:[NSDate class]]) {
+        return nil;
+    }
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     [dateFormatter setDateFormat:formatter?:@"yyyy-MM-dd HH:mm:ss"];
     return [dateFormatter stringFromDate:date];
