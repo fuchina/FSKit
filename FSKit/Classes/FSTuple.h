@@ -20,7 +20,7 @@
 
 @end
 
-@interface Tuple3 : NSObject
+@interface Tuple3<objectType1,objectType2,objectType3> : NSObject
 
 + (instancetype)v1:(id)v1 v2:(id)v2 v3:(id)v3;
 @property (nonatomic,strong) id _1;
@@ -29,7 +29,7 @@
 
 @end
 
-@interface Tuple4 : NSObject
+@interface Tuple4<objectType1,objectType2,objectType3,objectType4> : NSObject
 
 + (instancetype)v1:(id)v1 v2:(id)v2 v3:(id)v3 v4:(id)v4;
 @property (nonatomic,strong) id _1;
@@ -39,7 +39,7 @@
 
 @end
 
-@interface Tuple5 : NSObject
+@interface Tuple5<objectType1,objectType2,objectType3,objectType4,objectType5> : NSObject
 
 + (instancetype)v1:(id)v1 v2:(id)v2 v3:(id)v3 v4:(id)v4 v5:(id)v5;
 @property (nonatomic,strong) id _1;
@@ -50,7 +50,7 @@
 
 @end
 
-@interface Tuple6 : NSObject
+@interface Tuple6<objectType1,objectType2,objectType3,objectType4,objectType5,objectType6> : NSObject
 
 + (instancetype)v1:(id)v1 v2:(id)v2 v3:(id)v3 v4:(id)v4 v5:(id)v5 v6:(id)v6;
 @property (nonatomic,strong) id _1;
@@ -62,7 +62,7 @@
 
 @end
 
-@interface Tuple7 : NSObject
+@interface Tuple7<objectType1,objectType2,objectType3,objectType4,objectType5,objectType6,objectType7> : NSObject
 
 + (instancetype)v1:(id)v1 v2:(id)v2 v3:(id)v3 v4:(id)v4 v5:(id)v5 v6:(id)v6 v7:(id)v7;
 @property (nonatomic,strong) id _1;
@@ -75,7 +75,7 @@
 
 @end
 
-@interface Tuple8 : NSObject
+@interface Tuple8<objectType1,objectType2,objectType3,objectType4,objectType5,objectType6,objectType7,objectType8> : NSObject
 
 + (instancetype)v1:(id)v1 v2:(id)v2 v3:(id)v3 v4:(id)v4 v5:(id)v5 v6:(id)v6 v7:(id)v7 v8:(id)v8;
 @property (nonatomic,strong) id _1;
@@ -89,7 +89,7 @@
 
 @end
 
-@interface Tuple9 : NSObject
+@interface Tuple9<objectType1,objectType2,objectType3,objectType4,objectType5,objectType6,objectType7,objectType8,objectType9> : NSObject
 
 + (instancetype)v1:(id)v1 v2:(id)v2 v3:(id)v3 v4:(id)v4 v5:(id)v5 v6:(id)v6 v7:(id)v7 v8:(id)v8 v9:(id)v9;
 @property (nonatomic,strong) id _1;
@@ -104,7 +104,7 @@
 
 @end
 
-@interface Tuple10 : NSObject
+@interface Tuple10<objectType1,objectType2,objectType3,objectType4,objectType5,objectType6,objectType7,objectType8,objectType9,objectType10> : NSObject
 
 + (instancetype)v1:(id)v1 v2:(id)v2 v3:(id)v3 v4:(id)v4 v5:(id)v5 v6:(id)v6 v7:(id)v7 v8:(id)v8 v9:(id)v9 v10:(id)v10;
 @property (nonatomic,strong) id _1;

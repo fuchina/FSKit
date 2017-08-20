@@ -2871,17 +2871,20 @@ static CGRect oldframe;
     return hexData;
 }
 
-+ (NSString *)readableForTimeInterval:(NSTimeInterval)timeInterval{
-    NSDate *bDate = [[NSDate alloc] initWithTimeIntervalSince1970:timeInterval];
-    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-    [formatter setDateFormat:@"yyyy-MM-dd"];
-    return [formatter stringFromDate:bDate];
-}
-
 + (NSString *)stringWithDate:(NSDate *)date formatter:(NSString *)formatter{
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     [dateFormatter setDateFormat:formatter?:@"yyyy-MM-dd HH:mm:ss"];
     return [dateFormatter stringFromDate:date];
+}
+
++ (NSDate *)dateByString:(NSString *)str formatter:(NSString *)formatter{
+    if (!([self isValidateString:str] && [FSKit isValidateString:formatter])) {
+        return nil;
+    }
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:formatter?:@"yyyy-MM-dd HH:mm:ss"];
+    NSDate *date = [dateFormatter dateFromString:str];
+    return date;
 }
 
 + (NSAttributedString *)attributedStringFor:(NSString *)sourceString colorRange:(NSArray *)colorRanges color:(UIColor *)color textRange:(NSArray *)textRanges font:(UIFont *)font{

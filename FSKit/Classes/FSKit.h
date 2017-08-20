@@ -168,8 +168,8 @@
 + (NSString *)scanQRCode:(UIImage *)image;  // 解析二维码
 + (NSString *)dataToHex:(NSData *)data;
 + (NSData *)convertHexStrToData:(NSString *)str;
-+ (NSString *)readableForTimeInterval:(NSTimeInterval)timeInterval;
 + (NSString *)stringWithDate:(NSDate *)date formatter:(NSString *)formatter;
++ (NSDate *)dateByString:(NSString *)str formatter:(NSString *)formatter;
 
 /*  NSAttributedString *connectAttributedString = [FuData attributedStringFor:connectString colorRange:@[[NSValue valueWithRange:connectRange]] color:GZS_RedColor textRange:@[[NSValue valueWithRange:connectRange]] font:FONTFC(25)];*/
 + (NSAttributedString *)attributedStringFor:(NSString *)sourceString colorRange:(NSArray *)colorRanges color:(UIColor *)color textRange:(NSArray *)textRanges font:(UIFont *)font;
