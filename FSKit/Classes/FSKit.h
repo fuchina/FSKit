@@ -11,6 +11,8 @@
 
 @interface FSKit : NSObject
 
+NSTimeInterval FSTimeIntevalSince1970(void);
+
 + (void)userDefaultsKeepData:(id)instance  withKey:(NSString *)key;
 + (id)userDefaultsDataWithKey:(NSString *)key;
 + (id)objectFromJSonstring:(NSString *)jsonString;

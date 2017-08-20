@@ -25,6 +25,10 @@ static CGRect oldframe;
 
 @implementation FSKit
 
+NSTimeInterval FSTimeIntevalSince1970(void){
+    return [[NSDate date] timeIntervalSince1970];
+}
+
 + (void)presentAlertViewController:(UIAlertController *)alertController completion:(void (^)(void))completion{
     dispatch_async(dispatch_get_main_queue(), ^{
         UIWindow *keyWindow = [UIApplication sharedApplication].keyWindow;
