@@ -37,7 +37,9 @@ NSTimeInterval FSTimeIntevalSince1970(void){
         UIWindow *keyWindow = [UIApplication sharedApplication].keyWindow;
         UIViewController *controller = keyWindow.rootViewController;
         while (controller.presentedViewController) {
-            controller = controller.presentedViewController;
+            if (controller.presentedViewController != pController) {
+                controller = controller.presentedViewController;
+            }
         }
         [controller presentViewController:pController animated:YES completion:completion];
     });
