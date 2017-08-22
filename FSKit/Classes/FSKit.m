@@ -29,14 +29,17 @@ NSTimeInterval FSTimeIntevalSince1970(void){
     return [[NSDate date] timeIntervalSince1970];
 }
 
-+ (void)presentAlertViewController:(UIAlertController *)alertController completion:(void (^)(void))completion{
++ (void)presentViewController:(UIViewController *)pController completion:(void (^)(void))completion{
+    if (![pController isKindOfClass:[UIViewController class]]) {
+        return;
+    }
     dispatch_async(dispatch_get_main_queue(), ^{
         UIWindow *keyWindow = [UIApplication sharedApplication].keyWindow;
         UIViewController *controller = keyWindow.rootViewController;
         while (controller.presentedViewController) {
             controller = controller.presentedViewController;
         }
-        [controller presentViewController:alertController animated:YES completion:completion];
+        [controller presentViewController:pController animated:YES completion:completion];
     });
 }
 
@@ -55,7 +58,7 @@ NSTimeInterval FSTimeIntevalSince1970(void){
     }
     UIAlertAction *archiveAction = [UIAlertAction actionWithTitle:cancelTitle style:UIAlertActionStyleCancel handler:cancel];
     [controller addAction:archiveAction];
-    [self presentAlertViewController:controller completion:completion];
+    [self presentViewController:controller completion:completion];
 }
 
 + (void)alertInput:(NSInteger)number title:(NSString *)title message:(NSString *)message ok:(NSString *)okTitle handler:(void (^)(UIAlertController *bAlert,UIAlertAction *action))handler cancel:(NSString *)cancelTitle handler:(void (^)(UIAlertAction *action))cancelHandler textFieldConifg:(void (^)(UITextField *textField))configurationHandler completion:(void (^)(void))completion{
@@ -79,7 +82,7 @@ NSTimeInterval FSTimeIntevalSince1970(void){
     }];
     [alertController addAction:cancelAction];
     [alertController addAction:okAction];
-    [self presentAlertViewController:alertController completion:completion];
+    [self presentViewController:alertController completion:completion];
 }
 
 + (void)pushToViewControllerWithClass:(NSString *)className navigationController:(UINavigationController *)navigationController param:(NSDictionary *)param configBlock:(void (^)(id vc))configBlockParam{
