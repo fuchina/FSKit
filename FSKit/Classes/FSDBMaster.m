@@ -86,19 +86,20 @@ static FSDBMaster *_instance = nil;
     return path;
 }
 
-- (void)createTable:(NSString *)tableName className:(Class)className{
-    if (className == nil) {
+- (void)createTableIfNotExists:(NSString *)tableName className:(Class)className{
+    if (![FSKit isValidateString:tableName]) {
         return;
     }
-    
     BOOL exist = [self checkTableExistWithTableNamed:tableName];
     if (exist) {
         return;
     }
-    
     NSArray *properties = [FSKit propertiesForClass:className];
-    NSMutableString *append = [[NSMutableString alloc] init];
+    if (!properties.count) {
+        return;
+    }
     
+    NSMutableString *append = [[NSMutableString alloc] init];
     NSArray *keywords = [self keywords];
     for (int x = 0; x < properties.count; x ++) {
         NSString *name = properties[x];
@@ -125,7 +126,10 @@ static FSDBMaster *_instance = nil;
 }
 
 - (NSString *)insertSQL:(NSString *)sql class:(Class)instance tableName:(NSString *)tableName{
-    [self createTable:tableName className:instance];
+    if (![FSKit isValidateString:tableName]) {
+        return @"表名为空";
+    }
+    [self createTableIfNotExists:tableName className:instance];
     return [self execSQL:sql type:@"新增数据"];
 }
 
@@ -259,7 +263,7 @@ static FSDBMaster *_instance = nil;
 }
 
 - (BOOL)checkTableExistWithTableNamed:(NSString *)tableName{
-    if (tableName.length == 0) {
+    if (!([tableName isKindOfClass:[NSString class]] && tableName.length)) {
         return NO;
     }
     __block BOOL success = NO;
