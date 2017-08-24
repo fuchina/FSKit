@@ -93,6 +93,7 @@
  */
 - (NSMutableArray *)querySQL:(NSString *)sql class:(Class)className tableName:(NSString *)tableName;
 
+- (BOOL)checkTableExist:(NSString *)tableName;
 //  检查表是否存在
 - (BOOL)checkTableExistWithTableNamed:(NSString *)tableName;
 

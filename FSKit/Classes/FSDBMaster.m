@@ -120,9 +120,6 @@ static FSDBMaster *_instance = nil;
     
     // PRIMARY KEY 是唯一的，每条数据不能相同
     //    NSString *sql = @"CREATE TABLE IF NOT EXISTS UserTable ( time TEXT NOT NULL PRIMARY KEY,atype TEXT NOT NULL,btype TEXT NOT NULL,je TEXT,bz TEXT,sr TEXT, cb TEXT, ys TEXT, xj TEXT, ch TEXT, tz TEXT, tx TEXT, fz TEXT);";
-    /*
-     再这里会按照属性列表的顺序排列，可以用于下面从数据库读取数据映射成Entity时对应，但是如果属性列表的顺序变化，就会映射错误。可以保存一份列表顺序，在顺序变动时不会导致映射错误。
-     */
     NSString *sql = [[NSString alloc] initWithFormat:@"CREATE TABLE IF NOT EXISTS %@ (%@);",tableName,append];
     [self execSQL:sql type:@"创建表"];
 }
@@ -262,6 +259,32 @@ static FSDBMaster *_instance = nil;
         sqlite3_finalize(stmt);
     });
     return count;
+}
+
+- (BOOL)checkTableExist:(NSString *)tableName{
+    if (!([tableName isKindOfClass:[NSString class]] && tableName.length)) {
+        return NO;
+    }
+    __block BOOL success = NO;
+    dispatch_sync(_queue, ^{
+        char *err;
+        sqlite3_stmt *statement;
+        NSString *sql = [NSString stringWithFormat:@"SELECT COUNT(*) FROM sqlite_master where type='table' and name='%@';",tableName];
+        const char *sql_stmt = [sql UTF8String];
+        if (sqlite3_prepare_v2(_sqlite3, sql_stmt, -1, &statement, nil) == SQLITE_OK) {
+            @try {
+                while (sqlite3_step(statement) == SQLITE_ROW) {
+                    success = YES;
+                    break;
+                }
+            } @catch (NSException *exception) {
+
+            } @finally {
+                sqlite3_finalize(statement);
+            }
+        }
+    });
+    return success;
 }
 
 - (BOOL)checkTableExistWithTableNamed:(NSString *)tableName{
