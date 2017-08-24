@@ -152,15 +152,11 @@ static FSDBMaster *_instance = nil;
     return errMSG;
 }
 
-- (NSMutableArray *)findEntitySQL:(NSString *)sql class:(Class)className tableName:(NSString *)tableName{
-    return [self execSelectSQL:sql class:className tableName:tableName];
+- (NSMutableArray *)querySQL:(NSString *)sql class:(Class)className tableName:(NSString *)tableName{
+    return [self execQuerySQL:sql class:className tableName:tableName];
 }
 
-- (NSMutableArray *)findAllDatasWithSQL:(NSString *)sql class:(Class)className tableName:(NSString *)tableName{
-    return [self execSelectSQL:sql class:className tableName:tableName];
-}
-
-- (NSMutableArray *)execSelectSQL:(NSString *)sql class:(Class)className tableName:(NSString *)tableName{
+- (NSMutableArray *)execQuerySQL:(NSString *)sql class:(Class)className tableName:(NSString *)tableName{
     if (!([sql isKindOfClass:[NSString class]] && sql.length)) {
         return nil;
     }
@@ -215,6 +211,36 @@ static FSDBMaster *_instance = nil;
     dispatch_sync(_queue, ^{
         
         NSString *sql = [[NSString alloc] initWithFormat:@"SELECT COUNT(*) FROM %@;",tableName];
+        sqlite3_stmt *stmt = nil;
+        int prepare = sqlite3_prepare_v2(_sqlite3, [sql UTF8String], -1, &stmt, NULL);
+        if (prepare != SQLITE_OK) {
+#if DEBUG
+            [FSKit showMessage:@"准备Stmt失败"];
+#endif
+            return;
+        }
+        
+        while (sqlite3_step(stmt) == SQLITE_ROW) {
+            count += sqlite3_column_int(stmt, 0);
+        }
+        sqlite3_finalize(stmt);
+    });
+    return count;
+}
+
+- (int)countWithSQL:(NSString *)sql table:(NSString *)tableName{
+    if (!([tableName isKindOfClass:[NSString class]] && tableName.length)) {
+        return 0;
+    }
+    BOOL exist = [self checkTableExistWithTableNamed:tableName];
+    if (!exist) {
+        return 0;
+    }
+    if (!([sql isKindOfClass:[NSString class]] && sql.length)) {
+        return 0;
+    }
+    __block int count = 0;
+    dispatch_sync(_queue, ^{
         sqlite3_stmt *stmt = nil;
         int prepare = sqlite3_prepare_v2(_sqlite3, [sql UTF8String], -1, &stmt, NULL);
         if (prepare != SQLITE_OK) {
@@ -287,10 +313,10 @@ int checkTableCallBack(void *param, int f_num, char **f_value, char **f_name){
     NSArray *fields = [self tableFieldNames:tableName];
     for (int x = 0; x < fields.count; x ++) {
         const char *charValue = (const char*)sqlite3_column_text(stmt, x);
-        NSString *value = [NSString stringWithUTF8String:charValue?:""];
-        
+        NSString *value = [[NSString alloc] initWithUTF8String:charValue];
+
         NSDictionary *dic = fields[x];
-        NSString *name = [dic allKeys][0];
+        NSString *name = [[dic allKeys] firstObject];
         
         SEL setterSelector = [FSKit setterSELWithAttibuteName:name];
         if ([ps respondsToSelector:setterSelector]) {
