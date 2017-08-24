@@ -267,7 +267,6 @@ static FSDBMaster *_instance = nil;
     }
     __block BOOL success = NO;
     dispatch_sync(_queue, ^{
-        char *err;
         sqlite3_stmt *statement;
         NSString *sql = [NSString stringWithFormat:@"SELECT COUNT(*) FROM sqlite_master where type='table' and name='%@';",tableName];
         const char *sql_stmt = [sql UTF8String];
