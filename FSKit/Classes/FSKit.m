@@ -29,6 +29,10 @@ NSTimeInterval FSTimeIntevalSince1970(void){
     return [[NSDate date] timeIntervalSince1970];
 }
 
+NSInteger FSIntegerTimeIntevalSince1970(void){
+    return (NSInteger)[[NSDate date] timeIntervalSince1970];
+}
+
 + (void)presentViewController:(UIViewController *)pController completion:(void (^)(void))completion{
     if (![pController isKindOfClass:[UIViewController class]]) {
         return;
