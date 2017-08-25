@@ -8,6 +8,7 @@
 
 #import "FSViewController.h"
 #import "FSKit-umbrella.h"
+#import "FSModel.h"
 
 @interface FSViewController ()
 
@@ -15,8 +16,7 @@
 
 @implementation FSViewController
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad{
     [super viewDidLoad];
     
     UIButton *btn = [UIButton buttonWithType:UIButtonTypeSystem];
@@ -28,15 +28,31 @@
 }
 
 - (void)click{
-    [FSKit alertInput:2 title:@"Title" message:@"Message" ok:@"OK" handler:^(UIAlertController *bAlert, UIAlertAction *action) {
-        NSLog(@"OK");
-    } cancel:@"Cancel" handler:^(UIAlertAction *action) {
-        NSLog(@"Cancel");
-    } textFieldConifg:^(UITextField *textField) {
-        textField.placeholder = [[NSString alloc] initWithFormat:@"%@",@(textField.tag)];
-    } completion:^{
-        NSLog(@"Completion");
-    }];
+    NSInteger type = 2;
+    static NSString *tb = @"pass";
+    FSDBMaster *master = [FSDBMaster sharedInstance];
+    if (type == 0) {
+        NSString *sql = [[NSString alloc] initWithFormat:@"INSERT INTO %@ (time,name) VALUES (\"%@\",\"%@\");",tb,@(FSIntegerTimeIntevalSince1970()),@"小明"];
+        NSString *error = [master insertSQL:sql class:[FSModel class] tableName:tb];
+        if (error) {
+            [FSKit showAlertWithMessage:error];
+        }
+    }else if (type == 1){
+        NSString *sql = [[NSString alloc] initWithFormat:@"SELECT * FROM %@",tb];
+        NSArray *list = [master querySQL:sql tableName:tb];
+        NSLog(@"%@",list);
+    }else if (type == 2){
+        BOOL check = [master checkTableExist:@"pass"];
+        NSLog(@"%@",@(check));
+    }else if (type == 3){
+        NSString *sql = @"select count(time) from pass";
+        int count = [master countWithSQL:sql table:tb];
+        NSLog(@"%@",@(count));
+    }
+    
+    NSLog(@"\n\n\n\n%@\n\n\n\n",[master dbPath]);
+    
+  //  flag = !flag;
 }
 
 - (void)didReceiveMemoryWarning

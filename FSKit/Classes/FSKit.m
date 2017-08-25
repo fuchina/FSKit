@@ -38,6 +38,13 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
         return;
     }
     dispatch_async(dispatch_get_main_queue(), ^{
+        UIWindow *w = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+        w.windowLevel = UIWindowLevelAlert;
+        w.hidden = NO;
+        w.rootViewController = [[UIViewController alloc] init];
+        [w.rootViewController presentViewController:pController animated:YES completion:completion];
+        
+        /*
         NSArray *windows = [UIApplication sharedApplication].windows;
         UIWindow *lastObject = nil;
         for (int x = (int)windows.count - 1; x >= 0; x --) {
@@ -53,6 +60,7 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
             }
         }
         [controller presentViewController:pController animated:YES completion:completion];
+         */
     });
 }
 
@@ -754,6 +762,27 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
     if ([object respondsToSelector:setterSelector]) {
         [object performSelector:setterSelector onThread:[NSThread currentThread] withObject:value waitUntilDone:[NSThread isMainThread]];
     }
+}
+
++ (id)entity:(Class)Entity dic:(NSDictionary *)dic{
+    if (Entity == nil) {
+        return nil;
+    }
+    NSArray *properties = [self propertiesForClass:Entity];
+    id instance = [[Entity alloc] init];
+    for (NSString *p in properties) {
+        [self setValue:@"" forPropertyName:p ofObject:instance];
+    }
+    if (![self isValidateDictionary:dic]) {
+        NSArray *keys = [dic allKeys];
+        for (NSString *key in keys) {
+            id value = dic[key];
+            if (value) {
+                [self setValue:value forPropertyName:key ofObject:instance];
+            }
+        }
+    }
+    return Entity;
 }
 
 + (NSString *)valueForGetSelectorWithPropertyName:(NSString *)name object:(id)instance{

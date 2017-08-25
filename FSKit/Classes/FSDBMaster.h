@@ -91,11 +91,10 @@
  【SELECT * FROM %@ order by time DESC limit 0,10;】    ASC
  【SELECT * FROM %@ WHERE atype = ? OR btype = ? and time BETWEEN 1483228800 AND 1514764799 order by time DESC limit 0,10;】
  */
-- (NSMutableArray *)querySQL:(NSString *)sql class:(Class)className tableName:(NSString *)tableName;
+- (NSMutableArray *)querySQL:(NSString *)sql tableName:(NSString *)tableName;
 
-- (BOOL)checkTableExist:(NSString *)tableName;
 //  检查表是否存在
-- (BOOL)checkTableExistWithTableNamed:(NSString *)tableName;
+- (BOOL)checkTableExist:(NSString *)tableName;
 
 //  获取表名的所有数据数量
 - (int)countForTable:(NSString *)tableName;
@@ -105,7 +104,7 @@
  【select count(*) from dbgroup Where cast(freq as INTEGER) > 30;】查询满足条件的数据条数；
  【select count(DISTINCT type) from dbgroup;】查询type不同种类，比如type有password和diary两种，就返回2;
  */
-- (int)countWithSQL:(NSString *)sql table:(NSString *)tableName;
+- (int)countWithSQL:(NSString *)sql table:(NSString *)table;
 
 // 获取数据库中所有表名
 - (NSArray<NSString *> *)allTables;
