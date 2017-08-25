@@ -11,8 +11,8 @@
 
 @interface FSKit : NSObject
 
-NSTimeInterval FSTimeIntevalSince1970(void);
-NSInteger FSIntegerTimeIntevalSince1970(void);
+extern  NSTimeInterval FSTimeIntevalSince1970(void);
+extern NSInteger FSIntegerTimeIntevalSince1970(void);
 
 + (void)presentViewController:(UIViewController *)pController completion:(void (^)(void))completion;
 
