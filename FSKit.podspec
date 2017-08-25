@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'FSKit'
-  s.version          = '1.0.5'
+  s.version          = '1.0.6'
   s.summary          = 'FSKit is a gift for iOS developer'
 
 # This description is used to generate tags and improve search results.
@@ -18,7 +18,7 @@ Pod::Spec.new do |s|
 #   * Finally, don't worry about the indent, CocoaPods strips it!
 
   s.description      = <<-DESC
-    勿以恶小而为之，勿以善小而不为。虽然这是一句很朴素的话，却值得我去实践。
+		This is a very small software library, offering a few methods to help with programming.
     DESC
 
   s.homepage         = 'https://github.com/fuchina/FSKit'
