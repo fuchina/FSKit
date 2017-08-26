@@ -763,7 +763,7 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
 + (void)setValue:(id)value forPropertyName:(NSString *)name ofObject:(id)object{
     SEL setterSelector = [self setterSELWithAttibuteName:name];
     if ([object respondsToSelector:setterSelector]) {
-        [object performSelector:setterSelector onThread:[NSThread currentThread] withObject:value waitUntilDone:[NSThread isMainThread]];
+        [object performSelector:setterSelector onThread:[NSThread currentThread] withObject:value waitUntilDone:YES];
     }
 }
 
