@@ -38,11 +38,14 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
         return;
     }
     dispatch_async(dispatch_get_main_queue(), ^{
-        UIWindow *w = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
-        w.windowLevel = UIWindowLevelAlert;
-        w.hidden = NO;
-        w.rootViewController = [[UIViewController alloc] init];
-        [w.rootViewController presentViewController:pController animated:YES completion:completion];
+        UIWindow *lastObject = [UIApplication sharedApplication].keyWindow;
+        UIViewController *controller = lastObject.rootViewController;
+        while (controller.presentedViewController) {
+            if (controller.presentedViewController != pController) {
+                controller = controller.presentedViewController;
+            }
+        }
+        [controller presentViewController:pController animated:YES completion:completion];
         
         /*
         NSArray *windows = [UIApplication sharedApplication].windows;
