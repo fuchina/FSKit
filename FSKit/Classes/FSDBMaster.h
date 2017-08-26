@@ -43,6 +43,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <FSKit.h>
 
 #define FSDBMaster_DBName       @"FSDBMasterDB"
 

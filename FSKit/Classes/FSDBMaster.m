@@ -8,7 +8,6 @@
 
 #import "FSDBMaster.h"
 #import <sqlite3.h>
-#import <FSKit.h>
 
 static NSString     *_field_name = @"field_name";
 static NSString     *_field_type = @"field_type";
