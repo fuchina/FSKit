@@ -782,7 +782,7 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
             }
         }
     }
-    return Entity;
+    return instance;
 }
 
 + (NSString *)valueForGetSelectorWithPropertyName:(NSString *)name object:(id)instance{
