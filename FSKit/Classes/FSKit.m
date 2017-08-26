@@ -773,7 +773,7 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
     for (NSString *p in properties) {
         [self setValue:@"" forPropertyName:p ofObject:instance];
     }
-    if (![self isValidateDictionary:dic]) {
+    if ([self isValidateDictionary:dic]) {
         NSArray *keys = [dic allKeys];
         for (NSString *key in keys) {
             id value = dic[key];
