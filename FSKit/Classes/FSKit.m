@@ -771,18 +771,12 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
     if (Entity == nil) {
         return nil;
     }
-    NSArray *properties = [self propertiesForClass:Entity];
     id instance = [[Entity alloc] init];
-    for (NSString *p in properties) {
-        [self setValue:@"" forPropertyName:p ofObject:instance];
-    }
-    if ([self isValidateDictionary:dic]) {
+    if ([FSKit isValidateDictionary:dic]) {
         NSArray *keys = [dic allKeys];
         for (NSString *key in keys) {
             id value = dic[key];
-            if (value) {
-                [self setValue:value forPropertyName:key ofObject:instance];
-            }
+            [self setValue:value forPropertyName:key ofObject:instance];
         }
     }
     return instance;
