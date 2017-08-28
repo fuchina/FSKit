@@ -744,13 +744,13 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
     NSMutableArray *array = [[NSMutableArray alloc] init];
     unsigned int propertyCount = 0;
     objc_property_t *properties = class_copyPropertyList(className, &propertyCount);
-    
     for (unsigned int i = 0; i < propertyCount; ++i) {
         objc_property_t property = properties[i];
         const char *name = property_getName(property);//获取属性名字
         NSString *nameToString = [[NSString alloc] initWithFormat:@"%s",name];
         [array addObject:nameToString];
     }
+    free(properties);
     return array;
 }
 

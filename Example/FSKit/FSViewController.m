@@ -28,15 +28,21 @@
 }
 
 - (void)click{
-    NSInteger type = 2;
+    NSInteger type = 0;
     static NSString *tb = @"pass";
     FSDBMaster *master = [FSDBMaster sharedInstance];
     if (type == 0) {
-        NSString *sql = [[NSString alloc] initWithFormat:@"INSERT INTO %@ (time,name) VALUES (\"%@\",\"%@\");",tb,@(FSIntegerTimeIntevalSince1970()),@"小明"];
-        NSString *error = [master insertSQL:sql class:[FSModel class] tableName:tb];
-        if (error) {
-            [FSKit showAlertWithMessage:error];
+        NSString *sql = [[NSString alloc] initWithFormat:@"INSERT INTO %@ (time,name,one,two,thr,four,five) VALUES (\"%@\",\"%@\",\"%@\",\"%@\",\"%@\",\"%@\",\"%@\");",tb,@(FSIntegerTimeIntevalSince1970()),@"小明",@"中华人民共和国",@"美利坚合众国",@"英吉利海峡",@"法兰西帝国",@"阿里巴巴"];
+        CGFloat start = CFAbsoluteTimeGetCurrent();
+        NSString *error = nil;
+        for (int x = 0; x < 10; x ++) {
+            error = [master insertSQL:sql class:[FSModel class] tableName:tb];
+            if (error) {
+                [FSKit showAlertWithMessage:error];
+            }
         }
+        CGFloat end = CFAbsoluteTimeGetCurrent();
+        NSLog(@"\n\n\n\n%f\n\n\n\n",end - start);
     }else if (type == 1){
         NSString *sql = [[NSString alloc] initWithFormat:@"SELECT * FROM %@",tb];
         NSArray *list = [master querySQL:sql tableName:tb];
