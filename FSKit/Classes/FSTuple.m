@@ -14,8 +14,7 @@
 
 @implementation Tuple2
 
-+ (instancetype)v1:(id)v1 v2:(id)v2
-{
++ (instancetype)v1:(id)v1 v2:(id)v2{
     Tuple2 *p = [[Tuple2 alloc] init];
     p._1 = v1;
     p._2 = v2;
@@ -26,8 +25,7 @@
 
 @implementation Tuple3
 
-+ (instancetype)v1:(id)v1 v2:(id)v2 v3:(id)v3
-{
++ (instancetype)v1:(id)v1 v2:(id)v2 v3:(id)v3{
     Tuple3 *p = [[Tuple3 alloc] init];
     p._1 = v1;
     p._2 = v2;
@@ -39,8 +37,7 @@
 
 @implementation Tuple4
 
-+ (instancetype)v1:(id)v1 v2:(id)v2 v3:(id)v3 v4:(id)v4
-{
++ (instancetype)v1:(id)v1 v2:(id)v2 v3:(id)v3 v4:(id)v4{
     Tuple4 *p = [[Tuple4 alloc] init];
     p._1 = v1;
     p._2 = v2;
@@ -52,8 +49,7 @@
 
 @implementation Tuple5
 
-+ (instancetype)v1:(id)v1 v2:(id)v2 v3:(id)v3 v4:(id)v4 v5:(id)v5
-{
++ (instancetype)v1:(id)v1 v2:(id)v2 v3:(id)v3 v4:(id)v4 v5:(id)v5{
     Tuple5 *p = [[Tuple5 alloc] init];
     p._1 = v1;
     p._2 = v2;
@@ -67,8 +63,7 @@
 
 @implementation Tuple6
 
-+ (instancetype)v1:(id)v1 v2:(id)v2 v3:(id)v3 v4:(id)v4 v5:(id)v5 v6:(id)v6
-{
++ (instancetype)v1:(id)v1 v2:(id)v2 v3:(id)v3 v4:(id)v4 v5:(id)v5 v6:(id)v6{
     Tuple6 *p = [[Tuple6 alloc] init];
     p._1 = v1;
     p._2 = v2;
@@ -83,8 +78,7 @@
 
 @implementation Tuple7
 
-+ (instancetype)v1:(id)v1 v2:(id)v2 v3:(id)v3 v4:(id)v4 v5:(id)v5 v6:(id)v6 v7:(id)v7
-{
++ (instancetype)v1:(id)v1 v2:(id)v2 v3:(id)v3 v4:(id)v4 v5:(id)v5 v6:(id)v6 v7:(id)v7{
     Tuple7 *p = [[Tuple7 alloc] init];
     p._1 = v1;
     p._2 = v2;
@@ -100,8 +94,7 @@
 
 @implementation Tuple8
 
-+ (instancetype)v1:(id)v1 v2:(id)v2 v3:(id)v3 v4:(id)v4 v5:(id)v5 v6:(id)v6 v7:(id)v7 v8:(id)v8
-{
++ (instancetype)v1:(id)v1 v2:(id)v2 v3:(id)v3 v4:(id)v4 v5:(id)v5 v6:(id)v6 v7:(id)v7 v8:(id)v8{
     Tuple8 *p = [[Tuple8 alloc] init];
     p._1 = v1;
     p._2 = v2;
@@ -118,8 +111,7 @@
 
 @implementation Tuple9
 
-+ (instancetype)v1:(id)v1 v2:(id)v2 v3:(id)v3 v4:(id)v4 v5:(id)v5 v6:(id)v6 v7:(id)v7 v8:(id)v8 v9:(id)v9
-{
++ (instancetype)v1:(id)v1 v2:(id)v2 v3:(id)v3 v4:(id)v4 v5:(id)v5 v6:(id)v6 v7:(id)v7 v8:(id)v8 v9:(id)v9{
     Tuple9 *p = [[Tuple9 alloc] init];
     p._1 = v1;
     p._2 = v2;
@@ -137,8 +129,7 @@
 
 @implementation Tuple10
 
-+ (instancetype)v1:(id)v1 v2:(id)v2 v3:(id)v3 v4:(id)v4 v5:(id)v5 v6:(id)v6 v7:(id)v7 v8:(id)v8 v9:(id)v9 v10:(id)v10
-{
++ (instancetype)v1:(id)v1 v2:(id)v2 v3:(id)v3 v4:(id)v4 v5:(id)v5 v6:(id)v6 v7:(id)v7 v8:(id)v8 v9:(id)v9 v10:(id)v10{
     Tuple10 *p = [[Tuple10 alloc] init];
     p._1 = v1;
     p._2 = v2;
