@@ -755,12 +755,18 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
 }
 
 + (SEL)setterSELWithAttibuteName:(NSString*)attributeName{
+    if (![self isValidateString:attributeName]) {
+        return nil;
+    }
     NSString *capital = [[attributeName substringToIndex:1] uppercaseString];
     NSString *setterSelStr = [NSString stringWithFormat:@"set%@%@:",capital,[attributeName substringFromIndex:1]];
     return NSSelectorFromString(setterSelStr);
 }
 
 + (void)setValue:(id)value forPropertyName:(NSString *)name ofObject:(id)object{
+    if (![self isValidateString:name]) {
+        return;
+    }
     SEL setterSelector = [self setterSELWithAttibuteName:name];
     if ([object respondsToSelector:setterSelector]) {
         [object performSelector:setterSelector onThread:[NSThread currentThread] withObject:value waitUntilDone:YES];

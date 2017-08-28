@@ -97,7 +97,7 @@ static FSDBMaster *_instance = nil;
         return;
     }
     NSArray *properties = [FSKit propertiesForClass:className];
-    if (!properties.count) {
+    if (![FSKit isValidateArray:properties]) {
         return;
     }
     NSString *aid = @"aid";
