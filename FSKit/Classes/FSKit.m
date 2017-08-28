@@ -33,18 +33,21 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
     return (NSInteger)[[NSDate date] timeIntervalSince1970];
 }
 
++ (UIViewController *)presentViewController{
+    UIWindow *lastObject = [UIApplication sharedApplication].keyWindow;
+    UIViewController *controller = lastObject.rootViewController;
+    while (controller.presentedViewController) {
+        controller = controller.presentedViewController;
+    }
+    return controller;
+}
+
 + (void)presentViewController:(UIViewController *)pController completion:(void (^)(void))completion{
     if (![pController isKindOfClass:[UIViewController class]]) {
         return;
     }
     dispatch_async(dispatch_get_main_queue(), ^{
-        UIWindow *lastObject = [UIApplication sharedApplication].keyWindow;
-        UIViewController *controller = lastObject.rootViewController;
-        while (controller.presentedViewController) {
-            if (controller.presentedViewController != pController) {
-                controller = controller.presentedViewController;
-            }
-        }
+        UIViewController *controller = [self presentViewController ];
         [controller presentViewController:pController animated:YES completion:completion];
         
         /*
@@ -68,7 +71,14 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
 }
 
 + (void)alert:(UIAlertControllerStyle)style title:(NSString *)title message:(NSString *)message actionTitles:(NSArray<NSString *> *)titles styles:(NSArray<NSNumber *> *)styles handler:(void (^)(UIAlertAction *action))handler cancelTitle:(NSString *)cancelTitle cancel:(void (^)(UIAlertAction *action))cancel completion:(void (^)(void))completion{
+    [self alert:style controller:[self presentViewController] title:title message:message actionTitles:titles styles:styles handler:handler cancelTitle:cancelTitle cancel:cancel completion:completion];
+}
+
++ (void)alert:(UIAlertControllerStyle)style controller:(UIViewController *)pController title:(NSString *)title message:(NSString *)message actionTitles:(NSArray<NSString *> *)titles styles:(NSArray<NSNumber *> *)styles handler:(void (^)(UIAlertAction *action))handler cancelTitle:(NSString *)cancelTitle cancel:(void (^)(UIAlertAction *action))cancel completion:(void (^)(void))completion{
     if (titles.count != styles.count) {
+        return;
+    }
+    if (![pController isKindOfClass:[UIViewController class]]) {
         return;
     }
     UIAlertController *controller = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:style];
@@ -82,7 +92,7 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
     }
     UIAlertAction *archiveAction = [UIAlertAction actionWithTitle:cancelTitle style:UIAlertActionStyleCancel handler:cancel];
     [controller addAction:archiveAction];
-    [self presentViewController:controller completion:completion];
+    [pController presentViewController:controller animated:YES completion:completion];
 }
 
 + (void)alertInput:(NSInteger)number title:(NSString *)title message:(NSString *)message ok:(NSString *)okTitle handler:(void (^)(UIAlertController *bAlert,UIAlertAction *action))handler cancel:(NSString *)cancelTitle handler:(void (^)(UIAlertAction *action))cancelHandler textFieldConifg:(void (^)(UITextField *textField))configurationHandler completion:(void (^)(void))completion{

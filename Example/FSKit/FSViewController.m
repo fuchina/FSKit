@@ -28,7 +28,7 @@
 }
 
 - (void)click{
-    NSInteger type = 0;
+    NSInteger type = 4;
     static NSString *tb = @"pass";
     FSDBMaster *master = [FSDBMaster sharedInstance];
     if (type == 0) {
@@ -54,6 +54,10 @@
         NSString *sql = @"select count(time) from pass";
         int count = [master countWithSQL:sql table:tb];
         NSLog(@"%@",@(count));
+    }else if (type == 4){
+        [FSKit alert:UIAlertControllerStyleActionSheet title:@"Title" message:@"Message" actionTitles:@[@"OK"] styles:@[@(UIAlertActionStyleDefault)] handler:^(UIAlertAction *action) {
+            
+        } cancelTitle:@"Cancel" cancel:nil completion:nil];
     }
     
     NSLog(@"\n\n\n\n%@\n\n\n\n",[master dbPath]);
