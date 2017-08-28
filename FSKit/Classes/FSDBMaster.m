@@ -126,6 +126,10 @@ static FSDBMaster *_instance = nil;
     [self execSQL:sql type:@"创建表"];
 }
 
+/*
+ 新增 eg.
+ @"INSERT INTO %@ (time,name,loti,lati) VALUES (\"%@\",\"%@\",\"%@\",\"%@\");";
+ */
 - (NSString *)insertSQL:(NSString *)sql class:(Class)instance tableName:(NSString *)tableName{
     if (![FSKit isValidateString:tableName]) {
         return @"表名为空";
@@ -196,7 +200,7 @@ static FSDBMaster *_instance = nil;
 }
 
 - (int)countForTable:(NSString *)tableName{
-    if (!([tableName isKindOfClass:[NSString class]] && tableName.length)) {
+    if (![FSKit isValidateString:tableName]) {
         return 0;
     }
     BOOL exist = [self checkTableExist:tableName];
@@ -205,7 +209,6 @@ static FSDBMaster *_instance = nil;
     }
     __block int count = 0;
     dispatch_sync(_queue, ^{
-        
         NSString *sql = [[NSString alloc] initWithFormat:@"SELECT COUNT(*) FROM %@;",tableName];
         sqlite3_stmt *stmt = nil;
         int prepare = sqlite3_prepare_v2(_sqlite3, [sql UTF8String], -1, &stmt, NULL);
