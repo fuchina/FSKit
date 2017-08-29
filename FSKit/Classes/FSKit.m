@@ -2943,7 +2943,7 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
 }
 
 + (NSDate *)dateByString:(NSString *)str formatter:(NSString *)formatter{
-    if (!([self isValidateString:str] && [FSKit isValidateString:formatter])) {
+    if (![self isValidateString:str]) {
         return nil;
     }
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
