@@ -10,7 +10,6 @@
 #endif
 #endif
 
-#import "FSDBMaster.h"
 #import "FSEntity.h"
 #import "FSFile.h"
 #import "FSKit.h"

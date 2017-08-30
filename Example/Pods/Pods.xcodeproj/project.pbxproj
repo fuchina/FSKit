@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		072BAB1C505D472108D931CB9AAA8F3C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F3D0735C6943877EB620B031A8A9583C /* Foundation.framework */; };
-		07DC350D8239266DD4EF6AA8491B0DBE /* FSDBMaster.m in Sources */ = {isa = PBXBuildFile; fileRef = 265FD67589E3FC1563A16DA578F66EE1 /* FSDBMaster.m */; };
 		15430031321C90ED3184CDCC06F4E4A5 /* FSFile.m in Sources */ = {isa = PBXBuildFile; fileRef = B54090C8BD371995716A7B3149C7A152 /* FSFile.m */; };
 		18F747C244EF113FAF79FCB199A34449 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DFEFEBB508ECFA1557CF1E17C13D446A /* MapKit.framework */; };
 		1CED08D7685BB49498C4A9BD8F560FCA /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F3D0735C6943877EB620B031A8A9583C /* Foundation.framework */; };
@@ -19,7 +18,6 @@
 		445E7EA1408980405F66B088167480A2 /* FSTuple.m in Sources */ = {isa = PBXBuildFile; fileRef = 649317F7094902F6FD4D5BF617CC9D73 /* FSTuple.m */; };
 		6564B2F2D0857410913B4B879E187468 /* FSKit-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 994616C581439293CF6FBBFE747E50C0 /* FSKit-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		732174BA51E52D7EBD2EE772AC3FB7E2 /* FSEntity.h in Headers */ = {isa = PBXBuildFile; fileRef = 7E4510E03DB4B67471021560F1820468 /* FSEntity.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		7835FD40F29ADCABC763BF8FFC30B092 /* FSDBMaster.h in Headers */ = {isa = PBXBuildFile; fileRef = 7A0C53E613F38B598EDAFED7C3789150 /* FSDBMaster.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		83FCEF0BF1A419ACD4E4531708CA7B71 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 62DD0E094CA9B5775B0D4B4395303084 /* CoreLocation.framework */; };
 		8DFB9DD6958C4244AF680EE910EF6D01 /* FSKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 467DC8F1FCC0E3FAD0982F10495B5860 /* FSKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		A78C19C6B8FBEB43F9EA65190F42D889 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F3D0735C6943877EB620B031A8A9583C /* Foundation.framework */; };
@@ -51,7 +49,6 @@
 		135F0C50843266D67BD6D01DBE313FD3 /* Pods-FSKit_Example-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-FSKit_Example-frameworks.sh"; sourceTree = "<group>"; };
 		1F76D20677A2AFDF48D6615C6449F475 /* Pods-FSKit_Example-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-FSKit_Example-dummy.m"; sourceTree = "<group>"; };
 		25B0E8EAE5A1AA4B8CAE65D0175281AB /* FSPdf.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = FSPdf.h; sourceTree = "<group>"; };
-		265FD67589E3FC1563A16DA578F66EE1 /* FSDBMaster.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = FSDBMaster.m; sourceTree = "<group>"; };
 		2AF90B4C60406C66D9E431D310586676 /* Pods-FSKit_Example-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-FSKit_Example-umbrella.h"; sourceTree = "<group>"; };
 		3338FEEA0FE9C07566257311C129F9A5 /* FSKit.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = FSKit.xcconfig; sourceTree = "<group>"; };
 		467DC8F1FCC0E3FAD0982F10495B5860 /* FSKit.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = FSKit.h; sourceTree = "<group>"; };
@@ -60,31 +57,30 @@
 		5A0D6E69CC23EAA454F08FF867D8923F /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5DBEC02AC4E584E2E1A2B4C07638EAFA /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS10.3.sdk/System/Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
 		6222D9E312A6FBDB5DD0FF70E884FDC9 /* FSKit.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = FSKit.m; sourceTree = "<group>"; };
-		62752332DE754420E345A11F0A5C91A9 /* Pods-FSKit_Example.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; path = "Pods-FSKit_Example.modulemap"; sourceTree = "<group>"; };
+		62752332DE754420E345A11F0A5C91A9 /* Pods-FSKit_Example.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = "sourcecode.module-map"; path = "Pods-FSKit_Example.modulemap"; sourceTree = "<group>"; };
 		62DD0E094CA9B5775B0D4B4395303084 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS10.3.sdk/System/Library/Frameworks/CoreLocation.framework; sourceTree = DEVELOPER_DIR; };
 		645EEEBF88A32792CEF9B8045E911A35 /* FSKit-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "FSKit-dummy.m"; sourceTree = "<group>"; };
 		649317F7094902F6FD4D5BF617CC9D73 /* FSTuple.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = FSTuple.m; sourceTree = "<group>"; };
 		757D1BAA42823BEAB00115DECA21730C /* FSKit-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "FSKit-prefix.pch"; sourceTree = "<group>"; };
 		79E377B9F2E83B94BD28FDCF48852E61 /* Pods-FSKit_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-FSKit_Tests.debug.xcconfig"; sourceTree = "<group>"; };
-		7A0C53E613F38B598EDAFED7C3789150 /* FSDBMaster.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = FSDBMaster.h; sourceTree = "<group>"; };
 		7C9661440B167663B40D409DF28DC935 /* Pods-FSKit_Example-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-FSKit_Example-acknowledgements.plist"; sourceTree = "<group>"; };
 		7E04A1F6D4782E49AEAF41A1782DC5BF /* Pods-FSKit_Tests-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-FSKit_Tests-acknowledgements.plist"; sourceTree = "<group>"; };
 		7E4510E03DB4B67471021560F1820468 /* FSEntity.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = FSEntity.h; sourceTree = "<group>"; };
 		8635F9D05950C763B28D354D37F43EDD /* Pods-FSKit_Tests-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-FSKit_Tests-resources.sh"; sourceTree = "<group>"; };
 		88F1BC6F091971F66E9991C477B88C41 /* Pods-FSKit_Tests-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-FSKit_Tests-frameworks.sh"; sourceTree = "<group>"; };
-		8B32FFD213B15D42BC46F1A6B1501A59 /* FSKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = FSKit.framework; path = FSKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		8B32FFD213B15D42BC46F1A6B1501A59 /* FSKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = FSKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		8CDC5466F5F6D4E10B1C66DBFBB8F920 /* FSTuple.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = FSTuple.h; sourceTree = "<group>"; };
-		93A4A3777CF96A4AAC1D13BA6DCCEA73 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
-		987B2E1FBF504C4CF12CC0C69198B36C /* FSKit.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; path = FSKit.modulemap; sourceTree = "<group>"; };
+		93A4A3777CF96A4AAC1D13BA6DCCEA73 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		987B2E1FBF504C4CF12CC0C69198B36C /* FSKit.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = "sourcecode.module-map"; path = FSKit.modulemap; sourceTree = "<group>"; };
 		994616C581439293CF6FBBFE747E50C0 /* FSKit-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "FSKit-umbrella.h"; sourceTree = "<group>"; };
 		A51F565DA4F327939AD4ADB8F729998C /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS10.3.sdk/System/Library/Frameworks/AVFoundation.framework; sourceTree = DEVELOPER_DIR; };
 		A59DCCB288363CD7B990BF46FB5042DD /* FSEntity.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = FSEntity.m; sourceTree = "<group>"; };
 		A6D6DFAD3EF2DD1F77806BC4384B9803 /* FuSoft.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = FuSoft.h; sourceTree = "<group>"; };
 		A99639D5BA4FD144CF6446D3F70D7001 /* Pods-FSKit_Tests-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-FSKit_Tests-umbrella.h"; sourceTree = "<group>"; };
-		ACB3ECEC4EC77C003AA6FD7AE4A8796E /* Pods-FSKit_Tests.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; path = "Pods-FSKit_Tests.modulemap"; sourceTree = "<group>"; };
+		ACB3ECEC4EC77C003AA6FD7AE4A8796E /* Pods-FSKit_Tests.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = "sourcecode.module-map"; path = "Pods-FSKit_Tests.modulemap"; sourceTree = "<group>"; };
 		B54090C8BD371995716A7B3149C7A152 /* FSFile.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = FSFile.m; sourceTree = "<group>"; };
 		C542AD797FA0782F63CDA8E317B11B1A /* FSPdf.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = FSPdf.m; sourceTree = "<group>"; };
-		C58AFC51958234D0D8E25CF977DA52FF /* Pods_FSKit_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Pods_FSKit_Tests.framework; path = "Pods-FSKit_Tests.framework"; sourceTree = BUILT_PRODUCTS_DIR; };
+		C58AFC51958234D0D8E25CF977DA52FF /* Pods_FSKit_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_FSKit_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C96AD383F46A07D224673D724EF778BE /* CoreTelephony.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreTelephony.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS10.3.sdk/System/Library/Frameworks/CoreTelephony.framework; sourceTree = DEVELOPER_DIR; };
 		D3D957E54CB3C513475D225123B67662 /* Pods-FSKit_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-FSKit_Example.debug.xcconfig"; sourceTree = "<group>"; };
 		DA96DB4FA82B4BCE341FE83279C167A7 /* Pods-FSKit_Example-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-FSKit_Example-resources.sh"; sourceTree = "<group>"; };
@@ -95,7 +91,7 @@
 		F3D0735C6943877EB620B031A8A9583C /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS10.3.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		F42C124F8236A4D573B94D983928DB2D /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		F588F6BCAB60AF7B8472EF5324027CE2 /* Pods-FSKit_Example-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-FSKit_Example-acknowledgements.markdown"; sourceTree = "<group>"; };
-		F63FBE4068A23939908057FF01BDFD7E /* Pods_FSKit_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Pods_FSKit_Example.framework; path = "Pods-FSKit_Example.framework"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F63FBE4068A23939908057FF01BDFD7E /* Pods_FSKit_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_FSKit_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -244,8 +240,6 @@
 		C5959911949746BECD8251E09FF98ECA /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				7A0C53E613F38B598EDAFED7C3789150 /* FSDBMaster.h */,
-				265FD67589E3FC1563A16DA578F66EE1 /* FSDBMaster.m */,
 				7E4510E03DB4B67471021560F1820468 /* FSEntity.h */,
 				A59DCCB288363CD7B990BF46FB5042DD /* FSEntity.m */,
 				5463536FE71D0449C77F79D59549D71A /* FSFile.h */,
@@ -258,7 +252,6 @@
 				649317F7094902F6FD4D5BF617CC9D73 /* FSTuple.m */,
 				A6D6DFAD3EF2DD1F77806BC4384B9803 /* FuSoft.h */,
 			);
-			name = Classes;
 			path = Classes;
 			sourceTree = "<group>";
 		};
@@ -276,7 +269,6 @@
 			children = (
 				C5959911949746BECD8251E09FF98ECA /* Classes */,
 			);
-			name = FSKit;
 			path = FSKit;
 			sourceTree = "<group>";
 		};
@@ -295,7 +287,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7835FD40F29ADCABC763BF8FFC30B092 /* FSDBMaster.h in Headers */,
 				732174BA51E52D7EBD2EE772AC3FB7E2 /* FSEntity.h in Headers */,
 				B011EAB99906584F99B2F951FD92961F /* FSFile.h in Headers */,
 				6564B2F2D0857410913B4B879E187468 /* FSKit-umbrella.h in Headers */,
@@ -402,7 +393,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				07DC350D8239266DD4EF6AA8491B0DBE /* FSDBMaster.m in Sources */,
 				292267502DFFCF13996B747568990A16 /* FSEntity.m in Sources */,
 				15430031321C90ED3184CDCC06F4E4A5 /* FSFile.m in Sources */,
 				F26F8A983E0E63C049DC787FAEC5DAF3 /* FSKit-dummy.m in Sources */,
