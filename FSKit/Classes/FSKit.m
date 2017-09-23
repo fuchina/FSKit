@@ -2078,27 +2078,13 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
     return NO;
 }
 
-+ (int)isTheSameDayA:(NSDate *)aDate b:(NSDate *)bDate{
-    // 是返回1 不是返回2 其他返回0
-    if (aDate == nil  || bDate == nil) {
-        return 0;
++ (BOOL)isTheSameDayA:(NSDate *)aDate b:(NSDate *)bDate{
+    if (!([aDate isKindOfClass:[NSDate class]] && [bDate isKindOfClass:[NSDate class]])) {
+        return NO;
     }
-    NSCalendar *calendarA = [NSCalendar currentCalendar];
-    NSDateComponents *componentsA = [calendarA components:NSCalendarUnitYear|NSCalendarUnitMonth|NSCalendarUnitDay fromDate:aDate];
-    NSInteger yearA = [componentsA year];
-    NSInteger monthA = [componentsA month];
-    NSInteger dayA = [componentsA day];
-    
-    NSCalendar *calendarB = [NSCalendar currentCalendar];
-    NSDateComponents *componentsB = [calendarB components:NSCalendarUnitYear|NSCalendarUnitMonth|NSCalendarUnitDay fromDate:bDate];
-    NSInteger yearB = [componentsB year];
-    NSInteger monthB = [componentsB month];
-    NSInteger dayB = [componentsB day];
-    
-    if ((yearA == yearB) && (monthA == monthB) && (dayA == dayB)) {
-        return 1;
-    }
-    return 2;
+    NSDateComponents *f = [self componentForDate:aDate];
+    NSDateComponents *s = [self componentForDate:bDate];
+    return (f.year == s.year) && (f.month == s.month) && (f.day == s.day);
 }
 
 + (BOOL)isURLString:(NSString *)sourceString{

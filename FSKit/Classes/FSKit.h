@@ -66,7 +66,7 @@ extern NSInteger FSIntegerTimeIntevalSince1970(void);
 + (BOOL)isNumber:(NSString *)str;
 + (BOOL)isString:(NSString *)aString containString:(NSString *)bString;
 + (BOOL)isStringContainsStringAndNumber:(NSString *)sourceString;
-+ (int)isTheSameDayA:(NSDate *)aDate b:(NSDate *)bDate;
++ (BOOL)isTheSameDayA:(NSDate *)aDate b:(NSDate *)bDate;
 + (BOOL)isURLString:(NSString *)sourceString;//0
 // 判断字符串是否含有中文
 + (BOOL)isHaveChineseInString:(NSString *)string;
