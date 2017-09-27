@@ -1466,6 +1466,40 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
     return [[weekdays objectAtIndex:theComponents.weekday] integerValue];
 }
 
++ (NSInteger)daysForMonth:(NSInteger)month year:(NSInteger)year{
+    NSInteger days = 0;
+    BOOL isLeapYear = [FSKit isLeapYear:(int)year];
+    BOOL isBigMonth = NO;
+    if (month <=7) {
+        if (month % 2 == 1) {
+            isBigMonth = YES;
+        }
+    }else{
+        if (month % 2 == 0) {
+            isBigMonth = YES;
+        }
+    }
+    
+    if (isLeapYear) {
+        if (month == 2) {
+            days = 29;
+        }else if (isBigMonth){
+            days = 31;
+        }else{
+            days = 30;
+        }
+    }else{
+        if (month == 2) {
+            days = 28;
+        }else if (isBigMonth){
+            days = 31;
+        }else{
+            days = 30;
+        }
+    }
+    return days;
+}
+
 + (NSDateComponents *)yearMonthDayFromDate:(NSDate *)date{
     if (date == nil) {
         return nil;

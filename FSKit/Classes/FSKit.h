@@ -88,6 +88,8 @@ extern NSInteger FSIntegerTimeIntevalSince1970(void);
 + (NSTimeInterval)mmSecondsSince1970;
 + (NSInteger)integerSecondsSince1970;
 + (NSInteger)weekdayStringFromDate:(NSDate *)inputDate;
+// 根据年月计算当月有多少天
++ (NSInteger)daysForMonth:(NSInteger)month year:(NSInteger)year;
 + (NSDateComponents *)yearMonthDayFromDate:(NSDate *)date;
 
 + (double)forwardValue:(double)number afterPoint:(int)position;  // 只入不舍
