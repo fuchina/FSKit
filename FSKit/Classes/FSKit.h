@@ -43,7 +43,7 @@ extern NSInteger FSIntegerTimeIntevalSince1970(void);
 
 + (void)showMessage:(NSString *)message;
 + (void)showAlertWithMessage:(NSString *)message;
-+ (void)showAlertWithTitle:(NSString *)title message:(NSString *)message;
++ (void)showAlertWithTitle:(NSString *)title message:(NSString *)message ok:(NSString *)ok;
 
 + (BOOL)isValidateEmail:(NSString *)str;
 + (BOOL)isPureInt:(NSString *)string;
@@ -117,6 +117,9 @@ extern NSInteger FSIntegerTimeIntevalSince1970(void);
 + (CGFloat)freeStoragePercentage;   // 可用内存占总内存的比例,eg  0.1;
 + (NSInteger)getTotalDiskSize;   // 获取磁盘总量
 + (NSInteger)getAvailableDiskSize;   // 获取磁盘可用量
+
+// 根据键盘通知获取键盘高度
++ (CGSize)keyboardSizeFromNotification:(NSNotification *)notification;
 
 + (NSString *)appVersionNumber;                                                     // 获得版本号
 + (NSString *)appName;  // App名字

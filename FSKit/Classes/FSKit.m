@@ -263,11 +263,14 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
 }
 
 + (void)showAlertWithMessage:(NSString *)message{
-    [self alert:UIAlertControllerStyleAlert title:@"提示" message:message actionTitles:@[@"确定"] styles:@[@(UIAlertActionStyleDefault)] handler:nil cancelTitle:@"取消" cancel:nil completion:nil];
+    [self showAlertWithTitle:@"说明" message:message ok:@"确定"];
 }
 
-+ (void)showAlertWithTitle:(NSString *)title message:(NSString *)message{
-    [self alert:UIAlertControllerStyleAlert title:title message:message actionTitles:@[@"确定"] styles:@[@(UIAlertActionStyleDefault)] handler:nil cancelTitle:@"取消" cancel:nil completion:nil];
++ (void)showAlertWithTitle:(NSString *)title message:(NSString *)message ok:(NSString *)ok{
+    UIAlertController *controller = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *action = [UIAlertAction actionWithTitle:ok style:UIAlertActionStyleDefault handler:nil];
+    [controller addAction:action];
+    [self presentViewController:controller completion:nil];
 }
 
 + (void)showMessageInMainThread:(NSString *)message{
@@ -472,9 +475,7 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
 }
 
 + (CGSize)keyboardNotificationScroll:(NSNotification *)notification baseOn:(CGFloat)baseOn{
-    NSDictionary *info = [notification userInfo];
-    NSValue *value = [info objectForKey:UIKeyboardFrameEndUserInfoKey];
-    CGSize keyboardSize = [value CGRectValue].size;
+    CGSize keyboardSize = [self keyboardSizeFromNotification:notification];
     
     CGSize size = [UIScreen mainScreen].bounds.size;
     if ([notification.name isEqualToString:UIKeyboardWillShowNotification]) {
@@ -550,6 +551,16 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
         freeSpace = (unsigned long long)(buf.f_bsize * buf.f_bavail);
     }
     return (NSInteger)freeSpace;
+}
+
++ (CGSize)keyboardSizeFromNotification:(NSNotification *)notification{
+    if ([notification.name isEqualToString:UIKeyboardWillShowNotification] || [notification.name isEqualToString:UIKeyboardWillChangeFrameNotification] || [notification.name isEqualToString:UIKeyboardWillHideNotification]) {
+        NSDictionary *info = [notification userInfo];
+        NSValue *value = [info objectForKey:UIKeyboardFrameEndUserInfoKey];
+        CGSize keyboardSize = [value CGRectValue].size;
+        return keyboardSize;
+    }
+    return CGSizeZero;
 }
 
 + (double)rad:(double)d{
