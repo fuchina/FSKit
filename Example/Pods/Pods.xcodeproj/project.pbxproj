@@ -8,30 +8,32 @@
 
 /* Begin PBXBuildFile section */
 		072BAB1C505D472108D931CB9AAA8F3C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F3D0735C6943877EB620B031A8A9583C /* Foundation.framework */; };
-		15430031321C90ED3184CDCC06F4E4A5 /* FSFile.m in Sources */ = {isa = PBXBuildFile; fileRef = B54090C8BD371995716A7B3149C7A152 /* FSFile.m */; };
+		0BC3A6DE3327C25624787C7AC5A61334 /* FSKit-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 994616C581439293CF6FBBFE747E50C0 /* FSKit-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		18F747C244EF113FAF79FCB199A34449 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DFEFEBB508ECFA1557CF1E17C13D446A /* MapKit.framework */; };
+		1A02FE54094B3ED977AE72A7DA71BFBA /* FSKit.h in Headers */ = {isa = PBXBuildFile; fileRef = E13D628B9C83E08CCF26C280DF0471DF /* FSKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1CED08D7685BB49498C4A9BD8F560FCA /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F3D0735C6943877EB620B031A8A9583C /* Foundation.framework */; };
-		292267502DFFCF13996B747568990A16 /* FSEntity.m in Sources */ = {isa = PBXBuildFile; fileRef = A59DCCB288363CD7B990BF46FB5042DD /* FSEntity.m */; };
+		2501CB31EF43AFD1049032E4F2041117 /* FSTuple.h in Headers */ = {isa = PBXBuildFile; fileRef = 0675C540FF03546A4CC7EB136C990B07 /* FSTuple.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2B6CCC90E23CDD093BD10E7502A4B5FC /* Pods-FSKit_Tests-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = EBA818D098BEB759F729AD81808F57C7 /* Pods-FSKit_Tests-dummy.m */; };
+		2D57903401618460ECCF4483D580BE04 /* FSFile.h in Headers */ = {isa = PBXBuildFile; fileRef = 6CA7B2364D1DB020D8DBA07682C67005 /* FSFile.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		33280809DD83EB57E24799AA56DB1127 /* FuSoft.h in Headers */ = {isa = PBXBuildFile; fileRef = 47693742249D965CA939766CF5B71D0F /* FuSoft.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3C6A9B807710D79083A45DB6C53FE11D /* CoreTelephony.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C96AD383F46A07D224673D724EF778BE /* CoreTelephony.framework */; };
-		3E9F037C5D14AD3A722660F89086812A /* FSPdf.m in Sources */ = {isa = PBXBuildFile; fileRef = C542AD797FA0782F63CDA8E317B11B1A /* FSPdf.m */; };
-		445E7EA1408980405F66B088167480A2 /* FSTuple.m in Sources */ = {isa = PBXBuildFile; fileRef = 649317F7094902F6FD4D5BF617CC9D73 /* FSTuple.m */; };
-		6564B2F2D0857410913B4B879E187468 /* FSKit-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 994616C581439293CF6FBBFE747E50C0 /* FSKit-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		732174BA51E52D7EBD2EE772AC3FB7E2 /* FSEntity.h in Headers */ = {isa = PBXBuildFile; fileRef = 7E4510E03DB4B67471021560F1820468 /* FSEntity.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4B83A8B33111C84A858AB8699C69861A /* FSKit-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 645EEEBF88A32792CEF9B8045E911A35 /* FSKit-dummy.m */; };
+		5747E1A29088BEAB94A864012812BEE4 /* FSFile.m in Sources */ = {isa = PBXBuildFile; fileRef = E6534F7430D18613F2BAE894FFEE0BAC /* FSFile.m */; };
+		76CFB0F8E00ECF4E3E6A15E159D41384 /* FSPdf.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A04F51865B561FE4BF270F38EFD5D59 /* FSPdf.m */; };
+		81D08707A3ED5A591D13FF024DAE0F60 /* FSEntity.m in Sources */ = {isa = PBXBuildFile; fileRef = FD5E7905D530E9B68835FFF97FA9E74C /* FSEntity.m */; };
 		83FCEF0BF1A419ACD4E4531708CA7B71 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 62DD0E094CA9B5775B0D4B4395303084 /* CoreLocation.framework */; };
-		8DFB9DD6958C4244AF680EE910EF6D01 /* FSKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 467DC8F1FCC0E3FAD0982F10495B5860 /* FSKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		A44FBBF56AF3A75733ED5A9076DF6247 /* FSTuple.m in Sources */ = {isa = PBXBuildFile; fileRef = 69EC40600C1A8C3CCD743879C378B5F5 /* FSTuple.m */; };
 		A78C19C6B8FBEB43F9EA65190F42D889 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F3D0735C6943877EB620B031A8A9583C /* Foundation.framework */; };
-		B011EAB99906584F99B2F951FD92961F /* FSFile.h in Headers */ = {isa = PBXBuildFile; fileRef = 5463536FE71D0449C77F79D59549D71A /* FSFile.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		A9FB6562CB9F641CD6D3903B4FFFA41C /* FSEntity.h in Headers */ = {isa = PBXBuildFile; fileRef = D796E496667FFACFD4C1D217978DFD48 /* FSEntity.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B95F855ECCDA9B01EEF7C6B8EDA2D587 /* Pods-FSKit_Example-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F76D20677A2AFDF48D6615C6449F475 /* Pods-FSKit_Example-dummy.m */; };
+		C56A05325685AC76337DAE8B282B378D /* FSWindow.h in Headers */ = {isa = PBXBuildFile; fileRef = C1DC523B9F494A2B69A246DFBFA2992E /* FSWindow.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CA5C19F35BD34ACB374A3739C58A4C16 /* Pods-FSKit_Tests-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = A99639D5BA4FD144CF6446D3F70D7001 /* Pods-FSKit_Tests-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CA5E786AB3DAE751A1B3053A4005B1F5 /* Pods-FSKit_Example-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 2AF90B4C60406C66D9E431D310586676 /* Pods-FSKit_Example-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D4DBA2F2A62D9B37DA0FF01D20D8C62D /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5DBEC02AC4E584E2E1A2B4C07638EAFA /* UIKit.framework */; };
-		E536403EDC6A998DF03B7694CCAB26FC /* FSKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 6222D9E312A6FBDB5DD0FF70E884FDC9 /* FSKit.m */; };
-		E9557AB3D94DAFC6A955FF6A6A96273F /* FSPdf.h in Headers */ = {isa = PBXBuildFile; fileRef = 25B0E8EAE5A1AA4B8CAE65D0175281AB /* FSPdf.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		ECC0A6718CE4D6D1DF27CCB57C340667 /* FuSoft.h in Headers */ = {isa = PBXBuildFile; fileRef = A6D6DFAD3EF2DD1F77806BC4384B9803 /* FuSoft.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		D81750DD44868F92A8ECB3A6CDB816B6 /* FSKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 632E11A135CC696756855E05C15984C6 /* FSKit.m */; };
+		DB1B8A95C380F0F88AC5BC7244254C88 /* FSWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = FBE19B9254237E3179CCBDD04D7EA3A9 /* FSWindow.m */; };
 		EDBA44A92AD1F014A2DE4927F726C057 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A51F565DA4F327939AD4ADB8F729998C /* AVFoundation.framework */; };
-		EE6D214E9CD2F0E2081BB53612073E3B /* FSTuple.h in Headers */ = {isa = PBXBuildFile; fileRef = 8CDC5466F5F6D4E10B1C66DBFBB8F920 /* FSTuple.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		F26F8A983E0E63C049DC787FAEC5DAF3 /* FSKit-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 645EEEBF88A32792CEF9B8045E911A35 /* FSKit-dummy.m */; };
+		F4BEF42C0DF5F1425550481A4E1A4643 /* FSPdf.h in Headers */ = {isa = PBXBuildFile; fileRef = 60AF16C90953A567B8BEF82CD8E7BAEF /* FSPdf.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -46,52 +48,54 @@
 
 /* Begin PBXFileReference section */
 		03E2C90A92A22A34025A935D994C9F75 /* Pods-FSKit_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-FSKit_Tests.release.xcconfig"; sourceTree = "<group>"; };
+		0675C540FF03546A4CC7EB136C990B07 /* FSTuple.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = FSTuple.h; sourceTree = "<group>"; };
 		135F0C50843266D67BD6D01DBE313FD3 /* Pods-FSKit_Example-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-FSKit_Example-frameworks.sh"; sourceTree = "<group>"; };
 		1F76D20677A2AFDF48D6615C6449F475 /* Pods-FSKit_Example-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-FSKit_Example-dummy.m"; sourceTree = "<group>"; };
-		25B0E8EAE5A1AA4B8CAE65D0175281AB /* FSPdf.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = FSPdf.h; sourceTree = "<group>"; };
 		2AF90B4C60406C66D9E431D310586676 /* Pods-FSKit_Example-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-FSKit_Example-umbrella.h"; sourceTree = "<group>"; };
 		3338FEEA0FE9C07566257311C129F9A5 /* FSKit.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = FSKit.xcconfig; sourceTree = "<group>"; };
-		467DC8F1FCC0E3FAD0982F10495B5860 /* FSKit.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = FSKit.h; sourceTree = "<group>"; };
-		5463536FE71D0449C77F79D59549D71A /* FSFile.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = FSFile.h; sourceTree = "<group>"; };
+		47693742249D965CA939766CF5B71D0F /* FuSoft.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = FuSoft.h; sourceTree = "<group>"; };
 		584FE749363A5C88D11635AD0A0A3DF4 /* Pods-FSKit_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-FSKit_Example.release.xcconfig"; sourceTree = "<group>"; };
+		5A04F51865B561FE4BF270F38EFD5D59 /* FSPdf.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = FSPdf.m; sourceTree = "<group>"; };
 		5A0D6E69CC23EAA454F08FF867D8923F /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5DBEC02AC4E584E2E1A2B4C07638EAFA /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS10.3.sdk/System/Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
-		6222D9E312A6FBDB5DD0FF70E884FDC9 /* FSKit.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = FSKit.m; sourceTree = "<group>"; };
-		62752332DE754420E345A11F0A5C91A9 /* Pods-FSKit_Example.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = "sourcecode.module-map"; path = "Pods-FSKit_Example.modulemap"; sourceTree = "<group>"; };
+		60AF16C90953A567B8BEF82CD8E7BAEF /* FSPdf.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = FSPdf.h; sourceTree = "<group>"; };
+		62752332DE754420E345A11F0A5C91A9 /* Pods-FSKit_Example.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; path = "Pods-FSKit_Example.modulemap"; sourceTree = "<group>"; };
 		62DD0E094CA9B5775B0D4B4395303084 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS10.3.sdk/System/Library/Frameworks/CoreLocation.framework; sourceTree = DEVELOPER_DIR; };
+		632E11A135CC696756855E05C15984C6 /* FSKit.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = FSKit.m; sourceTree = "<group>"; };
 		645EEEBF88A32792CEF9B8045E911A35 /* FSKit-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "FSKit-dummy.m"; sourceTree = "<group>"; };
-		649317F7094902F6FD4D5BF617CC9D73 /* FSTuple.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = FSTuple.m; sourceTree = "<group>"; };
+		69EC40600C1A8C3CCD743879C378B5F5 /* FSTuple.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = FSTuple.m; sourceTree = "<group>"; };
+		6CA7B2364D1DB020D8DBA07682C67005 /* FSFile.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = FSFile.h; sourceTree = "<group>"; };
 		757D1BAA42823BEAB00115DECA21730C /* FSKit-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "FSKit-prefix.pch"; sourceTree = "<group>"; };
 		79E377B9F2E83B94BD28FDCF48852E61 /* Pods-FSKit_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-FSKit_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		7C9661440B167663B40D409DF28DC935 /* Pods-FSKit_Example-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-FSKit_Example-acknowledgements.plist"; sourceTree = "<group>"; };
 		7E04A1F6D4782E49AEAF41A1782DC5BF /* Pods-FSKit_Tests-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-FSKit_Tests-acknowledgements.plist"; sourceTree = "<group>"; };
-		7E4510E03DB4B67471021560F1820468 /* FSEntity.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = FSEntity.h; sourceTree = "<group>"; };
 		8635F9D05950C763B28D354D37F43EDD /* Pods-FSKit_Tests-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-FSKit_Tests-resources.sh"; sourceTree = "<group>"; };
 		88F1BC6F091971F66E9991C477B88C41 /* Pods-FSKit_Tests-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-FSKit_Tests-frameworks.sh"; sourceTree = "<group>"; };
-		8B32FFD213B15D42BC46F1A6B1501A59 /* FSKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = FSKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		8CDC5466F5F6D4E10B1C66DBFBB8F920 /* FSTuple.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = FSTuple.h; sourceTree = "<group>"; };
-		93A4A3777CF96A4AAC1D13BA6DCCEA73 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
-		987B2E1FBF504C4CF12CC0C69198B36C /* FSKit.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = "sourcecode.module-map"; path = FSKit.modulemap; sourceTree = "<group>"; };
+		8B32FFD213B15D42BC46F1A6B1501A59 /* FSKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = FSKit.framework; path = FSKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		93A4A3777CF96A4AAC1D13BA6DCCEA73 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		987B2E1FBF504C4CF12CC0C69198B36C /* FSKit.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; path = FSKit.modulemap; sourceTree = "<group>"; };
 		994616C581439293CF6FBBFE747E50C0 /* FSKit-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "FSKit-umbrella.h"; sourceTree = "<group>"; };
 		A51F565DA4F327939AD4ADB8F729998C /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS10.3.sdk/System/Library/Frameworks/AVFoundation.framework; sourceTree = DEVELOPER_DIR; };
-		A59DCCB288363CD7B990BF46FB5042DD /* FSEntity.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = FSEntity.m; sourceTree = "<group>"; };
-		A6D6DFAD3EF2DD1F77806BC4384B9803 /* FuSoft.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = FuSoft.h; sourceTree = "<group>"; };
 		A99639D5BA4FD144CF6446D3F70D7001 /* Pods-FSKit_Tests-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-FSKit_Tests-umbrella.h"; sourceTree = "<group>"; };
-		ACB3ECEC4EC77C003AA6FD7AE4A8796E /* Pods-FSKit_Tests.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = "sourcecode.module-map"; path = "Pods-FSKit_Tests.modulemap"; sourceTree = "<group>"; };
-		B54090C8BD371995716A7B3149C7A152 /* FSFile.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = FSFile.m; sourceTree = "<group>"; };
-		C542AD797FA0782F63CDA8E317B11B1A /* FSPdf.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = FSPdf.m; sourceTree = "<group>"; };
-		C58AFC51958234D0D8E25CF977DA52FF /* Pods_FSKit_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_FSKit_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		ACB3ECEC4EC77C003AA6FD7AE4A8796E /* Pods-FSKit_Tests.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; path = "Pods-FSKit_Tests.modulemap"; sourceTree = "<group>"; };
+		C1DC523B9F494A2B69A246DFBFA2992E /* FSWindow.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = FSWindow.h; sourceTree = "<group>"; };
+		C58AFC51958234D0D8E25CF977DA52FF /* Pods_FSKit_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Pods_FSKit_Tests.framework; path = "Pods-FSKit_Tests.framework"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C96AD383F46A07D224673D724EF778BE /* CoreTelephony.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreTelephony.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS10.3.sdk/System/Library/Frameworks/CoreTelephony.framework; sourceTree = DEVELOPER_DIR; };
 		D3D957E54CB3C513475D225123B67662 /* Pods-FSKit_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-FSKit_Example.debug.xcconfig"; sourceTree = "<group>"; };
+		D796E496667FFACFD4C1D217978DFD48 /* FSEntity.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = FSEntity.h; sourceTree = "<group>"; };
 		DA96DB4FA82B4BCE341FE83279C167A7 /* Pods-FSKit_Example-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-FSKit_Example-resources.sh"; sourceTree = "<group>"; };
 		DFEFEBB508ECFA1557CF1E17C13D446A /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS10.3.sdk/System/Library/Frameworks/MapKit.framework; sourceTree = DEVELOPER_DIR; };
+		E13D628B9C83E08CCF26C280DF0471DF /* FSKit.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = FSKit.h; sourceTree = "<group>"; };
+		E6534F7430D18613F2BAE894FFEE0BAC /* FSFile.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = FSFile.m; sourceTree = "<group>"; };
 		E84035CD2115CCFB250B4B9A268AE654 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		EBA818D098BEB759F729AD81808F57C7 /* Pods-FSKit_Tests-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-FSKit_Tests-dummy.m"; sourceTree = "<group>"; };
 		F2C1EEDDD63376B1410559EA9F5E0C4B /* Pods-FSKit_Tests-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-FSKit_Tests-acknowledgements.markdown"; sourceTree = "<group>"; };
 		F3D0735C6943877EB620B031A8A9583C /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS10.3.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		F42C124F8236A4D573B94D983928DB2D /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		F588F6BCAB60AF7B8472EF5324027CE2 /* Pods-FSKit_Example-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-FSKit_Example-acknowledgements.markdown"; sourceTree = "<group>"; };
-		F63FBE4068A23939908057FF01BDFD7E /* Pods_FSKit_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_FSKit_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		F63FBE4068A23939908057FF01BDFD7E /* Pods_FSKit_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Pods_FSKit_Example.framework; path = "Pods-FSKit_Example.framework"; sourceTree = BUILT_PRODUCTS_DIR; };
+		FBE19B9254237E3179CCBDD04D7EA3A9 /* FSWindow.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = FSWindow.m; sourceTree = "<group>"; };
+		FD5E7905D530E9B68835FFF97FA9E74C /* FSEntity.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = FSEntity.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -209,6 +213,27 @@
 			);
 			sourceTree = "<group>";
 		};
+		87B8D2E458215D13A11570914A8BDA97 /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				D796E496667FFACFD4C1D217978DFD48 /* FSEntity.h */,
+				FD5E7905D530E9B68835FFF97FA9E74C /* FSEntity.m */,
+				6CA7B2364D1DB020D8DBA07682C67005 /* FSFile.h */,
+				E6534F7430D18613F2BAE894FFEE0BAC /* FSFile.m */,
+				E13D628B9C83E08CCF26C280DF0471DF /* FSKit.h */,
+				632E11A135CC696756855E05C15984C6 /* FSKit.m */,
+				60AF16C90953A567B8BEF82CD8E7BAEF /* FSPdf.h */,
+				5A04F51865B561FE4BF270F38EFD5D59 /* FSPdf.m */,
+				0675C540FF03546A4CC7EB136C990B07 /* FSTuple.h */,
+				69EC40600C1A8C3CCD743879C378B5F5 /* FSTuple.m */,
+				C1DC523B9F494A2B69A246DFBFA2992E /* FSWindow.h */,
+				FBE19B9254237E3179CCBDD04D7EA3A9 /* FSWindow.m */,
+				47693742249D965CA939766CF5B71D0F /* FuSoft.h */,
+			);
+			name = Classes;
+			path = Classes;
+			sourceTree = "<group>";
+		};
 		AC33DBF563C3F7C9363F341B171D5A30 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -237,24 +262,6 @@
 			path = "Target Support Files/Pods-FSKit_Tests";
 			sourceTree = "<group>";
 		};
-		C5959911949746BECD8251E09FF98ECA /* Classes */ = {
-			isa = PBXGroup;
-			children = (
-				7E4510E03DB4B67471021560F1820468 /* FSEntity.h */,
-				A59DCCB288363CD7B990BF46FB5042DD /* FSEntity.m */,
-				5463536FE71D0449C77F79D59549D71A /* FSFile.h */,
-				B54090C8BD371995716A7B3149C7A152 /* FSFile.m */,
-				467DC8F1FCC0E3FAD0982F10495B5860 /* FSKit.h */,
-				6222D9E312A6FBDB5DD0FF70E884FDC9 /* FSKit.m */,
-				25B0E8EAE5A1AA4B8CAE65D0175281AB /* FSPdf.h */,
-				C542AD797FA0782F63CDA8E317B11B1A /* FSPdf.m */,
-				8CDC5466F5F6D4E10B1C66DBFBB8F920 /* FSTuple.h */,
-				649317F7094902F6FD4D5BF617CC9D73 /* FSTuple.m */,
-				A6D6DFAD3EF2DD1F77806BC4384B9803 /* FuSoft.h */,
-			);
-			path = Classes;
-			sourceTree = "<group>";
-		};
 		DA58BDE1DC1667802EE2F0D8B92F64A0 /* Targets Support Files */ = {
 			isa = PBXGroup;
 			children = (
@@ -267,8 +274,9 @@
 		FB2A9F0C22F4ECB5DB7107CB00E897E0 /* FSKit */ = {
 			isa = PBXGroup;
 			children = (
-				C5959911949746BECD8251E09FF98ECA /* Classes */,
+				87B8D2E458215D13A11570914A8BDA97 /* Classes */,
 			);
+			name = FSKit;
 			path = FSKit;
 			sourceTree = "<group>";
 		};
@@ -283,17 +291,18 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		EFFDC8D14C4872CBA8D09300BB26DB88 /* Headers */ = {
+		A797C5DDE617A5009FFD42AC3F0D01B0 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				732174BA51E52D7EBD2EE772AC3FB7E2 /* FSEntity.h in Headers */,
-				B011EAB99906584F99B2F951FD92961F /* FSFile.h in Headers */,
-				6564B2F2D0857410913B4B879E187468 /* FSKit-umbrella.h in Headers */,
-				8DFB9DD6958C4244AF680EE910EF6D01 /* FSKit.h in Headers */,
-				E9557AB3D94DAFC6A955FF6A6A96273F /* FSPdf.h in Headers */,
-				EE6D214E9CD2F0E2081BB53612073E3B /* FSTuple.h in Headers */,
-				ECC0A6718CE4D6D1DF27CCB57C340667 /* FuSoft.h in Headers */,
+				A9FB6562CB9F641CD6D3903B4FFFA41C /* FSEntity.h in Headers */,
+				2D57903401618460ECCF4483D580BE04 /* FSFile.h in Headers */,
+				0BC3A6DE3327C25624787C7AC5A61334 /* FSKit-umbrella.h in Headers */,
+				1A02FE54094B3ED977AE72A7DA71BFBA /* FSKit.h in Headers */,
+				F4BEF42C0DF5F1425550481A4E1A4643 /* FSPdf.h in Headers */,
+				2501CB31EF43AFD1049032E4F2041117 /* FSTuple.h in Headers */,
+				C56A05325685AC76337DAE8B282B378D /* FSWindow.h in Headers */,
+				33280809DD83EB57E24799AA56DB1127 /* FuSoft.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -330,9 +339,9 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 346DADBD02CB330EE5B908202071AB32 /* Build configuration list for PBXNativeTarget "FSKit" */;
 			buildPhases = (
-				1FEFE4206DC2E286FDFC754546DEDF5E /* Sources */,
+				D8CA2105636CE8C0A97090AE41EF40ED /* Sources */,
 				7B19EAD5CD41008B3851E775B838C00F /* Frameworks */,
-				EFFDC8D14C4872CBA8D09300BB26DB88 /* Headers */,
+				A797C5DDE617A5009FFD42AC3F0D01B0 /* Headers */,
 			);
 			buildRules = (
 			);
@@ -389,24 +398,25 @@
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
-		1FEFE4206DC2E286FDFC754546DEDF5E /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				292267502DFFCF13996B747568990A16 /* FSEntity.m in Sources */,
-				15430031321C90ED3184CDCC06F4E4A5 /* FSFile.m in Sources */,
-				F26F8A983E0E63C049DC787FAEC5DAF3 /* FSKit-dummy.m in Sources */,
-				E536403EDC6A998DF03B7694CCAB26FC /* FSKit.m in Sources */,
-				3E9F037C5D14AD3A722660F89086812A /* FSPdf.m in Sources */,
-				445E7EA1408980405F66B088167480A2 /* FSTuple.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		702894CE1CF8887DB451D21D06A19F5A /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				B95F855ECCDA9B01EEF7C6B8EDA2D587 /* Pods-FSKit_Example-dummy.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D8CA2105636CE8C0A97090AE41EF40ED /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				81D08707A3ED5A591D13FF024DAE0F60 /* FSEntity.m in Sources */,
+				5747E1A29088BEAB94A864012812BEE4 /* FSFile.m in Sources */,
+				4B83A8B33111C84A858AB8699C69861A /* FSKit-dummy.m in Sources */,
+				D81750DD44868F92A8ECB3A6CDB816B6 /* FSKit.m in Sources */,
+				76CFB0F8E00ECF4E3E6A15E159D41384 /* FSPdf.m in Sources */,
+				A44FBBF56AF3A75733ED5A9076DF6247 /* FSTuple.m in Sources */,
+				DB1B8A95C380F0F88AC5BC7244254C88 /* FSWindow.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

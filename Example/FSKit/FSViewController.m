@@ -30,7 +30,33 @@
 }
 
 - (void)click{
-    [FSKit showAlertWithMessage:@"消息内容"];
+    
+    NSMutableArray *array = [NSMutableArray new];
+    for (int x = 0; x < 1; x ++) {
+        NSDictionary *dic = @{@"expirtimekey":@"expirtimekey",@"expirtimekey":@"expirtimekey",@"expirtimekey":@"expirtimekey",@"expirtimekey":@"expirtimekey",@"expirtimekey":@"expirtimekey",@"expirtimekey":@"expirtimekey",@"expirtimekey":@"expirtimekey",@"expirtimekey":@"expirtimekey",@"expirtimekey":@"expirtimekey",@"expirtimekey":@"expirtimekey",@"expirtimekey":@"expirtimekey",@"expirtimekey":@"expirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekey"};
+        [array addObject:dic];
+    }
+    NSString *json = [FSKit jsonStringWithObject:array];
+    NSArray *value = [FSKit objectFromJSonstring:json];
+    
+    NSLog(@"object:%@",value);
+    
+    
+    
+    
+//    [FSKit alertInput:1 title:@"Title" message:@"Message" ok:@"ok" handler:^(UIAlertController *bAlert, UIAlertAction *action) {
+//        NSLog(@"%@",bAlert.textFields);
+//    } cancel:@"cancel" handler:^(UIAlertAction *action) {
+//        NSLog(@"%@",action.title);
+//    } textFieldConifg:^(UITextField *textField) {
+//        textField.placeholder = @"Here";
+//    } completion:^{
+//        NSLog(@"AAA");
+//    }];
+    
+//    [FSKit alert:UIAlertControllerStyleAlert title:@"Title" message:@"Message" actionTitles:@[@"ok"] styles:@[@(UIAlertActionStyleDefault)] handler:^(UIAlertAction *action) {
+//        
+//    } cancelTitle:@"cancel" cancel:nil completion:nil];
 }
 
 - (void)didReceiveMemoryWarning
