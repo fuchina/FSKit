@@ -16,6 +16,33 @@
 # define FSLog(...);
 #endif
 
+/******************单例安全模式*********************/
+#define SINGLE_ONCE(A)   \
++ (instancetype)allocWithZone:(struct _NSZone *)zone{ \
+if(!_w){\
+static dispatch_once_t onceToken;\
+dispatch_once(&onceToken, ^{\
+A = [super allocWithZone:zone];\
+});\
+}\
+return A;\
+}\
++ (id)copyWithZone:(struct _NSZone *)zone{\
+if(!_w){\
+static dispatch_once_t onceToken;\
+dispatch_once(&onceToken, ^{\
+A = [super copyWithZone:zone];\
+});\
+}\
+return A;\
+}\
+- (instancetype)init{\
+@synchronized(self) {\
+self = [super init];\
+}\
+return self;\
+}\
+
 /******************__system__*********************/
 #define MININ(A,B)      ({ __typeof__(A) __a = (A); __typeof__(B) __b = (B); __a < __b ? __a : __b; })
 #define WEAKSELF(A)      __weak typeof(*&self)A = self

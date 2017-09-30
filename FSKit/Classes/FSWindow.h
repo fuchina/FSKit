@@ -8,33 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-#define SINGLE_ONCE(A)   \
-+ (instancetype)allocWithZone:(struct _NSZone *)zone{ \
-if(!_w){\
-        static dispatch_once_t onceToken;\
-        dispatch_once(&onceToken, ^{\
-            A = [super allocWithZone:zone];\
-        });\
-    }\
-    return A;\
-}\
-+ (id)copyWithZone:(struct _NSZone *)zone{\
-    if(!_w){\
-        static dispatch_once_t onceToken;\
-        dispatch_once(&onceToken, ^{\
-            A = [super copyWithZone:zone];\
-        });\
-    }\
-    return A;\
-}\
-- (instancetype)init{\
-    @synchronized(self) {\
-        self = [super init];\
-    }\
-    return self;\
-}\
-
-
 @interface FSWindow : UIWindow
 
 + (instancetype)sharedInstance;

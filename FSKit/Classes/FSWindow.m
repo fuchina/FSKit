@@ -8,6 +8,7 @@
 //
 
 #import "FSWindow.h"
+#import "FuSoft.h"
 
 @implementation FSWindow{
     UIView              *_view;
