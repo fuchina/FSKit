@@ -58,8 +58,15 @@ static FSWindow *_w = nil;
     self.hidden = NO;
     [self makeKeyAndVisible];
 
-    UIViewController *vc = [[UIViewController alloc] init];
-    self.rootViewController = vc;
+    if (!self.rootViewController) {
+        UIViewController *vc = [[UIViewController alloc] init];
+        self.rootViewController = vc;
+    }
+    
+    UIViewController *vc = self.rootViewController;
+    while (vc.presentedViewController) {
+        vc = vc.presentedViewController;
+    }
     [vc presentViewController:controller animated:animated completion:completion];
 }
 

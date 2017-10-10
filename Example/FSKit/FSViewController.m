@@ -31,15 +31,17 @@
 
 - (void)click{
     
-    NSMutableArray *array = [NSMutableArray new];
-    for (int x = 0; x < 1; x ++) {
-        NSDictionary *dic = @{@"expirtimekey":@"expirtimekey",@"expirtimekey":@"expirtimekey",@"expirtimekey":@"expirtimekey",@"expirtimekey":@"expirtimekey",@"expirtimekey":@"expirtimekey",@"expirtimekey":@"expirtimekey",@"expirtimekey":@"expirtimekey",@"expirtimekey":@"expirtimekey",@"expirtimekey":@"expirtimekey",@"expirtimekey":@"expirtimekey",@"expirtimekey":@"expirtimekey",@"expirtimekey":@"expirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekey"};
-        [array addObject:dic];
-    }
-    NSString *json = [FSKit jsonStringWithObject:array];
-    NSArray *value = [FSKit objectFromJSonstring:json];
+    [FSKit showAlertWithTitle:@"Title" message:@"Message" ok:@"OK"];
     
-    NSLog(@"object:%@",value);
+//    NSMutableArray *array = [NSMutableArray new];
+//    for (int x = 0; x < 1; x ++) {
+//        NSDictionary *dic = @{@"expirtimekey":@"expirtimekey",@"expirtimekey":@"expirtimekey",@"expirtimekey":@"expirtimekey",@"expirtimekey":@"expirtimekey",@"expirtimekey":@"expirtimekey",@"expirtimekey":@"expirtimekey",@"expirtimekey":@"expirtimekey",@"expirtimekey":@"expirtimekey",@"expirtimekey":@"expirtimekey",@"expirtimekey":@"expirtimekey",@"expirtimekey":@"expirtimekey",@"expirtimekey":@"expirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekeyexpirtimekey"};
+//        [array addObject:dic];
+//    }
+//    NSString *json = [FSKit jsonStringWithObject:array];
+//    NSArray *value = [FSKit objectFromJSonstring:json];
+//    
+//    NSLog(@"object:%@",value);
     
     
     

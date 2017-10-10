@@ -277,10 +277,6 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
     });
 }
 
-+ (void)showAlertWithMessage:(NSString *)message{
-    [self showAlertWithTitle:@"说明" message:message ok:@"确定"];
-}
-
 + (void)showAlertWithTitle:(NSString *)title message:(NSString *)message ok:(NSString *)ok{
     UIAlertController *controller = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction *action = [UIAlertAction actionWithTitle:ok style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
@@ -288,6 +284,13 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
     }];
     [controller addAction:action];
     [self presentViewController:controller completion:nil];
+}
+
++ (void)showAlertWithTitle:(NSString *)title message:(NSString *)message ok:(NSString *)ok controller:(UIViewController *)pController{
+    UIAlertController *controller = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *action = [UIAlertAction actionWithTitle:ok style:UIAlertActionStyleDefault handler:nil];
+    [controller addAction:action];
+    [pController presentViewController:controller animated:YES completion:nil];
 }
 
 + (void)showMessageInMainThread:(NSString *)message{
