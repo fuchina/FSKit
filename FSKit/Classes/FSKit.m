@@ -277,18 +277,21 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
     });
 }
 
-+ (void)showAlertWithTitle:(NSString *)title message:(NSString *)message ok:(NSString *)ok{
++ (void)showAlertWithTitle:(NSString *)title message:(NSString *)message ok:(NSString *)ok handler:(void (^ __nullable)(UIAlertAction *action))handler{
     UIAlertController *controller = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction *action = [UIAlertAction actionWithTitle:ok style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         [FSWindow dismiss];
+        if (handler) {
+            handler(action);
+        }
     }];
     [controller addAction:action];
     [self presentViewController:controller completion:nil];
 }
 
-+ (void)showAlertWithTitle:(NSString *)title message:(NSString *)message ok:(NSString *)ok controller:(UIViewController *)pController{
++ (void)showAlertWithTitle:(NSString *)title message:(NSString *)message ok:(NSString *)ok controller:(UIViewController *)pController handler:(void (^ __nullable)(UIAlertAction *action))handler{
     UIAlertController *controller = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction *action = [UIAlertAction actionWithTitle:ok style:UIAlertActionStyleDefault handler:nil];
+    UIAlertAction *action = [UIAlertAction actionWithTitle:ok style:UIAlertActionStyleDefault handler:handler];
     [controller addAction:action];
     [pController presentViewController:controller animated:YES completion:nil];
 }

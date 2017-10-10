@@ -30,8 +30,9 @@
 }
 
 - (void)click{
-    
-    [FSKit showAlertWithTitle:@"Title" message:@"Message" ok:@"OK"];
+    [FSKit showAlertWithTitle:@"Title" message:@"Message" ok:@"OK" handler:^(UIAlertAction *action) {
+        NSLog(@"HERE");
+    }];
     
 //    NSMutableArray *array = [NSMutableArray new];
 //    for (int x = 0; x < 1; x ++) {

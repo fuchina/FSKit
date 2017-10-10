@@ -42,8 +42,8 @@ extern NSInteger FSIntegerTimeIntevalSince1970(void);
 + (void)setStatusBarBackgroundColor:(UIColor *)color;       // 设置状态栏颜色
 
 + (void)showMessage:(NSString *)message;
-+ (void)showAlertWithTitle:(NSString *)title message:(NSString *)message ok:(NSString *)ok;
-+ (void)showAlertWithTitle:(NSString *)title message:(NSString *)message ok:(NSString *)ok controller:(UIViewController *)controller;
++ (void)showAlertWithTitle:(NSString *)title message:(NSString *)message ok:(NSString *)ok handler:(void (^ __nullable)(UIAlertAction *action))handler;
++ (void)showAlertWithTitle:(NSString *)title message:(NSString *)message ok:(NSString *)ok controller:(UIViewController *)pController handler:(void (^ __nullable)(UIAlertAction *action))handler;
 
 + (BOOL)isValidateEmail:(NSString *)str;
 + (BOOL)isPureInt:(NSString *)string;
