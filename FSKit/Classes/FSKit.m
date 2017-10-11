@@ -277,7 +277,7 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
     });
 }
 
-static NSString *_Alert_Notice = @"TIPS";
+static NSString *_Alert_Notice = @"Tips";
 static NSString *_Alert_Know = @"OK";
 + (void)showAlertWithMessage:(NSString *)message{
     [self showAlertWithTitle:_Alert_Notice message:message ok:_Alert_Know handler:nil];
