@@ -277,9 +277,19 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
     });
 }
 
-+ (void)showAlertWithTitle:(NSString *)title message:(NSString *)message ok:(NSString *)ok handler:(void (^ __nullable)(UIAlertAction *action))handler{
+static NSString *_Alert_Notice = @"TIPS";
+static NSString *_Alert_Know = @"OK";
++ (void)showAlertWithMessage:(NSString *)message{
+    [self showAlertWithTitle:_Alert_Notice message:message ok:_Alert_Know handler:nil];
+}
+
++ (void)showAlertWithMessage:(NSString *)message handler:(void (^)(UIAlertAction *action))handler{
+    [self showAlertWithTitle:_Alert_Notice message:message ok:_Alert_Know handler:handler];
+}
+
++ (void)showAlertWithTitle:(NSString *)title message:(NSString *)message ok:(NSString *)ok handler:(void (^)(UIAlertAction *action))handler{
     UIAlertController *controller = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction *action = [UIAlertAction actionWithTitle:ok style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+    UIAlertAction *action = [UIAlertAction actionWithTitle:ok style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
         [FSWindow dismiss];
         if (handler) {
             handler(action);
@@ -289,7 +299,15 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
     [self presentViewController:controller completion:nil];
 }
 
-+ (void)showAlertWithTitle:(NSString *)title message:(NSString *)message ok:(NSString *)ok controller:(UIViewController *)pController handler:(void (^ __nullable)(UIAlertAction *action))handler{
++ (void)showAlertWithMessage:(NSString *)message controller:(UIViewController *)controller{
+    [self showAlertWithTitle:_Alert_Notice message:message ok:_Alert_Know controller:controller handler:nil];
+}
+
++ (void)showAlertWithMessage:(NSString *)message controller:(UIViewController *)controller handler:(void (^)(UIAlertAction *action))handler{
+    [self showAlertWithTitle:_Alert_Notice message:message ok:_Alert_Know controller:controller handler:handler];
+}
+
++ (void)showAlertWithTitle:(NSString *)title message:(NSString *)message ok:(NSString *)ok controller:(UIViewController *)pController handler:(void (^)(UIAlertAction *action))handler{
     UIAlertController *controller = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction *action = [UIAlertAction actionWithTitle:ok style:UIAlertActionStyleDefault handler:handler];
     [controller addAction:action];
