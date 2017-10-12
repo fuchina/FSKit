@@ -94,7 +94,6 @@ extern NSInteger FSIntegerTimeIntevalSince1970(void);
 + (NSInteger)weekdayStringFromDate:(NSDate *)inputDate;
 // 根据年月计算当月有多少天
 + (NSInteger)daysForMonth:(NSInteger)month year:(NSInteger)year;
-+ (NSDateComponents *)yearMonthDayFromDate:(NSDate *)date;
 
 + (double)forwardValue:(double)number afterPoint:(int)position;  // 只入不舍
 + (double)usedMemory;                                                               // 获得应用占用的内存，单位为M
@@ -138,22 +137,18 @@ extern NSInteger FSIntegerTimeIntevalSince1970(void);
 + (NSString *)keyedUnarchiverWithString:(NSString *)fileName;
 + (NSString *)documentsPath:(NSString *)fileName;
 + (NSString *)temporaryDirectoryFile:(NSString *)fileName;
-+ (NSString *)localFilePath:(NSString *)fileName;
 + (NSString *)md5:(NSString *)str;
 + (NSString *)stringDeleteNewLineAndWhiteSpace:(NSString *)string;
-+ (NSString *)pathForResource:(NSString *)name type:(NSString *)type;
 + (NSString *)macaddress;
 + (NSString *)identifierForVendorFromKeyChain;
 + (NSString *)asciiCodeWithString:(NSString *)string;
 + (NSString *)stringFromASCIIString:(NSString *)string;
 + (NSString *)DataToHex:(NSData *)data;                          // 将二进制转换为16进制再用字符串表示
 + (NSString *)cleanString:(NSString *)str;
-+ (NSString *)placeholderString:(NSString *)string font:(NSInteger)font back:(NSInteger)back;
 + (NSString *)stringByDate:(NSDate *)date;                       // 解决差8小时的问题
 + (NSString *)bankStyleData:(id)data;
 + (NSString *)bankStyleDataThree:(id)data;
 + (NSString *)fourNoFiveYes:(float)number afterPoint:(int)position;  // 四舍五入
-+ (NSString *)newFloat:(float)value withNumber:(int)numberOfPlace;
 + (NSString *)decimalNumberMutiplyWithString:(NSString *)multiplierValue  valueB:(NSString *)multiplicandValue;
 + (NSString *)deviceModel;
 + (NSString *)easySeeTimesBySeconds:(NSInteger)seconds;
@@ -161,12 +156,10 @@ extern NSInteger FSIntegerTimeIntevalSince1970(void);
 + (NSString *)tenThousandNumberString:(NSString *)value;
 + (NSString *)urlEncodedString:(NSString *)urlString;
 + (NSString *)urlDecodedString:(NSString *)urlString;
-+ (NSString *)addStringWithSpace:(NSString *)aString bString:(NSString *)bString;
 + (NSString *)base64StringForText:(NSString *)text;     // 将字符串转换为base64编码
 + (NSString *)textFromBase64String:(NSString *)text;    // 将base64转换为字符串
 + (NSString *)base64Code:(NSData *)data;                // 用来将图片转换为字符串
 + (NSString *)sessionID:(NSURLResponse *)response;
-+ (NSString *)hostNameFromUrlString:(NSString *)urlString;
 
 + (NSString *)ymdhsByTimeInterval:(NSTimeInterval)timeInterval;
 + (NSString *)ymdhsByTimeIntervalString:(NSString *)timeInterval;

@@ -17,7 +17,7 @@
 #endif
 
 /******************单例安全模式*********************/
-#define SINGLE_ONCE_SAFE (A)   \
+#define SINGLE_ONCE_SAFE(A)   \
 + (instancetype)allocWithZone:(struct _NSZone *)zone{ \
 if(!_w){\
 static dispatch_once_t onceToken;\

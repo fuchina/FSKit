@@ -34,42 +34,8 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
     return (NSInteger)[[NSDate date] timeIntervalSince1970];
 }
 
-//+ (UIViewController *)presentViewController1{
-//    UIWindow *lastObject = [UIApplication sharedApplication].keyWindow;
-//    UIViewController *controller = lastObject.rootViewController;
-//    while (controller.presentedViewController) {
-//        controller = controller.presentedViewController;
-//    }
-//    return controller;
-//}
-
 + (void)presentViewController:(UIViewController *)pController completion:(void (^)(void))completion{
     [FSWindow presentViewController:pController animated:YES completion:completion];
-//    if (![pController isKindOfClass:[UIViewController class]]) {
-//        return;
-//    }
-//    dispatch_async(dispatch_get_main_queue(), ^{
-//        UIViewController *controller = [self presentViewController ];
-//        [controller presentViewController:pController animated:YES completion:completion];
-//        
-//        /*
-//        NSArray *windows = [UIApplication sharedApplication].windows;
-//        UIWindow *lastObject = nil;
-//        for (int x = (int)windows.count - 1; x >= 0; x --) {
-//            lastObject = windows[x];
-//            if (!lastObject.hidden) {
-//                break;
-//            }
-//        }
-//        UIViewController *controller = lastObject.rootViewController;
-//        while (controller.presentedViewController) {
-//            if (controller.presentedViewController != pController) {
-//                controller = controller.presentedViewController;
-//            }
-//        }
-//        [controller presentViewController:pController animated:YES completion:completion];
-//         */
-//    });
 }
 
 + (void)alert:(UIAlertControllerStyle)style title:(NSString *)title message:(NSString *)message actionTitles:(NSArray<NSString *> *)titles styles:(NSArray<NSNumber *> *)styles handler:(void (^)(UIAlertAction *action))handler cancelTitle:(NSString *)cancelTitle cancel:(void (^)(UIAlertAction *action))cancel completion:(void (^)(void))completion{
@@ -1543,26 +1509,6 @@ static NSString *_Alert_Know = @"OK";
     return days;
 }
 
-+ (NSDateComponents *)yearMonthDayFromDate:(NSDate *)date{
-    if (date == nil) {
-        return nil;
-    }
-    
-    NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
-    NSTimeZone *timeZone = [[NSTimeZone alloc] initWithName:@"Asia/Shanghai"];
-    [calendar setTimeZone: timeZone];
-    NSCalendarUnit year = NSCalendarUnitYear;
-    NSCalendarUnit month = NSCalendarUnitMonth;
-    NSCalendarUnit day = NSCalendarUnitDay;
-    NSCalendarUnit hour = NSCalendarUnitHour;
-    NSCalendarUnit minute = NSCalendarUnitMinute;
-    NSCalendarUnit second = NSCalendarUnitSecond;
-    NSCalendarUnit weekday = NSCalendarUnitWeekday;
-    NSDateComponents *theComponents = [calendar components:year|month|day|hour|minute|second|weekday fromDate:date];
-    return theComponents;
-    //    return @[@(theComponents.year),@(theComponents.month),@(theComponents.day),@(theComponents.hour),@(theComponents.minute),@(theComponents.second),@(theComponents.weekday)];
-}
-
 + (NSString *)iPAddress{
     NSString *address = @"error";
     struct ifaddrs *interfaces = NULL;
@@ -2287,13 +2233,6 @@ static NSString *_Alert_Know = @"OK";
         return @[@.45,@13505];
 }
 
-//+ (NetStatus)netWorkStatus
-//{
-//    Reachability *reach = [Reachability reachabilityWithHostName:URL_NETWORKSTATUS_FUDATA];
-//    int flag = reach.currentReachabilityStatus;
-//    return flag;
-//}
-
 + (NSNumber *)fileSize:(NSString *)filePath{
     if (filePath.length == 0) {
         return nil;
@@ -2302,14 +2241,6 @@ static NSString *_Alert_Know = @"OK";
     NSDictionary *attrDic = [fileManager attributesOfItemAtPath:filePath error:nil];
     NSNumber *fileSize = [attrDic objectForKey:NSFileSize];
     return fileSize;
-}
-
-+ (NSString *)localFilePath:(NSString *)fileName{
-    if (fileName.length == 0) {
-        return nil;
-    }
-    NSString *filePath = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:fileName];
-    return filePath;
 }
 
 + (NSString *)md5:(NSString *)str{
@@ -2331,76 +2262,6 @@ static NSString *_Alert_Know = @"OK";
 + (NSString *)stringDeleteNewLineAndWhiteSpace:(NSString *)string{
     return [string stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 }
-
-+ (NSString *)pathForResource:(NSString *)name type:(NSString *)type{
-    return [[NSBundle mainBundle] pathForResource:name ofType:type];
-}
-
-//+ (NSString *)tripleDES:(NSString *)plainText encryptOrDecrypt:(CCOperation)encryptOrDecrypt encryptOrDecryptKey:(NSString *)encryptOrDecryptKey
-//{
-//    const void *vplainText;
-//    size_t plainTextBufferSize;
-//
-//    if (encryptOrDecrypt == kCCDecrypt)//解密
-//    {
-//        NSData *EncryptData = [GTMBase64 decodeData:[plainText dataUsingEncoding:NSUTF8StringEncoding]];
-//        plainTextBufferSize = [EncryptData length];
-//        vplainText = [EncryptData bytes];
-//    }else //加密
-//    {
-//        NSData* data = [plainText dataUsingEncoding:NSUTF8StringEncoding];
-//        plainTextBufferSize = [data length];
-//        vplainText = (const void *)[data bytes];
-//    }
-//
-//    CCCryptorStatus ccStatus;
-//    uint8_t *bufferPtr = NULL;
-//    size_t bufferPtrSize = 0;
-//    size_t movedBytes = 0;
-//
-//    bufferPtrSize = (plainTextBufferSize + kCCBlockSize3DES) & ~(kCCBlockSize3DES - 1);
-//    bufferPtr = malloc( bufferPtrSize * sizeof(uint8_t));
-//    memset((void *)bufferPtr, 0x0, bufferPtrSize);
-//    // memset((void *) iv, 0x0, (size_t) sizeof(iv));
-//
-//    const void *vkey = (const void *)[encryptOrDecryptKey UTF8String];
-//    // NSString *initVec = @"init Vec";
-//    //const void *vinitVec = (const void *) [initVec UTF8String];
-//    //  Byte iv[] = {0x12, 0x34, 0x56, 0x78, 0x90, 0xAB, 0xCD, 0xEF};
-//    ccStatus = CCCrypt(encryptOrDecrypt,
-//                       kCCAlgorithm3DES,
-//                       kCCOptionPKCS7Padding | kCCOptionECBMode,
-//                       vkey,
-//                       kCCKeySize3DES,
-//                       nil,
-//                       vplainText,
-//                       plainTextBufferSize,
-//                       (void *)bufferPtr,
-//                       bufferPtrSize,
-//                       &movedBytes);
-//        if (ccStatus == kCCSuccess) NSLog(@"SUCCESS");
-//        else if (ccStatus == kCCParamError) return @"PARAM ERROR";
-//        else if (ccStatus == kCCBufferTooSmall) return @"BUFFER TOO SMALL";
-//        else if (ccStatus == kCCMemoryFailure) return @"MEMORY FAILURE";
-//        else if (ccStatus == kCCAlignmentError) return @"ALIGNMENT";
-//        else if (ccStatus == kCCDecodeError) return @"DECODE ERROR";
-//        else if (ccStatus == kCCUnimplemented) return @"UNIMPLEMENTED";
-//
-//    NSString *result;
-//
-//    if (encryptOrDecrypt == kCCDecrypt)
-//    {
-//        result = [[NSString alloc] initWithData:[NSData dataWithBytes:(const void *)bufferPtr
-//                                                                length:(NSUInteger)movedBytes]
-//                                        encoding:NSUTF8StringEncoding];
-//    }else{
-//        NSData *myData = [NSData dataWithBytes:(const void *)bufferPtr length:(NSUInteger)movedBytes];
-//        result = [GTMBase64 stringByEncodingData:myData];
-//    }
-//
-//    free(bufferPtr);
-//    return result;
-//}
 
 + (NSString *)macaddress{
     int                 mib[6];
@@ -2448,8 +2309,8 @@ static NSString *_Alert_Know = @"OK";
 
 + (NSString *)identifierForVendorFromKeyChain{
     NSString *identifierStr = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
-    NSString * const KEY_USERNAME_PASSWORD = @"com.junnet.HyPhonePass";
-    NSString * const KEY_PASSWORD = @"com.junnet.HyPhonePass";
+    NSString * const KEY_USERNAME_PASSWORD = @"com.fuhope.myapp";
+    NSString * const KEY_PASSWORD = @"com.fuhope.myapp";
     
     NSMutableDictionary *readUserPwd = (NSMutableDictionary *)[self load:KEY_USERNAME_PASSWORD];
     if (!readUserPwd) {
@@ -2561,32 +2422,6 @@ static NSString *_Alert_Know = @"OK";
     return cleanString;
 }
 
-+ (NSString *)placeholderString:(NSString *)string font:(NSInteger)font back:(NSInteger)back{
-    if (string.length == 0) {
-        return nil;
-    }
-    
-    if (string.length >= 6) {
-        NSMutableArray *array = [[NSMutableArray alloc] init];
-        for (int x = 0; x < string.length; x ++) {
-            [array addObject:[string substringWithRange:NSMakeRange(x, 1)]];
-        }
-        
-        NSMutableArray *temp = [[NSMutableArray alloc] init];
-        
-        for (int x = 0; x < string.length; x ++) {
-            
-            if (x < font || x >= string.length - back) {
-                [temp addObject:array[x]];
-            }else{
-                [temp addObject:@"*"];
-            }
-        }
-        return [temp componentsJoinedByString:@""];
-    }
-    return nil;
-}
-
 + (NSString *)stringByDate:(NSDate *)date{
     NSTimeZone *zone = [NSTimeZone systemTimeZone];
     NSInteger interval = [zone secondsFromGMTForDate:date];
@@ -2665,13 +2500,6 @@ static NSString *_Alert_Know = @"OK";
     return [roundedOunces doubleValue];
 }
 
-+ (NSString *)newFloat:(float)value withNumber:(int)numberOfPlace{
-    NSString *formatStr = @"%0.";
-    formatStr = [formatStr stringByAppendingFormat:@"%df", numberOfPlace];
-    formatStr = [NSString stringWithFormat:formatStr, value];
-    return formatStr;
-}
-
 + (NSString *)decimalNumberMutiplyWithString:(NSString *)multiplierValue  valueB:(NSString *)multiplicandValue{
     NSDecimalNumber *multiplierNumber = [NSDecimalNumber decimalNumberWithString:multiplierValue];
     NSDecimalNumber *multiplicandNumber = [NSDecimalNumber decimalNumberWithString:multiplicandValue];
@@ -2705,27 +2533,6 @@ static NSString *_Alert_Know = @"OK";
     NSDecimalNumber *augendNumber = [NSDecimalNumber decimalNumberWithString:bValue];
     NSDecimalNumber *sumNumber = [addendNumber decimalNumberByDividingBy:augendNumber];
     return [sumNumber stringValue];
-}
-
-+ (NSString *)placeholderStringFor:(NSString *)sourceString with:(NSString *)placeholderString{
-    if ([sourceString isKindOfClass:[NSNull class]] || (sourceString == nil)) {
-        return placeholderString;
-    }
-    sourceString = [[NSString alloc] initWithFormat:@"%@",sourceString];
-    if (sourceString.length == 0) {
-        return placeholderString;
-    }
-    return sourceString;
-}
-
-+ (NSString *)addStringWithSpace:(NSString *)aString bString:(NSString *)bString{
-    if (aString.length == 0) {
-        aString = @"-";
-    }
-    if (bString.length == 0) {
-        bString = @"-";
-    }
-    return [[NSString alloc] initWithFormat:@"%@  %@",aString,bString];
 }
 
 + (NSString *)base64StringForText:(NSString *)text{
@@ -2762,17 +2569,6 @@ static NSString *_Alert_Know = @"OK";
     return subSession;
 }
 
-+ (NSString *)hostNameFromUrlString:(NSString *)urlString{
-    if (urlString.length == 0) {
-        return urlString;
-    }
-    NSArray *points = [urlString componentsSeparatedByString:@"."];
-    if (points.count >= 2) {
-        return points[1];
-    }
-    return nil;
-}
-
 + (NSString *)ymdhsByTimeInterval:(NSTimeInterval)fTI{
     NSDate *date = [[NSDate alloc] initWithTimeIntervalSince1970:fTI];
     
@@ -2794,11 +2590,11 @@ static NSString *_Alert_Know = @"OK";
     if (day > 0) {
         [overdueTimeString appendFormat:@"%ld天",(long)day];
     }
-    NSInteger hour = (seconds - day*60*60*24)/3600;
+    NSInteger hour = (seconds - day*60*60*24)/3600.0;
     if (hour > 0) {
         [overdueTimeString appendFormat:@"%ld小时",(long)hour];
     }
-    NSInteger minute = (seconds - day*60*60*24 - hour*3600)/60;
+    NSInteger minute = (seconds - day*60*60*24 - hour*3600)/60.0;
     if (minute > 0) {
         [overdueTimeString appendFormat:@"%ld分钟",(long)minute];
     }
@@ -2838,13 +2634,7 @@ static NSString *_Alert_Know = @"OK";
 }
 
 + (NSString *)pinyinForHansClear:(NSString *)chinese{        // 获取汉字的拼音，没有空格
-    //将NSString装换成NSMutableString
-    NSMutableString *pinyin = [chinese mutableCopy];
-    //将汉字转换为拼音(带音标)
-    CFStringTransform((__bridge CFMutableStringRef)pinyin, NULL, kCFStringTransformMandarinLatin, NO);
-    //去掉拼音的音标
-    CFStringTransform((__bridge CFMutableStringRef)pinyin, NULL, kCFStringTransformStripCombiningMarks, NO);
-    //返回最近结果
+    NSString *pinyin = [self pinyinForHans:chinese];
     return [self cleanString:pinyin];
 }
 

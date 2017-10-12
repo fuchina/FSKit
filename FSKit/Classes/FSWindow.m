@@ -15,7 +15,7 @@
     UIViewController    *_viewController;
 }
 
-SINGLE_ONCE(_w);
+SINGLE_ONCE_SAFE(_w);
 static FSWindow *_w = nil;
 + (instancetype)sharedInstance{
     static dispatch_once_t once;
