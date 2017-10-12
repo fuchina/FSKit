@@ -2608,27 +2608,14 @@ static NSString *_Alert_Know = @"OK";
             NSString *formattedNumberString = [numberFormatter stringFromNumber:[NSNumber numberWithDouble:[data doubleValue]]];
             return formattedNumberString;
         }else{
-            return [[NSString alloc] initWithFormat:@"%@",data];
+            return @"0.00";
         }
     }else{
-        return [[NSString alloc] initWithFormat:@"%@",data];
+        return @"0.00";
     }
 }
 
 + (NSString *)bankStyleData:(id)data{
-    if (!data) {
-        return @"0.00";
-    }
-    
-    NSString *str = [[NSString alloc] initWithFormat:@"%@",data];
-    if (str.length == 0) {
-        return @"0.00";
-    }
-    
-    if ([data isKindOfClass:[NSNull class]]) {
-        return @"0.00";
-    }
-    
     if ([data isKindOfClass:[NSNumber class]]) {
         NSNumberFormatter *numberFormatter = [[NSNumberFormatter alloc] init];
         //        [numberFormatter setPositiveFormat:@"###,##0.00;"];    // 100,000.00
@@ -2642,48 +2629,10 @@ static NSString *_Alert_Know = @"OK";
             NSString *formattedNumberString = [numberFormatter stringFromNumber:[NSNumber numberWithDouble:[data doubleValue]]];
             return formattedNumberString;
         }else{
-            return [[NSString alloc] initWithFormat:@"%@",data];
+            return @"0.00";
         }
     }else{
-        return [[NSString alloc] initWithFormat:@"%@",data];
-    }
-}
-
-+ (NSString *)zeroHandle:(id)data{
-    if (!data) {
-        return @"";
-    }
-    
-    NSString *str = [[NSString alloc] initWithFormat:@"%@",data];
-    if (str.length == 0) {
-        return @"";
-    }
-    
-    if ([data isKindOfClass:[NSNull class]]) {
-        return @"";
-    }
-    
-    if ([data isKindOfClass:[NSNumber class]]) {
-        NSNumberFormatter *numberFormatter = [[NSNumberFormatter alloc] init];
-        //        [numberFormatter setPositiveFormat:@"###,##0.00;"];    // 100,000.00
-        [numberFormatter setPositiveFormat:@"0.00;"];
-        NSString *formattedNumberString = [numberFormatter stringFromNumber:[NSNumber numberWithDouble:[data doubleValue]]];
-        return formattedNumberString;
-    }else if([data isKindOfClass:[NSString class]]){
-        if ([data floatValue] == 0) {
-            return @"";
-        }
-        
-        if ([self isPureFloat:data] || [self isPureInt:data]) {
-            NSNumberFormatter *numberFormatter = [[NSNumberFormatter alloc] init];
-            [numberFormatter setPositiveFormat:@"0.00;"];
-            NSString *formattedNumberString = [numberFormatter stringFromNumber:[NSNumber numberWithDouble:[data doubleValue]]];
-            return formattedNumberString;
-        }else{
-            return [[NSString alloc] initWithFormat:@"%@",data];
-        }
-    }else{
-        return [[NSString alloc] initWithFormat:@"%@",data];
+        return @"0.00";
     }
 }
 
@@ -2723,19 +2672,6 @@ static NSString *_Alert_Know = @"OK";
     return formatStr;
 }
 
-+ (NSString *)backBankData:(NSString *)text{
-    if (text.length == 0) {
-        return nil;
-    }
-    NSArray *array = [text componentsSeparatedByString:@"."];
-    if (array.count >= 1) {
-        NSString *string = array[0];
-        string = [string stringByReplacingOccurrencesOfString:@"," withString:@""];
-        return string;
-    }
-    return nil;
-}
-
 + (NSString *)decimalNumberMutiplyWithString:(NSString *)multiplierValue  valueB:(NSString *)multiplicandValue{
     NSDecimalNumber *multiplierNumber = [NSDecimalNumber decimalNumberWithString:multiplierValue];
     NSDecimalNumber *multiplicandNumber = [NSDecimalNumber decimalNumberWithString:multiplicandValue];
@@ -2769,14 +2705,6 @@ static NSString *_Alert_Know = @"OK";
     NSDecimalNumber *augendNumber = [NSDecimalNumber decimalNumberWithString:bValue];
     NSDecimalNumber *sumNumber = [addendNumber decimalNumberByDividingBy:augendNumber];
     return [sumNumber stringValue];
-}
-
-+ (NSString *)placeholderStringFor:(NSString *)sourceString{
-    if (sourceString.length == 0) {
-        return @"-";
-    }else{
-        return sourceString;
-    }
 }
 
 + (NSString *)placeholderStringFor:(NSString *)sourceString with:(NSString *)placeholderString{

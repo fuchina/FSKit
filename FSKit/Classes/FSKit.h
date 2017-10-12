@@ -151,11 +151,9 @@ extern NSInteger FSIntegerTimeIntevalSince1970(void);
 + (NSString *)placeholderString:(NSString *)string font:(NSInteger)font back:(NSInteger)back;
 + (NSString *)stringByDate:(NSDate *)date;                       // 解决差8小时的问题
 + (NSString *)bankStyleData:(id)data;
-+ (NSString *)zeroHandle:(id)data;
 + (NSString *)bankStyleDataThree:(id)data;
 + (NSString *)fourNoFiveYes:(float)number afterPoint:(int)position;  // 四舍五入
 + (NSString *)newFloat:(float)value withNumber:(int)numberOfPlace;
-+ (NSString *)backBankData:(NSString *)text;
 + (NSString *)decimalNumberMutiplyWithString:(NSString *)multiplierValue  valueB:(NSString *)multiplicandValue;
 + (NSString *)deviceModel;
 + (NSString *)easySeeTimesBySeconds:(NSInteger)seconds;
@@ -163,7 +161,6 @@ extern NSInteger FSIntegerTimeIntevalSince1970(void);
 + (NSString *)tenThousandNumberString:(NSString *)value;
 + (NSString *)urlEncodedString:(NSString *)urlString;
 + (NSString *)urlDecodedString:(NSString *)urlString;
-+ (NSString *)placeholderStringFor:(NSString *)sourceString;
 + (NSString *)addStringWithSpace:(NSString *)aString bString:(NSString *)bString;
 + (NSString *)base64StringForText:(NSString *)text;     // 将字符串转换为base64编码
 + (NSString *)textFromBase64String:(NSString *)text;    // 将base64转换为字符串
