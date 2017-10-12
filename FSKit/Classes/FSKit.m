@@ -577,8 +577,7 @@ static NSString *_Alert_Know = @"OK";
 + (NSInteger)getTotalDiskSize{   // 获取磁盘总量
     struct statfs buf;
     unsigned long long freeSpace = -1;
-    if (statfs("/var", &buf) >= 0)
-    {
+    if (statfs("/var", &buf) >= 0){
         freeSpace = (unsigned long long)(buf.f_bsize * buf.f_blocks);
     }
     return (NSInteger)freeSpace;
@@ -587,8 +586,7 @@ static NSString *_Alert_Know = @"OK";
 + (NSInteger)getAvailableDiskSize{   // 获取磁盘可用量
     struct statfs buf;
     unsigned long long freeSpace = -1;
-    if (statfs("/var", &buf) >= 0)
-    {
+    if (statfs("/var", &buf) >= 0){
         freeSpace = (unsigned long long)(buf.f_bsize * buf.f_bavail);
     }
     return (NSInteger)freeSpace;
@@ -850,18 +848,11 @@ static NSString *_Alert_Know = @"OK";
     return instance;
 }
 
-+ (NSString *)valueForGetSelectorWithPropertyName:(NSString *)name object:(id)instance{
-    if (![name isKindOfClass:[NSString class]]) {
++ (id)valueForGetSelectorWithPropertyName:(NSString *)name object:(id)instance{
+    if (!([name isKindOfClass:[NSString class]]) && name.length) {
         return nil;
     }
-    SEL getSelector = NSSelectorFromString(name);
-    if ([instance respondsToSelector:getSelector]) {
-        IMP imp = [instance methodForSelector:getSelector];
-        NSString* (*func)(id, SEL) = (void *)imp;
-        NSString *value = func(instance, getSelector);
-        return value;
-    }
-    return nil;
+    return [instance valueForKey:name];
 }
 
 + (UIColor *)randomColor{

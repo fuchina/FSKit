@@ -247,7 +247,7 @@ extern NSInteger FSIntegerTimeIntevalSince1970(void);
 + (SEL)setterSELWithAttibuteName:(NSString*)attributeName;      // 将字符串转化为Set方法，如将"name"转化为setName方法
 + (void)setValue:(id)value forPropertyName:(NSString *)name ofObject:(id)object;    // 给对象的属性赋值
 + (id)entity:(Class)instance dic:(NSDictionary *)dic;           
-+ (NSString *)valueForGetSelectorWithPropertyName:(NSString *)name object:(id)instance;  // 获取实例的属性的值
++ (id)valueForGetSelectorWithPropertyName:(NSString *)name object:(id)instance;  // 获取实例的属性的值
 
 + (NSDictionary *)keyedUnarchiverWithDictionary:(NSString *)fileName;
 
