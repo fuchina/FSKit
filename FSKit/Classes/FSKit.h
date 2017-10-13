@@ -253,12 +253,12 @@ extern NSInteger FSIntegerTimeIntevalSince1970(void);
 // 主要用于汉字倾斜,系统UIFont没有直接支持汉字倾斜。可以使字体倾斜rate角度，rate在0-180之间，取15较好；fontSize是字体大小。
 + (UIFont *)angleFontWithRate:(CGFloat)rate fontSize:(NSInteger)fontSize;
 
-+ (NSDate *)dateFromStringByHotline:(NSString *)string;
-+ (NSDate *)dateFromStringByHotlineWithoutSeconds:(NSString *)string;
-+ (NSDate *)chinaDateByDate:(NSDate *)date;                                     // 解决差8小时问题
-+ (NSDate *)chinaDateByTimeInterval:(NSString *)timeInterval;                   // 解决差8小时问题
+// 解决差8小时问题
++ (NSDate *)chinaDateByDate:(NSDate *)date;
+//
 + (NSDateComponents *)componentForDate:(NSDate *)date;
-+ (NSInteger)daythOfYearForDate:(NSDate *)date;                                 // 获取日期是当年的第几天
+// 获取日期是当年的第几天
++ (NSInteger)daythOfYearForDate:(NSDate *)date;
 
 // 绘制虚线
 + (UIView *)createDashedLineWithFrame:(CGRect)lineFrame

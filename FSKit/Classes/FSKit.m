@@ -857,52 +857,9 @@ static NSString *_Alert_Know = @"OK";
     return font;
 }
 
-+ (NSDate *)dateFromStringByHotline:(NSString *)string{
-    if ([string isKindOfClass:[NSNull class]]) {
-        return nil;
-    }
-    
-    if ([string isKindOfClass:[NSString class]] && string.length == 0) {
-        return nil;
-    }
-    
-    NSDateFormatter *dateFormatter=[[NSDateFormatter alloc] init];
-    
-    [dateFormatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:8 * 3600]];
-    [dateFormatter  setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
-    NSDate *date= [dateFormatter dateFromString:string];
-    
-    NSTimeZone *zone = [NSTimeZone systemTimeZone];
-    NSInteger interval = [zone secondsFromGMTForDate:date];
-    NSDate *localeDate = [date dateByAddingTimeInterval:interval];
-    return localeDate;
-}
-
-+ (NSDate *)dateFromStringByHotlineWithoutSeconds:(NSString *)string{
-    if ([string isKindOfClass:[NSNull class]]) {
-        return nil;
-    }
-    
-    if ([string isKindOfClass:[NSString class]] && string.length == 0) {
-        return nil;
-    }
-    
-    NSDateFormatter *dateFormatter=[[NSDateFormatter alloc] init];
-    [dateFormatter setDateFormat:@"yyyy-MM-dd HH:mm"];
-    NSDate *date= [dateFormatter dateFromString:string];
-    return date;
-}
-
 + (NSDate *)chinaDateByDate:(NSDate *)date{
     NSTimeZone *zone = [NSTimeZone systemTimeZone];
     NSInteger interval = [zone secondsFromGMTForDate:date];
-    return [date dateByAddingTimeInterval: interval];
-}
-
-+ (NSDate *)chinaDateByTimeInterval:(NSString *)timeInterval{
-    NSDate *date = [NSDate dateWithTimeIntervalSince1970:[timeInterval doubleValue]];
-    NSTimeZone *zone = [NSTimeZone timeZoneForSecondsFromGMT:8 * 3600];
-    NSInteger interval = [zone secondsFromGMTForDate: date];
     return [date dateByAddingTimeInterval: interval];
 }
 
