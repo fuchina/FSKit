@@ -76,7 +76,6 @@ extern NSInteger FSIntegerTimeIntevalSince1970(void);
 + (BOOL)isHaveChineseInString:(NSString *)string;
 // 判断字符串是否全为数字
 + (BOOL)isAllNum:(NSString *)string;
-+ (BOOL)networkSettedProxy;                 // 网络是否设置了代理
 + (BOOL)isValidateString:(NSString *)string;
 + (BOOL)isValidateArray:(NSArray *)array;
 + (BOOL)isValidateDictionary:(NSDictionary *)dictionary;

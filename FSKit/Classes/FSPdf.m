@@ -109,29 +109,28 @@
     }
     
     NSString *path = [NSTemporaryDirectory() stringByAppendingPathComponent:pdfName];
-    CGContextRef pdfContext = [self createPDFContext:view.bounds path:(CFStringRef)path];
-    CGContextBeginPage (pdfContext,nil);
     
-    CGAffineTransform transform = CGAffineTransformIdentity;
-    transform = CGAffineTransformMakeTranslation(0, view.bounds.size.height);
-    transform = CGAffineTransformScale(transform, 1.0, -1.0);
-    CGContextConcatCTM(pdfContext, transform);
-    [view.layer renderInContext:pdfContext];
-    CGContextEndPage (pdfContext);
-//    CGContextRelease (pdfContext);
-    
-    return path;
-}
-
-+ (CGContextRef)createPDFContext:(CGRect)inMediaBox path:(CFStringRef) path{
-    CGContextRef myOutContext = NULL;
-    CFURLRef url;
-    url = CFURLCreateWithFileSystemPath (NULL, path,kCFURLPOSIXPathStyle,false);
+    CGContextRef pdfContext = NULL;
+    CFURLRef url = CFURLCreateWithFileSystemPath (NULL, (CFStringRef)path,kCFURLPOSIXPathStyle,false);
     if (url != NULL) {
-        myOutContext = CGPDFContextCreateWithURL (url,&inMediaBox, NULL);
+        CGRect inMediaBox = view.bounds;
+        pdfContext = CGPDFContextCreateWithURL (url,&inMediaBox, NULL);
         CFRelease(url);
     }
-    return myOutContext;
+    if (!pdfContext) {
+        return nil;
+    }else{
+        CGContextBeginPage (pdfContext,nil);
+        
+        CGAffineTransform transform = CGAffineTransformIdentity;
+        transform = CGAffineTransformMakeTranslation(0, view.bounds.size.height);
+        transform = CGAffineTransformScale(transform, 1.0, -1.0);
+        CGContextConcatCTM(pdfContext, transform);
+        [view.layer renderInContext:pdfContext];
+        CGContextEndPage (pdfContext);
+        CGContextRelease(pdfContext);
+        return path;
+    }
 }
 
 + (NSString *)pdfForImage:(UIImage *)image pdfName:(NSString *)pdfName password:(NSString *)password{
