@@ -48,12 +48,20 @@ static FSWindow *_w = nil;
 }
 
 - (void)display:(UIView *)view{
+    if (_view) {
+        [_view removeFromSuperview];
+        _view = nil;
+    }
     _view = view;
     self.hidden = NO;
     [self makeKeyAndVisible];
 }
 
 - (void)presentViewController:(UIViewController *)controller animated:(BOOL)animated completion:(void (^)(void))completion{
+    if (_viewController) {
+        [_viewController dismissViewControllerAnimated:NO completion:nil];
+        _viewController = nil;
+    }
     _viewController = controller;
     self.hidden = NO;
     [self makeKeyAndVisible];
@@ -76,6 +84,7 @@ static FSWindow *_w = nil;
         _view = nil;
     }
     if (_viewController) {
+        [_viewController dismissViewControllerAnimated:YES completion:nil];
         _viewController = nil;
     }
     self.hidden = YES;
