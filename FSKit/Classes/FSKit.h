@@ -14,7 +14,7 @@
 extern  NSTimeInterval FSTimeIntevalSince1970(void);
 extern NSInteger FSIntegerTimeIntevalSince1970(void);
 
-+ (void)presentViewController:(UIViewController *)pController completion:(void (^)(void))completion;
+//+ (void)presentViewController:(UIViewController *)pController completion:(void (^)(void))completion;
 
 + (void)userDefaultsKeepData:(id)instance  withKey:(NSString *)key;
 + (id)userDefaultsDataWithKey:(NSString *)key;

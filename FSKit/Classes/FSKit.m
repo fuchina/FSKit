@@ -34,10 +34,6 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
     return (NSInteger)[[NSDate date] timeIntervalSince1970];
 }
 
-+ (void)presentViewController:(UIViewController *)pController completion:(void (^)(void))completion{
-    [FSWindow presentViewController:pController animated:YES completion:completion];
-}
-
 + (void)alert:(UIAlertControllerStyle)style title:(NSString *)title message:(NSString *)message actionTitles:(NSArray<NSString *> *)titles styles:(NSArray<NSNumber *> *)styles handler:(void (^)(UIAlertAction *action))handler cancelTitle:(NSString *)cancelTitle cancel:(void (^)(UIAlertAction *action))cancel completion:(void (^)(void))completion{
     UIAlertController *controller = [self alertControllerWithStyle:style title:title message:message actionTitles:titles styles:styles handler:handler cancelTitle:cancelTitle cancel:cancel];
     [FSWindow presentViewController:controller animated:YES completion:completion];
@@ -97,7 +93,7 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
     }];
     [alertController addAction:cancelAction];
     [alertController addAction:okAction];
-    [self presentViewController:alertController completion:completion];
+    [FSWindow presentViewController:alertController animated:YES completion:completion];
 }
 
 + (void)pushToViewControllerWithClass:(NSString *)className navigationController:(UINavigationController *)navigationController param:(NSDictionary *)param configBlock:(void (^)(id vc))configBlockParam{
@@ -262,7 +258,7 @@ static NSString *_Alert_Know = @"OK";
         }
     }];
     [controller addAction:action];
-    [self presentViewController:controller completion:nil];
+    [FSWindow presentViewController:controller animated:YES completion:nil];
 }
 
 + (void)showAlertWithMessage:(NSString *)message controller:(UIViewController *)controller{
