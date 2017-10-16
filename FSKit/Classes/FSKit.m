@@ -34,7 +34,7 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
     return (NSInteger)[[NSDate date] timeIntervalSince1970];
 }
 
-+ (void)alert:(UIAlertControllerStyle)style title:(NSString *)title message:(NSString *)message actionTitles:(NSArray<NSString *> *)titles styles:(NSArray<NSNumber *> *)styles handler:(void (^)(UIAlertAction *action))handler cancelTitle:(NSString *)cancelTitle cancel:(void (^)(UIAlertAction *action))cancel completion:(void (^)(void))completion{
++ (void)alertOnCustomWindow:(UIAlertControllerStyle)style title:(NSString *)title message:(NSString *)message actionTitles:(NSArray<NSString *> *)titles styles:(NSArray<NSNumber *> *)styles handler:(void (^)(UIAlertAction *action))handler cancelTitle:(NSString *)cancelTitle cancel:(void (^)(UIAlertAction *action))cancel completion:(void (^)(void))completion{
     UIAlertController *controller = [self alertControllerWithStyle:style title:title message:message actionTitles:titles styles:styles handler:handler cancelTitle:cancelTitle cancel:cancel];
     [FSWindow presentViewController:controller animated:YES completion:completion];
 }
@@ -241,15 +241,15 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
 
 static NSString *_Alert_Notice = @"Tips";
 static NSString *_Alert_Know = @"OK";
-+ (void)showAlertWithMessage:(NSString *)message{
-    [self showAlertWithTitle:_Alert_Notice message:message ok:_Alert_Know handler:nil];
++ (void)showAlertWithMessageOnCustomWindow:(NSString *)message{
+    [self showAlertWithTitleOnCustomWindow:_Alert_Notice message:message ok:_Alert_Know handler:nil];
 }
 
-+ (void)showAlertWithMessage:(NSString *)message handler:(void (^)(UIAlertAction *action))handler{
-    [self showAlertWithTitle:_Alert_Notice message:message ok:_Alert_Know handler:handler];
++ (void)showAlertWithMessageOnCustomWindow:(NSString *)message handler:(void (^)(UIAlertAction *action))handler{
+    [self showAlertWithTitleOnCustomWindow:_Alert_Notice message:message ok:_Alert_Know handler:handler];
 }
 
-+ (void)showAlertWithTitle:(NSString *)title message:(NSString *)message ok:(NSString *)ok handler:(void (^)(UIAlertAction *action))handler{
++ (void)showAlertWithTitleOnCustomWindow:(NSString *)title message:(NSString *)message ok:(NSString *)ok handler:(void (^)(UIAlertAction *action))handler{
     UIAlertController *controller = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction *action = [UIAlertAction actionWithTitle:ok style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
         [FSWindow dismiss];
@@ -2110,6 +2110,12 @@ static NSString *_Alert_Know = @"OK";
     return [a compare:b] == NSOrderedSame;
 }
 
++ (BOOL)isChineseEnvironment{
+    NSArray *appLanguages = [[NSUserDefaults standardUserDefaults] objectForKey:@"AppleLanguages"];
+    NSString *languageName = [appLanguages objectAtIndex:0];
+    return [languageName isEqualToString:@"zh-Hans-CN"];
+}
+
 + (CGFloat)taxForSalaryAfterSocialSecurity:(CGFloat)money{
     CGFloat deltaMoney = money - 3500;
     if (deltaMoney <= 0) {
@@ -2545,14 +2551,32 @@ static NSString *_Alert_Know = @"OK";
     return overdueTimeString;
 }
 
-+ (NSString *)pinyinForHans:(NSString *)chinese{
-    //将NSString装换成NSMutableString
++ (NSString *)pinyinForHans:(NSString *)string{
+    NSMutableString *preString = (NSMutableString *)[self pinyinForHansSimple:string];
+    /*多音字处理*/
+    if ([[(NSString *)string substringToIndex:1] compare:@"长"] == NSOrderedSame){
+        [preString replaceCharactersInRange:NSMakeRange(0, 5) withString:@"chang"];
+    }
+    
+    if ([[(NSString *)string substringToIndex:1] compare:@"沈"] == NSOrderedSame){
+        [preString replaceCharactersInRange:NSMakeRange(0, 4) withString:@"shen"];
+    }
+    if ([[(NSString *)string substringToIndex:1] compare:@"厦"] == NSOrderedSame){
+        [preString replaceCharactersInRange:NSMakeRange(0, 3) withString:@"xia"];
+    }
+    if ([[(NSString *)string substringToIndex:1] compare:@"地"] == NSOrderedSame){
+        [preString replaceCharactersInRange:NSMakeRange(0, 3) withString:@"di"];
+    }
+    if ([[(NSString *)string substringToIndex:1] compare:@"重"] == NSOrderedSame){
+        [preString replaceCharactersInRange:NSMakeRange(0, 5) withString:@"chong"];
+    }
+    return preString;
+}
+
++ (NSString *)pinyinForHansSimple:(NSString *)chinese{
     NSMutableString *pinyin = [chinese mutableCopy];
-    //将汉字转换为拼音(带音标)
     CFStringTransform((__bridge CFMutableStringRef)pinyin, NULL, kCFStringTransformMandarinLatin, NO);
-    //去掉拼音的音标
     CFStringTransform((__bridge CFMutableStringRef)pinyin, NULL, kCFStringTransformStripCombiningMarks, NO);
-    //返回最近结果
     return pinyin;
 }
 

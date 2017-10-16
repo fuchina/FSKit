@@ -23,7 +23,7 @@ extern NSInteger FSIntegerTimeIntevalSince1970(void);
 + (BOOL)popToController:(NSString *)className navigationController:(UINavigationController *)navigationController animated:(BOOL)animated;
 
 // 根据action.title映射titles中的字段来判断点击事件   UIAlertActionStyleDefault
-+ (void)alert:(UIAlertControllerStyle)style title:(NSString *)title message:(NSString *)message actionTitles:(NSArray<NSString *> *)titles styles:(NSArray<NSNumber *> *)styles handler:(void (^)(UIAlertAction *action))handler cancelTitle:(NSString *)cancelTitle cancel:(void (^)(UIAlertAction *action))cancel completion:(void (^)(void))completion;
++ (void)alertOnCustomWindow:(UIAlertControllerStyle)style title:(NSString *)title message:(NSString *)message actionTitles:(NSArray<NSString *> *)titles styles:(NSArray<NSNumber *> *)styles handler:(void (^)(UIAlertAction *action))handler cancelTitle:(NSString *)cancelTitle cancel:(void (^)(UIAlertAction *action))cancel completion:(void (^)(void))completion;
 + (void)alert:(UIAlertControllerStyle)style controller:(UIViewController *)pController title:(NSString *)title message:(NSString *)message actionTitles:(NSArray<NSString *> *)titles styles:(NSArray<NSNumber *> *)styles handler:(void (^)(UIAlertAction *action))handler cancelTitle:(NSString *)cancelTitle cancel:(void (^)(UIAlertAction *action))cancel completion:(void (^)(void))completion;
 
 // 有输入框时，number为输入框数量，根据textField的tag【0、1、2...】来配置textField
@@ -42,9 +42,9 @@ extern NSInteger FSIntegerTimeIntevalSince1970(void);
 + (void)setStatusBarBackgroundColor:(UIColor *)color;       // 设置状态栏颜色
 
 + (void)showMessage:(NSString *)message;
-+ (void)showAlertWithMessage:(NSString *)message;
-+ (void)showAlertWithMessage:(NSString *)message handler:(void (^)(UIAlertAction *action))handler;
-+ (void)showAlertWithTitle:(NSString *)title message:(NSString *)message ok:(NSString *)ok handler:(void (^)(UIAlertAction *action))handler;
++ (void)showAlertWithMessageOnCustomWindow:(NSString *)message;
++ (void)showAlertWithMessageOnCustomWindow:(NSString *)message handler:(void (^)(UIAlertAction *action))handler;
++ (void)showAlertWithTitleOnCustomWindow:(NSString *)title message:(NSString *)message ok:(NSString *)ok handler:(void (^)(UIAlertAction *action))handler;
 + (void)showAlertWithMessage:(NSString *)message controller:(UIViewController *)controller;
 + (void)showAlertWithMessage:(NSString *)message controller:(UIViewController *)controller handler:(void (^)(UIAlertAction *action))handler;
 + (void)showAlertWithTitle:(NSString *)title message:(NSString *)message ok:(NSString *)ok controller:(UIViewController *)pController handler:(void (^)(UIAlertAction *action))handler;
@@ -80,7 +80,8 @@ extern NSInteger FSIntegerTimeIntevalSince1970(void);
 + (BOOL)isValidateArray:(NSArray *)array;
 + (BOOL)isValidateDictionary:(NSDictionary *)dictionary;
 + (BOOL)floatEqual:(float)aNumber bNumber:(float)bNumber;
-
+// 判断是否为中文语言环境
++ (BOOL)isChineseEnvironment;
 // 五险一金后工资应缴税额
 + (CGFloat)taxForSalaryAfterSocialSecurity:(CGFloat)money;
 // 根据税后推算税前
