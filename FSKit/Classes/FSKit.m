@@ -96,6 +96,38 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
     [FSWindow presentViewController:alertController animated:YES completion:completion];
 }
 
++ (void)alertInput:(NSInteger)number controller:(UIViewController *)controller title:(NSString *)title message:(NSString *)message ok:(NSString *)okTitle handler:(void (^)(UIAlertController *bAlert,UIAlertAction *action))handler cancel:(NSString *)cancelTitle handler:(void (^)(UIAlertAction *action))cancelHandler textFieldConifg:(void (^)(UITextField *textField))configurationHandler completion:(void (^)(void))completion{
+    if (![controller isKindOfClass:[UIViewController class]]) {
+        return;
+    }
+    
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];
+    if (number > 0) {
+        for (int x = 0; x < number; x ++) {
+            [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField){
+                if (configurationHandler) {
+                    textField.tag = x;
+                    configurationHandler(textField);
+                }
+            }];
+        }
+    }
+    
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:cancelTitle style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+        if (cancelHandler) {
+            cancelHandler(action);
+        }
+    }];
+    UIAlertAction *okAction = [UIAlertAction actionWithTitle:okTitle style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        if (handler) {
+            handler(alertController,action);
+        }
+    }];
+    [alertController addAction:cancelAction];
+    [alertController addAction:okAction];
+    [controller presentViewController:alertController animated:YES completion:completion];
+}
+
 + (void)pushToViewControllerWithClass:(NSString *)className navigationController:(UINavigationController *)navigationController param:(NSDictionary *)param configBlock:(void (^)(id vc))configBlockParam{
     Class Controller = NSClassFromString(className);
     if (Controller) {
