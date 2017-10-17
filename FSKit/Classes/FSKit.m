@@ -44,6 +44,11 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
     [pController presentViewController:controller animated:YES completion:completion];
 }
 
++ (void)alert:(UIAlertControllerStyle)style controller:(UIViewController *)pController title:(NSString *)title message:(NSString *)message actionTitles:(NSArray<NSString *> *)titles styles:(NSArray<NSNumber *> *)styles handler:(void (^)(UIAlertAction *action))handler{
+    UIAlertController *controller = [self alertControllerWithStyle:style title:title message:message actionTitles:titles styles:styles handler:handler cancelTitle:NSLocalizedString(@"Cancel", nil) cancel:nil];
+    [pController presentViewController:controller animated:YES completion:nil];
+}
+
 + (UIAlertController *)alertControllerWithStyle:(UIAlertControllerStyle)style title:(NSString *)title message:(NSString *)message actionTitles:(NSArray<NSString *> *)titles styles:(NSArray<NSNumber *> *)styles handler:(void (^)(UIAlertAction *action))handler cancelTitle:(NSString *)cancelTitle cancel:(void (^)(UIAlertAction *action))cancel{
     NSInteger count = MIN(titles.count, styles.count);
     UIAlertController *controller = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:style];

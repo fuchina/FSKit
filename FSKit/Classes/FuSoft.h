@@ -66,6 +66,7 @@ return self;\
 #define FSValidateString(A)         [FSKit isValidateString:A]
 #define FSValidateArray(A)          [FSKit isValidateArray:A]
 #define FSValidateDictionary(A)     [FSKit isValidateDictionary:A]
+#define FSLocalString(A)            NSLocalizedString(A, nil)
 
 // 字符串格式化宏
 #define FSFORMATSTRING(...) [[NSString alloc] initWithFormat:__VA_ARGS__]
