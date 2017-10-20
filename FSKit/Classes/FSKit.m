@@ -419,8 +419,8 @@ static NSString *_Alert_Know = @"OK";
     CGRect rect = [attrStr boundingRectWithSize:CGSizeMake(labelWidth, CGFLOAT_MAX)
                                         options:options
                                         context:nil];
-    //    return titleHeight + 2;  // 加两个像素,防止emoji被切掉.
-    return ceilf(rect.size.height);
+     // 加两个像素,防止emoji被切掉.
+    return ceilf(rect.size.height + 2);
 }
 
 + (CGFloat)textWidth:(NSString *)text fontInt:(NSInteger)fontInt labelHeight:(CGFloat)labelHeight{
@@ -432,7 +432,7 @@ static NSString *_Alert_Know = @"OK";
     }
     
     CGSize size = [text boundingRectWithSize:CGSizeMake(CGFLOAT_MAX, labelHeight) options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:fontInt]} context:nil].size;
-    return ceil(size.width);
+    return ceil(size.width + 2);
 }
 
 + (double)distanceBetweenCoordinate:(CLLocationCoordinate2D)coordinateA toCoordinateB:(CLLocationCoordinate2D)coordinateB{
