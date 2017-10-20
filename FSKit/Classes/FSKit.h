@@ -102,6 +102,8 @@ extern NSInteger FSIntegerTimeIntevalSince1970(void);
 + (double)availableMemory;                                                          // 获得当前设备可用内存,单位为M
 + (float)folderSizeAtPath:(NSString*)folderPath extension:(NSString *)extension;    // 获取文件夹目录下的文件大小
 + (long long)fileSizeAtPath:(NSString*)filePath;                                    // 获取文件的大小
+// 计算文本宽度
++ (CGFloat)textWidth:(NSString *)text fontInt:(NSInteger)fontInt labelHeight:(CGFloat)labelHeight;
 + (CGFloat)textHeight:(NSString *)text
               fontInt:(NSInteger)fontInt                                            // 计算字符串放在label上需要的高度,font数字要和label的一样
            labelWidth:(CGFloat)labelWidth;                                          // label调用 sizeToFit 可以实现自适应

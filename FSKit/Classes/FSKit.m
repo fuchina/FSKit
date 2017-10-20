@@ -423,6 +423,18 @@ static NSString *_Alert_Know = @"OK";
     return ceilf(rect.size.height);
 }
 
++ (CGFloat)textWidth:(NSString *)text fontInt:(NSInteger)fontInt labelHeight:(CGFloat)labelHeight{
+    if (fontInt == 0) {
+        return 0;
+    }
+    if (![self isValidateString:text]) {
+        return 0;
+    }
+    
+    CGSize size = [text boundingRectWithSize:CGSizeMake(CGFLOAT_MAX, labelHeight) options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:fontInt]} context:nil].size;
+    return ceil(size.width);
+}
+
 + (double)distanceBetweenCoordinate:(CLLocationCoordinate2D)coordinateA toCoordinateB:(CLLocationCoordinate2D)coordinateB{
     static double EARTH_RADIUS = 6378.137;//地球半径
     
