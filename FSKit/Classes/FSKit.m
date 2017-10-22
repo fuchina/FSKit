@@ -39,6 +39,11 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
     [FSWindow presentViewController:controller animated:YES completion:completion];
 }
 
++ (void)alertOnCustomWindow:(UIAlertControllerStyle)style title:(NSString *)title message:(NSString *)message actionTitles:(NSArray<NSString *> *)titles styles:(NSArray<NSNumber *> *)styles handler:(void (^)(UIAlertAction *action))handler{
+    UIAlertController *controller = [self alertControllerWithStyle:style title:title message:message actionTitles:titles styles:styles handler:handler cancelTitle:NSLocalizedString(@"Cancel", nil) cancel:nil];
+    [FSWindow presentViewController:controller animated:YES completion:nil];
+}
+
 + (void)alert:(UIAlertControllerStyle)style controller:(UIViewController *)pController title:(NSString *)title message:(NSString *)message actionTitles:(NSArray<NSString *> *)titles styles:(NSArray<NSNumber *> *)styles handler:(void (^)(UIAlertAction *action))handler cancelTitle:(NSString *)cancelTitle cancel:(void (^)(UIAlertAction *action))cancel completion:(void (^)(void))completion{
     UIAlertController *controller = [self alertControllerWithStyle:style title:title message:message actionTitles:titles styles:styles handler:handler cancelTitle:cancelTitle cancel:cancel];
     [pController presentViewController:controller animated:YES completion:completion];
@@ -276,14 +281,12 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
     });
 }
 
-static NSString *_Alert_Notice = @"Tips";
-static NSString *_Alert_Know = @"OK";
 + (void)showAlertWithMessageOnCustomWindow:(NSString *)message{
-    [self showAlertWithTitleOnCustomWindow:_Alert_Notice message:message ok:_Alert_Know handler:nil];
+    [self showAlertWithTitleOnCustomWindow:NSLocalizedString(@"Tips", nil) message:message ok:NSLocalizedString(@"OK", nil) handler:nil];
 }
 
 + (void)showAlertWithMessageOnCustomWindow:(NSString *)message handler:(void (^)(UIAlertAction *action))handler{
-    [self showAlertWithTitleOnCustomWindow:_Alert_Notice message:message ok:_Alert_Know handler:handler];
+    [self showAlertWithTitleOnCustomWindow:NSLocalizedString(@"Tips", nil) message:message ok:NSLocalizedString(@"OK", nil) handler:handler];
 }
 
 + (void)showAlertWithTitleOnCustomWindow:(NSString *)title message:(NSString *)message ok:(NSString *)ok handler:(void (^)(UIAlertAction *action))handler{
@@ -299,11 +302,11 @@ static NSString *_Alert_Know = @"OK";
 }
 
 + (void)showAlertWithMessage:(NSString *)message controller:(UIViewController *)controller{
-    [self showAlertWithTitle:_Alert_Notice message:message ok:_Alert_Know controller:controller handler:nil];
+    [self showAlertWithTitle:NSLocalizedString(@"Tips", nil) message:message ok:NSLocalizedString(@"OK", nil) controller:controller handler:nil];
 }
 
 + (void)showAlertWithMessage:(NSString *)message controller:(UIViewController *)controller handler:(void (^)(UIAlertAction *action))handler{
-    [self showAlertWithTitle:_Alert_Notice message:message ok:_Alert_Know controller:controller handler:handler];
+    [self showAlertWithTitle:NSLocalizedString(@"Tips", nil) message:message ok:NSLocalizedString(@"OK", nil) controller:controller handler:handler];
 }
 
 + (void)showAlertWithTitle:(NSString *)title message:(NSString *)message ok:(NSString *)ok controller:(UIViewController *)pController handler:(void (^)(UIAlertAction *action))handler{
