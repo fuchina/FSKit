@@ -580,6 +580,23 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
     return monthPay * month / money;
 }
 
+/*
+ @param
+ days:周转天数，单位：天，即多少天后会卖出；
+ rate:目标年化收益率，比如20%；
+ 
+ @result
+ 返回价格倍数，比如输入90，0.3820,返回1.094129，即90天卖出应该定价为所投入资本的1.094129倍
+ */
++ (CGFloat)priceRiseWithDays:(CGFloat)days yearRate:(CGFloat)rate{
+    days = MAX(days, 1);
+    rate = MAX(0, rate);
+    CGFloat year = 365.2422;
+    CGFloat everyEarn = rate / year;
+    CGFloat allEarn = days * everyEarn;
+    return (allEarn + 1);
+}
+
 + (CGFloat)freeStoragePercentage{
     CGFloat total = [self getTotalDiskSize];
     if (total > 1) {

@@ -30,13 +30,7 @@
 }
 
 - (void)click{
-    [FSKit alertInput:2 controller:self title:@"Title" message:@"Message" ok:@"OK" handler:^(UIAlertController *bAlert, UIAlertAction *action) {
-        UITextField *first = bAlert.textFields.firstObject;
-        UITextField *last = bAlert.textFields.lastObject;
-        NSLog(@"%@-%@",first.text,last.text);
-    } cancel:@"Cancel" handler:nil textFieldConifg:^(UITextField *textField) {
-        textField.placeholder = @"placeholder";
-    } completion:nil];
+    NSLog(@"%.6f",[FSKit priceRiseWithDays:90 yearRate:0.382]);
 }
 
 - (void)didReceiveMemoryWarning

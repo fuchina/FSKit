@@ -120,8 +120,11 @@ extern NSInteger FSIntegerTimeIntevalSince1970(void);
 // 当前app所占内存（RAM）
 + (double)currentAppMemory;
 + (CGSize)keyboardNotificationScroll:(NSNotification *)notification baseOn:(CGFloat)baseOn;
+
 + (CGFloat)DEBJWithYearRate:(CGFloat)rate monthes:(NSInteger)month;
 + (CGFloat)DEBXWithYearRate:(CGFloat)rate monthes:(NSInteger)month;
++ (CGFloat)priceRiseWithDays:(CGFloat)days yearRate:(CGFloat)rate;
+
 + (CGFloat)freeStoragePercentage;   // 可用内存占总内存的比例,eg  0.1;
 + (NSInteger)getTotalDiskSize;   // 获取磁盘总量
 + (NSInteger)getAvailableDiskSize;   // 获取磁盘可用量
