@@ -1953,6 +1953,20 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
     return NO;
 }
 
++ (NSDictionary *)dictionaryWithObject:(id)model{
+    NSArray<NSString *> *ps = [self propertiesForClass:[model class]];
+    NSMutableDictionary *dic = [[NSMutableDictionary alloc] initWithCapacity:ps.count];
+    for (NSString *p in ps) {
+        NSString *value = [self valueForGetSelectorWithPropertyName:p object:model];
+        if ([value isKindOfClass:[NSString class]] || [value isKindOfClass:[NSNumber class]]) {
+            [dic setObject:value forKey:p];
+        }else{
+            [dic setObject:@"" forKey:p];
+        }
+    }
+    return [dic copy];
+}
+
 + (NSDictionary *)keyedUnarchiverWithDictionary:(NSString *)fileName{
     if (fileName.length == 0) {
         return nil;

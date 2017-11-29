@@ -247,6 +247,9 @@ extern NSInteger FSIntegerTimeIntevalSince1970(void);
 + (id)entity:(Class)instance dic:(NSDictionary *)dic;           
 + (id)valueForGetSelectorWithPropertyName:(NSString *)name object:(id)instance;  // 获取实例的属性的值
 
+// 将一个对象转换为字典
++ (NSDictionary *)dictionaryWithObject:(id)model;
+
 + (NSDictionary *)keyedUnarchiverWithDictionary:(NSString *)fileName;
 
 + (NSData *)keyedUnarchiverWithData:(NSString *)fileName;
