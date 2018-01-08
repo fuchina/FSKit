@@ -25,9 +25,21 @@ static FSWindow *_w = nil;
     return _w;
 }
 
+- (void)windowNoti:(NSNotification *)notification{
+    if (self.hidden == NO) {
+        UIWindow *object = notification.object;
+        if ([object isKindOfClass:[UIWindow class]] && object != self && object.isKeyWindow) {
+            self.windowLevel = object.windowLevel + 1;
+            [self makeKeyAndVisible];
+        }
+    }
+}
+
 - (instancetype)initWithFrame:(CGRect)frame{
     self = [super initWithFrame:frame];
     if (self) {
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(windowNoti:) name:UIWindowDidBecomeKeyNotification object:nil];
+        
         self.backgroundColor = [UIColor clearColor];
         UIView *view = [[UIView alloc] init];
         view.translatesAutoresizingMaskIntoConstraints = NO;
