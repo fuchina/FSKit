@@ -30,7 +30,9 @@
 }
 
 - (void)click{
-    NSLog(@"%.6f",[FSKit priceRiseWithDays:90 yearRate:0.382]);
+    NSString *path = @"/Users/fudon/Desktop/LogoMaker";
+    NSInteger size = [FSKit fileSizeAtPath:path];
+    NSLog(@"%.2f KB",size / 1024.0);
 }
 
 - (void)didReceiveMemoryWarning

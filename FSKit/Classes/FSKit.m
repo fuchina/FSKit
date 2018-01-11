@@ -375,14 +375,14 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
     return ((vm_page_size *vmStats.free_count) / 1024.0) / 1024.0;
 }
 
-+ (float)folderSizeAtPath:(NSString*)folderPath extension:(NSString *)extension{
++ (NSInteger)folderSizeAtPath:(NSString *)folderPath extension:(NSString *)extension{
     NSFileManager* manager = [NSFileManager defaultManager];
     if (![manager fileExistsAtPath:folderPath])
         return 0;
     
     NSEnumerator *childFilesEnumerator = [[manager subpathsAtPath:folderPath] objectEnumerator];
     NSString *fileName;
-    long long folderSize = 0;
+    NSInteger folderSize = 0;
     while ((fileName = [childFilesEnumerator nextObject]) != nil){
         NSString *fileAbsolutePath = [folderPath stringByAppendingPathComponent:fileName];
         if (extension) {
@@ -393,16 +393,27 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
             folderSize += [self fileSizeAtPath:fileAbsolutePath];
         }
     }
-    //    return folderSize / (1024.0 * 1024.0);
-    return folderSize / 1024.0;
+    return folderSize;
 }
 
-+ (long long)fileSizeAtPath:(NSString*)filePath{
-    NSFileManager* manager = [NSFileManager defaultManager];
-    if ([manager fileExistsAtPath:filePath]){
-        return [[manager attributesOfItemAtPath:filePath error:nil] fileSize];
++ (NSInteger)fileSizeAtPath:(NSString *)filePath{
+    NSInteger size = 0;
+    NSFileManager *manager = [NSFileManager defaultManager];
+    BOOL isDir = NO;
+    BOOL exist = [manager fileExistsAtPath:filePath isDirectory:&isDir];
+    // 判断路径是否存在
+    if (!exist) return size;
+    if (isDir) { // 是文件夹
+        NSDirectoryEnumerator *enumerator = [manager enumeratorAtPath:filePath];
+        for (NSString *subPath in enumerator) {
+            NSString *fullPath = [filePath stringByAppendingPathComponent:subPath];
+            NSInteger subSize = [manager attributesOfItemAtPath:fullPath error:nil].fileSize;
+            size += subSize;
+        }
+    }else{ // 是文件
+        size += [manager attributesOfItemAtPath:filePath error:nil].fileSize;
     }
-    return 0;
+    return size;
 }
 
 + (CGFloat)textHeight:(NSString *)text fontInt:(NSInteger)fontInt labelWidth:(CGFloat)labelWidth{

@@ -101,8 +101,8 @@ extern NSInteger FSIntegerTimeIntevalSince1970(void);
 + (double)forwardValue:(double)number afterPoint:(int)position;  // 只入不舍
 + (double)usedMemory;                                                               // 获得应用占用的内存，单位为M
 + (double)availableMemory;                                                          // 获得当前设备可用内存,单位为M
-+ (float)folderSizeAtPath:(NSString*)folderPath extension:(NSString *)extension;    // 获取文件夹目录下的文件大小
-+ (long long)fileSizeAtPath:(NSString*)filePath;                                    // 获取文件的大小
++ (NSInteger)folderSizeAtPath:(NSString*)folderPath extension:(NSString *)extension;// 获取文件夹目录下的文件大小
++ (NSInteger)fileSizeAtPath:(NSString*)filePath;                                    // 获取文件的大小
 // 计算文本宽度
 + (CGFloat)textWidth:(NSString *)text fontInt:(NSInteger)fontInt labelHeight:(CGFloat)labelHeight;
 + (CGFloat)textHeight:(NSString *)text
