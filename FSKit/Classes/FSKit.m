@@ -407,7 +407,7 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
         NSDirectoryEnumerator *enumerator = [manager enumeratorAtPath:filePath];
         for (NSString *subPath in enumerator) {
             NSString *fullPath = [filePath stringByAppendingPathComponent:subPath];
-            NSInteger subSize = [manager attributesOfItemAtPath:fullPath error:nil].fileSize;
+            NSInteger subSize = (NSInteger)[manager attributesOfItemAtPath:fullPath error:nil].fileSize;
             size += subSize;
         }
     }else{ // 是文件
