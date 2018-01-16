@@ -9,6 +9,7 @@
 #import "FSViewController.h"
 #import "FSKit-umbrella.h"
 #import "FSModel.h"
+#import "FSSecondController.h"
 
 @interface FSViewController ()
 
@@ -18,6 +19,7 @@
 
 - (void)viewDidLoad{
     [super viewDidLoad];
+    self.view.backgroundColor = [UIColor whiteColor];
     
     UIButton *btn = [UIButton buttonWithType:UIButtonTypeSystem];
     btn.translatesAutoresizingMaskIntoConstraints = NO;
@@ -30,9 +32,7 @@
 }
 
 - (void)click{
-    NSString *path = @"/Users/fudon/Desktop/LogoMaker";
-    NSInteger size = [FSKit fileSizeAtPath:path];
-    NSLog(@"%.2f KB",size / 1024.0);
+    [FSKit pushToViewControllerWithClass:@"FSSecondController" navigationController:self.navigationController param:nil configBlock:nil];
 }
 
 - (void)didReceiveMemoryWarning

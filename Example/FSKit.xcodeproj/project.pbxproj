@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5C235EC5200DA506009A718E /* FSSecondController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C235EC4200DA506009A718E /* FSSecondController.m */; };
 		5C33620C1F7F911900FE73CD /* FSAPP.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C33620B1F7F911900FE73CD /* FSAPP.m */; };
 		5C4259A71F4FCEE300DAED6A /* FSModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C4259A61F4FCEE300DAED6A /* FSModel.m */; };
 		6003F58E195388D20070C39A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6003F58D195388D20070C39A /* Foundation.framework */; };
@@ -42,6 +43,8 @@
 /* Begin PBXFileReference section */
 		368C77F8F9C048A3415DD619 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 		4E236457D14880D225E4A0F1 /* Pods-FSKit_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FSKit_Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-FSKit_Tests/Pods-FSKit_Tests.debug.xcconfig"; sourceTree = "<group>"; };
+		5C235EC3200DA506009A718E /* FSSecondController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FSSecondController.h; sourceTree = "<group>"; };
+		5C235EC4200DA506009A718E /* FSSecondController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FSSecondController.m; sourceTree = "<group>"; };
 		5C33620A1F7F911900FE73CD /* FSAPP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSAPP.h; sourceTree = "<group>"; };
 		5C33620B1F7F911900FE73CD /* FSAPP.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSAPP.m; sourceTree = "<group>"; };
 		5C4259A51F4FCEE300DAED6A /* FSModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSModel.h; sourceTree = "<group>"; };
@@ -147,6 +150,8 @@
 				873B8AEA1B1F5CCA007FD442 /* Main.storyboard */,
 				6003F5A5195388D20070C39A /* FSViewController.h */,
 				6003F5A6195388D20070C39A /* FSViewController.m */,
+				5C235EC3200DA506009A718E /* FSSecondController.h */,
+				5C235EC4200DA506009A718E /* FSSecondController.m */,
 				5C4259A51F4FCEE300DAED6A /* FSModel.h */,
 				5C4259A61F4FCEE300DAED6A /* FSModel.m */,
 				71719F9D1E33DC2100824A3D /* LaunchScreen.storyboard */,
@@ -408,6 +413,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5C235EC5200DA506009A718E /* FSSecondController.m in Sources */,
 				6003F59E195388D20070C39A /* FSAppDelegate.m in Sources */,
 				6003F5A7195388D20070C39A /* FSViewController.m in Sources */,
 				5C4259A71F4FCEE300DAED6A /* FSModel.m in Sources */,

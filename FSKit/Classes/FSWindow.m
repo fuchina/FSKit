@@ -21,6 +21,8 @@ static FSWindow *_w = nil;
     static dispatch_once_t once;
     dispatch_once(&once, ^{
         _w = [[FSWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+        UIViewController *c = [[UIViewController alloc] init];
+        _w.rootViewController = c;
     });
     return _w;
 }
@@ -67,6 +69,7 @@ static FSWindow *_w = nil;
     _view = view;
     self.hidden = NO;
     [self makeKeyAndVisible];
+    [self bringSubviewToFront:view];
 }
 
 - (void)presentViewController:(UIViewController *)controller animated:(BOOL)animated completion:(void (^)(void))completion{

@@ -7,12 +7,14 @@
 //
 
 #import "FSAppDelegate.h"
+#import "FSViewController.h"
 
 @implementation FSAppDelegate
 
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
-{
-    // Override point for customization after application launch.
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions{
+    FSViewController *v = [[FSViewController alloc] init];
+    UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:v];
+    self.window.rootViewController = nav;
     return YES;
 }
 
