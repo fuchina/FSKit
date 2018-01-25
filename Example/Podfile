@@ -2,6 +2,7 @@ use_frameworks!
 
 target 'FSKit_Example' do
   pod 'FSKit', :path => '../'
+  pod 'MLeaksFinder'
 
   target 'FSKit_Tests' do
     inherit! :search_paths

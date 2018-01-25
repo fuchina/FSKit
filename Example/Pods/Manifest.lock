@@ -1,16 +1,22 @@
 PODS:
-  - FSKit (1.2.0)
+  - FBRetainCycleDetector (0.1.4)
+  - FSKit (1.2.2)
+  - MLeaksFinder (1.0.0):
+    - FBRetainCycleDetector
 
 DEPENDENCIES:
   - FSKit (from `../`)
+  - MLeaksFinder
 
 EXTERNAL SOURCES:
   FSKit:
-    :path: ../
+    :path: "../"
 
 SPEC CHECKSUMS:
-  FSKit: f83e65e2b88d427515a2d6c9d02e56aebd44f8e7
+  FBRetainCycleDetector: 46f8179bbb1c587deee3ea838a1a3ee02acf5015
+  FSKit: 382bd4e4b185747349b74935b08808f5fa54a360
+  MLeaksFinder: 8c435bd2f6d070af18cff082b503b21adc130fc0
 
-PODFILE CHECKSUM: c0a76966c72444a002681a23ff2d062d0f91f1d1
+PODFILE CHECKSUM: b48b8c18df34973de16038de17b5b751f2940e13
 
 COCOAPODS: 1.2.1
