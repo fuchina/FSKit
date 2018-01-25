@@ -27,7 +27,8 @@
     self.view.backgroundColor = [UIColor whiteColor];
     __weak typeof(self)this = self;
     [FSKit alertInput:1 controller:self title:@"Title" message:@"Message" ok:@"OK" handler:^(UIAlertController *bAlert, UIAlertAction *action) {
-        NSLog(@"OK");
+        UITextField *tf = bAlert.textFields.firstObject;
+        NSLog(@"%@",tf.text);
         this.what = YES;
         this.str = @"what";
     } cancel:@"Cancel" handler:^(UIAlertAction *action) {

@@ -95,10 +95,11 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
             cancelHandler(action);
         }
     }];
+    __weak typeof(alertController)wAlertController = alertController;
     UIAlertAction *okAction = [UIAlertAction actionWithTitle:okTitle style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         [FSWindow dismiss];
         if (handler) {
-            handler(alertController,action);
+            handler(wAlertController,action);
         }
     }];
     [alertController addAction:cancelAction];
@@ -128,9 +129,10 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
             cancelHandler(action);
         }
     }];
+    __weak typeof(alertController)wAlertController = alertController;
     UIAlertAction *okAction = [UIAlertAction actionWithTitle:okTitle style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         if (handler) {
-            handler(alertController,action);
+            handler(wAlertController,action);
         }
     }];
     [alertController addAction:cancelAction];
