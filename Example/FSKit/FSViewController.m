@@ -32,7 +32,9 @@
 }
 
 - (void)click{
-    [FSKit pushToViewControllerWithClass:@"FSSecondController" navigationController:self.navigationController param:nil configBlock:nil];
+    FSSecondController *vc = [[FSSecondController alloc] init];
+    [self.navigationController pushViewController:vc animated:YES];
+//    [FSKit pushToViewControllerWithClass:@"FSSecondController" navigationController:self.navigationController param:nil configBlock:nil];
 }
 
 - (void)didReceiveMemoryWarning

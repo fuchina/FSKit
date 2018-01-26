@@ -2617,11 +2617,13 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
 
 + (NSString *)ymdhsByTimeInterval:(NSTimeInterval)fTI{
     NSDate *date = [[NSDate alloc] initWithTimeIntervalSince1970:fTI];
-    
-    NSTimeZone* localzone = [NSTimeZone localTimeZone];
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    [dateFormatter  setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
-    [dateFormatter setTimeZone:localzone];
+    static NSDateFormatter *dateFormatter = nil;
+    if (!dateFormatter) {
+        dateFormatter = [[NSDateFormatter alloc] init];
+        [dateFormatter  setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
+        NSTimeZone* localzone = [NSTimeZone localTimeZone];
+        [dateFormatter setTimeZone:localzone];
+    }
     return [dateFormatter stringFromDate:date];
 }
 
@@ -2782,7 +2784,10 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
     if (![date isKindOfClass:[NSDate class]]) {
         return nil;
     }
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    static NSDateFormatter *dateFormatter = nil;
+    if (!dateFormatter) {
+        dateFormatter = [[NSDateFormatter alloc] init];
+    }
     [dateFormatter setDateFormat:formatter?:@"yyyy-MM-dd HH:mm:ss"];
     return [dateFormatter stringFromDate:date];
 }
@@ -2791,7 +2796,10 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
     if (![self isValidateString:str]) {
         return nil;
     }
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    static NSDateFormatter *dateFormatter = nil;
+    if (!dateFormatter) {
+        dateFormatter = [[NSDateFormatter alloc] init];
+    }
     [dateFormatter setDateFormat:formatter?:@"yyyy-MM-dd HH:mm:ss"];
     NSDate *date = [dateFormatter dateFromString:str];
     return date;
