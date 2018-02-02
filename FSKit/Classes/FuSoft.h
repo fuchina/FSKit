@@ -69,7 +69,7 @@ return self;\
 #define FSLocalString(A)            NSLocalizedString(A, nil)
 
 // 字符串格式化宏
-#define FSFORMATSTRING(...) [[NSString alloc] initWithFormat:__VA_ARGS__]
+#define FSFORMATSTRING(...)         [[NSString alloc] initWithFormat:__VA_ARGS__]
 
 /******************__tag__**********************/
 #define   TAG_VIEW               1000

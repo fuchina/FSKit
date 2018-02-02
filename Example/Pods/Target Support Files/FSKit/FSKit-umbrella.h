@@ -15,6 +15,7 @@
 #import "FSKit.h"
 #import "FSPdf.h"
 #import "FSTuple.h"
+#import "FSURLSession.h"
 #import "FSWindow.h"
 #import "FuSoft.h"
 

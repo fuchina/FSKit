@@ -8,7 +8,7 @@
 
 #import "FSSecondController.h"
 #import <FSKit/FSKit.h>
-#import "FSLeakView.h"
+#import <FSKit/FSURLSession.h>
 
 @interface FSSecondController ()
 
@@ -37,17 +37,15 @@
     [self.view addSubview:btn];
     [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-15-[btn]-15-|" options:0 metrics:nil views:NSDictionaryOfVariableBindings(btn)]];
     [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-100-[btn(44)]" options:0 metrics:nil views:NSDictionaryOfVariableBindings(btn)]];
-    
-//    FSLeakView *leakView = [[FSLeakView alloc] initWithFrame:CGRectMake(10, 200, self.view.bounds.size.width - 20, 44)];
-//    leakView.backgroundColor = [UIColor brownColor];
-//    [self.view addSubview:leakView];
-//    leakView.click = ^(FSLeakView *view) {
-//        NSLog(@"%@",self);
-//    };
 }
 
 - (void)click{
-    [self memoryLeak];
+    [self request];
+}
+
+- (void)request{
+    NSString *url = @"http://qt.gtimg.cn/q=sz000858";
+    [FSURLSession sessionGet:url];
 }
 
 - (void)memoryLeak{
