@@ -180,7 +180,7 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
 }
 
 + (void)copyToPasteboard:(NSString *)copyString{
-    if (copyString == nil) {
+    if (![copyString isKindOfClass:[NSString class]]) {
         return;
     }
     UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];

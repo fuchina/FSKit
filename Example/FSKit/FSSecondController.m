@@ -9,6 +9,8 @@
 #import "FSSecondController.h"
 #import <FSKit/FSKit.h>
 #import <FSKit/FSURLSession.h>
+#import "FSBackWork.h"
+#import "FSSqlite3BroswerController.h"
 
 @interface FSSecondController ()
 
@@ -40,7 +42,27 @@
 }
 
 - (void)click{
-    [self request];
+    [self seeDB];
+}
+
+- (void)seeDB{
+    FSSqlite3BroswerController *broswer = [[FSSqlite3BroswerController alloc] init];
+    broswer.path = @"/Users/fudon/Documents/test.db";
+    [self.navigationController pushViewController:broswer animated:YES];
+}
+
+- (void)backExec{
+    [FSBackWork backWorkEvent:^{
+        [self log:0];
+    }];
+}
+
+- (void)log:(NSInteger)times{
+    times ++;
+    NSLog(@"我在后台执行%@次了",@(times));
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self log:times];
+    });
 }
 
 - (void)request{
