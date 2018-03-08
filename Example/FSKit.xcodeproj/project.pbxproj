@@ -12,9 +12,13 @@
 		5C26577420295BEB003A6328 /* FSDBMaster.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C26577220295BEB003A6328 /* FSDBMaster.m */; };
 		5C26577720296331003A6328 /* FSSqlite3DataController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C26577620296331003A6328 /* FSSqlite3DataController.m */; };
 		5C269E3C201AEDB200403CA3 /* FSLeakView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C269E3B201AEDB200403CA3 /* FSLeakView.m */; };
+		5C2A3A9220511615002A55A7 /* FSBankWork.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C2A3A9120511615002A55A7 /* FSBankWork.m */; };
 		5C33620C1F7F911900FE73CD /* FSAPP.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C33620B1F7F911900FE73CD /* FSAPP.m */; };
 		5C4259A71F4FCEE300DAED6A /* FSModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C4259A61F4FCEE300DAED6A /* FSModel.m */; };
 		5C91FED62028670C00D662BC /* FSBackWork.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C91FED52028670C00D662BC /* FSBackWork.m */; };
+		5CF882C62046930900896432 /* FSFastUploadController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CF882C52046930900896432 /* FSFastUploadController.m */; };
+		5CF882C92046AB3B00896432 /* UIScrollView+PullupRefresh.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CF882C82046AB3B00896432 /* UIScrollView+PullupRefresh.m */; };
+		5CF882CC2046CDF200896432 /* FSPullupView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CF882CB2046CDF200896432 /* FSPullupView.m */; };
 		6003F58E195388D20070C39A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6003F58D195388D20070C39A /* Foundation.framework */; };
 		6003F590195388D20070C39A /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6003F58F195388D20070C39A /* CoreGraphics.framework */; };
 		6003F592195388D20070C39A /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6003F591195388D20070C39A /* UIKit.framework */; };
@@ -58,12 +62,20 @@
 		5C26577620296331003A6328 /* FSSqlite3DataController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FSSqlite3DataController.m; sourceTree = "<group>"; };
 		5C269E3A201AEDB200403CA3 /* FSLeakView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FSLeakView.h; sourceTree = "<group>"; };
 		5C269E3B201AEDB200403CA3 /* FSLeakView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FSLeakView.m; sourceTree = "<group>"; };
+		5C2A3A9020511615002A55A7 /* FSBankWork.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FSBankWork.h; sourceTree = "<group>"; };
+		5C2A3A9120511615002A55A7 /* FSBankWork.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FSBankWork.m; sourceTree = "<group>"; };
 		5C33620A1F7F911900FE73CD /* FSAPP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSAPP.h; sourceTree = "<group>"; };
 		5C33620B1F7F911900FE73CD /* FSAPP.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSAPP.m; sourceTree = "<group>"; };
 		5C4259A51F4FCEE300DAED6A /* FSModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSModel.h; sourceTree = "<group>"; };
 		5C4259A61F4FCEE300DAED6A /* FSModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSModel.m; sourceTree = "<group>"; };
 		5C91FED42028670C00D662BC /* FSBackWork.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FSBackWork.h; sourceTree = "<group>"; };
 		5C91FED52028670C00D662BC /* FSBackWork.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FSBackWork.m; sourceTree = "<group>"; };
+		5CF882C42046930900896432 /* FSFastUploadController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FSFastUploadController.h; sourceTree = "<group>"; };
+		5CF882C52046930900896432 /* FSFastUploadController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FSFastUploadController.m; sourceTree = "<group>"; };
+		5CF882C72046AB3B00896432 /* UIScrollView+PullupRefresh.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIScrollView+PullupRefresh.h"; sourceTree = "<group>"; };
+		5CF882C82046AB3B00896432 /* UIScrollView+PullupRefresh.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIScrollView+PullupRefresh.m"; sourceTree = "<group>"; };
+		5CF882CA2046CDF200896432 /* FSPullupView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FSPullupView.h; sourceTree = "<group>"; };
+		5CF882CB2046CDF200896432 /* FSPullupView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FSPullupView.m; sourceTree = "<group>"; };
 		6003F58A195388D20070C39A /* FSKit_Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FSKit_Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6003F58D195388D20070C39A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		6003F58F195388D20070C39A /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -135,6 +147,19 @@
 			path = Sqlite3Broswer;
 			sourceTree = "<group>";
 		};
+		5CF882C3204692E200896432 /* Bank */ = {
+			isa = PBXGroup;
+			children = (
+				5CF882C42046930900896432 /* FSFastUploadController.h */,
+				5CF882C52046930900896432 /* FSFastUploadController.m */,
+				5CF882CA2046CDF200896432 /* FSPullupView.h */,
+				5CF882CB2046CDF200896432 /* FSPullupView.m */,
+				5CF882C72046AB3B00896432 /* UIScrollView+PullupRefresh.h */,
+				5CF882C82046AB3B00896432 /* UIScrollView+PullupRefresh.m */,
+			);
+			path = Bank;
+			sourceTree = "<group>";
+		};
 		6003F581195388D10070C39A = {
 			isa = PBXGroup;
 			children = (
@@ -173,6 +198,7 @@
 		6003F593195388D20070C39A /* Example for FSKit */ = {
 			isa = PBXGroup;
 			children = (
+				5CF882C3204692E200896432 /* Bank */,
 				6003F59C195388D20070C39A /* FSAppDelegate.h */,
 				6003F59D195388D20070C39A /* FSAppDelegate.m */,
 				873B8AEA1B1F5CCA007FD442 /* Main.storyboard */,
@@ -187,6 +213,8 @@
 				5C4259A61F4FCEE300DAED6A /* FSModel.m */,
 				5C91FED42028670C00D662BC /* FSBackWork.h */,
 				5C91FED52028670C00D662BC /* FSBackWork.m */,
+				5C2A3A9020511615002A55A7 /* FSBankWork.h */,
+				5C2A3A9120511615002A55A7 /* FSBankWork.m */,
 				71719F9D1E33DC2100824A3D /* LaunchScreen.storyboard */,
 				6003F5A8195388D20070C39A /* Images.xcassets */,
 				6003F594195388D20070C39A /* Supporting Files */,
@@ -463,9 +491,13 @@
 				6003F59E195388D20070C39A /* FSAppDelegate.m in Sources */,
 				5C269E3C201AEDB200403CA3 /* FSLeakView.m in Sources */,
 				6003F5A7195388D20070C39A /* FSViewController.m in Sources */,
+				5CF882C92046AB3B00896432 /* UIScrollView+PullupRefresh.m in Sources */,
 				5C91FED62028670C00D662BC /* FSBackWork.m in Sources */,
 				5C4259A71F4FCEE300DAED6A /* FSModel.m in Sources */,
 				5C33620C1F7F911900FE73CD /* FSAPP.m in Sources */,
+				5CF882C62046930900896432 /* FSFastUploadController.m in Sources */,
+				5CF882CC2046CDF200896432 /* FSPullupView.m in Sources */,
+				5C2A3A9220511615002A55A7 /* FSBankWork.m in Sources */,
 				5C26577720296331003A6328 /* FSSqlite3DataController.m in Sources */,
 				6003F59A195388D20070C39A /* main.m in Sources */,
 				5C26577420295BEB003A6328 /* FSDBMaster.m in Sources */,
