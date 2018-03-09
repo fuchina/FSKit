@@ -9,7 +9,7 @@
 
 @implementation FSURLSession
 
-+ (void)sessionGet:(NSString *)urlString{
++ (void)sessionGet:(NSString *)urlString success:(void (^)(id value))success fail:(void (^)(void))fail{
     if (!([urlString isKindOfClass:[NSString class]] && urlString.length)) {
         return;
     }
@@ -18,14 +18,22 @@
     NSURLSessionDataTask *dataTask = [session dataTaskWithURL:url completionHandler:
                                       ^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
                                           if (error) {
+                                              dispatch_async(dispatch_get_main_queue(), ^{
+                                                  if (fail) {
+                                                      fail();
+                                                  }
+                                              });
 #if DEBUG
                                               NSLog(@"%@",error.localizedDescription);
 #endif
                                               return;
                                           }
-                                          NSLog(@"%@", [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
-
-                                          NSLog(@"%@", [NSThread currentThread]);
+                                          NSString *value = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+                                          dispatch_async(dispatch_get_main_queue(), ^{
+                                              if (success) {
+                                                  success(value);
+                                              }
+                                          });
                                       }];
     [dataTask resume];
 }

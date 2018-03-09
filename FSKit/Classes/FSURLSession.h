@@ -9,6 +9,6 @@
 
 @interface FSURLSession : NSObject
 
-+ (void)sessionGet:(NSString *)urlString;
++ (void)sessionGet:(NSString *)urlString success:(void (^)(id value))success fail:(void (^)(void))fail;
 
 @end

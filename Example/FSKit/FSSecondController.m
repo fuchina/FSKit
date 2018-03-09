@@ -43,7 +43,18 @@
 }
 
 - (void)click{
-    [self blockTT];
+    [self sessionGet];
+}
+
+- (void)sessionGet{
+    [FSURLSession sessionGet:@"https://api.m.taobao.com/rest/api3.do?api=mtop.common.getTimestamp" success:^(id value) {
+        NSDictionary *dic = [FSKit objectFromJSonstring:value];
+        NSString *t = dic[@"data"][@"afd"];
+        NSLog(@"%@",t);
+        
+    } fail:^{
+        NSLog(@"网络请求失败");
+    }];
 }
 
 - (void)blockTT{
@@ -66,42 +77,6 @@
     block();
 }
 
-/*
- 1.formatt必须小于9999;
- 2.formatt的各位数字加起来等于字符长度;
-*/
-- (NSString *)formattFunction:(NSString *)str formatt:(NSInteger)formatt place:(NSString *)place{
-    if (formatt > 9999) {
-        return str;
-    }
-    NSInteger one = formatt / 1000;
-    NSInteger two = (formatt / 100) % 10;
-    NSInteger thr = (formatt / 10) % 10;
-    NSInteger fou = formatt % 10;
-    NSInteger length = one + two + thr + fou;
-    if (str.length != length) {
-        return str;
-    }
-    NSString *subOne = @"";
-    if (one) {
-        subOne = [[NSString alloc] initWithFormat:@"%@%@",[str substringWithRange:NSMakeRange(0, one)],place];
-    }
-    NSString *subTwo = @"";
-    if (two) {
-        subTwo = [[NSString alloc] initWithFormat:@"%@%@",[str substringWithRange:NSMakeRange(one, two)],place];
-    }
-    NSString *subThr = @"";
-    if (thr) {
-        subThr = [[NSString alloc] initWithFormat:@"%@%@",[str substringWithRange:NSMakeRange(one + two, thr)],place];
-    }
-    NSString *subFou = @"";
-    if (fou) {
-        subFou = [str substringWithRange:NSMakeRange(one + two + thr, fou)];
-    }
-    NSString *value = [[NSString alloc] initWithFormat:@"%@%@%@%@",subOne,subTwo,subThr,subFou];
-    return value;
-}
-
 - (void)seeDB{
     [FSKit pushToViewControllerWithClass:@"FSFastUploadController" navigationController:self.navigationController param:nil configBlock:nil];
 }
@@ -121,8 +96,12 @@
 }
 
 - (void)request{
-    NSString *url = @"http://qt.gtimg.cn/q=sz000858";
-    [FSURLSession sessionGet:url];
+    NSString *url = @"https://qt.gtimg.cn/q=sz000858";
+    [FSURLSession sessionGet:url success:^(id value) {
+        NSLog(@"%@",value);
+    } fail:^{
+        
+    }];
 }
 
 - (void)memoryLeak{
