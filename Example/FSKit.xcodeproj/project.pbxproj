@@ -8,9 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		5C235EC5200DA506009A718E /* FSSecondController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C235EC4200DA506009A718E /* FSSecondController.m */; };
-		5C265771202950BE003A6328 /* FSSqlite3BroswerController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C265770202950BE003A6328 /* FSSqlite3BroswerController.m */; };
-		5C26577420295BEB003A6328 /* FSDBMaster.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C26577220295BEB003A6328 /* FSDBMaster.m */; };
-		5C26577720296331003A6328 /* FSSqlite3DataController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C26577620296331003A6328 /* FSSqlite3DataController.m */; };
 		5C269E3C201AEDB200403CA3 /* FSLeakView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C269E3B201AEDB200403CA3 /* FSLeakView.m */; };
 		5C2A3A9220511615002A55A7 /* FSBankWork.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C2A3A9120511615002A55A7 /* FSBankWork.m */; };
 		5C33620C1F7F911900FE73CD /* FSAPP.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C33620B1F7F911900FE73CD /* FSAPP.m */; };
@@ -54,12 +51,6 @@
 		4E236457D14880D225E4A0F1 /* Pods-FSKit_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FSKit_Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-FSKit_Tests/Pods-FSKit_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		5C235EC3200DA506009A718E /* FSSecondController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FSSecondController.h; sourceTree = "<group>"; };
 		5C235EC4200DA506009A718E /* FSSecondController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FSSecondController.m; sourceTree = "<group>"; };
-		5C26576F202950BE003A6328 /* FSSqlite3BroswerController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FSSqlite3BroswerController.h; sourceTree = "<group>"; };
-		5C265770202950BE003A6328 /* FSSqlite3BroswerController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FSSqlite3BroswerController.m; sourceTree = "<group>"; };
-		5C26577220295BEB003A6328 /* FSDBMaster.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSDBMaster.m; sourceTree = "<group>"; };
-		5C26577320295BEB003A6328 /* FSDBMaster.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSDBMaster.h; sourceTree = "<group>"; };
-		5C26577520296331003A6328 /* FSSqlite3DataController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FSSqlite3DataController.h; sourceTree = "<group>"; };
-		5C26577620296331003A6328 /* FSSqlite3DataController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FSSqlite3DataController.m; sourceTree = "<group>"; };
 		5C269E3A201AEDB200403CA3 /* FSLeakView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FSLeakView.h; sourceTree = "<group>"; };
 		5C269E3B201AEDB200403CA3 /* FSLeakView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FSLeakView.m; sourceTree = "<group>"; };
 		5C2A3A9020511615002A55A7 /* FSBankWork.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FSBankWork.h; sourceTree = "<group>"; };
@@ -134,19 +125,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		5C26576E202950A6003A6328 /* Sqlite3Broswer */ = {
-			isa = PBXGroup;
-			children = (
-				5C26577320295BEB003A6328 /* FSDBMaster.h */,
-				5C26577220295BEB003A6328 /* FSDBMaster.m */,
-				5C26576F202950BE003A6328 /* FSSqlite3BroswerController.h */,
-				5C265770202950BE003A6328 /* FSSqlite3BroswerController.m */,
-				5C26577520296331003A6328 /* FSSqlite3DataController.h */,
-				5C26577620296331003A6328 /* FSSqlite3DataController.m */,
-			);
-			path = Sqlite3Broswer;
-			sourceTree = "<group>";
-		};
 		5CF882C3204692E200896432 /* Bank */ = {
 			isa = PBXGroup;
 			children = (
@@ -206,7 +184,6 @@
 				6003F5A6195388D20070C39A /* FSViewController.m */,
 				5C235EC3200DA506009A718E /* FSSecondController.h */,
 				5C235EC4200DA506009A718E /* FSSecondController.m */,
-				5C26576E202950A6003A6328 /* Sqlite3Broswer */,
 				5C269E3A201AEDB200403CA3 /* FSLeakView.h */,
 				5C269E3B201AEDB200403CA3 /* FSLeakView.m */,
 				5C4259A51F4FCEE300DAED6A /* FSModel.h */,
@@ -498,10 +475,7 @@
 				5CF882C62046930900896432 /* FSFastUploadController.m in Sources */,
 				5CF882CC2046CDF200896432 /* FSPullupView.m in Sources */,
 				5C2A3A9220511615002A55A7 /* FSBankWork.m in Sources */,
-				5C26577720296331003A6328 /* FSSqlite3DataController.m in Sources */,
 				6003F59A195388D20070C39A /* main.m in Sources */,
-				5C26577420295BEB003A6328 /* FSDBMaster.m in Sources */,
-				5C265771202950BE003A6328 /* FSSqlite3BroswerController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

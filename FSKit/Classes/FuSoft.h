@@ -5,6 +5,14 @@
 //  Created by fudon on 2017/6/17.
 //
 //
+/*
+有时在FSKit目录中增加了文件出现编译不过的问题，记录一下
+操作说明
+1.在Development Pods/FSKit下增加类文件；
+ 2.跳到物理目录下看看新建的类文件是否在Development Pods/FSKit下；
+ 3.pod install 一下 Podfile文件，系统自动会将新增的文件import到FSKit-umbrella.h文件中。
+ 
+ */
 
 #ifndef FuSoft_h
 #define FuSoft_h

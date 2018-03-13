@@ -10,4 +10,16 @@
 
 @implementation FSModel
 
+- (void)fs_instanceMethod{
+    
+}
+
++ (void)fs_classMethod{
+    
+}
+
++ (void)fs_classMethod1:(NSString *)name{
+    
+}
+
 @end

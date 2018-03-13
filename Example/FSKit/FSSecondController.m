@@ -10,8 +10,10 @@
 #import <FSKit/FSKit.h>
 #import <FSKit/FSURLSession.h>
 #import "FSBackWork.h"
-#import "FSSqlite3BroswerController.h"
 #import "FSBankWork.h"
+#import "FSModel.h"
+#import <objc/runtime.h>
+#import <FSKit/FSRuntime.h>
 
 @interface FSSecondController ()
 
@@ -43,7 +45,12 @@
 }
 
 - (void)click{
-    [self sessionGet];
+    [self metaClass];
+}
+
+- (void)metaClass{
+    NSArray *list = [FSRuntime classMethodListOfClass:[FSModel class]];
+    NSLog(@"%@",list);
 }
 
 - (void)sessionGet{

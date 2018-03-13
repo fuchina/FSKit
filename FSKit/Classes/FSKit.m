@@ -7,7 +7,6 @@
 //
 
 #import "FSKit.h"
-#import <objc/runtime.h>
 #import <sys/sysctl.h>
 #import <mach/mach.h>
 #import <ifaddrs.h>
@@ -21,6 +20,7 @@
 #import <AVFoundation/AVFoundation.h>
 #import <sys/mount.h>
 #import "FSWindow.h"
+#import "FSRuntime.h"
 
 static CGRect oldframe;
 
@@ -146,7 +146,7 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
         UIViewController *viewController = [[Controller alloc] init];
         //... 根据字典给属性赋值
         for (NSString *key in param) {
-            SEL setSEL = [self setterSELWithAttibuteName:key];
+            SEL setSEL = [FSRuntime setterSELWithAttibuteName:key];
             if ([viewController respondsToSelector:setSEL]) {
                 [viewController performSelector:setSEL onThread:[NSThread currentThread] withObject:[param objectForKey:key] waitUntilDone:YES];
             }
@@ -165,7 +165,7 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
         UIViewController *presentViewController = [[Controller alloc] init];
         //... 根据字典给属性赋值
         for (NSString *key in param) {
-            SEL setSEL = [self setterSELWithAttibuteName:key];
+            SEL setSEL = [FSRuntime setterSELWithAttibuteName:key];
             if ([viewController respondsToSelector:setSEL]) {
                 [viewController performSelectorOnMainThread:setSEL
                                                  withObject:[param objectForKey:key]
@@ -842,61 +842,6 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
 + (NSString *)appName{
     NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];
     return [infoDictionary objectForKey:@"CFBundleDisplayName"];
-}
-
-+ (NSArray<NSString *> *)propertiesForClass:(Class)className{
-    NSMutableArray *array = [[NSMutableArray alloc] init];
-    unsigned int propertyCount = 0;
-    objc_property_t *properties = class_copyPropertyList(className, &propertyCount);
-    for (unsigned int i = 0; i < propertyCount; ++i) {
-        objc_property_t property = properties[i];
-        const char *name = property_getName(property);//获取属性名字
-        NSString *nameToString = [[NSString alloc] initWithFormat:@"%s",name];
-        [array addObject:nameToString];
-    }
-    free(properties);
-    return array;
-}
-
-+ (SEL)setterSELWithAttibuteName:(NSString*)attributeName{
-    if (![self isValidateString:attributeName]) {
-        return nil;
-    }
-    NSString *capital = [[attributeName substringToIndex:1] uppercaseString];
-    NSString *setterSelStr = [NSString stringWithFormat:@"set%@%@:",capital,[attributeName substringFromIndex:1]];
-    return NSSelectorFromString(setterSelStr);
-}
-
-+ (void)setValue:(id)value forPropertyName:(NSString *)name ofObject:(id)object{
-    if (![self isValidateString:name]) {
-        return;
-    }
-    SEL setterSelector = [self setterSELWithAttibuteName:name];
-    if ([object respondsToSelector:setterSelector]) {
-        [object performSelector:setterSelector onThread:[NSThread currentThread] withObject:value waitUntilDone:YES];
-    }
-}
-
-+ (id)entity:(Class)Entity dic:(NSDictionary *)dic{
-    if (Entity == nil) {
-        return nil;
-    }
-    id instance = [[Entity alloc] init];
-    if ([FSKit isValidateDictionary:dic]) {
-        NSArray *keys = [dic allKeys];
-        for (NSString *key in keys) {
-            id value = dic[key];
-            [self setValue:value forPropertyName:key ofObject:instance];
-        }
-    }
-    return instance;
-}
-
-+ (id)valueForGetSelectorWithPropertyName:(NSString *)name object:(id)instance{
-    if (!([name isKindOfClass:[NSString class]]) && name.length) {
-        return nil;
-    }
-    return [instance valueForKey:name];
 }
 
 + (UIColor *)randomColor{
@@ -1964,20 +1909,6 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
         return YES;
     }
     return NO;
-}
-
-+ (NSDictionary *)dictionaryWithObject:(id)model{
-    NSArray<NSString *> *ps = [self propertiesForClass:[model class]];
-    NSMutableDictionary *dic = [[NSMutableDictionary alloc] initWithCapacity:ps.count];
-    for (NSString *p in ps) {
-        NSString *value = [self valueForGetSelectorWithPropertyName:p object:model];
-        if ([value isKindOfClass:[NSString class]] || [value isKindOfClass:[NSNumber class]]) {
-            [dic setObject:value forKey:p];
-        }else{
-            [dic setObject:@"" forKey:p];
-        }
-    }
-    return [dic copy];
 }
 
 + (NSDictionary *)keyedUnarchiverWithDictionary:(NSString *)fileName{
