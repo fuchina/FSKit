@@ -182,6 +182,38 @@ void combine (int *arr,int start,int *result,int index,int n,int arr_len){
     NSLog(@"aid:%@",m.aid);
 //    NSArray *list = [FSRuntime ivarsForClass:[FSModel class]];
 //    NSLog(@"%@",list);
+    int a = 1;
+    int b = 2;
+    [self swap:&a b:&b];
+    NSLog(@"%d,%d",a,b);
+}
+
+- (void)swap:(int*)a b:(int*)b{
+    *a = *a ^ *b;
+    *b = *b ^ *a;
+    *a = *a ^ *b;
+}
+
+- (void)aboutCopyString{
+    NSString *a = @"china";
+    NSString *b = [a copy];
+    NSMutableString *m = [a mutableCopy];
+    NSMutableString *o = [a mutableCopy];
+    [m appendString:@" win"];
+    NSLog(@"m:%@\no:%@\nb:%@",m,o,b);
+}
+
+- (void)aboutCopy{
+    NSMutableArray *element = [NSMutableArray arrayWithObject:@1];
+    NSMutableArray *array = [NSMutableArray arrayWithObject:element];
+    NSMutableArray *mutableCopyArray = [array mutableCopy];
+    [mutableCopyArray[0] addObject:@2];
+    NSLog(@"%@\n\n",array[0]);
+    
+    NSArray *deepCopyArray = [[NSArray alloc] initWithArray:array copyItems:YES];
+    NSLog(@"%@\n\n",deepCopyArray);
+    
+    NSLog(@"after:%@\n\n",array[0]);
 }
 
 - (void)metaClass{
