@@ -14,6 +14,7 @@
 #import "FSModel.h"
 #import <objc/runtime.h>
 #import <FSKit/FSRuntime.h>
+#import <FSKit/FuSoft.h>
 
 @interface FSSecondController ()
 
@@ -45,7 +46,18 @@
 }
 
 - (void)click{
-    [self metaClass];
+    [self CSBlock];
+}
+
+- (void)CSBlock{
+    FSBool boo = FSBool_Undefined;
+    if (boo == YES) {
+        NSLog(@"YES");
+    }else if (boo == NO){
+        NSLog(@"NO");
+    }else{
+        NSLog(@"Undefined");
+    }
 }
 
 - (void)metaClass{
@@ -107,22 +119,6 @@
     [FSURLSession sessionGet:url success:^(id value) {
         NSLog(@"%@",value);
     } fail:^{
-        
-    }];
-}
-
-- (void)memoryLeak{
-    __weak typeof(self)this = self;
-    [FSKit alertInput:1 controller:self title:@"Title" message:@"Message" ok:@"OK" handler:^(UIAlertController *bAlert, UIAlertAction *action) {
-        UITextField *tf = bAlert.textFields.firstObject;
-        NSLog(@"%@",tf.text);
-        this.what = YES;
-        self.str = @"what";
-    } cancel:@"Cancel" handler:^(UIAlertAction *action) {
-        NSLog(@"Cancel");
-    } textFieldConifg:^(UITextField *textField) {
-        textField.keyboardType = UIKeyboardTypeNumberPad;
-    } completion:^{
         
     }];
 }

@@ -22,8 +22,6 @@
 #import "FSWindow.h"
 #import "FSRuntime.h"
 
-static CGRect oldframe;
-
 @implementation FSKit
 
 NSTimeInterval FSTimeIntevalSince1970(void){
@@ -32,112 +30,6 @@ NSTimeInterval FSTimeIntevalSince1970(void){
 
 NSInteger FSIntegerTimeIntevalSince1970(void){
     return (NSInteger)[[NSDate date] timeIntervalSince1970];
-}
-
-+ (void)alertOnCustomWindow:(UIAlertControllerStyle)style title:(NSString *)title message:(NSString *)message actionTitles:(NSArray<NSString *> *)titles styles:(NSArray<NSNumber *> *)styles handler:(void (^)(UIAlertAction *action))handler cancelTitle:(NSString *)cancelTitle cancel:(void (^)(UIAlertAction *action))cancel completion:(void (^)(void))completion{
-    UIAlertController *controller = [self alertControllerWithStyle:style title:title message:message actionTitles:titles styles:styles handler:handler cancelTitle:cancelTitle cancel:cancel];
-    [FSWindow presentViewController:controller animated:YES completion:completion];
-}
-
-+ (void)alertOnCustomWindow:(UIAlertControllerStyle)style title:(NSString *)title message:(NSString *)message actionTitles:(NSArray<NSString *> *)titles styles:(NSArray<NSNumber *> *)styles handler:(void (^)(UIAlertAction *action))handler{
-    UIAlertController *controller = [self alertControllerWithStyle:style title:title message:message actionTitles:titles styles:styles handler:handler cancelTitle:NSLocalizedString(@"Cancel", nil) cancel:nil];
-    [FSWindow presentViewController:controller animated:YES completion:nil];
-}
-
-+ (void)alert:(UIAlertControllerStyle)style controller:(UIViewController *)pController title:(NSString *)title message:(NSString *)message actionTitles:(NSArray<NSString *> *)titles styles:(NSArray<NSNumber *> *)styles handler:(void (^)(UIAlertAction *action))handler cancelTitle:(NSString *)cancelTitle cancel:(void (^)(UIAlertAction *action))cancel completion:(void (^)(void))completion{
-    UIAlertController *controller = [self alertControllerWithStyle:style title:title message:message actionTitles:titles styles:styles handler:handler cancelTitle:cancelTitle cancel:cancel];
-    [pController presentViewController:controller animated:YES completion:completion];
-}
-
-+ (void)alert:(UIAlertControllerStyle)style controller:(UIViewController *)pController title:(NSString *)title message:(NSString *)message actionTitles:(NSArray<NSString *> *)titles styles:(NSArray<NSNumber *> *)styles handler:(void (^)(UIAlertAction *action))handler{
-    UIAlertController *controller = [self alertControllerWithStyle:style title:title message:message actionTitles:titles styles:styles handler:handler cancelTitle:NSLocalizedString(@"Cancel", nil) cancel:nil];
-    [pController presentViewController:controller animated:YES completion:nil];
-}
-
-+ (UIAlertController *)alertControllerWithStyle:(UIAlertControllerStyle)style title:(NSString *)title message:(NSString *)message actionTitles:(NSArray<NSString *> *)titles styles:(NSArray<NSNumber *> *)styles handler:(void (^)(UIAlertAction *action))handler cancelTitle:(NSString *)cancelTitle cancel:(void (^)(UIAlertAction *action))cancel{
-    NSInteger count = MIN(titles.count, styles.count);
-    UIAlertController *controller = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:style];
-    for (int x = 0; x < count; x ++) {
-        UIAlertAction *action = [UIAlertAction actionWithTitle:titles[x] style:[styles[x] integerValue] handler:^(UIAlertAction * _Nonnull action) {
-            [FSWindow dismiss];
-            if (handler) {
-                handler(action);
-            }
-        }];
-        [controller addAction:action];
-    }
-    UIAlertAction *archiveAction = [UIAlertAction actionWithTitle:cancelTitle style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
-        [FSWindow dismiss];
-        if (cancel) {
-            cancel(action);
-        }
-    }];
-    [controller addAction:archiveAction];
-    return controller;
-}
-
-+ (void)alertInputOnCustomWindow:(NSInteger)number title:(NSString *)title message:(NSString *)message ok:(NSString *)okTitle handler:(void (^)(UIAlertController *bAlert,UIAlertAction *action))handler cancel:(NSString *)cancelTitle handler:(void (^)(UIAlertAction *action))cancelHandler textFieldConifg:(void (^)(UITextField *textField))configurationHandler completion:(void (^)(void))completion{
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];
-    if (number > 0) {
-        for (int x = 0; x < number; x ++) {
-            [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField){
-                if (configurationHandler) {
-                    textField.tag = x;
-                    configurationHandler(textField);
-                }
-            }];
-        }
-    }
-    
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:cancelTitle style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
-        [FSWindow dismiss];
-        if (cancelHandler) {
-            cancelHandler(action);
-        }
-    }];
-    __weak typeof(alertController)wAlertController = alertController;
-    UIAlertAction *okAction = [UIAlertAction actionWithTitle:okTitle style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        [FSWindow dismiss];
-        if (handler) {
-            handler(wAlertController,action);
-        }
-    }];
-    [alertController addAction:cancelAction];
-    [alertController addAction:okAction];
-    [FSWindow presentViewController:alertController animated:YES completion:completion];
-}
-
-+ (void)alertInput:(NSInteger)number controller:(UIViewController *)controller title:(NSString *)title message:(NSString *)message ok:(NSString *)okTitle handler:(void (^)(UIAlertController *bAlert,UIAlertAction *action))handler cancel:(NSString *)cancelTitle handler:(void (^)(UIAlertAction *action))cancelHandler textFieldConifg:(void (^)(UITextField *textField))configurationHandler completion:(void (^)(void))completion{
-    if (![controller isKindOfClass:[UIViewController class]]) {
-        return;
-    }
-    
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];
-    if (number > 0) {
-        for (int x = 0; x < number; x ++) {
-            [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField){
-                if (configurationHandler) {
-                    textField.tag = x;
-                    configurationHandler(textField);
-                }
-            }];
-        }
-    }
-    
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:cancelTitle style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
-        if (cancelHandler) {
-            cancelHandler(action);
-        }
-    }];
-    __weak typeof(alertController)wAlertController = alertController;
-    UIAlertAction *okAction = [UIAlertAction actionWithTitle:okTitle style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        if (handler) {
-            handler(wAlertController,action);
-        }
-    }];
-    [alertController addAction:cancelAction];
-    [alertController addAction:okAction];
-    [controller presentViewController:alertController animated:YES completion:completion];
 }
 
 + (void)pushToViewControllerWithClass:(NSString *)className navigationController:(UINavigationController *)navigationController param:(NSDictionary *)param configBlock:(void (^)(id vc))configBlockParam{
@@ -194,16 +86,6 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
     AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);// 播放震动
 }
 
-+ (void)xuanzhuanView:(UIView *)view{
-    CGContextRef context=UIGraphicsGetCurrentContext();
-    [UIView beginAnimations:nil context:context];
-    [UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
-    [UIView setAnimationDuration:1.0];
-    [UIView setAnimationTransition:UIViewAnimationTransitionFlipFromLeft forView:view cache:YES];
-    [UIView setAnimationDelegate:self];
-    [UIView commitAnimations];
-}
-
 + (void)userDefaultsKeepData:(id)instance  withKey:(NSString *)key{
     NSUserDefaults *fdd = [NSUserDefaults standardUserDefaults];
     [fdd setObject:instance forKey:key];
@@ -212,42 +94,6 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
 
 + (id)userDefaultsDataWithKey:(NSString *)key{
     return [[NSUserDefaults standardUserDefaults] objectForKey:key];
-}
-
-+ (void)showFullScreenImage:(UIImageView *)avatarImageView{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        UIImage *image = avatarImageView.image;
-        UIWindow *window = [UIApplication sharedApplication].keyWindow;
-        UIView *backgroundView = [[UIView alloc]initWithFrame:CGRectMake(0,0,[UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height)];
-        
-        oldframe = [avatarImageView convertRect:avatarImageView.bounds toView:window];
-        backgroundView.backgroundColor=[UIColor blackColor];
-        backgroundView.alpha=0;
-        UIImageView *imageView=[[UIImageView alloc]initWithFrame:oldframe];
-        imageView.image=image;
-        imageView.tag=1;
-        [backgroundView addSubview:imageView];
-        [window addSubview:backgroundView];
-        
-        UITapGestureRecognizer *tap=[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(hideImage:)];
-        [backgroundView addGestureRecognizer: tap];
-        [UIView animateWithDuration:0.3 animations:^{
-            imageView.frame=CGRectMake(0,([UIScreen mainScreen].bounds.size.height-image.size.height*[UIScreen mainScreen].bounds.size.width/image.size.width)/2, [UIScreen mainScreen].bounds.size.width, image.size.height*[UIScreen mainScreen].bounds.size.width/image.size.width);
-            backgroundView.alpha=1;
-        }completion:nil];
-    });
-}
-
-+ (void)hideImage:(UITapGestureRecognizer*)tap{
-    UIView *backgroundView=tap.view;
-    UIImageView *imageView=(UIImageView*)[tap.view viewWithTag:1];
-    [UIView animateWithDuration:0.3 animations:^{
-        imageView.frame = oldframe;
-        backgroundView.alpha=0;
-    }completion:^(BOOL finished) {
-        [backgroundView
-         removeFromSuperview];
-    }];
 }
 
 + (void)clearUserDefaults{
@@ -272,80 +118,6 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
     if ([statusBar respondsToSelector:@selector(setBackgroundColor:)]){
         statusBar.backgroundColor = color;
     }
-}
-
-+ (void)showMessage:(NSString *)message{
-    if (![message respondsToSelector:@selector(length)] || [message length] == 0) {
-        return;
-    }
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self showMessageInMainThread:message];
-    });
-}
-
-+ (void)showAlertWithMessageOnCustomWindow:(NSString *)message{
-    [self showAlertWithTitleOnCustomWindow:NSLocalizedString(@"Tips", nil) message:message ok:NSLocalizedString(@"OK", nil) handler:nil];
-}
-
-+ (void)showAlertWithMessageOnCustomWindow:(NSString *)message handler:(void (^)(UIAlertAction *action))handler{
-    [self showAlertWithTitleOnCustomWindow:NSLocalizedString(@"Tips", nil) message:message ok:NSLocalizedString(@"OK", nil) handler:handler];
-}
-
-+ (void)showAlertWithTitleOnCustomWindow:(NSString *)title message:(NSString *)message ok:(NSString *)ok handler:(void (^)(UIAlertAction *action))handler{
-    UIAlertController *controller = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction *action = [UIAlertAction actionWithTitle:ok style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
-        [FSWindow dismiss];
-        if (handler) {
-            handler(action);
-        }
-    }];
-    [controller addAction:action];
-    [FSWindow presentViewController:controller animated:YES completion:nil];
-}
-
-+ (void)showAlertWithMessage:(NSString *)message controller:(UIViewController *)controller{
-    [self showAlertWithTitle:NSLocalizedString(@"Tips", nil) message:message ok:NSLocalizedString(@"OK", nil) controller:controller handler:nil];
-}
-
-+ (void)showAlertWithMessage:(NSString *)message controller:(UIViewController *)controller handler:(void (^)(UIAlertAction *action))handler{
-    [self showAlertWithTitle:NSLocalizedString(@"Tips", nil) message:message ok:NSLocalizedString(@"OK", nil) controller:controller handler:handler];
-}
-
-+ (void)showAlertWithTitle:(NSString *)title message:(NSString *)message ok:(NSString *)ok controller:(UIViewController *)pController handler:(void (^)(UIAlertAction *action))handler{
-    UIAlertController *controller = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction *action = [UIAlertAction actionWithTitle:ok style:UIAlertActionStyleDefault handler:handler];
-    [controller addAction:action];
-    [pController presentViewController:controller animated:YES completion:nil];
-}
-
-+ (void)showMessageInMainThread:(NSString *)message{
-    CGSize size = [UIScreen mainScreen].bounds.size;
-    UIView *backView = [[UIView alloc] initWithFrame:CGRectMake(0, 64, size.width, size.height - 64)];
-    
-    CGFloat width = size.width - 60;
-    CGFloat height = MAX([self textHeight:message fontInt:15 labelWidth:width], 36);
-    
-    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(size.width / 2 - width / 2, size.height / 2 - height / 2, width, height)];
-    label.text = message;
-    label.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:.8f];
-    label.textColor = [UIColor whiteColor];
-    label.textAlignment = NSTextAlignmentCenter;
-    label.numberOfLines = 0;
-    label.font = [UIFont systemFontOfSize:15];
-    label.layer.masksToBounds = YES;
-    label.layer.cornerRadius = 3;
-    [backView addSubview:label];
-    
-    UIWindow *keyWindow = [UIApplication sharedApplication].keyWindow;
-    [keyWindow addSubview:backView];
-    
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [UIView animateWithDuration:.3 animations:^{
-            label.alpha = 0.0;
-        } completion:^(BOOL finished) {
-            [backView removeFromSuperview];
-        }];
-    });
 }
 
 + (double)usedMemory{
@@ -418,57 +190,6 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
     return size;
 }
 
-+ (CGFloat)textHeight:(NSString *)text fontInt:(NSInteger)fontInt labelWidth:(CGFloat)labelWidth{
-    if (fontInt == 0) {
-        return 0;
-    }
-    if (![self isValidateString:text]) {
-        return 0;
-    }
-    NSMutableAttributedString *attrStr = [[NSMutableAttributedString alloc] initWithString:text];
-    NSRange allRange = [text rangeOfString:text];
-    [attrStr addAttribute:NSFontAttributeName
-                    value:[UIFont systemFontOfSize:fontInt]
-                    range:allRange];
-    
-    NSStringDrawingOptions options =  NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading;
-    CGRect rect = [attrStr boundingRectWithSize:CGSizeMake(labelWidth, CGFLOAT_MAX)
-                                        options:options
-                                        context:nil];
-     // 加两个像素,防止emoji被切掉.
-    return ceilf(rect.size.height + 2);
-}
-
-+ (CGFloat)textWidth:(NSString *)text fontInt:(NSInteger)fontInt labelHeight:(CGFloat)labelHeight{
-    if (fontInt == 0) {
-        return 0;
-    }
-    if (![self isValidateString:text]) {
-        return 0;
-    }
-    
-    CGSize size = [text boundingRectWithSize:CGSizeMake(CGFLOAT_MAX, labelHeight) options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:fontInt]} context:nil].size;
-    return ceil(size.width + 2);
-}
-
-+ (double)distanceBetweenCoordinate:(CLLocationCoordinate2D)coordinateA toCoordinateB:(CLLocationCoordinate2D)coordinateB{
-    static double EARTH_RADIUS = 6378.137;//地球半径
-    
-    double lat1 = coordinateA.latitude;
-    double lng1 = coordinateA.longitude;
-    double lat2 = coordinateB.latitude;
-    double lng2 = coordinateB.longitude;
-    
-    double radLat1 = [self rad:lat1];
-    double radLat2 = [self rad:lat2];
-    double a = radLat1 - radLat2;
-    double b = [self rad:lng1] - [self rad:lng2];
-    
-    double s = 2 * sin(sqrt(pow(sin(a/2),2) + cos(radLat1) * cos(radLat2)* pow(sin(b/2),2)));
-    s = s * EARTH_RADIUS;
-    s = round(s * 10000) / 10000;
-    return s;
-}
 
 //磁盘总空间
 + (CGFloat)diskOfAllSizeBytes{
@@ -554,62 +275,6 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
     return CGSizeZero;
 }
 
-/*
- 等额本金计算公式
- rate:年利率，如4.9%，输入4.9；
- month:期数，也就是月数，如10年，输入120
- 返回值：总还款除以贷款的倍数
- */
-+ (CGFloat)DEBJWithYearRate:(CGFloat)rate monthes:(NSInteger)month{
-    if (rate < 0.01) {
-        return 1;
-    }
-    CGFloat money = 1.0;
-    CGFloat R = rate / 1200.0f;
-    
-    CGFloat allInterest = 0;
-    double payMonth = money / month;
-    for (int x = 0; x < month; x ++) {
-        double mI = (money - x * payMonth) * R; // 每月的利息；加上payMonth就是每月的还款额
-        allInterest += mI;
-    }
-    return (money + allInterest) / money;
-}
-
-/*
- 等额本息计算公式
- rate:年利率，如4.9%，输入4.9；
- month:期数，也就是月数，如10年，输入120
- 返回值：总还款除以贷款的倍数
- */
-+ (CGFloat)DEBXWithYearRate:(CGFloat)rate monthes:(NSInteger)month{
-    if (rate < 0.01) {
-        return 1;
-    }
-    CGFloat money = 1.0f;
-    CGFloat R = rate / 1200.0f;
-    // 等额本息
-    double monthPay = (money * R * pow(1 + R, month)) / (pow(1 + R, month) - 1);
-    return monthPay * month / money;
-}
-
-/*
- @param
- days:周转天数，单位：天，即多少天后会卖出；
- rate:目标年化收益率，比如20%；
- 
- @result
- 返回价格倍数，比如输入90，0.3820,返回1.094129，即90天卖出应该定价为所投入资本的1.094129倍
- */
-+ (CGFloat)priceRiseWithDays:(CGFloat)days yearRate:(CGFloat)rate{
-    days = MAX(days, 1);
-    rate = MAX(0, rate);
-    CGFloat year = 365.2422;
-    CGFloat everyEarn = rate / year;
-    CGFloat allEarn = days * everyEarn;
-    return (allEarn + 1);
-}
-
 + (CGFloat)freeStoragePercentage{
     CGFloat total = [self getTotalDiskSize];
     if (total > 1) {
@@ -644,10 +309,6 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
         return keyboardSize;
     }
     return CGSizeZero;
-}
-
-+ (double)rad:(double)d{
-    return d * 3.141592653 / 180.0;
 }
 
 + (NSArray *)maxandMinNumberInArray:(NSArray *)array{
@@ -884,146 +545,14 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
     return font;
 }
 
-+ (NSDate *)chinaDateByDate:(NSDate *)date{
-    NSTimeZone *zone = [NSTimeZone systemTimeZone];
-    NSInteger interval = [zone secondsFromGMTForDate:date];
-    return [date dateByAddingTimeInterval: interval];
-}
 
-+ (NSDateComponents *)componentForDate:(NSDate *)date{
-    NSCalendar *calendar = [NSCalendar calendarWithIdentifier:NSCalendarIdentifierGregorian];
-    NSDateComponents *components = [calendar components:NSCalendarUnitYear | NSCalendarUnitMonth | NSCalendarUnitDay | NSCalendarUnitHour | NSCalendarUnitMinute | NSCalendarUnitSecond | NSCalendarUnitWeekOfMonth | NSCalendarUnitWeekday | NSCalendarUnitWeekOfMonth | NSCalendarUnitWeekOfYear fromDate:date];
-    return components;
-}
 
-+ (NSInteger)daythOfYearForDate:(NSDate *)date{
-    if (date == nil) {
-        date = [NSDate date];
-    }
-    NSDateComponents *component = [self componentForDate:date];
-    NSInteger year = component.year;
-    NSInteger month = component.month;
-    NSInteger day = component.day;
-    int a[12]={31,28,31,30,31,30,31,31,30,31,30,31};
-    int b[12]={31,29,31,30,31,30,31,31,30,31,30,31};
-    int i,sum=0;
-    if([self isLeapYear:(int)year])
-        for(i=0;i<month-1;i++)
-            sum+=b[i];
-    else
-        for(i=0;i<month-1;i++)
-            sum+=a[i];
-    sum+=day;
-    return sum;
-}
 
-/*
- ** lineFrame:     虚线的 frame
- ** length:        虚线中短线的宽度
- ** spacing:       虚线中短线之间的间距
- ** color:         虚线中短线的颜色
- */
-+ (UIView *)createDashedLineWithFrame:(CGRect)lineFrame
-                           lineLength:(int)length
-                          lineSpacing:(int)spacing
-                            lineColor:(UIColor *)color{
-    UIView *dashedLine = [[UIView alloc] initWithFrame:lineFrame];
-    dashedLine.backgroundColor = [UIColor clearColor];
-    CAShapeLayer *shapeLayer = [CAShapeLayer layer];
-    [shapeLayer setBounds:dashedLine.bounds];
-    [shapeLayer setPosition:CGPointMake(CGRectGetWidth(dashedLine.frame) / 2, CGRectGetHeight(dashedLine.frame))];
-    [shapeLayer setFillColor:[UIColor clearColor].CGColor];
-    [shapeLayer setStrokeColor:color.CGColor];
-    [shapeLayer setLineWidth:CGRectGetHeight(dashedLine.frame)];
-    [shapeLayer setLineJoin:kCALineJoinRound];
-    [shapeLayer setLineDashPattern:[NSArray arrayWithObjects:[NSNumber numberWithInt:length], [NSNumber numberWithInt:spacing], nil]];
-    CGMutablePathRef path = CGPathCreateMutable();
-    CGPathMoveToPoint(path, NULL, 0, 0);
-    CGPathAddLineToPoint(path, NULL, CGRectGetWidth(dashedLine.frame), 0);
-    [shapeLayer setPath:path];
-    CGPathRelease(path);
-    [dashedLine.layer addSublayer:shapeLayer];
-    return dashedLine;
-}
 
-+ (UIImage *)QRImageFromString:(NSString *)sourceString{
-    if (sourceString == nil) {
-        sourceString = @"";
-    }
-    CIFilter *filter = [CIFilter filterWithName:@"CIQRCodeGenerator"];
-    [filter setDefaults];
-    NSData *data = [sourceString dataUsingEncoding:NSUTF8StringEncoding];
-    [filter setValue:data forKey:@"inputMessage"];
-    CIImage *ciImage = [filter outputImage];
-    //UIImage *unsharpImage = [UIImage imageWithCIImage:ciImage];//不清晰
-    UIImage *image = [self createNonInterpolatedUIImageFormCIImage:ciImage withSize:960];
-    return image;
-}
 
-+ (UIImage *)createNonInterpolatedUIImageFormCIImage:(CIImage *)image withSize:(CGFloat)size{
-    CGRect extent = CGRectIntegral(image.extent);
-    CGFloat scale = MIN(size/CGRectGetWidth(extent), size/CGRectGetHeight(extent));
-    size_t width = CGRectGetWidth(extent) * scale;
-    size_t height = CGRectGetHeight(extent) * scale;
-    CGColorSpaceRef cs = CGColorSpaceCreateDeviceGray();
-    CGContextRef bitmapRef = CGBitmapContextCreate(nil, width, height, 8, 0, cs, (CGBitmapInfo)kCGImageAlphaNone);
-    CIContext *context = [CIContext contextWithOptions:nil];
-    CGImageRef bitmapImage = [context createCGImage:image fromRect:extent];
-    CGContextSetInterpolationQuality(bitmapRef, kCGInterpolationNone);
-    CGContextScaleCTM(bitmapRef, scale, scale);
-    CGContextDrawImage(bitmapRef, extent, bitmapImage);
-    CGImageRef scaledImage = CGBitmapContextCreateImage(bitmapRef);
-    CGContextRelease(bitmapRef);
-    CGImageRelease(bitmapImage);
-    CGColorSpaceRelease(cs);
-    UIImage *result = [UIImage imageWithCGImage:scaledImage];
-    CGImageRelease(scaledImage);
-    return result;
-}
 
-+ (UIImage *)imageFromColor:(UIColor *)color{
-    CGRect rect = CGRectMake(0, 0, 1, 10);
-    UIGraphicsBeginImageContext(rect.size);
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    CGContextSetFillColorWithColor(context, [color CGColor]);
-    CGContextFillRect(context, rect);
-    UIImage *img = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    return img;
-}
 
-+ (UIImage *)imageFromColor:(UIColor *)color size:(CGSize)size{
-    CGRect rect = CGRectMake(0, 0, size.width, size.height);
-    UIGraphicsBeginImageContext(rect.size);
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    CGContextSetFillColorWithColor(context, [color CGColor]);
-    CGContextFillRect(context, rect);
-    UIImage *img = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    return img;
-}
 
-+ (UIImage*)circleImage:(UIImage*)image withParam:(CGFloat)inset{
-    UIGraphicsBeginImageContext(image.size);
-    CGContextRef context =UIGraphicsGetCurrentContext();
-    
-    //圆的边框宽度为2，颜色为红色
-    CGContextSetLineWidth(context,2);
-    CGContextSetStrokeColorWithColor(context, [UIColor clearColor].CGColor);
-    CGRect rect = CGRectMake(inset, inset, image.size.width - inset *2.0f, image.size.height - inset *2.0f);
-    CGContextAddEllipseInRect(context, rect);
-    CGContextClip(context);
-    
-    //在圆区域内画出image原图
-    [image drawInRect:rect];
-    CGContextAddEllipseInRect(context, rect);
-    CGContextStrokePath(context);
-    
-    //生成新的image
-    UIImage *newimg = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    return newimg;
-}
 
 + (NSURL *)convertTxtEncoding:(NSURL *)fileUrl{
     NSString *filePath = [fileUrl path];
@@ -1087,340 +616,6 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
     return [sb instantiateViewControllerWithIdentifier:storybbordID];
 }
 
-+ (UIImage *)imageCompressForWidth:(UIImage *)sourceImage targetWidth:(CGFloat)defineWidth{
-    if (sourceImage.size.width < defineWidth) {
-        return sourceImage;
-    }
-    
-    CGSize imageSize = sourceImage.size;
-    CGFloat width = imageSize.width;
-    CGFloat height = imageSize.height;
-    CGFloat targetWidth = defineWidth;
-    CGFloat targetHeight = (targetWidth / width) * height;
-    UIGraphicsBeginImageContext(CGSizeMake(targetWidth, targetHeight));
-    [sourceImage drawInRect:CGRectMake(0,0,targetWidth,  targetHeight)];
-    UIImage* newImage = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    return newImage;
-}
-
-+ (UIImage *)compressImage:(UIImage *)sourceImage targetWidth:(CGFloat)targetWidth{
-    CGFloat sourceWidth = sourceImage.size.width;
-    CGFloat sourceHeight = sourceImage.size.height;
-    CGFloat targetHeight = (targetWidth / sourceWidth) * sourceHeight;
-    
-    CGFloat compressRate = sourceWidth * sourceHeight / (targetWidth * targetHeight);
-    if (compressRate <= 1.0f) {
-        return sourceImage;
-    }
-    
-    UIGraphicsBeginImageContext(CGSizeMake(targetWidth, targetHeight));
-    [sourceImage drawInRect:CGRectMake(0,0,targetWidth, targetHeight)];
-    UIImage* newImage = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    return newImage;
-}
-
-// 怀旧 --> CIPhotoEffectInstant                         单色 --> CIPhotoEffectMono
-// 黑白 --> CIPhotoEffectNoir                            褪色 --> CIPhotoEffectFade
-// 色调 --> CIPhotoEffectTonal                           冲印 --> CIPhotoEffectProcess
-// 岁月 --> CIPhotoEffectTransfer                        铬黄 --> CIPhotoEffectChrome
-// CILinearToSRGBToneCurve, CISRGBToneCurveToLinear, CIGaussianBlur, CIBoxBlur, CIDiscBlur, CISepiaTone, CIDepthOfField
-+ (UIImage *)filterWithOriginalImage:(UIImage *)image filterName:(NSString *)name{
-    CIContext *context = [CIContext contextWithOptions:nil];
-    CIImage *inputImage = [[CIImage alloc] initWithImage:image];
-    CIFilter *filter = [CIFilter filterWithName:name];
-    [filter setValue:inputImage forKey:kCIInputImageKey];
-    CIImage *result = [filter valueForKey:kCIOutputImageKey];
-    CGImageRef cgImage = [context createCGImage:result fromRect:[result extent]];
-    UIImage *resultImage = [UIImage imageWithCGImage:cgImage];
-    CGImageRelease(cgImage);
-    return resultImage;
-}
-
-#pragma mark - 对图片进行模糊处理
-// CIGaussianBlur ---> 高斯模糊
-// CIBoxBlur      ---> 均值模糊(Available in iOS 9.0 and later)
-// CIDiscBlur     ---> 环形卷积模糊(Available in iOS 9.0 and later)
-// CIMedianFilter ---> 中值模糊, 用于消除图像噪点, 无需设置radius(Available in iOS 9.0 and later)
-// CIMotionBlur   ---> 运动模糊, 用于模拟相机移动拍摄时的扫尾效果(Available in iOS 9.0 and later)
-+ (UIImage *)blurWithOriginalImage:(UIImage *)image blurName:(NSString *)name radius:(NSInteger)radius{
-    CIContext *context = [CIContext contextWithOptions:nil];
-    CIImage *inputImage = [[CIImage alloc] initWithImage:image];
-    CIFilter *filter;
-    if (name.length != 0) {
-        filter = [CIFilter filterWithName:name];
-        [filter setValue:inputImage forKey:kCIInputImageKey];
-        if (![name isEqualToString:@"CIMedianFilter"]) {
-            [filter setValue:@(radius) forKey:@"inputRadius"];
-        }
-        CIImage *result = [filter valueForKey:kCIOutputImageKey];
-        CGImageRef cgImage = [context createCGImage:result fromRect:[result extent]];
-        UIImage *resultImage = [UIImage imageWithCGImage:cgImage];
-        CGImageRelease(cgImage);
-        return resultImage;
-    }else{
-        return nil;
-    }
-}
-
-/**
- *  调整图片饱和度, 亮度, 对比度
- *
- *  @param image      目标图片
- *  @param saturation 饱和度
- *  @param brightness 亮度: -1.0 ~ 1.0
- *  @param contrast   对比度
- *
- */
-+ (UIImage *)colorControlsWithOriginalImage:(UIImage *)image
-                                 saturation:(CGFloat)saturation
-                                 brightness:(CGFloat)brightness
-                                   contrast:(CGFloat)contrast{
-    CIContext *context = [CIContext contextWithOptions:nil];
-    CIImage *inputImage = [[CIImage alloc] initWithImage:image];
-    CIFilter *filter = [CIFilter filterWithName:@"CIColorControls"];
-    [filter setValue:inputImage forKey:kCIInputImageKey];
-    
-    [filter setValue:@(saturation) forKey:@"inputSaturation"];
-    [filter setValue:@(brightness) forKey:@"inputBrightness"];
-    [filter setValue:@(contrast) forKey:@"inputContrast"];
-    
-    CIImage *result = [filter valueForKey:kCIOutputImageKey];
-    CGImageRef cgImage = [context createCGImage:result fromRect:[result extent]];
-    UIImage *resultImage = [UIImage imageWithCGImage:cgImage];
-    CGImageRelease(cgImage);
-    return resultImage;
-}
-
-//Avilable in iOS 8.0 and later
-+ (UIVisualEffectView *)effectViewWithFrame:(CGRect)frame{
-    UIBlurEffect *effect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleLight];
-    UIVisualEffectView *effectView = [[UIVisualEffectView alloc] initWithEffect:effect];
-    effectView.frame = frame;
-    return effectView;
-}
-
-//全屏截图
-+ (UIImage *)shotFullScreen{
-    //    UIWindow *window = [UIApplication sharedApplication].keyWindow;
-    //    UIGraphicsBeginImageContext(window.bounds.size);
-    //    [window.layer renderInContext:UIGraphicsGetCurrentContext()];
-    //    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-    //    UIGraphicsEndImageContext();
-    //    return image;
-    
-    UIWindow *screenWindow = [[UIApplication sharedApplication] keyWindow];
-    UIGraphicsBeginImageContextWithOptions(screenWindow.frame.size, NO, 0.0); // no ritina
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    CGContextSaveGState(context);
-    for (UIWindow *window in [[UIApplication sharedApplication] windows]) {
-        if(window == screenWindow){
-            break;
-        }else{
-            [window.layer renderInContext:context];
-        }
-    }
-    
-    //    //    ////////////////////////
-    if ([screenWindow respondsToSelector:@selector(drawViewHierarchyInRect:afterScreenUpdates:)]) {
-        [screenWindow drawViewHierarchyInRect:screenWindow.bounds afterScreenUpdates:YES];
-    } else {
-        [screenWindow.layer renderInContext:context];
-    }
-    CGContextRestoreGState(context);
-    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-    screenWindow.layer.contents = nil;
-    UIGraphicsEndImageContext();
-    
-    float iOSVersion = [UIDevice currentDevice].systemVersion.floatValue;
-    if(iOSVersion < 8.0){
-        image = [self rotateUIInterfaceOrientationImage:image];
-    }
-    return image;
-}
-
-+ (UIImage *)rotateUIInterfaceOrientationImage:(UIImage *)image{
-    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
-    switch (orientation) {
-        case UIInterfaceOrientationLandscapeRight:{
-            image = [UIImage imageWithCGImage:image.CGImage scale:1 orientation:UIImageOrientationLeft];
-        }break;
-        case UIInterfaceOrientationLandscapeLeft:{
-            image = [UIImage imageWithCGImage:image.CGImage scale:1 orientation:UIImageOrientationRight];
-        }break;
-        case UIInterfaceOrientationPortraitUpsideDown:{
-            image = [UIImage imageWithCGImage:image.CGImage scale:1 orientation:UIImageOrientationDown];
-        }break;
-        case UIInterfaceOrientationPortrait:{
-            image = [UIImage imageWithCGImage:image.CGImage scale:1 orientation:UIImageOrientationUp];
-        }break;
-        case UIInterfaceOrientationUnknown:{
-        }break;
-        default:
-        break;
-    }
-    
-    return image;
-}
-
-//截取view中某个区域生成一张图片
-+ (UIImage *)shotWithView:(UIView *)view scope:(CGRect)scope{
-    CGImageRef imageRef = CGImageCreateWithImageInRect([self shotWithView:view].CGImage, scope);
-    UIGraphicsBeginImageContext(scope.size);
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    CGRect rect = CGRectMake(0, 0, scope.size.width, scope.size.height);
-    CGContextTranslateCTM(context, 0, rect.size.height);//下移
-    CGContextScaleCTM(context, 1.0f, -1.0f);//上翻
-    CGContextDrawImage(context, rect, imageRef);
-    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    CGImageRelease(imageRef);
-    return image;
-}
-
-//截取view生成一张图片
-+ (UIImage *)shotWithView:(UIView *)view{
-    UIGraphicsBeginImageContext(view.bounds.size);
-    [view.layer renderInContext:UIGraphicsGetCurrentContext()];
-    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    return image;
-}
-
-+ (UIImage *)captureScrollView:(UIScrollView *)scrollView{
-    CGRect frame = scrollView.frame;
-    //设置控件显示的区域大小     key:显示
-    scrollView.frame = CGRectMake(0, scrollView.frame.origin.y, scrollView.contentSize.width, scrollView.contentSize.height);
-    
-    //设置截屏大小(截屏区域的大小必须要跟视图控件的大小一样)
-    UIGraphicsBeginImageContextWithOptions(scrollView.frame.size, YES, 0.0);
-    [[scrollView layer] renderInContext:UIGraphicsGetCurrentContext()];
-    UIImage *viewImage = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    
-    scrollView.frame = frame;
-    return viewImage;
-}
-
-+ (UIImage *)compressImageData:(NSData *)imageData{
-    UIImage *image = [[UIImage alloc] initWithData:imageData];
-    if (![self isNeedCompress:imageData]) {
-        return image;
-    }
-    NSInteger compressRate = 0;
-    if ([self isPortait:image]) {
-        compressRate = [self computeSampleSize:image minSideLength:750 maxNumOfPixels:1334 * 750];  // 安卓:1240 * 860
-    }else{
-        compressRate = [self computeSampleSize:image minSideLength:750 maxNumOfPixels:750 * 1334];
-    }
-    
-    NSInteger width = image.size.width / compressRate;
-    return [self compressImage:image targetWidth:width];
-}
-
-+ (UIImage *)compressImage:(UIImage *)image width:(NSInteger)minWidth minHeight:(NSInteger)minHeight{
-    if (![image isKindOfClass:[UIImage class]]) {
-        return nil;
-    }
-    CGSize size = [UIScreen mainScreen].bounds.size;
-    if (image.size.width < size.width) {
-        return image;
-    }
-    NSInteger compressRate = 0;
-    if ([self isPortait:image]) {
-        compressRate = [self computeSampleSize:image minSideLength:minWidth maxNumOfPixels:minWidth * minHeight];  // 安卓:1240 * 860
-    }else{
-        compressRate = [self computeSampleSize:image minSideLength:minWidth maxNumOfPixels:minWidth * minHeight];
-    }
-    NSInteger width = image.size.width / compressRate;
-    return [self compressImage:image targetWidth:width];
-}
-
-+ (UIImage *)compressImage:(UIImage *)image{
-    if (![image isKindOfClass:[UIImage class]]) {
-        return nil;
-    }
-    if (image.size.width < [UIScreen mainScreen].bounds.size.width){
-        return image;
-    }
-    NSInteger compressRate = 0;
-    if ([self isPortait:image]) {
-        compressRate = [self computeSampleSize:image minSideLength:640 maxNumOfPixels:1136 * 640];  // 安卓:1240 * 860
-    }else{
-        compressRate = [self computeSampleSize:image minSideLength:640 maxNumOfPixels:1136 * 640];
-    }
-    NSInteger width = image.size.width / compressRate;
-    return [self compressImage:image targetWidth:width];
-}
-
-+ (UIImage *)compressImage:(UIImage *)image width:(NSInteger)width{
-    if (![image isKindOfClass:[UIImage class]]) {
-        return nil;
-    }
-    if (image.size.width < [UIScreen mainScreen].bounds.size.width) {
-        return image;
-    }
-    NSInteger compressRate = 0;
-    if ([self isPortait:image]) {
-        compressRate = [self computeSampleSize:image minSideLength:width maxNumOfPixels:width * 1.775 * width];  // 安卓:1240 * 860
-    }else{
-        compressRate = [self computeSampleSize:image minSideLength:width maxNumOfPixels:width * width * 1.775];
-    }
-    
-    NSInteger targetWidth = image.size.width / compressRate;
-    return [self compressImage:image targetWidth:targetWidth];
-}
-
-+ (UIImage*)imageForUIView:(UIView*)view{
-    //    UIGraphicsBeginImageContext(view.bounds.size);// 只会生成屏幕所见的部分
-    CGSize size = view.bounds.size;
-    if ([view isKindOfClass:[UIScrollView class]]) {
-        UIScrollView *sView = (UIScrollView *)view;
-        size = CGSizeMake(sView.frame.size.width,sView.contentSize.height+ sView.contentInset.top+ sView.contentInset.bottom);
-    }
-    UIGraphicsBeginImageContextWithOptions(size, YES, view.layer.contentsScale);
-    CGContextRef currnetContext = UIGraphicsGetCurrentContext();
-    [view.layer renderInContext:currnetContext];
-    //    CGContextRestoreGState(currnetContext);
-    
-    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    return image;
-}
-
-+ (NSInteger)computeSampleSize:(UIImage *)image minSideLength:(NSInteger)minSideLength maxNumOfPixels:(NSInteger)maxNumOfPixels{
-    NSInteger initialSize = [self computeInitialSampleSize:image minSideLength:minSideLength maxNumOfPixels:maxNumOfPixels];
-    NSInteger roundedSize = 0;
-    if (initialSize <= 8) {
-        roundedSize = 1;
-        while (roundedSize < initialSize) {
-            roundedSize <<= 1;
-        }
-    }else{
-        roundedSize = (initialSize + 7) / 8 * 8;
-    }
-    return roundedSize;
-}
-
-+ (NSInteger)computeInitialSampleSize:(UIImage *)image minSideLength:(NSInteger)minSideLength maxNumOfPixels:(NSInteger)maxNumOfPixels{
-    double w = image.size.width;
-    double h = image.size.height;
-    
-    NSInteger lowerBound = (maxNumOfPixels == -1) ? 1 : (int)ceil(sqrt(w * h / maxNumOfPixels));
-    NSInteger upperBound = (minSideLength == -1) ? 128 : (int) MIN(floor(w / minSideLength), floor(h / minSideLength));
-    if (upperBound < lowerBound) {
-        return lowerBound;
-    }
-    if ((maxNumOfPixels == -1) && (minSideLength == -1)) {
-        return 1;
-    }else if (minSideLength == -1) {
-        return lowerBound;
-    } else {
-        return upperBound;
-    }
-}
-
 + (BOOL)isNeedCompress:(NSData *)imageData{
     return imageData.length > 500 * 1024;
 }
@@ -1437,14 +632,6 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
     }else{
         return [[NSString alloc] initWithFormat:@"%.2f K",size / 1024.0f];
     }
-}
-
-+ (NSTimeInterval)mmSecondsSince1970{
-    return [[NSDate date] timeIntervalSince1970];
-}
-
-+ (NSInteger)integerSecondsSince1970{
-    return (NSInteger)[[NSDate date] timeIntervalSince1970];
 }
 
 + (NSInteger)weekdayStringFromDate:(NSDate*)inputDate{
@@ -1510,45 +697,6 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
     }
     freeifaddrs(interfaces);
     return address;
-}
-
-+ (NSDateComponents *)chineseDate:(NSDate *)date{
-    if (![date isKindOfClass:[NSDate class]]) {
-        return nil;
-    }
-    NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierChinese];
-    NSDateComponents *components = [calendar components:NSCalendarUnitYear | NSCalendarUnitMonth | NSCalendarUnitDay fromDate:date];
-    return components;
-}
-
-+ (NSArray<NSString *> *)chineseCalendarForDate:(NSDate *)date{
-    if (![date isKindOfClass:[NSDate class]]) {
-        return nil;
-    }
-    NSDateComponents *components = [self chineseDate:date];
-    return @[[self chineseCalendarYear:components.year - 1],[self chineseCalendarMonth:components.month - 1],[self chineseCalendarDay:components.day - 1]];
-}
-
-+ (NSString *)chineseCalendarYear:(NSInteger)index{
-    NSArray *chineseYears = @[@"甲子",  @"乙丑",  @"丙寅",  @"丁卯",  @"戊辰",  @"己巳",  @"庚午",  @"辛未",  @"壬申",  @"癸酉",
-                              @"甲戌",   @"乙亥",  @"丙子",  @"丁丑",  @"戊寅",  @"己卯",  @"庚辰",  @"辛己",  @"壬午",  @"癸未",
-                              @"甲申",   @"乙酉",  @"丙戌",  @"丁亥",  @"戊子",  @"己丑",  @"庚寅",  @"辛卯",  @"壬辰",  @"癸巳",
-                              @"甲午",   @"乙未",  @"丙申",  @"丁酉",  @"戊戌",  @"己亥",  @"庚子",  @"辛丑",  @"壬寅",  @"癸丑",
-                              @"甲辰",   @"乙巳",  @"丙午",  @"丁未",  @"戊申",  @"己酉",  @"庚戌",  @"辛亥",  @"壬子",  @"癸丑",
-                              @"甲寅",   @"乙卯",  @"丙辰",  @"丁巳",  @"戊午",  @"己未",  @"庚申",  @"辛酉",  @"壬戌",  @"癸亥"];
-    return chineseYears[index % chineseYears.count];
-}
-
-+ (NSString *)chineseCalendarMonth:(NSInteger)index{
-    NSArray *chineseYears = @[@"正月", @"二月", @"三月", @"四月", @"五月", @"六月", @"七月", @"八月",@"九月", @"十月", @"冬月", @"腊月"];
-    return chineseYears[index % chineseYears.count];
-}
-
-+ (NSString *)chineseCalendarDay:(NSInteger)index{
-    NSArray *chineseYears = @[  @"初一", @"初二", @"初三", @"初四", @"初五", @"初六", @"初七", @"初八", @"初九", @"初十",
-                                @"十一", @"十二", @"十三", @"十四", @"十五", @"十六", @"十七", @"十八", @"十九", @"二十",
-                                @"廿一", @"廿二", @"廿三", @"廿四", @"廿五", @"廿六", @"廿七", @"廿八", @"廿九", @"三十"];
-    return chineseYears[index % chineseYears.count];
 }
 
 + (NSArray *)arrayFromArray:(NSArray *)array withString:(NSString *)string{
@@ -1620,13 +768,6 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
     NSScanner *scan = [NSScanner scannerWithString:string];
     float val;
     return [scan scanFloat:&val] && [scan isAtEnd];
-}
-
-+ (BOOL)isLeapYear:(int)year{
-    if ((year % 4  == 0 && year % 100 != 0)  || year % 400 == 0)
-        return YES;
-    else
-        return NO;
 }
 
 + (NSArray *)arrayByOneCharFromString:(NSString *)string{
@@ -2083,15 +1224,6 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
     return NO;
 }
 
-+ (BOOL)isTheSameDayA:(NSDate *)aDate b:(NSDate *)bDate{
-    if (!([aDate isKindOfClass:[NSDate class]] && [bDate isKindOfClass:[NSDate class]])) {
-        return NO;
-    }
-    NSDateComponents *f = [self componentForDate:aDate];
-    NSDateComponents *s = [self componentForDate:bDate];
-    return (f.year == s.year) && (f.month == s.month) && (f.day == s.day);
-}
-
 + (BOOL)isURLString:(NSString *)sourceString{
     NSString *matchString = @"((http[s]{0,1}|ftp)://[a-zA-Z0-9\\.\\-]+\\.([a-zA-Z]{2,4})(:\\d+)?(/[a-zA-Z0-9\\.\\-~!@#$%^&*+?:_/=<>]*)?)|(www.[a-zA-Z0-9\\.\\-]+\\.([a-zA-Z]{2,4})(:\\d+)?(/[a-zA-Z0-9\\.\\-~!@#$%^&*+?:_/=<>]*)?)";
     NSPredicate *phoneTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@",matchString];
@@ -2143,72 +1275,7 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
     return [languageName isEqualToString:@"zh-Hans-CN"];
 }
 
-+ (CGFloat)taxForSalaryAfterSocialSecurity:(CGFloat)money{
-    CGFloat deltaMoney = money - 3500;
-    if (deltaMoney <= 0) {
-        return 0;
-    }
-    NSArray *rateArray = [self taxRateForMoney:deltaMoney];
-    CGFloat taxRate = [rateArray[0] floatValue];
-    CGFloat quickNumber = [rateArray[1] floatValue];
-    return deltaMoney * taxRate - quickNumber;
-}
 
-+ (NSArray *)taxRatesWithMoneyAfterTax:(CGFloat)money{
-    NSArray *rateArray = @[
-                           @[@0.03,@0,@0,@1500],
-                           @[@0.1,@105,@1500,@4500],
-                           @[@.2,@555,@4500,@9000],
-                           @[@.25,@1005,@9000,@35000],
-                           @[@.3,@2755,@35000,@55000],
-                           @[@.35,@5505,@55000,@80000],
-                           @[@.45,@13505,@8000000]
-                           ];
-    NSMutableArray *selectArrays = [[NSMutableArray alloc] init];
-    for (int x = 0; x < rateArray.count; x ++) {
-        if (x == (rateArray.count - 1)) {
-            NSArray *subRateArray = rateArray[x];
-            CGFloat marginMin = [subRateArray[2] floatValue];
-            CGFloat quickNumber = [subRateArray[1] floatValue];
-            CGFloat taxRate = [subRateArray[0] floatValue];
-            CGFloat salary = (money - quickNumber - 3500 * taxRate) / (1 - taxRate);
-            if ((salary - 3500) > marginMin) {
-                [selectArrays addObject:subRateArray];
-            }
-        }else{
-            NSArray *subRateArray = rateArray[x];
-            CGFloat marginMin = [subRateArray[2] floatValue];
-            CGFloat marginMax = [subRateArray[3] floatValue];
-            CGFloat quickNumber = [subRateArray[1] floatValue];
-            CGFloat taxRate = [subRateArray[0] floatValue];
-            CGFloat salary = (money - quickNumber - 3500 * taxRate) / (1 - taxRate);
-            if (((salary - 3500) > marginMin) && ((salary - 3500) <= marginMax)) {
-                [selectArrays addObject:subRateArray];
-            }
-        }
-    }
-    if (!selectArrays.count) {
-        return nil;
-    }
-    return selectArrays;
-}
-
-+ (NSArray *)taxRateForMoney:(CGFloat)money{
-    if (money <= 1500) {
-        return @[@0.03,@0];
-    }else if (money <= 4500){
-        return @[@0.1,@105];
-    }else if (money <= 9000){
-        return @[@.2,@555];
-    }else if (money <= 35000){
-        return @[@.25,@1005];
-    }else if (money <= 55000){
-        return @[@.3,@2755];
-    }else if (money <= 80000){
-        return @[@.35,@5505];
-    }else
-        return @[@.45,@13505];
-}
 
 + (NSNumber *)fileSize:(NSString *)filePath{
     if (filePath.length == 0) {
@@ -2484,34 +1551,6 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
     return [product stringValue];
 }
 
-+ (NSString *)highAdd:(NSString *)aValue add:(NSString *)bValue{
-    NSDecimalNumber *addendNumber = [NSDecimalNumber decimalNumberWithString:aValue];
-    NSDecimalNumber *augendNumber = [NSDecimalNumber decimalNumberWithString:bValue];
-    NSDecimalNumber *sumNumber = [addendNumber decimalNumberByAdding:augendNumber];
-    return [sumNumber stringValue];
-}
-
-+ (NSString *)highSubtract:(NSString *)fontValue add:(NSString *)backValue{
-    NSDecimalNumber *addendNumber = [NSDecimalNumber decimalNumberWithString:fontValue];
-    NSDecimalNumber *augendNumber = [NSDecimalNumber decimalNumberWithString:backValue];
-    NSDecimalNumber *sumNumber = [addendNumber decimalNumberBySubtracting:augendNumber];
-    return [sumNumber stringValue];
-}
-
-+ (NSString *)highMultiply:(NSString *)aValue add:(NSString *)bValue{
-    NSDecimalNumber *addendNumber = [NSDecimalNumber decimalNumberWithString:aValue];
-    NSDecimalNumber *augendNumber = [NSDecimalNumber decimalNumberWithString:bValue];
-    NSDecimalNumber *sumNumber = [addendNumber decimalNumberByMultiplyingBy:augendNumber];
-    return [sumNumber stringValue];
-}
-
-+ (NSString *)highDivide:(NSString *)aValue add:(NSString *)bValue{
-    NSDecimalNumber *addendNumber = [NSDecimalNumber decimalNumberWithString:aValue];
-    NSDecimalNumber *augendNumber = [NSDecimalNumber decimalNumberWithString:bValue];
-    NSDecimalNumber *sumNumber = [addendNumber decimalNumberByDividingBy:augendNumber];
-    return [sumNumber stringValue];
-}
-
 + (NSString *)base64StringForText:(NSString *)text{
     if (text && [text isKindOfClass:NSString.class]) {
         NSData *data = [text dataUsingEncoding:NSUTF8StringEncoding];
@@ -2711,30 +1750,8 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
     return hexData;
 }
 
-+ (NSString *)stringWithDate:(NSDate *)date formatter:(NSString *)formatter{
-    if (![date isKindOfClass:[NSDate class]]) {
-        return nil;
-    }
-    static NSDateFormatter *dateFormatter = nil;
-    if (!dateFormatter) {
-        dateFormatter = [[NSDateFormatter alloc] init];
-    }
-    [dateFormatter setDateFormat:formatter?:@"yyyy-MM-dd HH:mm:ss"];
-    return [dateFormatter stringFromDate:date];
-}
 
-+ (NSDate *)dateByString:(NSString *)str formatter:(NSString *)formatter{
-    if (![self isValidateString:str]) {
-        return nil;
-    }
-    static NSDateFormatter *dateFormatter = nil;
-    if (!dateFormatter) {
-        dateFormatter = [[NSDateFormatter alloc] init];
-    }
-    [dateFormatter setDateFormat:formatter?:@"yyyy-MM-dd HH:mm:ss"];
-    NSDate *date = [dateFormatter dateFromString:str];
-    return date;
-}
+
 
 + (NSAttributedString *)attributedStringFor:(NSString *)sourceString colorRange:(NSArray *)colorRanges color:(UIColor *)color textRange:(NSArray *)textRanges font:(UIFont *)font{
     NSMutableAttributedString *attributedStr = [[NSMutableAttributedString alloc] initWithString:sourceString];
@@ -2818,70 +1835,6 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
         [value addObject:last];
     }
     return [value componentsJoinedByString:@" "];
-}
-
-
-/**
- *  计算上次日期距离现在多久
- *
- *  @param lastTime    上次日期(需要和格式对应)
- *  @param format1     上次日期格式
- *  @param currentTime 最近日期(需要和格式对应)
- *  @param format2     最近日期格式
- *
- *  @return xx分钟前、xx小时前、xx天前
- */
-+ (NSString *)timeIntervalFromLastTime:(NSString *)lastTime
-                        lastTimeFormat:(NSString *)format1
-                         ToCurrentTime:(NSString *)currentTime
-                     currentTimeFormat:(NSString *)format2{
-    //上次时间
-    NSDateFormatter *dateFormatter1 = [[NSDateFormatter alloc]init];
-    dateFormatter1.dateFormat = format1;
-    NSDate *lastDate = [dateFormatter1 dateFromString:lastTime];
-    //当前时间
-    NSDateFormatter *dateFormatter2 = [[NSDateFormatter alloc]init];
-    dateFormatter2.dateFormat = format2;
-    NSDate *currentDate = [dateFormatter2 dateFromString:currentTime];
-    return [self timeIntervalFromLastTime:lastDate ToCurrentTime:currentDate];
-}
-
-+ (NSString *)timeIntervalFromLastTime:(NSDate *)lastTime ToCurrentTime:(NSDate *)currentTime{
-    NSTimeZone *timeZone = [NSTimeZone systemTimeZone];
-    //上次时间
-    NSDate *lastDate = [lastTime dateByAddingTimeInterval:[timeZone secondsFromGMTForDate:lastTime]];
-    //当前时间
-    NSDate *currentDate = [currentTime dateByAddingTimeInterval:[timeZone secondsFromGMTForDate:currentTime]];
-    //时间间隔
-    NSInteger intevalTime = [currentDate timeIntervalSinceReferenceDate] - [lastDate timeIntervalSinceReferenceDate];
-    
-    //秒、分、小时、天、月、年
-    NSInteger minutes = intevalTime / 60;
-    NSInteger hours = intevalTime / 60 / 60;
-    NSInteger day = intevalTime / 60 / 60 / 24;
-    NSInteger month = intevalTime / 60 / 60 / 24 / 30;
-    NSInteger yers = intevalTime / 60 / 60 / 24 / 365;
-    
-    if (minutes <= 10) {
-        return  @"刚刚";
-    }else if (minutes < 60){
-        return [NSString stringWithFormat: @"%ld分钟前",(long)minutes];
-    }else if (hours < 24){
-        return [NSString stringWithFormat: @"%ld小时前",(long)hours];
-    }else if (day < 30){
-        return [NSString stringWithFormat: @"%ld天前",(long)day];
-    }else if (month < 12){
-        NSDateFormatter * df =[[NSDateFormatter alloc]init];
-        df.dateFormat = @"M月d日";
-        NSString * time = [df stringFromDate:lastDate];
-        return time;
-    }else if (yers >= 1){
-        NSDateFormatter * df =[[NSDateFormatter alloc]init];
-        df.dateFormat = @"yyyy年M月d日";
-        NSString * time = [df stringFromDate:lastDate];
-        return time;
-    }
-    return @"";
 }
 
 + (BOOL)isValidPassword:(NSString*)password{

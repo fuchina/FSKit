@@ -77,7 +77,14 @@ return self;\
 #define FSLocalString(A)            NSLocalizedString(A, nil)
 
 // 字符串格式化宏
-#define FSFORMATSTRING(...)         [[NSString alloc] initWithFormat:__VA_ARGS__]
+#define FSSTRING(...)         [[NSString alloc] initWithFormat:__VA_ARGS__]
+
+// 三元布尔值，判断手机是不是iPhoneX，如果是就返回YES，不是就返回NO，为了防止重复计算，可以用FSBool_Undefined来判断有没有计算过
+typedef NS_ENUM(NSInteger, FSBool) {
+    FSBool_Undefined = -1,
+    FSBool_NO = NO,
+    FSBool_YES = YES,
+};
 
 /******************__tag__**********************/
 #define   TAG_VIEW               1000

@@ -10,6 +10,9 @@
 #endif
 #endif
 
+#import "FSCalculator.h"
+#import "FSConstant.h"
+#import "FSDate.h"
 #import "FSEntity.h"
 #import "FSFile.h"
 #import "FSKit.h"
@@ -17,6 +20,7 @@
 #import "FSPdf.h"
 #import "FSRuntime.h"
 #import "FSTuple.h"
+#import "FSUIKit.h"
 #import "FSURLSession.h"
 #import "FSWindow.h"
 #import "FuSoft.h"

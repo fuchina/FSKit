@@ -7,14 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
-#import <CoreLocation/CoreLocation.h>
 
 @interface FSKit : NSObject
 
 extern  NSTimeInterval FSTimeIntevalSince1970(void);
 extern NSInteger FSIntegerTimeIntevalSince1970(void);
-
-//+ (void)presentViewController:(UIViewController *)pController completion:(void (^)(void))completion;
 
 + (void)userDefaultsKeepData:(id)instance  withKey:(NSString *)key;
 + (id)userDefaultsDataWithKey:(NSString *)key;
@@ -22,35 +19,15 @@ extern NSInteger FSIntegerTimeIntevalSince1970(void);
 
 + (BOOL)popToController:(NSString *)className navigationController:(UINavigationController *)navigationController animated:(BOOL)animated;
 
-// 根据action.title映射titles中的字段来判断点击事件   UIAlertActionStyleDefault
-+ (void)alertOnCustomWindow:(UIAlertControllerStyle)style title:(NSString *)title message:(NSString *)message actionTitles:(NSArray<NSString *> *)titles styles:(NSArray<NSNumber *> *)styles handler:(void (^)(UIAlertAction *action))handler cancelTitle:(NSString *)cancelTitle cancel:(void (^)(UIAlertAction *action))cancel completion:(void (^)(void))completion;
-+ (void)alertOnCustomWindow:(UIAlertControllerStyle)style title:(NSString *)title message:(NSString *)message actionTitles:(NSArray<NSString *> *)titles styles:(NSArray<NSNumber *> *)styles handler:(void (^)(UIAlertAction *action))handler;
-+ (void)alert:(UIAlertControllerStyle)style controller:(UIViewController *)pController title:(NSString *)title message:(NSString *)message actionTitles:(NSArray<NSString *> *)titles styles:(NSArray<NSNumber *> *)styles handler:(void (^)(UIAlertAction *action))handler;
-+ (void)alert:(UIAlertControllerStyle)style controller:(UIViewController *)pController title:(NSString *)title message:(NSString *)message actionTitles:(NSArray<NSString *> *)titles styles:(NSArray<NSNumber *> *)styles handler:(void (^)(UIAlertAction *action))handler cancelTitle:(NSString *)cancelTitle cancel:(void (^)(UIAlertAction *action))cancel completion:(void (^)(void))completion;
-
-// 有输入框时，number为输入框数量，根据textField的tag【0、1、2...】来配置textField
-+ (void)alertInput:(NSInteger)number controller:(UIViewController *)controller title:(NSString *)title message:(NSString *)message ok:(NSString *)okTitle handler:(void (^)(UIAlertController *bAlert,UIAlertAction *action))handler cancel:(NSString *)cancelTitle handler:(void (^)(UIAlertAction *action))cancelHandler textFieldConifg:(void (^)(UITextField *textField))configurationHandler completion:(void (^)(void))completion;
-+ (void)alertInputOnCustomWindow:(NSInteger)number title:(NSString *)title message:(NSString *)message ok:(NSString *)okTitle handler:(void (^)(UIAlertController *bAlert,UIAlertAction *action))handler cancel:(NSString *)cancelTitle handler:(void (^)(UIAlertAction *action))cancelHandler textFieldConifg:(void (^)(UITextField *textField))configurationHandler completion:(void (^)(void))completion;
-
 + (void)pushToViewControllerWithClass:(NSString *)className navigationController:(UINavigationController *)navigationController param:(NSDictionary *)param configBlock:(void (^)(id vc))configBlockParam;
 + (void)presentToViewControllerWithClass:(NSString *)className controller:(UIViewController *)viewController param:(NSDictionary *)param configBlock:(void (^)(UIViewController *vc))configBlockParam presentCompletion:(void(^)(void))completion;
 + (void)copyToPasteboard:(NSString *)copyString;
 + (void)playSongs:(NSString *)songs type:(NSString *)fileType;
-+ (void)xuanzhuanView:(UIView *)view;
 
-+ (void)showFullScreenImage:(UIImageView *)avatarImageView;
 + (void)clearUserDefaults;
 + (void)letScreenLock:(BOOL)lock;                           // YES:让屏幕锁屏    NO：让屏幕不锁屏   【未测】
 + (void)gotoAppCentPageWithAppId:(NSString *)appID;         // 去App评分页
 + (void)setStatusBarBackgroundColor:(UIColor *)color;       // 设置状态栏颜色
-
-+ (void)showMessage:(NSString *)message;
-+ (void)showAlertWithMessageOnCustomWindow:(NSString *)message;
-+ (void)showAlertWithMessageOnCustomWindow:(NSString *)message handler:(void (^)(UIAlertAction *action))handler;
-+ (void)showAlertWithTitleOnCustomWindow:(NSString *)title message:(NSString *)message ok:(NSString *)ok handler:(void (^)(UIAlertAction *action))handler;
-+ (void)showAlertWithMessage:(NSString *)message controller:(UIViewController *)controller;
-+ (void)showAlertWithMessage:(NSString *)message controller:(UIViewController *)controller handler:(void (^)(UIAlertAction *action))handler;
-+ (void)showAlertWithTitle:(NSString *)title message:(NSString *)message ok:(NSString *)ok controller:(UIViewController *)pController handler:(void (^)(UIAlertAction *action))handler;
 
 + (BOOL)isValidateEmail:(NSString *)str;
 + (BOOL)isPureInt:(NSString *)string;
@@ -73,7 +50,6 @@ extern NSInteger FSIntegerTimeIntevalSince1970(void);
 + (BOOL)isNumber:(NSString *)str;
 + (BOOL)isString:(NSString *)aString containString:(NSString *)bString;
 + (BOOL)isStringContainsStringAndNumber:(NSString *)sourceString;
-+ (BOOL)isTheSameDayA:(NSDate *)aDate b:(NSDate *)bDate;
 + (BOOL)isURLString:(NSString *)sourceString;//0
 // 判断字符串是否含有中文
 + (BOOL)isHaveChineseInString:(NSString *)string;
@@ -85,15 +61,7 @@ extern NSInteger FSIntegerTimeIntevalSince1970(void);
 + (BOOL)floatEqual:(float)aNumber bNumber:(float)bNumber;
 // 判断是否为中文语言环境
 + (BOOL)isChineseEnvironment;
-// 五险一金后工资应缴税额
-+ (CGFloat)taxForSalaryAfterSocialSecurity:(CGFloat)money;
-// 根据税后推算税前
-+ (NSArray *)taxRatesWithMoneyAfterTax:(CGFloat)money;
-// 返回税率（index[0]）和速算扣除数(index[1])
-+ (NSArray *)taxRateForMoney:(CGFloat)money;
 
-+ (NSTimeInterval)mmSecondsSince1970;
-+ (NSInteger)integerSecondsSince1970;
 + (NSInteger)weekdayStringFromDate:(NSDate *)inputDate;
 // 根据年月计算当月有多少天
 + (NSInteger)daysForMonth:(NSInteger)month year:(NSInteger)year;
@@ -103,12 +71,7 @@ extern NSInteger FSIntegerTimeIntevalSince1970(void);
 + (double)availableMemory;                                                          // 获得当前设备可用内存,单位为M
 + (NSInteger)folderSizeAtPath:(NSString*)folderPath extension:(NSString *)extension;// 获取文件夹目录下的文件大小
 + (NSInteger)fileSizeAtPath:(NSString*)filePath;                                    // 获取文件的大小
-// 计算文本宽度
-+ (CGFloat)textWidth:(NSString *)text fontInt:(NSInteger)fontInt labelHeight:(CGFloat)labelHeight;
-+ (CGFloat)textHeight:(NSString *)text
-              fontInt:(NSInteger)fontInt                                            // 计算字符串放在label上需要的高度,font数字要和label的一样
-           labelWidth:(CGFloat)labelWidth;                                          // label调用 sizeToFit 可以实现自适应
-+ (double)distanceBetweenCoordinate:(CLLocationCoordinate2D)coordinateA toCoordinateB:(CLLocationCoordinate2D)coordinateB;
+
 // 获取磁盘大小（单位：Byte）
 + (CGFloat)diskOfAllSizeBytes;
 // 磁盘可用空间
@@ -120,10 +83,6 @@ extern NSInteger FSIntegerTimeIntevalSince1970(void);
 // 当前app所占内存（RAM）
 + (double)currentAppMemory;
 + (CGSize)keyboardNotificationScroll:(NSNotification *)notification baseOn:(CGFloat)baseOn;
-
-+ (CGFloat)DEBJWithYearRate:(CGFloat)rate monthes:(NSInteger)month;
-+ (CGFloat)DEBXWithYearRate:(CGFloat)rate monthes:(NSInteger)month;
-+ (CGFloat)priceRiseWithDays:(CGFloat)days yearRate:(CGFloat)rate;
 
 + (CGFloat)freeStoragePercentage;   // 可用内存占总内存的比例,eg  0.1;
 + (NSInteger)getTotalDiskSize;   // 获取磁盘总量
@@ -181,8 +140,6 @@ extern NSInteger FSIntegerTimeIntevalSince1970(void);
 + (NSString *)scanQRCode:(UIImage *)image;  // 解析二维码
 + (NSString *)dataToHex:(NSData *)data;
 + (NSData *)convertHexStrToData:(NSString *)str;
-+ (NSString *)stringWithDate:(NSDate *)date formatter:(NSString *)formatter;
-+ (NSDate *)dateByString:(NSString *)str formatter:(NSString *)formatter;
 
 /*  NSAttributedString *connectAttributedString = [FuData attributedStringFor:connectString colorRange:@[[NSValue valueWithRange:connectRange]] color:GZS_RedColor textRange:@[[NSValue valueWithRange:connectRange]] font:FONTFC(25)];*/
 + (NSAttributedString *)attributedStringFor:(NSString *)sourceString colorRange:(NSArray *)colorRanges color:(UIColor *)color textRange:(NSArray *)textRanges font:(UIFont *)font;
@@ -195,32 +152,6 @@ extern NSInteger FSIntegerTimeIntevalSince1970(void);
 - (NSAttributedString *)middleLineForLabel:(NSString *)text;    // 中划线
 - (NSAttributedString *)underLineForLabel:(NSString *)text;     // 下划线
 
-
-/**
- *  计算上次日期距离现在多久
- *
- *  @param lastTime    上次日期(需要和格式对应)
- *  @param format1     上次日期格式
- *  @param currentTime 最近日期(需要和格式对应)
- *  @param format2     最近日期格式
- *
- *  @return xx分钟前、xx小时前、xx天前
- *  eg. NSLog(@"\n\nresult: %@", [Utilities timeIntervalFromLastTime:@"2015年12月8日 15:50"
- lastTimeFormat:@"yyyy年MM月dd日 HH:mm"
- ToCurrentTime:@"2015/12/08 16:12"
- currentTimeFormat:@"yyyy/MM/dd HH:mm"]);
- */
-+ (NSString *)timeIntervalFromLastTime:(NSString *)lastTime
-                        lastTimeFormat:(NSString *)format1
-                         ToCurrentTime:(NSString *)currentTime
-                     currentTimeFormat:(NSString *)format2;
-
-// 高精度计算
-+ (NSString *)highAdd:(NSString *)aValue add:(NSString *)bValue;
-+ (NSString *)highSubtract:(NSString *)fontValue add:(NSString *)backValue;
-+ (NSString *)highMultiply:(NSString *)aValue add:(NSString *)bValue;
-+ (NSString *)highDivide:(NSString *)aValue add:(NSString *)bValue;
-
 + (void)call:(NSString *)phone;
 + (void)callPhoneWithNoNotice:(NSString *)phone;
 + (void)openAppByURLString:(NSString *)str;
@@ -228,10 +159,6 @@ extern NSInteger FSIntegerTimeIntevalSince1970(void);
 // 操作闪光灯
 + (void)flashLampShow:(BOOL)show;
 
-// 除了年不是当年数字，月日是当月日
-+ (NSDateComponents *)chineseDate:(NSDate *)date;
-// 获取农历日期，数组共三个元素，分别是农历的年月日
-+ (NSArray<NSString *> *)chineseCalendarForDate:(NSDate *)date;
 + (NSArray *)arrayFromArray:(NSArray *)array withString:(NSString *)string;
 + (NSArray *)arrayByOneCharFromString:(NSString *)string;
 + (NSArray *)keyedUnarchiverWithArray:(NSString *)fileName;
@@ -255,51 +182,6 @@ extern NSInteger FSIntegerTimeIntevalSince1970(void);
 
 // 主要用于汉字倾斜,系统UIFont没有直接支持汉字倾斜。可以使字体倾斜rate角度，rate在0-180之间，取15较好；fontSize是字体大小。
 + (UIFont *)angleFontWithRate:(CGFloat)rate fontSize:(NSInteger)fontSize;
-
-// 解决差8小时问题
-+ (NSDate *)chinaDateByDate:(NSDate *)date;
-//
-+ (NSDateComponents *)componentForDate:(NSDate *)date;
-// 获取日期是当年的第几天
-+ (NSInteger)daythOfYearForDate:(NSDate *)date;
-
-// 绘制虚线
-+ (UIView *)createDashedLineWithFrame:(CGRect)lineFrame
-                           lineLength:(int)length
-                          lineSpacing:(int)spacing
-                            lineColor:(UIColor *)color;
-+ (UIImage *)QRImageFromString:(NSString *)string;
-+ (UIImage *)imageFromColor:(UIColor *)color;
-+ (UIImage *)imageFromColor:(UIColor *)color size:(CGSize)size;
-+ (UIImage*)circleImage:(UIImage*)image withParam:(CGFloat)inset;
-+ (UIImage *)imageCompressForWidth:(UIImage *)sourceImage targetWidth:(CGFloat)defineWidth; // 将图片大小设置为目标大小，用于压缩图片
-+ (UIImage *)compressImage:(UIImage *)sourceImage targetWidth:(CGFloat)targetWidth;
-#pragma mark - 对图片进行滤镜处理
-+ (UIImage *)filterWithOriginalImage:(UIImage *)image filterName:(NSString *)name;
-#pragma mark -  对图片进行模糊处理
-+ (UIImage *)blurWithOriginalImage:(UIImage *)image blurName:(NSString *)name radius:(NSInteger)radius;
-// 调整图片饱和度、亮度、对比度
-+ (UIImage *)colorControlsWithOriginalImage:(UIImage *)image
-                                 saturation:(CGFloat)saturation
-                                 brightness:(CGFloat)brightness
-                                   contrast:(CGFloat)contrast;
-// 创建一张实时模糊效果 View (毛玻璃效果)
-+ (UIVisualEffectView *)effectViewWithFrame:(CGRect)frame;
-// 全屏截图
-+ (UIImage *)shotFullScreen;
-//截取view中某个区域生成一张图片
-+ (UIImage *)shotWithView:(UIView *)view scope:(CGRect)scope;
-//截取view生成一张图片
-+ (UIImage *)shotWithView:(UIView *)view;
-+ (UIImage *)captureScrollView:(UIScrollView *)scrollView;
-
-// 压缩图片
-+ (UIImage *)compressImageData:(NSData *)imageData;
-+ (UIImage *)compressImage:(UIImage *)imageData;
-+ (UIImage *)compressImage:(UIImage *)image width:(NSInteger)minWidth minHeight:(NSInteger)minHeight;
-
-+ (UIImage *)compressImage:(UIImage *)image width:(NSInteger)width;
-+ (UIImage*)imageForUIView:(UIView *)view;
 
 // 单位转换方法
 + (NSString *)KMGUnit:(NSInteger)size;
