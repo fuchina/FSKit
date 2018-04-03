@@ -193,4 +193,6 @@ extern NSInteger FSIntegerTimeIntevalSince1970(void);
 
 + (id)storyboardInstantiateViewControllerWithStoryboardID:(NSString *)storybbordID;
 
++ (void)spendTimeInDoingSomething:(void (^)(void))body time:(void (^)(double time))time;
+
 @end

@@ -2010,6 +2010,17 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
     }
 }
 
++ (void)spendTimeInDoingSomething:(void (^)(void))body time:(void (^)(double time))time{
+    NSTimeInterval t = FSTimeIntevalSince1970();
+    if (body) {
+        body();
+    }
+    t = FSTimeIntevalSince1970() - t;
+    if (time) {
+        time(t);
+    }
+}
+
 @end
 
 

@@ -81,9 +81,9 @@ return self;\
 
 // 三元布尔值，判断手机是不是iPhoneX，如果是就返回YES，不是就返回NO，为了防止重复计算，可以用FSBool_Undefined来判断有没有计算过
 typedef NS_ENUM(NSInteger, FSBool) {
-    FSBool_Undefined = -1,
-    FSBool_NO = NO,
-    FSBool_YES = YES,
+    FSBool_Undefined = 0,
+    FSBool_NO = 0,
+    FSBool_YES = 2,
 };
 
 /******************__tag__**********************/

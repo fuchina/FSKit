@@ -7,6 +7,8 @@
 
 #import "FSRuntime.h"
 #import <objc/runtime.h>
+#import "FuSoft.h"
+#import <objc/message.h>
 
 @implementation FSRuntime
 
@@ -22,6 +24,31 @@
         [array addObject:nameToString];
     }
     free(properties);
+    return array;
+}
+
++ (NSArray<NSString *> *)ivarsForClass:(Class)_class{
+    if (!_class) {
+        return nil;
+    }
+    static NSMutableArray *array = nil;
+    static FSBool hasHandled = FSBool_Undefined;
+    if (hasHandled) {
+        return array;
+    }
+    array = [[NSMutableArray alloc] init];
+    unsigned int numIvars;
+    Ivar *vars = class_copyIvarList(_class, &numIvars);
+    for(int i = 0; i < numIvars; i++) {
+        Ivar thisIvar = vars[i];
+        NSString *key = [NSString stringWithUTF8String:ivar_getName(thisIvar)];  //获取成员变量的名字
+        if (key) {
+            [array addObject:key];
+        }
+//        key = [NSString stringWithUTF8String:ivar_getTypeEncoding(thisIvar)]; //获取成员变量的数据类型
+    }
+    free(vars);
+    hasHandled = FSBool_YES;
     return array;
 }
 
@@ -43,6 +70,16 @@
     SEL setterSelector = [self setterSELWithAttibuteName:name];
     if ([object respondsToSelector:setterSelector]) {
         [object performSelector:setterSelector onThread:[NSThread currentThread] withObject:value waitUntilDone:YES];
+    }
+}
+
++ (void)setValue:(id)value forIvarName:(NSString *)name ofObject:(id)object{
+    if (!(object && [name isKindOfClass:[NSString class]] && name.length)) {
+        return;
+    }
+    SEL sel = [self setterSELWithAttibuteName:name];
+    if ([object respondsToSelector:sel]) {
+        ((void(*)(id,SEL, id))objc_msgSend)(object, sel, value);        
     }
 }
 
@@ -113,6 +150,26 @@
         }
     }
     return nil;
+}
+
++ (NSArray<NSString *> *)methodListOfClass:(Class)_class{
+    if (!_class) {
+        return nil;
+    }
+    unsigned int numIvars;
+    NSMutableArray *list = [[NSMutableArray alloc] init];
+    Method *meth = class_copyMethodList(_class, &numIvars);
+    for(int i = 0; i < numIvars; i++) {
+        Method thisIvar = meth[i];
+        SEL sel = method_getName(thisIvar);
+        const char *name = sel_getName(sel);
+        if (name) {
+            NSString *value = [[NSString alloc] initWithUTF8String:name];
+            [list addObject:value];
+        }
+    }
+    free(meth);
+    return list;
 }
 
 @end

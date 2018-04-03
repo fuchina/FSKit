@@ -46,23 +46,29 @@
 }
 
 - (void)click{
-    [self CSBlock];
+    [self metaClass];
 }
 
 - (void)CSBlock{
-    FSBool boo = FSBool_Undefined;
-    if (boo == YES) {
-        NSLog(@"YES");
-    }else if (boo == NO){
-        NSLog(@"NO");
-    }else{
-        NSLog(@"Undefined");
-    }
+    FSModel *m = [[FSModel alloc] init];
+    [FSRuntime setValue:@[] forIvarName:@"aid" ofObject:m];
+    NSLog(@"aid:%@",m.aid);
+//    NSArray *list = [FSRuntime ivarsForClass:[FSModel class]];
+//    NSLog(@"%@",list);
 }
 
 - (void)metaClass{
-    NSArray *list = [FSRuntime classMethodListOfClass:[FSModel class]];
-    NSLog(@"%@",list);
+    [FSKit spendTimeInDoingSomething:^{
+        NSInteger x = 0;
+        FSModel *m = [[FSModel alloc] init];
+        while (x < 1000000) {
+            [FSRuntime setValue:@[] forIvarName:@"aid" ofObject:m];
+//            [FSRuntime setValue:@[] forPropertyName:@"aid" ofObject:m];
+            x ++;
+        }
+    } time:^(double time) {
+        NSLog(@"time:%lf",time);
+    }];
 }
 
 - (void)sessionGet{
