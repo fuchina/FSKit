@@ -45,8 +45,78 @@
     [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-100-[btn(44)]" options:0 metrics:nil views:NSDictionaryOfVariableBindings(btn)]];
 }
 
+- (NSArray *)alphabets{
+    static NSArray *as = nil;
+    if (!as) {
+        as = @[@"a",@"d",@"g",@"j",@"m",@"p",@"t",@"w"];
+        as = @[@"a",@"d",@"g",@"j",@"m",@"p",@"t",@"w"];
+        as = @[@"a",@"d",@"g",@"j",@"m",@"p",@"t",@"w"];
+        as = @[@"a",@"d",@"g",@"j",@"m",@"p",@"t",@"w"];
+    }
+    return as;
+}
+
 - (void)click{
-    [self metaClass];
+    NSArray *source = [self alphabets];
+    NSMutableArray *indexes = [[NSMutableArray alloc] init];
+}
+
+/*
+ 1.索引数组，取几个数，就几个索引的数组；每次循环，索引数组的每个位置都存入索引；遍历索引数组，取到值。~~~~~~ 为 1 次循环。
+ 2.如何给索引数组存入值？（）
+ 3.思路是：每位都从前往后遍历，
+ */
+- (void)source:(NSArray<NSString *> *)source position:(NSInteger)position count:(NSInteger)count hasMarked:(NSMutableArray<NSNumber *> *)indexes NUM:(NSInteger)NUM{
+    for (int x = 0; x < source.count - indexes.count; x ++) {
+        
+    }
+}
+
+- (NSInteger)Fibonacci:(NSInteger)n{
+    if (n == 1 || n == 2) {
+        return 1;
+    }
+    return [self Fibonacci:n -1] + [self Fibonacci:n - 2];
+}
+
+- (void)clickA{
+    int arr[] = {1, 2, 3, 4, 5, 6};
+    int num = 4;
+    int result[num];
+    printf("分界线\n");
+    combine_decrease(arr, sizeof(arr)/sizeof(int), result, num, num);
+}
+
+/*演绎：
+ */
+
+void combine_decrease(int *arr, int start, int* result, int count, const int NUM){
+    for (int i = start; i >=count; i--){
+        result[count - 1] = i - 1;
+        if (count > 1){
+            combine_decrease(arr, i - 1, result, count - 1, NUM);
+        }else{
+            int j;
+            for (j = NUM - 1; j >=0; j--)
+                printf("%d\t",arr[result[j]]);
+            printf("\n");
+        }
+    }
+}
+
+void combine (int *arr,int start,int *result,int index,int n,int arr_len){
+    int ct = 0;
+    for(ct = start;ct < arr_len-index+1;ct++){
+        result[index-1] = ct;
+        if(index-1==0){
+            int j;
+            for(j = n-1;j>=0;j--)
+                printf("%d\t",arr[result[j]]);
+            printf("\n");
+        }
+        else
+            combine(arr,ct+1,result,index-1,n,arr_len);
+    }
 }
 
 - (void)CSBlock{
