@@ -49,16 +49,63 @@
     static NSArray *as = nil;
     if (!as) {
         as = @[@"a",@"d",@"g",@"j",@"m",@"p",@"t",@"w"];
-        as = @[@"a",@"d",@"g",@"j",@"m",@"p",@"t",@"w"];
-        as = @[@"a",@"d",@"g",@"j",@"m",@"p",@"t",@"w"];
-        as = @[@"a",@"d",@"g",@"j",@"m",@"p",@"t",@"w"];
     }
     return as;
 }
 
 - (void)click{
-    NSArray *source = [self alphabets];
-    NSMutableArray *indexes = [[NSMutableArray alloc] init];
+    NSArray *abs = [self alphabets];
+    [self permutationsForSource:abs position:0 count:6];
+}
+
+int _visited[100]={0};
+- (void)permutationsForSource:(NSArray *)source position:(NSInteger)num count:(NSInteger)k{
+    static NSMutableArray *indexes = nil;
+    if (!indexes) {
+        indexes = [[NSMutableArray alloc] init];
+    }
+    
+    if(k == num){
+        NSMutableArray *need = [[NSMutableArray alloc] initWithCapacity:k];
+        for(int i = 0;i < num; i++){
+            NSInteger indexI = [indexes[i] integerValue];
+            NSString *e = source[indexI];
+            [need addObject:e];
+        }
+        static NSString *p = @"a";
+        NSString *value = [[NSString alloc] initWithFormat:@"%@%@%@%@%@%@",need[0],p,need[1],p,need[2],p];
+        NSLog(@"%@",value);
+        return;
+    }
+    
+    for(int i = 0;i < source.count; i++){
+        if(_visited[i] == 0){
+            [indexes addObject:@(i)];
+            _visited[i] = 1;
+            num ++;
+            [self permutationsForSource:source position:num count:k];
+            [indexes removeLastObject];
+            num --;
+            _visited[i] = 0;
+        }
+    }
+}
+
+/*
+    对任何一个位置的取值进行递归，他的取值是已取值剩下的可取数
+ */
+
+- (NSInteger)indexOfPosition:(NSInteger)position hasMarked:(NSMutableArray<NSString *> *)marks source:(NSArray *)source{
+    
+    NSMutableArray *list = [[NSMutableArray alloc] initWithArray:source];
+    [list removeObjectsInArray:marks];
+    for (int x = 0; x < list.count; x ++) {   // 每个都有 souce.count - position 种选择
+        NSString *e = list[x];
+        
+        [marks addObject:e];
+    }
+    
+    return NSNotFound;
 }
 
 /*
@@ -69,6 +116,16 @@
 - (void)source:(NSArray<NSString *> *)source position:(NSInteger)position count:(NSInteger)count hasMarked:(NSMutableArray<NSNumber *> *)indexes NUM:(NSInteger)NUM{
     for (int x = 0; x < source.count - indexes.count; x ++) {
         
+    }
+    if (indexes.count == NUM) {
+        for (int x = 0; x < NUM; x ++) {
+            NSInteger i = [indexes[x] integerValue];
+            NSLog(@"%@",source[i]);
+        }
+        NSLog(@"\n\n");
+        [indexes removeAllObjects];
+    }else{
+        [self source:source position:position + 1 count:count hasMarked:indexes NUM:NUM];
     }
 }
 
