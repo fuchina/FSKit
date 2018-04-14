@@ -54,6 +54,31 @@
 }
 
 - (void)click{
+    [self stringDealloc];
+}
+
+- (void)stringDealloc{
+    NSString *staticString = @"a";
+    __unsafe_unretained NSString *other = staticString;
+    NSString *str = [@"b" mutableCopy];
+    __unsafe_unretained NSString *b = str;
+    NSArray *array = @[@1];
+    __unsafe_unretained NSArray *temp = array;
+    @try{
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            NSLog(@"HHHHHHHHHHHHH");
+            NSLog(@"%@",other); // 不崩溃 other为 NSCFConstantString，静态字符串不会释放
+            NSLog(@"%@",b);     // 崩溃，b为NSString，此时已经释放
+            NSLog(@"%@",temp);  // 崩溃
+        });
+    }@catch(NSException *e){
+        
+    }@finally{
+        
+    }
+}
+
+- (void)permutations{
     NSArray *abs = [self alphabets];
     [self permutationsForSource:abs position:0 count:6];
 }
