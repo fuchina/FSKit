@@ -54,7 +54,11 @@
 }
 
 - (void)click{
-    [self stringDealloc];
+    [self KVC];
+}
+
+- (void)KVC{
+    [self setValue:@"abc" forKey:@"fuswift"];   // 该方法不存在，崩溃
 }
 
 - (void)stringDealloc{
