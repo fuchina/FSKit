@@ -54,7 +54,59 @@
 }
 
 - (void)click{
-    [self KVC];
+    int array[] = {12,20,80,91,56,32,12,33,100,55,78,90,22};
+    quickSort(array, 0, 12);
+}
+
+void quickSort(int array[],int left,int right){     // 快速排序，效率最高的排序
+    if (left < right) {
+        int i = left;
+        int j = right;
+        int x = array[left];
+        while (i < j) {
+            while (i < j && array[j] >= x) {
+                j --;
+            }
+            array[i] = array[j];
+            
+            while (i < j && array[i] <= x) {
+                i ++;
+            }
+            array[j] = array[i];
+        }
+        array[i] = x;
+        quickSort(array, left, i --);
+        quickSort(array, i + 1, right);
+    }
+}
+
+- (void)selection:(NSArray<NSNumber *> *)array position:(NSInteger)position{  // 选择排序
+    NSInteger count = array.count;
+    static NSMutableArray *indexes = nil;
+    if (!indexes) {
+        indexes = [[NSMutableArray alloc] initWithArray:array];
+    }
+    if (count == position) {    // 结束
+        NSLog(@"%@",indexes);
+        return;
+    }
+    NSInteger index = NSNotFound;
+    NSInteger origin = [indexes[position] integerValue];
+    for (NSInteger x = position; x < count; x ++) {
+        NSInteger e = [indexes[x] integerValue];
+        if (e < origin) {
+            index = x;
+            origin = e;
+        }
+    }
+    
+    if (index != NSNotFound) {
+        NSNumber *old = indexes[position];
+        [indexes replaceObjectAtIndex:position withObject:indexes[index]];
+        [indexes replaceObjectAtIndex:index withObject:old];
+    }
+    position ++;
+    [self selection:array position:position];
 }
 
 - (void)KVC{
