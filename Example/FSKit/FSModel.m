@@ -3,7 +3,7 @@
 //  FSKit
 //
 //  Created by Guazi on 2017/8/25.
-//  Copyright © 2017年 topchuan. All rights reserved.
+//  Copyright © 2017年 fudongdong. All rights reserved.
 //
 
 #import "FSModel.h"

@@ -1,6 +1,6 @@
 PODS:
   - FBRetainCycleDetector (0.1.4)
-  - FSKit (1.2.2)
+  - FSKit (1.2.3)
   - MLeaksFinder (1.0.0):
     - FBRetainCycleDetector
 
@@ -14,7 +14,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   FBRetainCycleDetector: 46f8179bbb1c587deee3ea838a1a3ee02acf5015
-  FSKit: 382bd4e4b185747349b74935b08808f5fa54a360
+  FSKit: cf1af6f7fa1c607193909a1f3615fc2c0ee65378
   MLeaksFinder: 8c435bd2f6d070af18cff082b503b21adc130fc0
 
 PODFILE CHECKSUM: b48b8c18df34973de16038de17b5b751f2940e13

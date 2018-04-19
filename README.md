@@ -1,6 +1,6 @@
 # FSKit
 
-[![CI Status](http://img.shields.io/travis/topchuan/FSKit.svg?style=flat)](https://travis-ci.org/topchuan/FSKit)
+[![CI Status](http://img.shields.io/travis/fudongdong/FSKit.svg?style=flat)](https://travis-ci.org/fudongdong/FSKit)
 [![Version](https://img.shields.io/cocoapods/v/FSKit.svg?style=flat)](http://cocoapods.org/pods/FSKit)
 [![License](https://img.shields.io/cocoapods/l/FSKit.svg?style=flat)](http://cocoapods.org/pods/FSKit)
 [![Platform](https://img.shields.io/cocoapods/p/FSKit.svg?style=flat)](http://cocoapods.org/pods/FSKit)
