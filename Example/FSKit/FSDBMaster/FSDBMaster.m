@@ -442,4 +442,8 @@ int checkTableCallBack(void *param, int f_num, char **f_value, char **f_name){
     return list;
 }
 
++ (NSInteger)threadsafe{
+    return sqlite3_threadsafe();
+}
+
 @end

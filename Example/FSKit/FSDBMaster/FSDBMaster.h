@@ -124,6 +124,11 @@ static NSString *_db_first_name = @"sql_ling";
  */
 - (NSArray<NSString *> *)keywords;
 
+/*
+ 
+ */
++ (NSInteger)threadsafe;
+
 @end
 
 
