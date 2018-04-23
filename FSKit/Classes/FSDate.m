@@ -219,4 +219,65 @@
     return (f.year == s.year) && (f.month == s.month) && (f.day == s.day);
 }
 
++ (NSInteger)theFirstSecondOfMonth:(NSDate *)date{
+    return [self publicFunction:date str:^NSString *(NSDateComponents *c) {
+        NSString *str = [[NSString alloc] initWithFormat:@"%d-%@-01 00:00:00",(int)c.year,[self twoChar:c.month]];
+        return str;
+    }];
+}
+
++ (NSInteger)theLastSecondOfMonth:(NSDate *)date{
+    return [self publicFunction:date str:^NSString *(NSDateComponents *c) {
+        NSInteger days = [self daysForMonth:c.month year:c.year];
+        NSString *str = [[NSString alloc] initWithFormat:@"%d-%@-%d 23:59:59",(int)c.year,[self twoChar:c.month],(int)days];
+        return str;
+    }];
+}
+
++ (NSInteger)theFirstSecondOfDay:(NSDate *)date{
+    return [self publicFunction:date str:^NSString *(NSDateComponents *c) {
+        NSString *str = [[NSString alloc] initWithFormat:@"%d-%@-%@ 00:00:00",(int)c.year,[self twoChar:c.month],[self twoChar:c.day]];
+        return str;
+    }];
+}
+
++ (NSInteger)theLastSecondOfDay:(NSDate *)date{
+    return [self publicFunction:date str:^NSString *(NSDateComponents *c) {
+        NSString *str = [[NSString alloc] initWithFormat:@"%d-%@-%@ 23:59:59",(int)c.year,[self twoChar:c.month],[self twoChar:c.day]];
+        return str;
+    }];
+}
+
++ (NSInteger)theFirstSecondOfYear:(NSInteger)year{
+    NSString *str = [[NSString alloc] initWithFormat:@"%@-01-01 00:00:00",@(year)];
+    NSDate *result = [self dateByString:str formatter:nil];
+    NSTimeInterval t = (NSInteger)[result timeIntervalSince1970];
+    return t;
+}
+
++ (NSInteger)theLastSecondOfYear:(NSInteger)year{
+    NSString *str = [[NSString alloc] initWithFormat:@"%@-12-31 23:59:59",@(year)];
+    NSDate *result = [self dateByString:str formatter:nil];
+    NSTimeInterval t = (NSInteger)[result timeIntervalSince1970];
+    return t;
+}
+
++ (NSInteger)publicFunction:(NSDate *)date str:(NSString *(^)(NSDateComponents *c))callback{
+    if (![date isKindOfClass:[NSDate class]]) {
+        return 0;
+    }
+    NSDateComponents *c = [self componentForDate:date];
+    NSString *str = callback(c);
+    NSDate *result = [self dateByString:str formatter:nil];
+    NSTimeInterval t = (NSInteger)[result timeIntervalSince1970];
+    return t;
+}
+
++ (NSString *)twoChar:(NSInteger)value{
+    if (value < 10) {
+        return [[NSString alloc] initWithFormat:@"0%@",@(value)];
+    }
+    return [[NSString alloc] initWithFormat:@"%@",@(value)];
+}
+
 @end

@@ -9,6 +9,17 @@
 
 @interface FSDate : NSObject
 
+// 该月第一秒/最后一秒
++ (NSInteger)theFirstSecondOfMonth:(NSDate *)date;
++ (NSInteger)theLastSecondOfMonth:(NSDate *)date;
+// 该天第一秒/最后一秒
++ (NSInteger)theFirstSecondOfDay:(NSDate *)date;
++ (NSInteger)theLastSecondOfDay:(NSDate *)date;
+
+// 该年第一秒/最后一秒
++ (NSInteger)theFirstSecondOfYear:(NSInteger)year;
++ (NSInteger)theLastSecondOfYear:(NSInteger)year;
+
 // 解决差8小时问题
 + (NSDate *)chinaDateByDate:(NSDate *)date;
 
