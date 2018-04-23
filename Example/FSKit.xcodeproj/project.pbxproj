@@ -14,7 +14,6 @@
 		5C33620C1F7F911900FE73CD /* FSAPP.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C33620B1F7F911900FE73CD /* FSAPP.m */; };
 		5C4259A71F4FCEE300DAED6A /* FSModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C4259A61F4FCEE300DAED6A /* FSModel.m */; };
 		5C91FED62028670C00D662BC /* FSBackWork.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C91FED52028670C00D662BC /* FSBackWork.m */; };
-		5CD44A7F2088887300A66E00 /* FSDBMaster.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CD44A7D2088887300A66E00 /* FSDBMaster.m */; };
 		5CD44A822088929E00A66E00 /* FSSQLite3Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CD44A812088929E00A66E00 /* FSSQLite3Controller.m */; };
 		5CF882C62046930900896432 /* FSFastUploadController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CF882C52046930900896432 /* FSFastUploadController.m */; };
 		5CF882C92046AB3B00896432 /* UIScrollView+PullupRefresh.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CF882C82046AB3B00896432 /* UIScrollView+PullupRefresh.m */; };
@@ -66,8 +65,6 @@
 		5C4259A61F4FCEE300DAED6A /* FSModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSModel.m; sourceTree = "<group>"; };
 		5C91FED42028670C00D662BC /* FSBackWork.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FSBackWork.h; sourceTree = "<group>"; };
 		5C91FED52028670C00D662BC /* FSBackWork.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FSBackWork.m; sourceTree = "<group>"; };
-		5CD44A7D2088887300A66E00 /* FSDBMaster.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSDBMaster.m; sourceTree = "<group>"; };
-		5CD44A7E2088887300A66E00 /* FSDBMaster.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSDBMaster.h; sourceTree = "<group>"; };
 		5CD44A802088929E00A66E00 /* FSSQLite3Controller.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FSSQLite3Controller.h; sourceTree = "<group>"; };
 		5CD44A812088929E00A66E00 /* FSSQLite3Controller.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FSSQLite3Controller.m; sourceTree = "<group>"; };
 		5CF882C42046930900896432 /* FSFastUploadController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FSFastUploadController.h; sourceTree = "<group>"; };
@@ -134,15 +131,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		5CD44A7C2088887300A66E00 /* FSDBMaster */ = {
-			isa = PBXGroup;
-			children = (
-				5CD44A7D2088887300A66E00 /* FSDBMaster.m */,
-				5CD44A7E2088887300A66E00 /* FSDBMaster.h */,
-			);
-			path = FSDBMaster;
-			sourceTree = "<group>";
-		};
 		5CF882C3204692E200896432 /* Bank */ = {
 			isa = PBXGroup;
 			children = (
@@ -197,7 +185,6 @@
 				5CF882C3204692E200896432 /* Bank */,
 				6003F59C195388D20070C39A /* FSAppDelegate.h */,
 				6003F59D195388D20070C39A /* FSAppDelegate.m */,
-				5CD44A7C2088887300A66E00 /* FSDBMaster */,
 				873B8AEA1B1F5CCA007FD442 /* Main.storyboard */,
 				6003F5A5195388D20070C39A /* FSViewController.h */,
 				6003F5A6195388D20070C39A /* FSViewController.m */,
@@ -288,7 +275,6 @@
 				6003F587195388D20070C39A /* Frameworks */,
 				6003F588195388D20070C39A /* Resources */,
 				A2F98037C0F994CFA4CB1212 /* [CP] Embed Pods Frameworks */,
-				CF64C4340CA46B2A7EB4F836 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -307,8 +293,6 @@
 				6003F5AA195388D20070C39A /* Sources */,
 				6003F5AB195388D20070C39A /* Frameworks */,
 				6003F5AC195388D20070C39A /* Resources */,
-				5D3560A2DDF9529D27AE0D24 /* [CP] Embed Pods Frameworks */,
-				CE337014514AE87B4D478BDC /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -395,21 +379,6 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		5D3560A2DDF9529D27AE0D24 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-FSKit_Tests/Pods-FSKit_Tests-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		A2F98037C0F994CFA4CB1212 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -430,36 +399,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-FSKit_Example/Pods-FSKit_Example-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		CE337014514AE87B4D478BDC /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-FSKit_Tests/Pods-FSKit_Tests-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		CF64C4340CA46B2A7EB4F836 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-FSKit_Example/Pods-FSKit_Example-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		DD1B2AD2167266CDCCC29A9C /* [CP] Check Pods Manifest.lock */ = {
@@ -489,7 +428,6 @@
 			files = (
 				5C235EC5200DA506009A718E /* FSSecondController.m in Sources */,
 				6003F59E195388D20070C39A /* FSAppDelegate.m in Sources */,
-				5CD44A7F2088887300A66E00 /* FSDBMaster.m in Sources */,
 				5C269E3C201AEDB200403CA3 /* FSLeakView.m in Sources */,
 				6003F5A7195388D20070C39A /* FSViewController.m in Sources */,
 				5CF882C92046AB3B00896432 /* UIScrollView+PullupRefresh.m in Sources */,

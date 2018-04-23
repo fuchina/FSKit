@@ -8,6 +8,7 @@
 
 #import "FSDBMaster.h"
 #import <sqlite3.h>
+#import "FSRuntime.h"
 
 static NSString     *_field_name = @"field_name";
 static NSString     *_field_type = @"field_type";
@@ -68,7 +69,7 @@ static FSDBMaster *_instance = nil;
         _sqlite3 = NULL;
     }else{
         openDatabaseSuccess = YES;
-        int result = sqlite3_exec(_sqlite3, "PRAGMA synchronous=OFF;", NULL, NULL, NULL);
+        int result = sqlite3_exec(_sqlite3, "PRAGMA synchronous=FULL;", NULL, NULL, NULL);
         if (result != SQLITE_OK) {
             
         }
@@ -94,7 +95,7 @@ static FSDBMaster *_instance = nil;
         sqlite3_close(_sqlite3);
         _sqlite3 = NULL;
     }else{
-        int result = sqlite3_exec(_sqlite3, "PRAGMA synchronous=OFF;", NULL, NULL, NULL);
+        int result = sqlite3_exec(_sqlite3, "PRAGMA synchronous=FULL;", NULL, NULL, NULL);
         if (result != SQLITE_OK) {
             
         }
@@ -117,7 +118,7 @@ static FSDBMaster *_instance = nil;
 }
 
 - (void)createTableIfNotExists:(NSString *)tableName className:(Class)className{
-    if (![FSKit isValidateString:tableName]) {
+    if (!([tableName isKindOfClass:[NSString class]] && tableName.length)) {
         return;
     }
     BOOL exist = [self checkTableExist:tableName];
@@ -125,7 +126,7 @@ static FSDBMaster *_instance = nil;
         return;
     }
     NSArray *properties = [FSRuntime propertiesForClass:className];
-    if (![FSKit isValidateArray:properties]) {
+    if (!([properties isKindOfClass:[NSArray class]] && properties.count)) {
         return;
     }
     NSString *aid = @"aid";
@@ -166,7 +167,7 @@ static FSDBMaster *_instance = nil;
  @"INSERT INTO %@ (time,name,loti,lati) VALUES (\"%@\",\"%@\",\"%@\",\"%@\");";
  */
 - (NSString *)insertSQL:(NSString *)sql class:(Class)instance tableName:(NSString *)tableName{
-    if (![FSKit isValidateString:tableName]) {
+    if (!([tableName isKindOfClass:[NSString class]] && tableName.length)) {
         return @"表名为空";
     }
     [self createTableIfNotExists:tableName className:instance];
@@ -245,7 +246,7 @@ static FSDBMaster *_instance = nil;
 }
 
 - (int)countForTable:(NSString *)tableName{
-    if (![FSKit isValidateString:tableName]) {
+    if (!([tableName isKindOfClass:[NSString class]] && tableName.length)) {
         return 0;
     }
     BOOL exist = [self checkTableExist:tableName];
@@ -440,10 +441,6 @@ int checkTableCallBack(void *param, int f_num, char **f_value, char **f_name){
         list = @[@"select",@"insert",@"update",@"delete",@"from",@"creat",@"where",@"desc",@"order",@"by",@"group",@"table",@"alter",@"view",@"index",@"when"];
     }
     return list;
-}
-
-+ (NSInteger)threadsafe{
-    return sqlite3_threadsafe();
 }
 
 @end

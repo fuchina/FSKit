@@ -7,7 +7,7 @@
 //
 
 #import "FSSQLite3Controller.h"
-#import "FSDBMaster.h"
+#import <FSKit/FSDBMaster.h>
 #import <FSKit/FSKit.h>
 #import "FSModel.h"
 

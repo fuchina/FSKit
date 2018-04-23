@@ -49,8 +49,6 @@
  */
 
 #import <Foundation/Foundation.h>
-#import <FSKit/FSRuntime.h>
-#import <FSKit/FSKit.h>
 
 static NSString *_db_extension = @".db";
 static NSString *_db_first_name = @"sql_ling";
@@ -123,11 +121,6 @@ static NSString *_db_first_name = @"sql_ling";
  所有关键字，不能用作表名或字段名
  */
 - (NSArray<NSString *> *)keywords;
-
-/*
- 
- */
-+ (NSInteger)threadsafe;
 
 @end
 

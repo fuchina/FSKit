@@ -13,6 +13,7 @@
 #import "FSCalculator.h"
 #import "FSConstant.h"
 #import "FSDate.h"
+#import "FSDBMaster.h"
 #import "FSEntity.h"
 #import "FSFile.h"
 #import "FSKit.h"
