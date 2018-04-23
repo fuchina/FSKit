@@ -38,7 +38,7 @@ static NSString *_table = @"apple";
 - (void)click{
     FSDBMaster *master = [FSDBMaster sharedInstance];
     NSLog(@"%@",master.dbPath);
-    [self queryData];
+    [self addData];
 }
 
 - (void)addData{

@@ -68,7 +68,7 @@ static FSDBMaster *_instance = nil;
         _sqlite3 = NULL;
     }else{
         openDatabaseSuccess = YES;
-        int result = sqlite3_exec(_sqlite3, "PRAGMA synchronous=FULL;", NULL, NULL, NULL);
+        int result = sqlite3_exec(_sqlite3, "PRAGMA synchronous=OFF;", NULL, NULL, NULL);
         if (result != SQLITE_OK) {
             
         }
@@ -94,7 +94,7 @@ static FSDBMaster *_instance = nil;
         sqlite3_close(_sqlite3);
         _sqlite3 = NULL;
     }else{
-        int result = sqlite3_exec(_sqlite3, "PRAGMA synchronous=FULL;", NULL, NULL, NULL);
+        int result = sqlite3_exec(_sqlite3, "PRAGMA synchronous=OFF;", NULL, NULL, NULL);
         if (result != SQLITE_OK) {
             
         }
