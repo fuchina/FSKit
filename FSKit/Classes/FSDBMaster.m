@@ -193,7 +193,7 @@ static FSDBMaster *_instance = nil;
     __block NSString *errMSG = nil;
     dispatch_sync(_queue, ^{
         char *error = NULL;
-        int result = sqlite3_exec(_sqlite3, [SQL UTF8String], NULL, NULL, &error);
+        int result = sqlite3_exec(self->_sqlite3, [SQL UTF8String], NULL, NULL, &error);
         if (result != SQLITE_OK) {
             errMSG = [[NSString alloc] initWithFormat:@"%@失败，原因:%s",type,error];
         }
@@ -225,14 +225,14 @@ static FSDBMaster *_instance = nil;
     __block NSMutableArray *mArr = nil;
     dispatch_sync(_queue, ^{
         sqlite3_stmt *stmt = nil;
-        int prepare = sqlite3_prepare_v2(_sqlite3, [sql UTF8String], -1, &stmt, NULL);
+        int prepare = sqlite3_prepare_v2(self->_sqlite3, [sql UTF8String], -1, &stmt, NULL);
         if (prepare != SQLITE_OK) {
             sqlite3_finalize(stmt);
             return;
         }
         mArr = [[NSMutableArray alloc] init];
         while (sqlite3_step(stmt) == SQLITE_ROW) {
-            id entity = [self data:stmt tableName:tableName];
+            id entity = [self dictionaryFromStmt:stmt];
             if (entity) {
                 [mArr addObject:entity];
             }
@@ -257,7 +257,7 @@ static FSDBMaster *_instance = nil;
     dispatch_sync(_queue, ^{
         NSString *sql = [[NSString alloc] initWithFormat:@"SELECT COUNT(*) FROM %@;",tableName];
         sqlite3_stmt *stmt = nil;
-        int prepare = sqlite3_prepare_v2(_sqlite3, [sql UTF8String], -1, &stmt, NULL);
+        int prepare = sqlite3_prepare_v2(self->_sqlite3, [sql UTF8String], -1, &stmt, NULL);
         if (prepare != SQLITE_OK) {
             return;
         }
@@ -283,7 +283,7 @@ static FSDBMaster *_instance = nil;
     __block int count = 0;
     dispatch_sync(_queue, ^{
         sqlite3_stmt *stmt = nil;
-        int prepare = sqlite3_prepare_v2(_sqlite3, [sql UTF8String], -1, &stmt, NULL);
+        int prepare = sqlite3_prepare_v2(self->_sqlite3, [sql UTF8String], -1, &stmt, NULL);
         if (prepare != SQLITE_OK) {
             return;
         }
@@ -304,7 +304,7 @@ static FSDBMaster *_instance = nil;
         sqlite3_stmt *statement;
         NSString *sql = [NSString stringWithFormat:@"SELECT COUNT(*) FROM sqlite_master where type='table' and name='%@';",tableName];
         const char *sql_stmt = [sql UTF8String];
-        if (sqlite3_prepare_v2(_sqlite3, sql_stmt, -1, &statement, nil) == SQLITE_OK) {
+        if (sqlite3_prepare_v2(self->_sqlite3, sql_stmt, -1, &statement, nil) == SQLITE_OK) {
             @try {
                 while (sqlite3_step(statement) == SQLITE_ROW) {
                     success += sqlite3_column_int(statement, 0);
@@ -328,7 +328,7 @@ static FSDBMaster *_instance = nil;
         char *err;
         NSString *sql = [NSString stringWithFormat:@"SELECT COUNT(*) FROM sqlite_master where type='table' and name='%@';",tableName];
         const char *sql_stmt = [sql UTF8String];
-        int result = sqlite3_exec(_sqlite3, sql_stmt, checkTableCallBack, (void *)[tableName UTF8String], &err);
+        int result = sqlite3_exec(self->_sqlite3, sql_stmt, checkTableCallBack, (void *)[tableName UTF8String], &err);
         if(result != SQLITE_OK){
             return;
         }
@@ -366,7 +366,7 @@ int checkTableCallBack(void *param, int f_num, char **f_value, char **f_name){
 }
 
 // 要返回一条数据中的所有字段及其值
-- (NSDictionary *)data:(sqlite3_stmt *)stmt tableName:(NSString *)tableName{
+- (NSDictionary *)dictionaryFromStmt:(sqlite3_stmt *)stmt{
     NSMutableDictionary *last = [[NSMutableDictionary alloc] init];
     int count = sqlite3_column_count(stmt);
     for (int x = 0; x < count; x ++) {
@@ -416,23 +416,34 @@ int checkTableCallBack(void *param, int f_num, char **f_value, char **f_name){
 }
 
 - (NSArray<NSString *> *)allTables{
-    NSMutableArray *array = [[NSMutableArray alloc] init];
-    sqlite3_stmt *statement;
-    const char *getTableInfo = "select * from sqlite_master where type='table' order by name";
-    if (sqlite3_prepare_v2(_sqlite3, getTableInfo, -1, &statement, nil) == SQLITE_OK) {
-        @try {
-            while (sqlite3_step(statement) == SQLITE_ROW) {
-                char *nameData = (char *)sqlite3_column_text(statement, 1);
-                NSString *tableName = [[NSString alloc] initWithUTF8String:nameData];
-                [array addObject:tableName];
-            }
-        } @catch (NSException *exception) {
-            return nil;
-        } @finally {
-            sqlite3_finalize(statement);
-            return array.count?array:nil;
+    NSArray *array = [self allTablesDetail];
+    NSMutableArray *names = nil;
+    if ([array isKindOfClass:[NSArray class]] && array.count) {
+        names = [[NSMutableArray alloc] initWithCapacity:array.count];
+        static NSString *_name = @"name";
+        static NSString *_nlString = @"";
+        for (NSDictionary *m in array) {
+            NSString *n = [m objectForKey:_name];
+            [names addObject:n?:_nlString];
         }
     }
+    return [names copy];
+}
+
+- (NSArray<NSDictionary *> *)allTablesDetail{
+    NSMutableArray *array = [[NSMutableArray alloc] init];
+    sqlite3_stmt *statement;
+    static const char *getTableInfo = "select * from sqlite_master where type = 'table' order by name";
+    if (sqlite3_prepare_v2(_sqlite3, getTableInfo, -1, &statement, nil) == SQLITE_OK) {
+        while (sqlite3_step(statement) == SQLITE_ROW) {
+            id entity = [self dictionaryFromStmt:statement];
+            if (entity) {
+                [array addObject:entity];
+            }
+        }
+    }
+    sqlite3_finalize(statement);
+    return array.count?array:nil;
 }
 
 - (NSArray<NSString *> *)keywords{
@@ -441,6 +452,10 @@ int checkTableCallBack(void *param, int f_num, char **f_value, char **f_name){
         list = @[@"select",@"insert",@"update",@"delete",@"from",@"creat",@"where",@"desc",@"order",@"by",@"group",@"table",@"alter",@"view",@"index",@"when"];
     }
     return list;
+}
+
++ (int)sqlite3_threadsafe{
+    return sqlite3_threadsafe();
 }
 
 @end

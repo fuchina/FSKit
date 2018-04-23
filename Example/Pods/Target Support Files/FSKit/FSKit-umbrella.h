@@ -10,6 +10,7 @@
 #endif
 #endif
 
+#import "FSAVKit.h"
 #import "FSCalculator.h"
 #import "FSConstant.h"
 #import "FSDate.h"

@@ -22,7 +22,6 @@ extern NSInteger FSIntegerTimeIntevalSince1970(void);
 + (void)pushToViewControllerWithClass:(NSString *)className navigationController:(UINavigationController *)navigationController param:(NSDictionary *)param configBlock:(void (^)(id vc))configBlockParam;
 + (void)presentToViewControllerWithClass:(NSString *)className controller:(UIViewController *)viewController param:(NSDictionary *)param configBlock:(void (^)(UIViewController *vc))configBlockParam presentCompletion:(void(^)(void))completion;
 + (void)copyToPasteboard:(NSString *)copyString;
-+ (void)playSongs:(NSString *)songs type:(NSString *)fileType;
 
 + (void)clearUserDefaults;
 + (void)letScreenLock:(BOOL)lock;                           // YES:让屏幕锁屏    NO：让屏幕不锁屏   【未测】
@@ -32,8 +31,6 @@ extern NSInteger FSIntegerTimeIntevalSince1970(void);
 + (BOOL)isValidateEmail:(NSString *)str;
 + (BOOL)isPureInt:(NSString *)string;
 + (BOOL)isPureFloat:(NSString*)string;
-+ (BOOL)isLeapYear:(int)year;
-+ (BOOL)isValidPassword:(NSString*)password;
 + (BOOL)keyedArchiverWithArray:(NSArray *)array toFilePath:(NSString *)fileName;
 + (BOOL)keyedArchiverWithData:(NSData *)data toFilePath:(NSString *)fileName;
 + (BOOL)keyedArchiverWithNumber:(NSNumber *)number toFilePath:(NSString *)fileName;
@@ -63,8 +60,6 @@ extern NSInteger FSIntegerTimeIntevalSince1970(void);
 + (BOOL)isChineseEnvironment;
 
 + (NSInteger)weekdayStringFromDate:(NSDate *)inputDate;
-// 根据年月计算当月有多少天
-+ (NSInteger)daysForMonth:(NSInteger)month year:(NSInteger)year;
 
 + (double)forwardValue:(double)number afterPoint:(int)position;  // 只入不舍
 + (double)usedMemory;                                                               // 获得应用占用的内存，单位为M
@@ -155,9 +150,6 @@ extern NSInteger FSIntegerTimeIntevalSince1970(void);
 + (void)call:(NSString *)phone;
 + (void)callPhoneWithNoNotice:(NSString *)phone;
 + (void)openAppByURLString:(NSString *)str;
-
-// 操作闪光灯
-+ (void)flashLampShow:(BOOL)show;
 
 + (NSArray *)arrayFromArray:(NSArray *)array withString:(NSString *)string;
 + (NSArray *)arrayByOneCharFromString:(NSString *)string;

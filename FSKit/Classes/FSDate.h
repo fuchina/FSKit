@@ -18,6 +18,9 @@
 // 是否为闰年
 + (BOOL)isLeapYear:(int)year;
 
+// 根据年月计算当月有多少天
++ (NSInteger)daysForMonth:(NSInteger)month year:(NSInteger)year;
+
 + (NSDateComponents *)componentForDate:(NSDate *)date;
 
 + (NSDate *)dateByString:(NSString *)str formatter:(NSString *)formatter;

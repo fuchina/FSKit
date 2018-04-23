@@ -14,6 +14,7 @@
  select * from ab_ling where (atype = 'fzp' and cast(arest as REAL) > 0 or (btype = 'fzp' and cast(brest as REAL) > 0));
  直接在电脑上SQLPRO FOR SQLITE修改数据
  
+ SELECT name FROM (SELECT * FROM sqlite_master UNION ALL SELECT * FROM sqlite_temp_master) WHERE type=’table’ ORDER BY name;
  
  1.将数据库导出到其他应用，无法插入数据和修改数据，这是因为权限问题，可以cd到数据库文件目录下执行:
     chmod 777 sql_ling.db
@@ -114,6 +115,7 @@ static NSString *_db_first_name = @"sql_ling";
 
 // 获取数据库中所有表名
 - (NSArray<NSString *> *)allTables;
+- (NSArray<NSDictionary *> *)allTablesDetail;
 // 获取表中的所有字段
 - (NSArray<NSDictionary *> *)allFields:(NSString *)table;
 
@@ -121,6 +123,9 @@ static NSString *_db_first_name = @"sql_ling";
  所有关键字，不能用作表名或字段名
  */
 - (NSArray<NSString *> *)keywords;
+
+//线程安全  iOS是2，2：支持多线程但不支持一个数据库在多线程内，即只支持一个数据库对应一个线程的多线程
++ (int)sqlite3_threadsafe;
 
 @end
 

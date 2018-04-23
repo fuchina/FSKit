@@ -17,9 +17,7 @@
 #import <CommonCrypto/CommonDigest.h>
 #import <CoreTelephony/CTCarrier.h>
 #import <CoreTelephony/CTTelephonyNetworkInfo.h>
-#import <AVFoundation/AVFoundation.h>
 #import <sys/mount.h>
-#import "FSWindow.h"
 #import "FSRuntime.h"
 
 @implementation FSKit
@@ -77,13 +75,6 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
     }
     UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
     [pasteboard setString:copyString];
-}
-
-+ (void)playSongs:(NSString *)songs type:(NSString *)fileType{
-    SystemSoundID soundID;
-    AudioServicesCreateSystemSoundID((__bridge CFURLRef)[NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:songs ofType:fileType]], &soundID);
-    AudioServicesPlaySystemSound(soundID);
-    AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);// 播放震动
 }
 
 + (void)userDefaultsKeepData:(id)instance  withKey:(NSString *)key{
@@ -545,15 +536,6 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
     return font;
 }
 
-
-
-
-
-
-
-
-
-
 + (NSURL *)convertTxtEncoding:(NSURL *)fileUrl{
     NSString *filePath = [fileUrl path];
     NSFileManager* manager = [NSFileManager defaultManager];
@@ -642,40 +624,6 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
     NSCalendarUnit calendarUnit = NSCalendarUnitWeekday;
     NSDateComponents *theComponents = [calendar components:calendarUnit fromDate:inputDate];
     return [[weekdays objectAtIndex:theComponents.weekday] integerValue];
-}
-
-+ (NSInteger)daysForMonth:(NSInteger)month year:(NSInteger)year{
-    NSInteger days = 0;
-    BOOL isLeapYear = [FSKit isLeapYear:(int)year];
-    BOOL isBigMonth = NO;
-    if (month <=7) {
-        if (month % 2 == 1) {
-            isBigMonth = YES;
-        }
-    }else{
-        if (month % 2 == 0) {
-            isBigMonth = YES;
-        }
-    }
-    
-    if (isLeapYear) {
-        if (month == 2) {
-            days = 29;
-        }else if (isBigMonth){
-            days = 31;
-        }else{
-            days = 30;
-        }
-    }else{
-        if (month == 2) {
-            days = 28;
-        }else if (isBigMonth){
-            days = 31;
-        }else{
-            days = 30;
-        }
-    }
-    return days;
 }
 
 + (NSString *)iPAddress{
@@ -1750,9 +1698,6 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
     return hexData;
 }
 
-
-
-
 + (NSAttributedString *)attributedStringFor:(NSString *)sourceString colorRange:(NSArray *)colorRanges color:(UIColor *)color textRange:(NSArray *)textRanges font:(UIFont *)font{
     NSMutableAttributedString *attributedStr = [[NSMutableAttributedString alloc] initWithString:sourceString];
     for (int x = 0; x < colorRanges.count; x ++) {
@@ -1837,29 +1782,6 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
     return [value componentsJoinedByString:@" "];
 }
 
-+ (BOOL)isValidPassword:(NSString*)password{
-    BOOL valid = YES;
-    if([password length] < 6 || [password length] > 30){
-        return NO;
-    }
-    
-    for(int i=0; i<[password length]; i++){
-        unichar curChar = [password characterAtIndex:i];
-        if(curChar >= '0' && curChar <= '9'){
-            continue;
-        }
-        if(curChar >='a' && curChar <= 'z'){
-            continue;
-        }
-        if(curChar >= 'A' && curChar <= 'Z'){
-            continue;
-        }
-        valid = NO;
-        break;
-    }
-    return valid;
-}
-
 + (void)call:(NSString *)phone{
     if (phone != nil) {
         NSString *telUrl = [NSString stringWithFormat:@"telprompt:%@",phone];
@@ -1875,12 +1797,6 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
     NSString *str=[[NSString alloc] initWithFormat:@"tel:%@",phone];
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:str]];
 }
-
-//+ (void)gotoDownloadApp:(NSString *)appid
-//{
-//    NSString *str = [NSString stringWithFormat:@"https://itunes.apple.com/us/app/id%@",appid];
-//    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:str]];
-//}
 
 + (NSString *)deviceModel{
     struct utsname systemInfo;
@@ -1992,21 +1908,6 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
     NSURL *myURL_APP_A = [NSURL URLWithString:string];
     if ([[UIApplication sharedApplication] canOpenURL:myURL_APP_A]) {
         [[UIApplication sharedApplication] openURL:myURL_APP_A];
-    }
-}
-
-+ (void)flashLampShow:(BOOL)show{
-    AVCaptureDevice *device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
-    if ([device hasTorch]) {//判断是否有闪光灯
-        if (show) {
-            [device lockForConfiguration:nil];
-            [device setTorchMode:AVCaptureTorchModeOn];
-            [device unlockForConfiguration];
-        }else{
-            [device lockForConfiguration:nil];
-            [device setTorchMode: AVCaptureTorchModeOff];
-            [device unlockForConfiguration];
-        }
     }
 }
 
