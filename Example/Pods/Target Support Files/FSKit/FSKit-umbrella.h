@@ -10,6 +10,7 @@
 #endif
 #endif
 
+#import "FSAlgorithm.h"
 #import "FSAVKit.h"
 #import "FSCalculator.h"
 #import "FSConstant.h"
