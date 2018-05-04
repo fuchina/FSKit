@@ -137,9 +137,6 @@ static FSDBMaster *_instance = nil;
         NSString *name = properties[x];
         BOOL isKeyword = [keywords containsObject:name];
         if (isKeyword) {
-            NSString *desc = [[NSString alloc] initWithFormat:@"字段%@是关键字",name];
-            NSAssert(isKeyword, desc);
-            NSLog(@"%@",desc);
             continue;
 //            name = [[NSString alloc] initWithFormat:@"[%@]",name];
         }
