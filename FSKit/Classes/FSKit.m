@@ -1922,6 +1922,22 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
     }
 }
 
++ (void)FS_Main_Queue_Async:(void (^)(void))block {
+    if ([NSThread isMainThread]) {
+        block();
+    } else {
+        dispatch_async(dispatch_get_main_queue(), block);
+    }
+}
+
++ (void)FS_Main_Queue_Sync:(void (^)(void))block{
+    if ([NSThread isMainThread]) {
+        block();
+    } else {
+        dispatch_sync(dispatch_get_main_queue(), block);
+    }
+}
+
 @end
 
 

@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "FuSoft.h"
 
 @interface FSKit : NSObject
 
@@ -186,5 +187,8 @@ extern NSInteger FSIntegerTimeIntevalSince1970(void);
 + (id)storyboardInstantiateViewControllerWithStoryboardID:(NSString *)storybbordID;
 
 + (void)spendTimeInDoingSomething:(void (^)(void))body time:(void (^)(double time))time;
+
++ (void)FS_Main_Queue_Async:(void (^)(void))block;
++ (void)FS_Main_Queue_Sync:(void (^)(void))block;
 
 @end
