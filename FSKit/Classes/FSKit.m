@@ -1236,7 +1236,7 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
 }
 
 + (NSString *)md5:(NSString *)str{
-    if (str.length == 0) {
+    if (![str isKindOfClass:[NSString class]]) {
         return nil;
     }
     const char *cStr = [str UTF8String];
