@@ -1922,21 +1922,42 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
     }
 }
 
-+ (void)FS_Main_Queue_Async:(void (^)(void))block {
-    if ([NSThread isMainThread]) {
-        block();
-    } else {
-        dispatch_async(dispatch_get_main_queue(), block);
+void fs_dispatch_global_main_queue_async(dispatch_block_t _global_block,dispatch_block_t _main_block){
+    if (_global_block) {
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            _global_block();
+
+            if (_main_block) {
+                dispatch_async(dispatch_get_main_queue(), _main_block);
+            }
+        });
     }
 }
 
-+ (void)FS_Main_Queue_Sync:(void (^)(void))block{
+void fs_dispatch_main_queue_async(dispatch_block_t _main_block){
     if ([NSThread isMainThread]) {
-        block();
+        _main_block();
     } else {
-        dispatch_sync(dispatch_get_main_queue(), block);
+        dispatch_async(dispatch_get_main_queue(), _main_block);
     }
 }
+
+void fs_dispatch_main_queue_sync(dispatch_block_t _main_block){
+    if ([NSThread isMainThread]) {
+        _main_block();
+    } else {
+        dispatch_sync(dispatch_get_main_queue(), _main_block);
+    }
+}
+
+void fs_dispatch_global_queue_async(dispatch_block_t _global_block){
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), _global_block);
+}
+
+void fs_dispatch_global_queue_sync(dispatch_block_t _global_block){
+    dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), _global_block);
+}
+
 
 @end
 

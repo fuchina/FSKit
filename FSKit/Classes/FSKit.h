@@ -11,7 +11,7 @@
 
 @interface FSKit : NSObject
 
-extern  NSTimeInterval FSTimeIntevalSince1970(void);
+extern NSTimeInterval FSTimeIntevalSince1970(void);
 extern NSInteger FSIntegerTimeIntevalSince1970(void);
 
 + (void)userDefaultsKeepData:(id)instance  withKey:(NSString *)key;
@@ -188,7 +188,11 @@ extern NSInteger FSIntegerTimeIntevalSince1970(void);
 
 + (void)spendTimeInDoingSomething:(void (^)(void))body time:(void (^)(double time))time;
 
-+ (void)FS_Main_Queue_Async:(void (^)(void))block;
-+ (void)FS_Main_Queue_Sync:(void (^)(void))block;
+// GCD方法
+extern void fs_dispatch_global_main_queue_async(dispatch_block_t _global_block,dispatch_block_t _main_block);
+extern void fs_dispatch_main_queue_async(dispatch_block_t _main_block);
+extern void fs_dispatch_main_queue_sync(dispatch_block_t _main_block);
+extern void fs_dispatch_global_queue_async(dispatch_block_t _global_block);
+extern void fs_dispatch_global_queue_sync(dispatch_block_t _global_block);
 
 @end
