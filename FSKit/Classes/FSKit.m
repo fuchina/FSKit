@@ -496,7 +496,7 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
     return [infoDictionary objectForKey:@"CFBundleDisplayName"];
 }
 
-+ (UIColor *)randomColor{
+UIColor *_fs_randomColor(void){
     CGFloat r = arc4random_uniform(256) / 255.0;
     CGFloat g = arc4random_uniform(256) / 255.0;
     CGFloat b = arc4random_uniform(256) / 255.0;

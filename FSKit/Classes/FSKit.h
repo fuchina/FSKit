@@ -170,7 +170,9 @@ extern NSInteger FSIntegerTimeIntevalSince1970(void);
 
 + (NSNumber *)keyedUnarchiverWithNumber:(NSString *)fileName;
 + (NSNumber *)fileSize:(NSString *)filePath;
-+ (UIColor *)randomColor;
+
+extern UIColor *_fs_randomColor(void);
+
 + (UIColor *)colorWithHexString:(NSString *)color;               // 根据16进制字符串获得颜色类对象
 
 // 主要用于汉字倾斜,系统UIFont没有直接支持汉字倾斜。可以使字体倾斜rate角度，rate在0-180之间，取15较好；fontSize是字体大小。
