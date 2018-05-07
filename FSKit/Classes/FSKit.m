@@ -1922,7 +1922,7 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
     }
 }
 
-void fs_dispatch_global_main_queue_async(dispatch_block_t _global_block,dispatch_block_t _main_block){
+void _fs_dispatch_global_main_queue_async(dispatch_block_t _global_block,dispatch_block_t _main_block){
     if (_global_block) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             _global_block();
@@ -1934,7 +1934,7 @@ void fs_dispatch_global_main_queue_async(dispatch_block_t _global_block,dispatch
     }
 }
 
-void fs_dispatch_main_queue_async(dispatch_block_t _main_block){
+void _fs_dispatch_main_queue_async(dispatch_block_t _main_block){
     if ([NSThread isMainThread]) {
         _main_block();
     } else {
@@ -1942,7 +1942,7 @@ void fs_dispatch_main_queue_async(dispatch_block_t _main_block){
     }
 }
 
-void fs_dispatch_main_queue_sync(dispatch_block_t _main_block){
+void _fs_dispatch_main_queue_sync(dispatch_block_t _main_block){
     if ([NSThread isMainThread]) {
         _main_block();
     } else {
@@ -1950,11 +1950,11 @@ void fs_dispatch_main_queue_sync(dispatch_block_t _main_block){
     }
 }
 
-void fs_dispatch_global_queue_async(dispatch_block_t _global_block){
+void _fs_dispatch_global_queue_async(dispatch_block_t _global_block){
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), _global_block);
 }
 
-void fs_dispatch_global_queue_sync(dispatch_block_t _global_block){
+void _fs_dispatch_global_queue_sync(dispatch_block_t _global_block){
     dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), _global_block);
 }
 

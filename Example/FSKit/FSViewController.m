@@ -32,9 +32,8 @@
 }
 
 - (void)click{
-//    FSSecondController *vc = [[FSSecondController alloc] init];
-//    [self.navigationController pushViewController:vc animated:YES];
-    [FSKit pushToViewControllerWithClass:@"FSSQLite3Controller" navigationController:self.navigationController param:nil configBlock:nil];
+    FSSecondController *vc = [[FSSecondController alloc] init];
+    [self.navigationController pushViewController:vc animated:YES];
 }
 
 - (void)didReceiveMemoryWarning

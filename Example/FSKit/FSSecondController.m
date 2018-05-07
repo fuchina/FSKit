@@ -15,6 +15,7 @@
 #import <objc/runtime.h>
 #import <FSKit/FSRuntime.h>
 #import <FSKit/FuSoft.h>
+#import <FSKit/FSHook.h>
 
 @interface FSSecondController ()
 
@@ -25,12 +26,29 @@
 
 @implementation FSSecondController
 
++(void)load{
+    [super load];
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        _fs_hook_swizzle_class([self class],@selector(viewDidLoad),@selector(_fs_viewDidLoad));
+    });
+}
+
 - (void)dealloc{
     NSLog(@"%s",__FUNCTION__);
 }
 
+- (void)_fs_viewDidLoad{
+    FSLog();
+    
+    [self _fs_viewDidLoad];
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
+    FSLog();
+    
+    
     self.view.backgroundColor = [UIColor whiteColor];
     
     self.view.backgroundColor = [UIColor whiteColor];
@@ -54,6 +72,10 @@
 }
 
 - (void)click{
+
+}
+
+- (void)quickSortMethod{
     int array[] = {12,20,80,91,56,32,12,33,100,55,78,90,22};
     quickSort(array, 0, 12);
 }

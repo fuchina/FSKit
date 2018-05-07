@@ -18,6 +18,7 @@
 #import "FSDBMaster.h"
 #import "FSEntity.h"
 #import "FSFile.h"
+#import "FSHook.h"
 #import "FSKit.h"
 #import "FSLocalNotification.h"
 #import "FSPdf.h"

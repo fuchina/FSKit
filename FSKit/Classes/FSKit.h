@@ -189,10 +189,10 @@ extern NSInteger FSIntegerTimeIntevalSince1970(void);
 + (void)spendTimeInDoingSomething:(void (^)(void))body time:(void (^)(double time))time;
 
 // GCD方法
-extern void fs_dispatch_global_main_queue_async(dispatch_block_t _global_block,dispatch_block_t _main_block);
-extern void fs_dispatch_main_queue_async(dispatch_block_t _main_block);
-extern void fs_dispatch_main_queue_sync(dispatch_block_t _main_block);
-extern void fs_dispatch_global_queue_async(dispatch_block_t _global_block);
-extern void fs_dispatch_global_queue_sync(dispatch_block_t _global_block);
+extern void _fs_dispatch_global_main_queue_async(dispatch_block_t _global_block,dispatch_block_t _main_block);
+extern void _fs_dispatch_main_queue_async(dispatch_block_t _main_block);
+extern void _fs_dispatch_main_queue_sync(dispatch_block_t _main_block);
+extern void _fs_dispatch_global_queue_async(dispatch_block_t _global_block);
+extern void _fs_dispatch_global_queue_sync(dispatch_block_t _global_block);
 
 @end
