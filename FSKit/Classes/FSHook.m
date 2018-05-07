@@ -30,4 +30,28 @@ void _fs_hook_swizzle_class(Class class, SEL originalSelector, SEL swizzledSelec
     }
 }
 
+BOOL _fs_hook_JRSwizzle_class(Class cls,SEL origSel_,SEL altSel_){
+    Method origMethod = class_getInstanceMethod(cls, origSel_);
+    if (!origMethod) {
+        return NO;
+    }
+    
+    Method altMethod = class_getInstanceMethod(cls, altSel_);
+    if (!altMethod) {
+        return NO;
+    }
+    
+    class_addMethod(cls,
+                    origSel_,
+                    class_getMethodImplementation(cls, origSel_),
+                    method_getTypeEncoding(origMethod));
+    class_addMethod(cls,
+                    altSel_,
+                    class_getMethodImplementation(cls, altSel_),
+                    method_getTypeEncoding(altMethod));
+    
+    method_exchangeImplementations(class_getInstanceMethod(cls, origSel_), class_getInstanceMethod(cls, altSel_));
+    return YES;
+}
+
 @end

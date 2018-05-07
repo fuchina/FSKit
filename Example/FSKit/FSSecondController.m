@@ -48,7 +48,6 @@
     [super viewDidLoad];
     FSLog();
     
-    
     self.view.backgroundColor = [UIColor whiteColor];
     
     self.view.backgroundColor = [UIColor whiteColor];
