@@ -22,11 +22,11 @@
 
 @implementation FSKit
 
-NSTimeInterval FSTimeIntevalSince1970(void){
+NSTimeInterval _fs_timeIntevalSince1970(void){
     return [[NSDate date] timeIntervalSince1970];
 }
 
-NSInteger FSIntegerTimeIntevalSince1970(void){
+NSInteger _fs_integerTimeIntevalSince1970(void){
     return (NSInteger)[[NSDate date] timeIntervalSince1970];
 }
 
@@ -87,7 +87,7 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
     return [[NSUserDefaults standardUserDefaults] objectForKey:key];
 }
 
-+ (void)clearUserDefaults{
+void _fs_clearUserDefaults(void){
     NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
     NSDictionary *dict = [defs dictionaryRepresentation];
     for(id key in dict) {
@@ -390,8 +390,8 @@ NSInteger FSIntegerTimeIntevalSince1970(void){
     NSDictionary *dic10 = @{name:@"iP地址",value:[self iPAddress]};
     //    NSDictionary *dic12 = @{name:@"内存",value:[self kMGTUnit:[NSProcessInfo processInfo].physicalMemory]};
     //    NSDictionary *dic13 = @{name:@"可用内存",value:[self kMGTUnit:[self getAvailableMemorySize]]};
-    NSDictionary *dic14 = @{name:@"磁盘总量",value:[self KMGUnit:[self getTotalDiskSize]]};
-    NSDictionary *dic15 = @{name:@"磁盘可用空间",value:[self KMGUnit:[self getAvailableDiskSize]]};
+    NSDictionary *dic14 = @{name:@"磁盘总量",value:_fs_KMGUnit([self getTotalDiskSize])};
+    NSDictionary *dic15 = @{name:@"磁盘可用空间",value:_fs_KMGUnit([self getAvailableDiskSize])};
     
     [array addObject:dic0];
     //    [array addObject:dic1];
@@ -606,7 +606,7 @@ UIColor *_fs_randomColor(void){
     return image.size.height >= image.size.width;
 }
 
-+ (NSString *)KMGUnit:(NSInteger)size{
+NSString* _fs_KMGUnit(NSInteger size){
     if (size >= (1024 * 1024 * 1024)) {
         return [[NSString alloc] initWithFormat:@"%.2f G",size / (1024 * 1024 * 1024.0f)];
     }else if (size >= (1024 * 1024)){
@@ -698,24 +698,6 @@ UIColor *_fs_randomColor(void){
         strLst = (NSMutableString *)[array componentsJoinedByString:@""];
     }
     return strLst;
-}
-
-+ (BOOL)isPureInt:(NSString *)string{
-    if (string.length == 0) {
-        return NO;
-    }
-    NSScanner* scan = [NSScanner scannerWithString:string];
-    int val;
-    return [scan scanInt:&val] && [scan isAtEnd];
-}
-
-+ (BOOL)isPureFloat:(NSString*)string{
-    if ((string.length == 0)) {
-        return NO;
-    }
-    NSScanner *scan = [NSScanner scannerWithString:string];
-    float val;
-    return [scan scanFloat:&val] && [scan isAtEnd];
 }
 
 + (NSArray *)arrayByOneCharFromString:(NSString *)string{
@@ -1159,7 +1141,7 @@ UIColor *_fs_randomColor(void){
         BOOL containsChar = NO;
         for (int x = 0; x < sourceString.length; x ++) {
             NSString *componentString = [sourceString substringWithRange:NSMakeRange(x, 1)];
-            if ([self isPureInt:componentString]) {
+            if (_fs_isPureInt(componentString)) {
                 containsNumber = YES;
             }else{
                 containsChar = YES;
@@ -1203,15 +1185,43 @@ UIColor *_fs_randomColor(void){
     return [string isKindOfClass:[NSString class]] && string.length;
 }
 
-+ (BOOL)isValidateArray:(NSArray *)array{
+BOOL _fs_isPureInt(NSString *string){
+    if (![string isKindOfClass:[NSString class]]) {
+        string = [string description];
+    }
+    if (string.length == 0) {
+        return NO;
+    }
+    NSScanner *scan = [NSScanner scannerWithString:string];
+    int val;
+    return [scan scanInt:&val] && [scan isAtEnd];
+}
+
+BOOL _fs_isPureFloat(NSString *string){
+    if (![string isKindOfClass:[NSString class]]) {
+        string = [string description];
+    }
+    if (string.length == 0) {
+        return NO;
+    }
+    NSScanner *scan = [NSScanner scannerWithString:string];
+    float val;
+    return [scan scanFloat:&val] && [scan isAtEnd];
+}
+
+BOOL _fs_isValidateString(NSString *string){
+    return [string isKindOfClass:[NSString class]] && string.length;
+}
+
+BOOL _fs_isValidateArray(NSArray *array){
     return [array isKindOfClass:[NSArray class]] && array.count;
 }
 
-+ (BOOL)isValidateDictionary:(NSDictionary *)dictionary{
+BOOL _fs_isValidateDictionary(NSDictionary *dictionary){
     return [dictionary isKindOfClass:[NSDictionary class]] && dictionary.count;
 }
 
-+ (BOOL)floatEqual:(float)aNumber bNumber:(float)bNumber{
+BOOL _fs_floatEqual(CGFloat aNumber,CGFloat bNumber){
     NSNumber *a=[NSNumber numberWithFloat:aNumber];
     NSNumber *b=[NSNumber numberWithFloat:bNumber];
     return [a compare:b] == NSOrderedSame;
@@ -1235,12 +1245,12 @@ UIColor *_fs_randomColor(void){
     return fileSize;
 }
 
-+ (NSString *)md5:(NSString *)str{
+NSString *_fs_md5(NSString *str){
     if (![str isKindOfClass:[NSString class]]) {
         return nil;
     }
     const char *cStr = [str UTF8String];
-    unsigned char result[CC_MD5_DIGEST_LENGTH];//16
+    unsigned char result[CC_MD5_DIGEST_LENGTH];
     CC_MD5(cStr, (CC_LONG)strlen(cStr),result);
     return [NSString  stringWithFormat:
             @"%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X",
@@ -1429,7 +1439,7 @@ UIColor *_fs_randomColor(void){
         NSString *formattedNumberString = [numberFormatter stringFromNumber:[NSNumber numberWithDouble:[data doubleValue]]];
         return formattedNumberString;
     }else if([data isKindOfClass:[NSString class]]){
-        if ([self isPureFloat:data] || [self isPureInt:data]) {
+        if (_fs_isPureFloat(data) || _fs_isPureInt(data)) {
             NSNumberFormatter *numberFormatter = [[NSNumberFormatter alloc] init];
             [numberFormatter setPositiveFormat:@"###,##0.00;"];    // 100,000.00
             NSString *formattedNumberString = [numberFormatter stringFromNumber:[NSNumber numberWithDouble:[data doubleValue]]];
@@ -1450,7 +1460,7 @@ UIColor *_fs_randomColor(void){
         NSString *formattedNumberString = [numberFormatter stringFromNumber:[NSNumber numberWithDouble:[data doubleValue]]];
         return formattedNumberString;
     }else if([data isKindOfClass:[NSString class]]){
-        if ([self isPureFloat:data] || [self isPureInt:data]) {
+        if (_fs_isPureFloat(data) || _fs_isPureInt(data)) {
             NSNumberFormatter *numberFormatter = [[NSNumberFormatter alloc] init];
             [numberFormatter setPositiveFormat:@"0.00;"];
             NSString *formattedNumberString = [numberFormatter stringFromNumber:[NSNumber numberWithDouble:[data doubleValue]]];
@@ -1911,12 +1921,12 @@ UIColor *_fs_randomColor(void){
     }
 }
 
-+ (void)spendTimeInDoingSomething:(void (^)(void))body time:(void (^)(double time))time{
-    NSTimeInterval t = FSTimeIntevalSince1970();
+void _fs_spendTimeInDoSomething(void(^body)(void),void(^time)(double time)){
+    NSTimeInterval t = _fs_timeIntevalSince1970();
     if (body) {
         body();
     }
-    t = FSTimeIntevalSince1970() - t;
+    t = _fs_timeIntevalSince1970() - t;
     if (time) {
         time(t);
     }

@@ -11,8 +11,8 @@
 
 @interface FSKit : NSObject
 
-extern NSTimeInterval FSTimeIntevalSince1970(void);
-extern NSInteger FSIntegerTimeIntevalSince1970(void);
+extern NSTimeInterval _fs_timeIntevalSince1970(void);
+extern NSInteger _fs_integerTimeIntevalSince1970(void);
 
 + (void)userDefaultsKeepData:(id)instance  withKey:(NSString *)key;
 + (id)userDefaultsDataWithKey:(NSString *)key;
@@ -24,14 +24,13 @@ extern NSInteger FSIntegerTimeIntevalSince1970(void);
 + (void)presentToViewControllerWithClass:(NSString *)className controller:(UIViewController *)viewController param:(NSDictionary *)param configBlock:(void (^)(UIViewController *vc))configBlockParam presentCompletion:(void(^)(void))completion;
 + (void)copyToPasteboard:(NSString *)copyString;
 
-+ (void)clearUserDefaults;
+void _fs_clearUserDefaults(void);
+
 + (void)letScreenLock:(BOOL)lock;                           // YES:让屏幕锁屏    NO：让屏幕不锁屏   【未测】
 + (void)gotoAppCentPageWithAppId:(NSString *)appID;         // 去App评分页
 + (void)setStatusBarBackgroundColor:(UIColor *)color;       // 设置状态栏颜色
 
 + (BOOL)isValidateEmail:(NSString *)str;
-+ (BOOL)isPureInt:(NSString *)string;
-+ (BOOL)isPureFloat:(NSString*)string;
 + (BOOL)keyedArchiverWithArray:(NSArray *)array toFilePath:(NSString *)fileName;
 + (BOOL)keyedArchiverWithData:(NSData *)data toFilePath:(NSString *)fileName;
 + (BOOL)keyedArchiverWithNumber:(NSNumber *)number toFilePath:(NSString *)fileName;
@@ -53,10 +52,14 @@ extern NSInteger FSIntegerTimeIntevalSince1970(void);
 + (BOOL)isHaveChineseInString:(NSString *)string;
 // 判断字符串是否全为数字
 + (BOOL)isAllNum:(NSString *)string;
-+ (BOOL)isValidateString:(NSString *)string;
-+ (BOOL)isValidateArray:(NSArray *)array;
-+ (BOOL)isValidateDictionary:(NSDictionary *)dictionary;
-+ (BOOL)floatEqual:(float)aNumber bNumber:(float)bNumber;
+
+BOOL _fs_isPureInt(NSString *string);
+BOOL _fs_isPureFloat(NSString *string);
+BOOL _fs_isValidateString(NSString *string);
+BOOL _fs_isValidateArray(NSArray *array);
+BOOL _fs_isValidateDictionary(NSDictionary *dictionary);
+BOOL _fs_floatEqual(CGFloat aNumber,CGFloat bNumber);
+
 // 判断是否为中文语言环境
 + (BOOL)isChineseEnvironment;
 
@@ -100,7 +103,7 @@ extern NSInteger FSIntegerTimeIntevalSince1970(void);
 + (NSString *)keyedUnarchiverWithString:(NSString *)fileName;
 + (NSString *)documentsPath:(NSString *)fileName;
 + (NSString *)temporaryDirectoryFile:(NSString *)fileName;
-+ (NSString *)md5:(NSString *)str;
+NSString *_fs_md5(NSString *str);
 + (NSString *)stringDeleteNewLineAndWhiteSpace:(NSString *)string;
 + (NSString *)macaddress;
 + (NSString *)identifierForVendorFromKeyChain;
@@ -171,7 +174,7 @@ extern NSInteger FSIntegerTimeIntevalSince1970(void);
 + (NSNumber *)keyedUnarchiverWithNumber:(NSString *)fileName;
 + (NSNumber *)fileSize:(NSString *)filePath;
 
-extern UIColor *_fs_randomColor(void);
+UIColor *_fs_randomColor(void);
 
 + (UIColor *)colorWithHexString:(NSString *)color;               // 根据16进制字符串获得颜色类对象
 
@@ -179,7 +182,7 @@ extern UIColor *_fs_randomColor(void);
 + (UIFont *)angleFontWithRate:(CGFloat)rate fontSize:(NSInteger)fontSize;
 
 // 单位转换方法
-+ (NSString *)KMGUnit:(NSInteger)size;
+NSString* _fs_KMGUnit(NSInteger size);
 
 + (NSURL *)convertTxtEncoding:(NSURL *)fileUrl;
 
@@ -188,8 +191,7 @@ extern UIColor *_fs_randomColor(void);
 
 + (id)storyboardInstantiateViewControllerWithStoryboardID:(NSString *)storybbordID;
 
-+ (void)spendTimeInDoingSomething:(void (^)(void))body time:(void (^)(double time))time;
-
+void _fs_spendTimeInDoSomething(void(^body)(void),void(^time)(double time));
 // GCD方法
 extern void _fs_dispatch_global_main_queue_async(dispatch_block_t _global_block,dispatch_block_t _main_block);
 extern void _fs_dispatch_main_queue_async(dispatch_block_t _main_block);

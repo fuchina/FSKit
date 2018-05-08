@@ -71,9 +71,6 @@ return self;\
 #define FONTOBLIQUE(A)              ([UIFont fontWithName:@"Helvetica-BoldOblique" size:A])
 #define FONTLIQUE(A)                ([UIFont fontWithName:@"Helvetica-Oblique" size:A])
 
-#define FSValidateString(A)         [FSKit isValidateString:A]
-#define FSValidateArray(A)          [FSKit isValidateArray:A]
-#define FSValidateDictionary(A)     [FSKit isValidateDictionary:A]
 #define FSLocalString(A)            NSLocalizedString(A, nil)
 
 // 字符串格式化宏

@@ -44,9 +44,10 @@ static NSString *_table = @"apple";
 }
 
 - (void)addData{
-    NSNumber *time = @(FSIntegerTimeIntevalSince1970());
+    NSNumber *time = @(_fs_integerTimeIntevalSince1970());
     FSDBMaster *master = [FSDBMaster sharedInstance];
-    [FSKit spendTimeInDoingSomething:^{
+    
+    _fs_spendTimeInDoSomething(^{
         for (int x = 0; x < 1000; x ++) {
             NSString *sql = [[NSString alloc] initWithFormat:@"INSERT INTO %@ (time,name,one,two,thr,four,five) VALUES ('%@','%@','%@','%@','%@','%@',\'%@\');",_table,time,@(x),@1,@2,@3,@4,@5];
             NSString *error = [master insertSQL:sql class:[FSModel class] tableName:_table];
@@ -54,14 +55,14 @@ static NSString *_table = @"apple";
                 NSLog(@"%@",error);
             }
         }
-    } time:^(double time) {
+    }, ^(double time) {
         NSLog(@"spend time:%.2f s",time);
-    }];
+    });
 }
 
 - (void)updateData{
     FSDBMaster *master = [FSDBMaster sharedInstance];
-    [FSKit spendTimeInDoingSomething:^{
+    _fs_spendTimeInDoSomething(^{
         for (int x = 0; x < 1000; x ++) {
             NSString *sql = [[NSString alloc] initWithFormat:@"UPDATE %@ SET four = '%@',five = '%@';",_table,@(x + 4),@(x + 5)];
             NSString *error = [master updateWithSQL:sql];
@@ -69,14 +70,14 @@ static NSString *_table = @"apple";
                 NSLog(@"%@",error);
             }
         }
-    } time:^(double time) {
+    }, ^(double time) {
         NSLog(@"spend time:%.2f s",time);
-    }];
+    });
 }
 
 - (void)deleteData{
     FSDBMaster *master = [FSDBMaster sharedInstance];
-    [FSKit spendTimeInDoingSomething:^{
+    _fs_spendTimeInDoSomething(^{
         for (int x = 0; x < 1000; x ++) {
             NSString *sql = [[NSString alloc] initWithFormat:@"DELETE FROM %@ WHERE name = '%@';",_table,@(x)];
             NSString *error = [master deleteSQL:sql];
@@ -84,9 +85,9 @@ static NSString *_table = @"apple";
                 NSLog(@"%@",error);
             }
         }
-    } time:^(double time) {
+    }, ^(double time) {
         NSLog(@"spend time:%.2f s",time);
-    }];
+    });
 }
 
 - (void)queryData{

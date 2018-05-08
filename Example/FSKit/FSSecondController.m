@@ -48,9 +48,7 @@
     [super viewDidLoad];
     FSLog();
     
-    self.view.backgroundColor = [UIColor whiteColor];
-    
-    self.view.backgroundColor = [UIColor whiteColor];
+    self.view.backgroundColor = _fs_randomColor();
     
     UIButton *btn = [UIButton buttonWithType:UIButtonTypeSystem];
     btn.translatesAutoresizingMaskIntoConstraints = NO;
@@ -71,7 +69,7 @@
 }
 
 - (void)click{
-
+    [self metaClass];
 }
 
 - (void)quickSortMethod{
@@ -319,17 +317,17 @@ void combine (int *arr,int start,int *result,int index,int n,int arr_len){
 }
 
 - (void)metaClass{
-    [FSKit spendTimeInDoingSomething:^{
+    _fs_spendTimeInDoSomething(^{
         NSInteger x = 0;
         FSModel *m = [[FSModel alloc] init];
         while (x < 1000000) {
             [FSRuntime setValue:@[] forIvarName:@"aid" ofObject:m];
-//            [FSRuntime setValue:@[] forPropertyName:@"aid" ofObject:m];
+            //            [FSRuntime setValue:@[] forPropertyName:@"aid" ofObject:m];
             x ++;
         }
-    } time:^(double time) {
+    }, ^(double time) {
         NSLog(@"time:%lf",time);
-    }];
+    });
 }
 
 - (void)sessionGet{
