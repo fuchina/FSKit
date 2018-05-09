@@ -26,13 +26,13 @@
 
 @implementation FSSecondController
 
-+(void)load{
-    [super load];
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        _fs_hook_swizzle_class([self class],@selector(viewDidLoad),@selector(_fs_viewDidLoad));
-    });
-}
+//+(void)load{
+//    [super load];
+//    static dispatch_once_t onceToken;
+//    dispatch_once(&onceToken, ^{
+//        _fs_hook_swizzle_class([self class],@selector(viewDidLoad),@selector(_fs_viewDidLoad));
+//    });
+//}
 
 - (void)dealloc{
     NSLog(@"%s",__FUNCTION__);
@@ -42,6 +42,11 @@
     FSLog();
     
     [self _fs_viewDidLoad];
+}
+
+- (void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
+    FSLog();
 }
 
 - (void)viewDidLoad {
@@ -69,7 +74,15 @@
 }
 
 - (void)click{
-    [self metaClass];
+    for (int x = 0; x < 10; x ++) {
+        _fs_dispatch_global_queue_async(^{
+            NSThread *thread = [NSThread currentThread];
+            if (!thread.name) {
+                thread.name = [[NSString alloc] initWithFormat:@"WhatsThread_%d",x];
+            }
+            NSLog(@"Thread name:%@",thread.name);
+        });
+    }
 }
 
 - (void)quickSortMethod{

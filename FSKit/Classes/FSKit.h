@@ -11,8 +11,8 @@
 
 @interface FSKit : NSObject
 
-extern NSTimeInterval _fs_timeIntevalSince1970(void);
-extern NSInteger _fs_integerTimeIntevalSince1970(void);
+NSTimeInterval _fs_timeIntevalSince1970(void);
+NSInteger _fs_integerTimeIntevalSince1970(void);
 
 + (void)userDefaultsKeepData:(id)instance  withKey:(NSString *)key;
 + (id)userDefaultsDataWithKey:(NSString *)key;
@@ -193,10 +193,10 @@ NSString* _fs_KMGUnit(NSInteger size);
 
 void _fs_spendTimeInDoSomething(void(^body)(void),void(^time)(double time));
 // GCD方法
-extern void _fs_dispatch_global_main_queue_async(dispatch_block_t _global_block,dispatch_block_t _main_block);
-extern void _fs_dispatch_main_queue_async(dispatch_block_t _main_block);
-extern void _fs_dispatch_main_queue_sync(dispatch_block_t _main_block);
-extern void _fs_dispatch_global_queue_async(dispatch_block_t _global_block);
-extern void _fs_dispatch_global_queue_sync(dispatch_block_t _global_block);
+void _fs_dispatch_global_main_queue_async(dispatch_block_t _global_block,dispatch_block_t _main_block);
+void _fs_dispatch_main_queue_async(dispatch_block_t _main_block);
+void _fs_dispatch_main_queue_sync(dispatch_block_t _main_block);
+void _fs_dispatch_global_queue_async(dispatch_block_t _global_block);
+void _fs_dispatch_global_queue_sync(dispatch_block_t _global_block);
 
 @end
