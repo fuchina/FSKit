@@ -44,14 +44,12 @@
     [self _fs_viewDidLoad];
 }
 
-- (void)viewWillAppear:(BOOL)animated{
-    [super viewWillAppear:animated];
-    FSLog();
-}
-
 - (void)viewDidLoad {
     [super viewDidLoad];
-    FSLog();
+    
+    NSString *str = [NSString stringWithFormat:@"sunnyxx_%@",@"what"];
+    _sample = str;
+    
     
     self.view.backgroundColor = _fs_randomColor();
     
@@ -65,6 +63,17 @@
     [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-100-[btn(44)]" options:0 metrics:nil views:NSDictionaryOfVariableBindings(btn)]];
 }
 
+__weak NSString *_sample = nil;
+- (void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
+    NSLog(@"value_%@:%@",_sample,NSStringFromSelector(_cmd));
+}
+
+- (void)viewDidAppear:(BOOL)animated{
+    [super viewDidAppear:animated];
+    NSLog(@"value_%@:%@",_sample,NSStringFromSelector(_cmd));
+}
+
 - (NSArray *)alphabets{
     static NSArray *as = nil;
     if (!as) {
@@ -74,15 +83,37 @@
 }
 
 - (void)click{
-    for (int x = 0; x < 10; x ++) {
+    [self clickThreads];
+}
+
+- (void)clickBlock{
+    __weak __block NSString *what = @(_fs_timeIntevalSince1970()).stringValue;
+    NSLog(@"init:%@",what);
+    _fs_dispatch_global_queue_sync(^{
+        what = @(_fs_timeIntevalSince1970()).stringValue;
+    });
+    NSLog(@"blocked:%@",what);
+}
+
+- (void)clickThreads{
+    for (int x = 0; x < 100; x ++) {
         _fs_dispatch_global_queue_async(^{
             NSThread *thread = [NSThread currentThread];
             if (!thread.name) {
-                thread.name = [[NSString alloc] initWithFormat:@"WhatsThread_%d",x];
+                NSString *thread_name = [[NSString alloc] initWithFormat:@"TN_%@",@(x)];
+                [thread setName:thread_name];
             }
-            NSLog(@"Thread name:%@",thread.name);
+            NSLog(@"Thread_name:%@",thread.name);
         });
     }
+}
+
+- (void)clickAutoreleasepool{
+    NSString *str = nil;
+    @autoreleasepool {
+        str = [NSString stringWithFormat:@"sunnyxx"];
+    }
+    NSLog(@"%@", str); // Console: (null)
 }
 
 - (void)quickSortMethod{
@@ -400,6 +431,19 @@ void combine (int *arr,int start,int *result,int index,int n,int arr_len){
         
     }];
 }
+
+/*
+ for (int x = 0; x < 10; x ++) {
+ _fs_dispatch_global_queue_async(^{
+ NSThread *thread = [NSThread currentThread];
+ if (!thread.name) {
+ thread.name = [[NSString alloc] initWithFormat:@"WhatsThread_%d",x];
+ }
+ NSLog(@"Thread name:%@",thread.name);
+ });
+ }
+ 
+ */
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
