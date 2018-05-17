@@ -199,4 +199,7 @@ void _fs_dispatch_main_queue_sync(dispatch_block_t _main_block);
 void _fs_dispatch_global_queue_async(dispatch_block_t _global_block);
 void _fs_dispatch_global_queue_sync(dispatch_block_t _global_block);
 
+//void _fs_runloop_observer(void);
+void _fs_runloop_freeTime_event(void(^event)(void));
+
 @end

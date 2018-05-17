@@ -38,20 +38,13 @@
     NSLog(@"%s",__FUNCTION__);
 }
 
-- (void)_fs_viewDidLoad{
-    FSLog();
-    
-    [self _fs_viewDidLoad];
-}
-
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
-    NSString *str = [NSString stringWithFormat:@"sunnyxx_%@",@"what"];
-    _sample = str;
-    
-    
     self.view.backgroundColor = _fs_randomColor();
+    
+    _fs_runloop_freeTime_event(^{
+        NSLog(@"空闲啦");
+    });
     
     UIButton *btn = [UIButton buttonWithType:UIButtonTypeSystem];
     btn.translatesAutoresizingMaskIntoConstraints = NO;
@@ -63,17 +56,6 @@
     [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-100-[btn(44)]" options:0 metrics:nil views:NSDictionaryOfVariableBindings(btn)]];
 }
 
-__weak NSString *_sample = nil;
-- (void)viewWillAppear:(BOOL)animated{
-    [super viewWillAppear:animated];
-    NSLog(@"value_%@:%@",_sample,NSStringFromSelector(_cmd));
-}
-
-- (void)viewDidAppear:(BOOL)animated{
-    [super viewDidAppear:animated];
-    NSLog(@"value_%@:%@",_sample,NSStringFromSelector(_cmd));
-}
-
 - (NSArray *)alphabets{
     static NSArray *as = nil;
     if (!as) {
@@ -83,7 +65,7 @@ __weak NSString *_sample = nil;
 }
 
 - (void)click{
-    [self clickThreads];
+
 }
 
 - (void)clickBlock{
@@ -96,7 +78,7 @@ __weak NSString *_sample = nil;
 }
 
 - (void)clickThreads{
-    for (int x = 0; x < 100; x ++) {
+    for (int x = 0; x < 10; x ++) {
         _fs_dispatch_global_queue_async(^{
             NSThread *thread = [NSThread currentThread];
             if (!thread.name) {
@@ -104,6 +86,7 @@ __weak NSString *_sample = nil;
                 [thread setName:thread_name];
             }
             NSLog(@"Thread_name:%@",thread.name);
+            sleep(1);
         });
     }
 }

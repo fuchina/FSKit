@@ -1968,6 +1968,71 @@ void _fs_dispatch_global_queue_sync(dispatch_block_t _global_block){
     dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), _global_block);
 }
 
+/*
+ kCFRunLoopEntry = (1UL << 0),        即将进入runloop
+ kCFRunLoopBeforeTimers = (1UL << 1), 即将处理timer事件
+ kCFRunLoopBeforeSources = (1UL << 2),即将处理source事件
+ kCFRunLoopBeforeWaiting = (1UL << 5),即将进入睡眠
+ kCFRunLoopAfterWaiting = (1UL << 6), 被唤醒
+ kCFRunLoopExit = (1UL << 7),         runloop退出
+ kCFRunLoopAllActivities = 0x0FFFFFFFU
+ */
+void _fs_runloop_observer(void){
+    CFRunLoopObserverRef observer = CFRunLoopObserverCreateWithHandler(CFAllocatorGetDefault(), kCFRunLoopAllActivities, YES, 0, ^(CFRunLoopObserverRef observer, CFRunLoopActivity activity) {
+            switch (activity) {
+            case kCFRunLoopEntry:
+                NSLog(@"即将进入runloop");
+                break;
+            case kCFRunLoopBeforeTimers:
+                NSLog(@"即将处理timer事件");
+                break;
+            case kCFRunLoopBeforeSources:
+                NSLog(@"即将处理source事件");
+                break;
+            case kCFRunLoopBeforeWaiting:
+                NSLog(@"即将进入睡眠");
+                break;
+            case kCFRunLoopAfterWaiting:
+                NSLog(@"被唤醒");
+                break;
+            case kCFRunLoopExit:
+                NSLog(@"runloop退出");
+                break;
+                
+            default:
+                break;
+        }
+    });
+    
+    CFRunLoopRef rl = CFRunLoopGetCurrent();
+    if (observer) {
+        CFRunLoopAddObserver(rl,observer, kCFRunLoopDefaultMode);
+        CFRelease(observer);
+//        CFRunLoopObserverInvalidate(observer);//使Observer无效
+//        CFRunLoopRemoveObserver(rl, observer, kCFRunLoopDefaultMode);// 移除Observer
+    }
+}
+
+void _fs_runloop_freeTime_event(void(^event)(void)){
+    CFRunLoopObserverRef observer = CFRunLoopObserverCreateWithHandler(CFAllocatorGetDefault(), kCFRunLoopAllActivities, YES, 0, ^(CFRunLoopObserverRef observer, CFRunLoopActivity activity) {
+        switch (activity) {
+            case kCFRunLoopBeforeWaiting:
+            case kCFRunLoopExit:{
+                if (event) {
+                    event();
+                }
+            }break;
+            default:break;
+        }
+    });
+    
+    CFRunLoopRef rl = CFRunLoopGetCurrent();
+    if (observer) {
+        CFRunLoopAddObserver(rl,observer, kCFRunLoopDefaultMode);
+        CFRelease(observer);
+    }
+}
+
 
 @end
 
