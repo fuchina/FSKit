@@ -40,11 +40,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.view.backgroundColor = _fs_randomColor();
-    
-    _fs_runloop_freeTime_event(^{
-        NSLog(@"空闲啦");
-    });
+    self.view.backgroundColor = [UIColor whiteColor];
     
     UIButton *btn = [UIButton buttonWithType:UIButtonTypeSystem];
     btn.translatesAutoresizingMaskIntoConstraints = NO;
@@ -65,7 +61,56 @@
 }
 
 - (void)click{
+    NSString *str = @(1).stringValue;
+    NSLog(@"%p",str);
+    NSString *value = [self change:str];
+    NSLog(@"str:%@,p:%p",str,str);
+    NSLog(@"value:%@,p:%p",value,value);
+    NSLog(@"www:%@",*&str);
+    NSLog(@"wwwvalue:%@",*&value);
+}
 
+- (NSString *)change:(NSString *)value{
+    NSLog(@"value:%p",value);
+    value = @(2).stringValue;
+    return value;
+}
+
+- (void)clickSync{
+    dispatch_queue_t concurrentQueue = dispatch_queue_create("my.concurrent.queue", DISPATCH_QUEUE_SERIAL);
+    NSLog(@"1");
+    dispatch_async(concurrentQueue, ^(){
+        NSLog(@"isMain:%@",@([NSThread isMainThread]));
+        NSLog(@"2");
+        [NSThread sleepForTimeInterval:3];
+        NSLog(@"3");
+    });
+    NSLog(@"4");
+}
+
+- (void)asyncHZ{
+    _fs_dispatch_global_queue_async(^{
+        CGRect rect = CGRectMake(0, 0, 300, 300);
+        UIGraphicsBeginImageContextWithOptions(rect.size, YES, 0);
+        CGContextRef context = UIGraphicsGetCurrentContext();
+        [[UIColor redColor] set];
+        CGContextFillRect(context, rect);
+        
+        // 1.
+        NSString *text = @"我是一段文字";
+        [text drawInRect:CGRectMake(10, 10, 100, 44) withAttributes:nil];
+
+        UIImage *temp = UIGraphicsGetImageFromCurrentImageContext();
+        UIGraphicsEndImageContext();
+        _fs_dispatch_main_queue_async(^{
+            NSLog(@"image:(width:%f,height:%f)",temp.size.width,temp.size.height);
+            
+            UIImageView *imageview = [[UIImageView alloc] initWithFrame:CGRectMake(10, 238, 300, 300)];
+            imageview.image = temp;
+            [self.view addSubview:imageview];
+            
+        });
+    });
 }
 
 - (void)clickBlock{
