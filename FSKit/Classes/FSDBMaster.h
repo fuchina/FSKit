@@ -77,6 +77,7 @@ static NSString *_db_first_name = @"sql_ling";
  新增 eg.
  @"INSERT INTO %@ (time,name,loti,lati) VALUES ('%@','%@','%@','%@');";
  */
+- (NSString *)insertSQL:(NSString *)sql fields:(NSArray<NSString *> *)fields table:(NSString *)table;
 - (NSString *)insertSQL:(NSString *)sql class:(Class)instance tableName:(NSString *)tableName;
 /*
  删除  eg

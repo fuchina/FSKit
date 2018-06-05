@@ -199,7 +199,7 @@ static CGRect oldframe;
     if (![message respondsToSelector:@selector(length)] || [message length] == 0) {
         return;
     }
-    dispatch_async(dispatch_get_main_queue(), ^{
+    _fs_dispatch_main_queue_async(^{
         [self showMessageInMainThread:message];
     });
 }

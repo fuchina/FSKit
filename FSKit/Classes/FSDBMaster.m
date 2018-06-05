@@ -6,12 +6,14 @@
 //  Copyright © 2017年 fuhope. All rights reserved.
 //
 
+/*
+ 1.串行队列+同步方式，如果在queue里又同步往queue里添加任务，有死锁的风险；
+ 2.
+ */
+
 #import "FSDBMaster.h"
 #import <sqlite3.h>
 #import "FSRuntime.h"
-
-static NSString     *_field_name = @"field_name";
-static NSString     *_field_type = @"field_type";
 
 @interface FSDBMaster ()
 
@@ -19,7 +21,7 @@ static NSString     *_field_type = @"field_type";
 
 @end
 
-static const char *_SQLManagerQueue = "FSDBMasterQueue";
+static const char *_SQLManagerQueue = "fsdbmaster.sync";
 @implementation FSDBMaster{
     dispatch_queue_t    _queue;
 }
@@ -117,20 +119,24 @@ static FSDBMaster *_instance = nil;
     return path;
 }
 
-- (void)createTableIfNotExists:(NSString *)tableName className:(Class)className{
+- (NSString *)createTableIfNotExists:(NSString *)tableName fields:(NSArray<NSString *> *)properties{
+    if (!([properties isKindOfClass:[NSArray class]] && properties.count)) {
+        return @"fields 为空";
+    }
+    for (NSString *s in properties) {
+        if (!([s isKindOfClass:[NSString class]] && s.length)) {
+            return @"field不是字符串";
+        }
+    }
     if (!([tableName isKindOfClass:[NSString class]] && tableName.length)) {
-        return;
+        return @"表名为空";
     }
     BOOL exist = [self checkTableExist:tableName];
     if (exist) {
-        return;
+        return nil;
     }
-    NSArray *properties = [FSRuntime propertiesForClass:className];
-    if (!([properties isKindOfClass:[NSArray class]] && properties.count)) {
-        return;
-    }
-    NSString *aid = @"aid";
-    NSString *primaryKey = [[NSString alloc] initWithFormat:@"%@ INTEGER PRIMARY KEY autoincrement,",aid];// 因为PRIMARY KEY，id自动是8个字节
+    static NSString *_static_aid = @"aid";
+    NSString *primaryKey = [[NSString alloc] initWithFormat:@"%@ INTEGER PRIMARY KEY autoincrement,",_static_aid];// 因为PRIMARY KEY，id自动是8个字节
     NSMutableString *append = [[NSMutableString alloc] initWithString:primaryKey];
     NSArray *keywords = [self keywords];
     for (int x = 0; x < properties.count; x ++) {
@@ -138,9 +144,9 @@ static FSDBMaster *_instance = nil;
         BOOL isKeyword = [keywords containsObject:name];
         if (isKeyword) {
             continue;
-//            name = [[NSString alloc] initWithFormat:@"[%@]",name];
+            //            name = [[NSString alloc] initWithFormat:@"[%@]",name];
         }
-        if ([name isEqualToString:aid]) {
+        if ([_static_aid isEqualToString:name]) {
             continue;
         }
         if (x == (properties.count - 1)){
@@ -155,20 +161,27 @@ static FSDBMaster *_instance = nil;
     NSString *sql = [[NSString alloc] initWithFormat:@"CREATE TABLE IF NOT EXISTS %@ (%@);",tableName,append];
     NSString *e = [self execSQL:sql type:@"创建表"];
     if (e) {
-        NSAssert(e, @"创建表失败");
-        NSLog(@"%@",e);
+        return @"创建表失败";
     }
+    return nil;
+}
+
+- (NSString *)insertSQL:(NSString *)sql class:(Class)instance tableName:(NSString *)tableName{
+    NSArray<NSString *> *fields = [FSRuntime propertiesForClass:instance];
+    return [self insertSQL:sql fields:fields table:tableName];
 }
 
 /*
- 新增 eg.
- @"INSERT INTO %@ (time,name,loti,lati) VALUES (\"%@\",\"%@\",\"%@\",\"%@\");";
+ @"INSERT INTO %@ (time,name,loti,lati) VALUES ('%@','%@','%@','%@');";
  */
-- (NSString *)insertSQL:(NSString *)sql class:(Class)instance tableName:(NSString *)tableName{
-    if (!([tableName isKindOfClass:[NSString class]] && tableName.length)) {
+- (NSString *)insertSQL:(NSString *)sql fields:(NSArray<NSString *> *)fields table:(NSString *)table{
+    if (!([table isKindOfClass:[NSString class]] && table.length)) {
         return @"表名为空";
     }
-    [self createTableIfNotExists:tableName className:instance];
+    NSString *error = [self createTableIfNotExists:table fields:fields];
+    if (error) {
+        return error;
+    }
     return [self execSQL:sql type:@"新增数据"];
 }
 
@@ -198,6 +211,46 @@ static FSDBMaster *_instance = nil;
     });
     return errMSG;
 }
+
+//// insert into t1 values(?,?,?,?)
+//- (NSString *)insertSQL:(NSString *)SQL params:(NSArray<NSString *> *)params error:(NSError **)err type:(NSString *)type{
+//    if (!([SQL isKindOfClass:[NSString class]] && SQL.length)) {
+//        return @"语句为空";
+//    }
+//    if (!([params isKindOfClass:[NSArray class]] && params.count)) {
+//        return nil;
+//    }
+//    __block NSString *errMSG = nil;
+//    dispatch_sync(_queue, ^{
+//        sqlite3_exec(self -> _sqlite3,"begin;",0,0,0);
+//        
+//        const char *charSql = [SQL UTF8String];
+//        if (!charSql) {
+//            return;
+//        }
+//        sqlite3_stmt *stmt;
+//        int len = (int)strlen(charSql);
+//        int ok = sqlite3_prepare_v2(self -> _sqlite3,charSql,len,&stmt,0);
+//        if (ok != SQLITE_OK) {
+//            sqlite3_finalize(stmt);
+//            return;
+//        }
+//        
+//        for (NSString *value in params) {
+//            if ([value isKindOfClass:[NSString class]]) {
+//                sqlite3_bind_text(stmt, 0, NULL, 0, NULL);
+//            }
+//        }
+//        char *error = NULL;
+//        int result = sqlite3_exec(self->_sqlite3, [SQL UTF8String], NULL, NULL, &error);
+//        if (result != SQLITE_OK) {
+//            errMSG = [[NSString alloc] initWithFormat:@"%@失败，原因:%s",type,error];
+//        }
+//        
+//        sqlite3_exec(self -> _sqlite3,"commit;",0,0,0);
+//    });
+//    return errMSG;
+//}
 
 /*
  【SELECT DISTINCT name FROM %@;】// 从%@表中查询name字段的所有不重复的值
@@ -395,6 +448,8 @@ int checkTableCallBack(void *param, int f_num, char **f_value, char **f_name){
 }
 
 //获取表中所有字段名和类型
+static NSString     *_field_name = @"field_name";
+static NSString     *_field_type = @"field_type";
 - (NSArray<NSDictionary *> *)allFields:(NSString *)tableName{
     NSMutableArray *array = [[NSMutableArray alloc] init];
     NSString *getColumn = [NSString stringWithFormat:@"PRAGMA table_info(%@)",tableName];
