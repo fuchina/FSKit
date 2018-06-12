@@ -28,10 +28,9 @@
 #endif
                                               return;
                                           }
-                                          NSString *value = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
                                           dispatch_async(dispatch_get_main_queue(), ^{
                                               if (success) {
-                                                  success(value);
+                                                  success(data);
                                               }
                                           });
                                       }];

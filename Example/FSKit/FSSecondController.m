@@ -16,6 +16,8 @@
 #import <FSKit/FSRuntime.h>
 #import <FSKit/FuSoft.h>
 #import <FSKit/FSHook.h>
+#import <FSKit/FSLocalNotification.h>
+#import "FSLocalNotificationController.h"
 
 @interface FSSecondController ()
 
@@ -24,7 +26,9 @@
 
 @end
 
-@implementation FSSecondController
+@implementation FSSecondController{
+    UIImageView     *_imageView;
+}
 
 //+(void)load{
 //    [super load];
@@ -50,6 +54,9 @@
     [self.view addSubview:btn];
     [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-15-[btn]-15-|" options:0 metrics:nil views:NSDictionaryOfVariableBindings(btn)]];
     [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-100-[btn(44)]" options:0 metrics:nil views:NSDictionaryOfVariableBindings(btn)]];
+    
+    _imageView = [[UIImageView alloc] initWithFrame:CGRectMake(30, 180, WIDTHFC - 60, 190)];
+    [self.view addSubview:_imageView];
 }
 
 - (NSArray *)alphabets{
@@ -61,19 +68,39 @@
 }
 
 - (void)click{
-    NSString *str = @(1).stringValue;
-    NSLog(@"%p",str);
-    NSString *value = [self change:str];
-    NSLog(@"str:%@,p:%p",str,str);
-    NSLog(@"value:%@,p:%p",value,value);
-    NSLog(@"www:%@",*&str);
-    NSLog(@"wwwvalue:%@",*&value);
+    [self localNotification];
 }
 
-- (NSString *)change:(NSString *)value{
-    NSLog(@"value:%p",value);
-    value = @(2).stringValue;
-    return value;
+- (void)localNotification{
+    FSLocalNotificationController *notification = [[FSLocalNotificationController alloc] init];
+    [self.navigationController pushViewController:notification animated:YES];
+}
+
+- (void)url_12306{
+    // GET
+    static NSString *code = @"https://kyfw.12306.cn/otn/passcodeNew/getPassCodeNew.do?module=login&rand=sjrand&";   // 验证码
+    static NSString *people = @"https://kyfw.12306.cn/otn/passengers/init";// 联系人
+    static NSString *query = @"https://kyfw.12306.cn/otn/leftTicket/query?";// 查票
+    
+    // POST
+    
+    _imageView.image = nil;
+    [FSURLSession sessionGet:people success:^(id value) {
+        NSInteger type = 0;
+        if (type == 0) {
+            NSString *content = [[NSString alloc] initWithData:(NSData *)value encoding:NSUTF8StringEncoding];
+            if (content) {
+                NSLog(@"%@",content);
+            }
+        }else{
+            UIImage *image = [[UIImage alloc] initWithData:(NSData *)value];
+            if (image) {
+                self->_imageView.image = image;
+            }
+        }
+    } fail:^{
+        
+    }];
 }
 
 - (void)clickSync{
