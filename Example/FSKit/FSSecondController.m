@@ -70,7 +70,16 @@
 }
 
 - (void)click{
-    [self groupClear];
+    [self aboutThreadOfQueue];
+}
+
+- (void)aboutThreadOfQueue{
+    dispatch_queue_t queue = dispatch_queue_create("queue", DISPATCH_QUEUE_CONCURRENT);
+    dispatch_sync(queue, ^{
+        BOOL isMain = [NSThread isMainThread];
+        NSLog(@"isMain:%@",@(isMain));
+    });
+    NSLog(@"back");
 }
 
 - (void)groupClear{

@@ -14,11 +14,10 @@ void _fs_hook_swizzle_class(Class class, SEL originalSelector, SEL swizzledSelec
     Method originalMethod = class_getInstanceMethod(class, originalSelector);
     Method swizzledMethod = class_getInstanceMethod(class, swizzledSelector);
     
-    BOOL didAddMethod =
-    class_addMethod(class,
-                    originalSelector,
-                    method_getImplementation(swizzledMethod),
-                    method_getTypeEncoding(swizzledMethod));
+    BOOL didAddMethod = class_addMethod(class,
+                                        originalSelector,
+                                        method_getImplementation(swizzledMethod),
+                                        method_getTypeEncoding(swizzledMethod));
     
     if (didAddMethod) {
         class_replaceMethod(class,
