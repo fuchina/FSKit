@@ -19,6 +19,8 @@
 @property (nonatomic,copy)   NSString   *four;
 @property (nonatomic,copy)   NSString   *five;
 
++ (NSArray<NSString *> *)tableFields;
+
 - (void)fs_instanceMethod;
 
 + (void)fs_classMethod;

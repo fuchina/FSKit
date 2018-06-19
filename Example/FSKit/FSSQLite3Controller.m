@@ -39,6 +39,11 @@ static NSString *_table = @"apple";
     FSDBMaster *master = [FSDBMaster sharedInstance];
     NSLog(@"%@",master.dbPath);
     
+    NSString *error = [master dropTable:_table];
+    if (!error) {
+        NSLog(@"删除表成功");
+    }
+    
     NSArray *allTables = [master allTables];
     NSLog(@"\n\n\n\n%@",allTables);
 }
@@ -50,7 +55,7 @@ static NSString *_table = @"apple";
     _fs_spendTimeInDoSomething(^{
         for (int x = 0; x < 1000; x ++) {
             NSString *sql = [[NSString alloc] initWithFormat:@"INSERT INTO %@ (time,name,one,two,thr,four,five) VALUES ('%@','%@','%@','%@','%@','%@',\'%@\');",_table,time,@(x),@1,@2,@3,@4,@5];
-            NSString *error = [master insertSQL:sql class:[FSModel class] tableName:_table];
+            NSString *error = [master insertSQL:sql fields:[FSModel tableFields] table:_table];
             if (error) {
                 NSLog(@"%@",error);
             }

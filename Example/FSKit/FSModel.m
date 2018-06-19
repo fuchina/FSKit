@@ -10,6 +10,10 @@
 
 @implementation FSModel
 
++ (NSArray<NSString *> *)tableFields{
+    return @[@"time",@"name",@"one",@"two",@"thr",@"four",@"five"];
+}
+
 - (void)fs_instanceMethod{
     
 }

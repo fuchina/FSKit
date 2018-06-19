@@ -18,6 +18,8 @@
 #import <FSKit/FSHook.h>
 #import <FSKit/FSLocalNotification.h>
 #import "FSLocalNotificationController.h"
+#import <FSKit/FSDBMaster.h>
+#import "FSSQLite3Controller.h"
 
 @interface FSSecondController ()
 
@@ -68,7 +70,11 @@
 }
 
 - (void)click{
-    [self localNotification];
+    [self groupClear];
+}
+
+- (void)groupClear{
+    [FSKit pushToViewControllerWithClass:@"FSSQLite3Controller" navigationController:self.navigationController param:nil configBlock:nil];
 }
 
 - (void)localNotification{

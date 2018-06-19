@@ -18,7 +18,6 @@
 #import <CoreTelephony/CTCarrier.h>
 #import <CoreTelephony/CTTelephonyNetworkInfo.h>
 #import <sys/mount.h>
-#import "FSRuntime.h"
 
 @implementation FSKit
 
@@ -77,14 +76,19 @@ NSInteger _fs_integerTimeIntevalSince1970(void){
     [pasteboard setString:copyString];
 }
 
-+ (void)userDefaultsKeepData:(id)instance  withKey:(NSString *)key{
-    NSUserDefaults *fdd = [NSUserDefaults standardUserDefaults];
-    [fdd setObject:instance forKey:key];
-    [fdd synchronize];
+void _fs_userDefaults_setObjectForKey(id object,NSString *key){
+    if (object && _fs_isValidateString(key)) {
+        NSUserDefaults *fdd = [NSUserDefaults standardUserDefaults];
+        [fdd setObject:object forKey:key];
+        [fdd synchronize];
+    }
 }
 
-+ (id)userDefaultsDataWithKey:(NSString *)key{
-    return [[NSUserDefaults standardUserDefaults] objectForKey:key];
+id _fs_userDefaults_objectForKey(NSString *key){
+    if (_fs_isValidateString(key)) {
+        return [[NSUserDefaults standardUserDefaults] objectForKey:key];
+    }
+    return nil;
 }
 
 void _fs_clearUserDefaults(void){
@@ -1929,6 +1933,21 @@ void _fs_spendTimeInDoSomething(void(^body)(void),void(^time)(double time)){
     t = _fs_timeIntevalSince1970() - t;
     if (time) {
         time(t);
+    }
+}
+
+void _fs_userDefaultsOnce(NSString *key,void (^event)(void)){
+    if (!_fs_isValidateString(key)) {
+        return;
+    }
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    id object = [ud objectForKey:key];
+    if (!object) {
+        if (event) {
+            event();
+        }
+        [ud setObject:@(1) forKey:key];
+        [ud synchronize];
     }
 }
 

@@ -6,11 +6,6 @@
 //  Copyright © 2017年 fuhope. All rights reserved.
 //
 
-/*
- 1.串行队列+同步方式，如果在queue里又同步往queue里添加任务，有死锁的风险；
- 2.
- */
-
 #import "FSDBMaster.h"
 #import <sqlite3.h>
 #import "FSRuntime.h"
@@ -99,7 +94,6 @@ static FSDBMaster *_instance = nil;
     }else{
         int result = sqlite3_exec(_sqlite3, "PRAGMA synchronous=FULL;", NULL, NULL, NULL);
         if (result != SQLITE_OK) {
-            
         }
     }
 }
@@ -166,11 +160,6 @@ static FSDBMaster *_instance = nil;
     return nil;
 }
 
-- (NSString *)insertSQL:(NSString *)sql class:(Class)instance tableName:(NSString *)tableName{
-    NSArray<NSString *> *fields = [FSRuntime propertiesForClass:instance];
-    return [self insertSQL:sql fields:fields table:tableName];
-}
-
 /*
  @"INSERT INTO %@ (time,name,loti,lati) VALUES ('%@','%@','%@','%@');";
  */
@@ -212,46 +201,6 @@ static FSDBMaster *_instance = nil;
     return errMSG;
 }
 
-//// insert into t1 values(?,?,?,?)
-//- (NSString *)insertSQL:(NSString *)SQL params:(NSArray<NSString *> *)params error:(NSError **)err type:(NSString *)type{
-//    if (!([SQL isKindOfClass:[NSString class]] && SQL.length)) {
-//        return @"语句为空";
-//    }
-//    if (!([params isKindOfClass:[NSArray class]] && params.count)) {
-//        return nil;
-//    }
-//    __block NSString *errMSG = nil;
-//    dispatch_sync(_queue, ^{
-//        sqlite3_exec(self -> _sqlite3,"begin;",0,0,0);
-//        
-//        const char *charSql = [SQL UTF8String];
-//        if (!charSql) {
-//            return;
-//        }
-//        sqlite3_stmt *stmt;
-//        int len = (int)strlen(charSql);
-//        int ok = sqlite3_prepare_v2(self -> _sqlite3,charSql,len,&stmt,0);
-//        if (ok != SQLITE_OK) {
-//            sqlite3_finalize(stmt);
-//            return;
-//        }
-//        
-//        for (NSString *value in params) {
-//            if ([value isKindOfClass:[NSString class]]) {
-//                sqlite3_bind_text(stmt, 0, NULL, 0, NULL);
-//            }
-//        }
-//        char *error = NULL;
-//        int result = sqlite3_exec(self->_sqlite3, [SQL UTF8String], NULL, NULL, &error);
-//        if (result != SQLITE_OK) {
-//            errMSG = [[NSString alloc] initWithFormat:@"%@失败，原因:%s",type,error];
-//        }
-//        
-//        sqlite3_exec(self -> _sqlite3,"commit;",0,0,0);
-//    });
-//    return errMSG;
-//}
-
 /*
  【SELECT DISTINCT name FROM %@;】// 从%@表中查询name字段的所有不重复的值
  【SELECT * FROM %@ WHERE name = 'ddd';】
@@ -278,7 +227,7 @@ static FSDBMaster *_instance = nil;
         sqlite3_stmt *stmt = nil;
         int prepare = sqlite3_prepare_v2(self->_sqlite3, [sql UTF8String], -1, &stmt, NULL);
         if (prepare != SQLITE_OK) {
-            sqlite3_finalize(stmt);
+            sqlite3_finalize(stmt);stmt = NULL;
             return;
         }
         mArr = [[NSMutableArray alloc] init];
@@ -288,7 +237,7 @@ static FSDBMaster *_instance = nil;
                 [mArr addObject:entity];
             }
         }
-        sqlite3_finalize(stmt);
+        sqlite3_finalize(stmt);stmt = NULL;
     });
     if (mArr.count) {
         return mArr;
@@ -315,7 +264,7 @@ static FSDBMaster *_instance = nil;
         while (sqlite3_step(stmt) == SQLITE_ROW) {
             count += sqlite3_column_int(stmt, 0);
         }
-        sqlite3_finalize(stmt);
+        sqlite3_finalize(stmt);stmt = NULL;
     });
     return count;
 }
@@ -341,7 +290,7 @@ static FSDBMaster *_instance = nil;
         while (sqlite3_step(stmt) == SQLITE_ROW) {
             count += sqlite3_column_int(stmt, 0);
         }
-        sqlite3_finalize(stmt);
+        sqlite3_finalize(stmt);stmt = NULL;
     });
     return count;
 }
@@ -358,16 +307,65 @@ static FSDBMaster *_instance = nil;
         if (sqlite3_prepare_v2(self->_sqlite3, sql_stmt, -1, &statement, nil) == SQLITE_OK) {
             @try {
                 while (sqlite3_step(statement) == SQLITE_ROW) {
-                    success += sqlite3_column_int(statement, 0);
+                    int count = sqlite3_column_int(statement, 0);
+                    success += count;
+                    if (success > 0) {
+                        break;
+                    }
                 }
             } @catch (NSException *exception) {
-
+                
             } @finally {
-                sqlite3_finalize(statement);
+                sqlite3_finalize(statement);statement = NULL;
             }
         }
     });
     return success > 0;
+}
+
+- (NSString *)addField:(NSString *)field defaultValue:(NSString *)value toTable:(NSString *)table{
+    BOOL checkField = [field isKindOfClass:[NSString class]] && field.length;
+    if (!checkField) {
+        return @"字段不是字符串";
+    }
+    BOOL checkTable = [table isKindOfClass:[NSString class]] && table.length;
+    if (!checkTable) {
+        return @"表不是字符串";
+    }
+    NSArray *keys = [self keywords];
+    if ([keys containsObject:field]) {
+        return @"字段名不能使用关键字";
+    }
+    BOOL exist = [self checkTableExist:table];
+    if (!exist) {
+        return @"表不存在";
+    }
+    NSArray *fs = [self allFields:table];
+    BOOL fe = NO;
+    for (NSDictionary *dic in fs) {
+        NSString *f = [dic objectForKey:@"field_name"];
+        if ([f isEqualToString:field]) {
+            fe = YES;
+            break;
+        }
+    }
+    if (fe) {   // 表中已有改字段，算是增加成功了
+        return nil;
+    }
+    
+    NSString *sql = [[NSString alloc] initWithFormat:@"ALTER TABLE '%@' ADD '%@' TEXT NULL DEFAULT '%@';",table,field,value?:@""];
+    NSString *error = [self execSQL:sql type:nil];
+    return error;
+}
+
+- (NSString *)dropTable:(NSString *)table{
+    if (!([table isKindOfClass:[NSString class]] && table.length)) {
+        return @"表名为空";
+    }
+    NSString *sql = [[NSString alloc] initWithFormat:@"DROP TABLE %@",table];
+    NSString *type = [[NSString alloc] initWithFormat:@"删除表'%@'",table];
+    NSString *error = [self execSQL:sql type:type];
+    return error;
 }
 
 - (BOOL)checkTableExistWithTableNamed:(NSString *)tableName{
@@ -409,7 +407,7 @@ int checkTableCallBack(void *param, int f_num, char **f_value, char **f_name){
     }
     
     if (number) {
-        [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:p];
+        [[NSUserDefaults standardUserDefaults] setObject:@(1) forKey:p];
     }else{
         [[NSUserDefaults standardUserDefaults] setObject:@"" forKey:p];
     }
@@ -428,7 +426,8 @@ int checkTableCallBack(void *param, int f_num, char **f_value, char **f_name){
         NSString *name = [[NSString alloc] initWithUTF8String:cname];
         
         int cType = sqlite3_column_type(stmt, x);
-        id str = @"";
+        static NSString *noLenghthString = @"";
+        id str = noLenghthString;
         if (cType == SQLITE_TEXT) {
             const char *cValue = (char *)sqlite3_column_text(stmt, x);
             if (cValue != NULL) {
@@ -451,21 +450,23 @@ int checkTableCallBack(void *param, int f_num, char **f_value, char **f_name){
 static NSString     *_field_name = @"field_name";
 static NSString     *_field_type = @"field_type";
 - (NSArray<NSDictionary *> *)allFields:(NSString *)tableName{
-    NSMutableArray *array = [[NSMutableArray alloc] init];
-    NSString *getColumn = [NSString stringWithFormat:@"PRAGMA table_info(%@)",tableName];
-    sqlite3_stmt *statement;
-    sqlite3_prepare_v2(_sqlite3, [getColumn UTF8String], -1, &statement, nil);
-    while (sqlite3_step(statement) == SQLITE_ROW) {
-        char *nameData = (char *)sqlite3_column_text(statement, 1);
-        NSString *columnName = [[NSString alloc] initWithUTF8String:nameData];
-        char *typeData = (char *)sqlite3_column_text(statement, 2);
-        NSString *columntype = [NSString stringWithCString:typeData encoding:NSUTF8StringEncoding];
-        NSDictionary *dic = @{_field_name:columnName,_field_type:[columntype lowercaseString]};
-        [array addObject:dic];
-    }
-    sqlite3_finalize(statement);
-    statement = nil;
-    return array;
+    __block NSMutableArray *array = nil;
+    dispatch_sync(_queue, ^{
+        array = [[NSMutableArray alloc] init];
+        NSString *getColumn = [NSString stringWithFormat:@"PRAGMA table_info(%@)",tableName];
+        sqlite3_stmt *statement;
+        sqlite3_prepare_v2(self->_sqlite3, [getColumn UTF8String], -1, &statement, nil);
+        while (sqlite3_step(statement) == SQLITE_ROW) {
+            char *nameData = (char *)sqlite3_column_text(statement, 1);
+            NSString *columnName = [[NSString alloc] initWithUTF8String:nameData];
+            char *typeData = (char *)sqlite3_column_text(statement, 2);
+            NSString *columntype = [NSString stringWithCString:typeData encoding:NSUTF8StringEncoding];
+            NSDictionary *dic = @{_field_name:columnName,_field_type:[columntype lowercaseString]};
+            [array addObject:dic];
+        }
+        sqlite3_finalize(statement);statement = NULL;
+    });
+    return [array copy];
 }
 
 - (NSArray<NSString *> *)allTables{
@@ -484,18 +485,21 @@ static NSString     *_field_type = @"field_type";
 }
 
 - (NSArray<NSDictionary *> *)allTablesDetail{
-    NSMutableArray *array = [[NSMutableArray alloc] init];
-    sqlite3_stmt *statement;
-    static const char *getTableInfo = "select * from sqlite_master where type = 'table' order by name";
-    if (sqlite3_prepare_v2(_sqlite3, getTableInfo, -1, &statement, nil) == SQLITE_OK) {
-        while (sqlite3_step(statement) == SQLITE_ROW) {
-            id entity = [self dictionaryFromStmt:statement];
-            if (entity) {
-                [array addObject:entity];
+    __block NSMutableArray *array = nil;
+    dispatch_sync(_queue, ^{
+        array = [[NSMutableArray alloc] init];
+        sqlite3_stmt *statement;
+        static const char *getTableInfo = "select * from sqlite_master where type = 'table' order by name";
+        if (sqlite3_prepare_v2(self->_sqlite3, getTableInfo, -1, &statement, nil) == SQLITE_OK) {
+            while (sqlite3_step(statement) == SQLITE_ROW) {
+                id entity = [self dictionaryFromStmt:statement];
+                if (entity) {
+                    [array addObject:entity];
+                }
             }
         }
-    }
-    sqlite3_finalize(statement);
+        sqlite3_finalize(statement);statement = NULL;
+    });
     return array.count?array:nil;
 }
 

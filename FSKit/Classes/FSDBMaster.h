@@ -7,10 +7,6 @@
 //
 
 /*
- update ab_ling set brest = '0.00' where aid = 805;
- INSERT INTO accounttrack (time,link,type,je,bz,accname) VALUES ("1512145297","805","b","43.2","冲抵负债调整数据","ab_ling");
- update ab_ling set brest = '131.53' where aid = 65;
- INSERT INTO accounttrack (time,link,type,je,bz,accname) VALUES ("1512145297","65","b","43.2","冲抵负债调整数据","ab_ling");
  select * from ab_ling where (atype = 'fzp' and cast(arest as REAL) > 0 or (btype = 'fzp' and cast(brest as REAL) > 0));
  直接在电脑上SQLPRO FOR SQLITE修改数据
  
@@ -29,7 +25,7 @@
     NSString *documentsDirectory = [paths objectAtIndex:0];
     NSString *writableDBPath = [documentsDirectory stringByAppendingPathComponent:@"livefile.mp3"];
     BOOL isosd = [dd writeToFile:writableDBPath atomically:YES];
-    这样写则无问题！
+    这样写则无问题。
  
  3.判断某个字段为NULL的条件语句是 deflag is NULL，而不是 deflag = NULL;
 
@@ -47,6 +43,10 @@
     TEXT，值是文本字符串，使用数据库编码（UTF-8，UTF-16BE或者UTF-16LE）存放
     BLOB，只是一个数据块，完全按照输入存放（即没有准换）
     。。。。。。
+ */
+
+/*
+ 1.串行队列+同步方式，如果在queue里又同步往queue里添加任务，有死锁的风险；
  */
 
 #import <Foundation/Foundation.h>
@@ -78,17 +78,15 @@ static NSString *_db_first_name = @"sql_ling";
  @"INSERT INTO %@ (time,name,loti,lati) VALUES ('%@','%@','%@','%@');";
  */
 - (NSString *)insertSQL:(NSString *)sql fields:(NSArray<NSString *> *)fields table:(NSString *)table;
-- (NSString *)insertSQL:(NSString *)sql class:(Class)instance tableName:(NSString *)tableName;
+
 /*
  删除  eg
  @"DELETE FROM %@ WHERE time = '%@';"
  注意time的值，time是字符串，所以要用''来表示，如果time是字符型数字时加不加''都没关系，但如果time是155555.8888之类时，因为那个小数点导致必须加上''才能找到time
  */
 - (NSString *)deleteSQL:(NSString *)sql;
-/*
- 更新  eg.
- @"UPDATE %@ SET lati = '%@',loti = '%@' WHERE aid = %@;"
- */
+
+// @"UPDATE %@ SET lati = '%@',loti = '%@' WHERE aid = %@;"
 - (NSString *)updateWithSQL:(NSString *)sql;
 
 - (NSString *)execSQL:(NSString *)SQL type:(NSString *)type;
@@ -103,6 +101,12 @@ static NSString *_db_first_name = @"sql_ling";
 
 //  检查表是否存在
 - (BOOL)checkTableExist:(NSString *)tableName;
+
+// 往表中增加字段  成功返回nil，失败返回原因
+- (NSString *)addField:(NSString *)field defaultValue:(NSString *)value toTable:(NSString *)table;
+
+// 删除表  成功返回nil，失败返回原因
+- (NSString *)dropTable:(NSString *)table;
 
 //  获取表名的所有数据数量
 - (int)countForTable:(NSString *)tableName;

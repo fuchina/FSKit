@@ -64,8 +64,8 @@ return self;\
 #define RGBCOLOR(R, G, B, A)        ([UIColor colorWithRed:R/255.0 green:G/255.0 blue:B/255.0 alpha:A])
 #define RGB16(rgbValue)             [UIColor colorWithRed:((float)((rgbValue & 0xFF0000) >> 16))/255.0 green:((float)((rgbValue & 0xFF00) >> 8))/255.0 blue:((float)(rgbValue & 0xFF))/255.0 alpha:1.0]
 
-#define IMAGENAMED(A)               [UIImage imageNamed:A]
 #define ROUNDIMAGE(A,B)             ([FSKit circleImage:IMAGENAMED(A) withParam:B]) // B default is 0.
+
 #define FONTFC(A)                   ([UIFont systemFontOfSize:A])
 #define FONTBOLD(A)                 ([UIFont fontWithName:@"Helvetica-Bold" size:A])
 #define FONTOBLIQUE(A)              ([UIFont fontWithName:@"Helvetica-BoldOblique" size:A])
@@ -74,13 +74,13 @@ return self;\
 #define FSLocalString(A)            NSLocalizedString(A, nil)
 
 // 字符串格式化宏
-#define FSSTRING(...)         [[NSString alloc] initWithFormat:__VA_ARGS__]
+#define FSSTRING(...)               [[NSString alloc] initWithFormat:__VA_ARGS__]
 
 // 三元布尔值，判断手机是不是iPhoneX，如果是就返回YES，不是就返回NO，为了防止重复计算，可以用FSBool_Undefined来判断有没有计算过
 typedef NS_ENUM(NSInteger, FSBool) {
-    FSBool_Undefined = 0,
+    FSBool_Undefined = NSNotFound,
     FSBool_NO = 0,
-    FSBool_YES = 2,
+    FSBool_YES = 1,
 };
 
 /******************__tag__**********************/

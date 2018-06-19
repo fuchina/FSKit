@@ -7,15 +7,17 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "FuSoft.h"
+#import "FSRuntime.h"
 
 @interface FSKit : NSObject
 
 NSTimeInterval _fs_timeIntevalSince1970(void);
 NSInteger _fs_integerTimeIntevalSince1970(void);
 
-+ (void)userDefaultsKeepData:(id)instance  withKey:(NSString *)key;
-+ (id)userDefaultsDataWithKey:(NSString *)key;
+void _fs_userDefaults_setObjectForKey(id object,NSString *key);
+id _fs_userDefaults_objectForKey(NSString *key);
+void _fs_clearUserDefaults(void);
+
 + (id)objectFromJSonstring:(NSString *)jsonString;
 
 + (BOOL)popToController:(NSString *)className navigationController:(UINavigationController *)navigationController animated:(BOOL)animated;
@@ -23,8 +25,6 @@ NSInteger _fs_integerTimeIntevalSince1970(void);
 + (void)pushToViewControllerWithClass:(NSString *)className navigationController:(UINavigationController *)navigationController param:(NSDictionary *)param configBlock:(void (^)(id vc))configBlockParam;
 + (void)presentToViewControllerWithClass:(NSString *)className controller:(UIViewController *)viewController param:(NSDictionary *)param configBlock:(void (^)(UIViewController *vc))configBlockParam presentCompletion:(void(^)(void))completion;
 + (void)copyToPasteboard:(NSString *)copyString;
-
-void _fs_clearUserDefaults(void);
 
 + (void)letScreenLock:(BOOL)lock;                           // YES:让屏幕锁屏    NO：让屏幕不锁屏   【未测】
 + (void)gotoAppCentPageWithAppId:(NSString *)appID;         // 去App评分页
@@ -192,6 +192,10 @@ NSString* _fs_KMGUnit(NSInteger size);
 + (id)storyboardInstantiateViewControllerWithStoryboardID:(NSString *)storybbordID;
 
 void _fs_spendTimeInDoSomething(void(^body)(void),void(^time)(double time));
+
+// userDefault只执行一次，即key对应的值不存在时，走event，存在，就不走
+void _fs_userDefaultsOnce(NSString *key,void (^event)(void));
+
 // GCD方法
 void _fs_dispatch_global_main_queue_async(dispatch_block_t _global_block,dispatch_block_t _main_block);
 void _fs_dispatch_main_queue_async(dispatch_block_t _main_block);
