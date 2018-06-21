@@ -88,7 +88,7 @@ static CGRect oldframe;
 }
 
 + (void)alertInput:(NSInteger)number controller:(UIViewController *)controller title:(NSString *)title message:(NSString *)message ok:(NSString *)okTitle handler:(void (^)(UIAlertController *bAlert,UIAlertAction *action))handler cancel:(NSString *)cancelTitle handler:(void (^)(UIAlertAction *action))cancelHandler textFieldConifg:(void (^)(UITextField *textField))configurationHandler completion:(void (^)(void))completion{
-    if (![controller isKindOfClass:[UIViewController class]]) {
+    if (![controller isKindOfClass:UIViewController.class]) {
         return;
     }
     
@@ -257,7 +257,7 @@ static CGRect oldframe;
 }
 
 + (UIImage *)compressImage:(UIImage *)image width:(NSInteger)minWidth minHeight:(NSInteger)minHeight{
-    if (![image isKindOfClass:[UIImage class]]) {
+    if (![image isKindOfClass:UIImage.class]) {
         return nil;
     }
     CGSize size = [UIScreen mainScreen].bounds.size;
@@ -275,7 +275,7 @@ static CGRect oldframe;
 }
 
 + (UIImage *)compressImage:(UIImage *)image{
-    if (![image isKindOfClass:[UIImage class]]) {
+    if (![image isKindOfClass:UIImage.class]) {
         return nil;
     }
     if (image.size.width < [UIScreen mainScreen].bounds.size.width){
@@ -292,7 +292,7 @@ static CGRect oldframe;
 }
 
 + (UIImage *)compressImage:(UIImage *)image width:(NSInteger)width{
-    if (![image isKindOfClass:[UIImage class]]) {
+    if (![image isKindOfClass:UIImage.class]) {
         return nil;
     }
     if (image.size.width < [UIScreen mainScreen].bounds.size.width) {
@@ -312,7 +312,7 @@ static CGRect oldframe;
 + (UIImage*)imageForUIView:(UIView*)view{
     //    UIGraphicsBeginImageContext(view.bounds.size);// 只会生成屏幕所见的部分
     CGSize size = view.bounds.size;
-    if ([view isKindOfClass:[UIScrollView class]]) {
+    if ([view isKindOfClass:UIScrollView.class]) {
         UIScrollView *sView = (UIScrollView *)view;
         size = CGSizeMake(sView.frame.size.width,sView.contentSize.height+ sView.contentInset.top+ sView.contentInset.bottom);
     }

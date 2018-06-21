@@ -47,7 +47,7 @@ static FSDBMaster *_instance = nil;
 }
 
 - (BOOL)openSqlite3DatabaseAtPath:(NSString *)path{
-    if (!([path isKindOfClass:[NSString class]] && path.length)) {
+    if (!([path isKindOfClass:NSString.class] && path.length)) {
         return NO;
     }
     NSFileManager *manager = [NSFileManager defaultManager];
@@ -75,7 +75,7 @@ static FSDBMaster *_instance = nil;
 }
 
 - (void)generateHandlerWithDBName:(NSString *)dbName{
-    if (!([dbName isKindOfClass:[NSString class]] && dbName.length)) {
+    if (!([dbName isKindOfClass:NSString.class] && dbName.length)) {
         return;
     }
     
@@ -104,7 +104,7 @@ static FSDBMaster *_instance = nil;
 
 // param: 不需要带扩展名
 - (NSString *)dbPathWithFileName:(NSString *)name{
-    if (!([name isKindOfClass:[NSString class]] && name.length)) {
+    if (!([name isKindOfClass:NSString.class] && name.length)) {
         return nil;
     }
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
@@ -114,15 +114,15 @@ static FSDBMaster *_instance = nil;
 }
 
 - (NSString *)createTableIfNotExists:(NSString *)tableName fields:(NSArray<NSString *> *)properties{
-    if (!([properties isKindOfClass:[NSArray class]] && properties.count)) {
+    if (!([properties isKindOfClass:NSArray.class] && properties.count)) {
         return @"fields 为空";
     }
     for (NSString *s in properties) {
-        if (!([s isKindOfClass:[NSString class]] && s.length)) {
+        if (!([s isKindOfClass:NSString.class] && s.length)) {
             return @"field不是字符串";
         }
     }
-    if (!([tableName isKindOfClass:[NSString class]] && tableName.length)) {
+    if (!([tableName isKindOfClass:NSString.class] && tableName.length)) {
         return @"表名为空";
     }
     BOOL exist = [self checkTableExist:tableName];
@@ -164,7 +164,7 @@ static FSDBMaster *_instance = nil;
  @"INSERT INTO %@ (time,name,loti,lati) VALUES ('%@','%@','%@','%@');";
  */
 - (NSString *)insertSQL:(NSString *)sql fields:(NSArray<NSString *> *)fields table:(NSString *)table{
-    if (!([table isKindOfClass:[NSString class]] && table.length)) {
+    if (!([table isKindOfClass:NSString.class] && table.length)) {
         return @"表名为空";
     }
     NSString *error = [self createTableIfNotExists:table fields:fields];
@@ -187,7 +187,7 @@ static FSDBMaster *_instance = nil;
 }
 
 - (NSString *)execSQL:(NSString *)SQL type:(NSString *)type{
-    if (!([SQL isKindOfClass:[NSString class]] && SQL.length)) {
+    if (!([SQL isKindOfClass:NSString.class] && SQL.length)) {
         return @"语句为空";
     }
     __block NSString *errMSG = nil;
@@ -212,10 +212,10 @@ static FSDBMaster *_instance = nil;
 }
 
 - (NSMutableArray *)execQuerySQL:(NSString *)sql tableName:(NSString *)tableName{
-    if (!([sql isKindOfClass:[NSString class]] && sql.length)) {
+    if (!([sql isKindOfClass:NSString.class] && sql.length)) {
         return nil;
     }
-    if (!([tableName isKindOfClass:[NSString class]] && tableName.length)) {
+    if (!([tableName isKindOfClass:NSString.class] && tableName.length)) {
         return nil;
     }
     BOOL exist = [self checkTableExist:tableName];
@@ -246,7 +246,7 @@ static FSDBMaster *_instance = nil;
 }
 
 - (int)countForTable:(NSString *)tableName{
-    if (!([tableName isKindOfClass:[NSString class]] && tableName.length)) {
+    if (!([tableName isKindOfClass:NSString.class] && tableName.length)) {
         return 0;
     }
     BOOL exist = [self checkTableExist:tableName];
@@ -270,14 +270,14 @@ static FSDBMaster *_instance = nil;
 }
 
 - (int)countWithSQL:(NSString *)sql table:(NSString *)tableName{
-    if (!([tableName isKindOfClass:[NSString class]] && tableName.length)) {
+    if (!([tableName isKindOfClass:NSString.class] && tableName.length)) {
         return 0;
     }
     BOOL exist = [self checkTableExist:tableName];
     if (!exist) {
         return 0;
     }
-    if (!([sql isKindOfClass:[NSString class]] && sql.length)) {
+    if (!([sql isKindOfClass:NSString.class] && sql.length)) {
         return 0;
     }
     __block int count = 0;
@@ -296,7 +296,7 @@ static FSDBMaster *_instance = nil;
 }
 
 - (BOOL)checkTableExist:(NSString *)tableName{
-    if (!([tableName isKindOfClass:[NSString class]] && tableName.length)) {
+    if (!([tableName isKindOfClass:NSString.class] && tableName.length)) {
         return NO;
     }
     __block NSInteger success = 0;
@@ -324,11 +324,11 @@ static FSDBMaster *_instance = nil;
 }
 
 - (NSString *)addField:(NSString *)field defaultValue:(NSString *)value toTable:(NSString *)table{
-    BOOL checkField = [field isKindOfClass:[NSString class]] && field.length;
+    BOOL checkField = [field isKindOfClass:NSString.class] && field.length;
     if (!checkField) {
         return @"字段不是字符串";
     }
-    BOOL checkTable = [table isKindOfClass:[NSString class]] && table.length;
+    BOOL checkTable = [table isKindOfClass:NSString.class] && table.length;
     if (!checkTable) {
         return @"表不是字符串";
     }
@@ -359,7 +359,7 @@ static FSDBMaster *_instance = nil;
 }
 
 - (NSString *)dropTable:(NSString *)table{
-    if (!([table isKindOfClass:[NSString class]] && table.length)) {
+    if (!([table isKindOfClass:NSString.class] && table.length)) {
         return @"表名为空";
     }
     NSString *sql = [[NSString alloc] initWithFormat:@"DROP TABLE %@",table];
@@ -369,7 +369,7 @@ static FSDBMaster *_instance = nil;
 }
 
 - (BOOL)checkTableExistWithTableNamed:(NSString *)tableName{
-    if (!([tableName isKindOfClass:[NSString class]] && tableName.length)) {
+    if (!([tableName isKindOfClass:NSString.class] && tableName.length)) {
         return NO;
     }
     __block BOOL success = NO;
@@ -472,7 +472,7 @@ static NSString     *_field_type = @"field_type";
 - (NSArray<NSString *> *)allTables{
     NSArray *array = [self allTablesDetail];
     NSMutableArray *names = nil;
-    if ([array isKindOfClass:[NSArray class]] && array.count) {
+    if ([array isKindOfClass:NSArray.class] && array.count) {
         names = [[NSMutableArray alloc] initWithCapacity:array.count];
         static NSString *_name = @"name";
         static NSString *_nlString = @"";

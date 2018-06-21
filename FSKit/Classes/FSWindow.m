@@ -30,7 +30,7 @@ static FSWindow *_w = nil;
 - (void)windowNoti:(NSNotification *)notification{
     if (self.hidden == NO) {
         UIWindow *object = notification.object;
-        if ([object isKindOfClass:[UIWindow class]] && object != self && object.isKeyWindow) {
+        if ([object isKindOfClass:UIWindow.class] && object != self && object.isKeyWindow) {
             self.windowLevel = object.windowLevel + 1;
             [self makeKeyAndVisible];
         }
@@ -112,7 +112,7 @@ static FSWindow *_w = nil;
 }
 
 + (void)presentViewController:(UIViewController *)controller animated:(BOOL)animated completion:(void (^)(void))completion{
-    if (![controller isKindOfClass:[UIViewController class]]) {
+    if (![controller isKindOfClass:UIViewController.class]) {
         return;
     }
     [[FSWindow sharedInstance] presentViewController:controller animated:animated completion:completion];

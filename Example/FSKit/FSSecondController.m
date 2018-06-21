@@ -30,6 +30,19 @@
 
 @implementation FSSecondController{
     UIImageView     *_imageView;
+    UILabel         *_label;
+}
+
+- (void)setText:(NSString *)text{
+    self.label.text = text;
+}
+
+- (UILabel *)label{
+    if (!_label) {
+        _label = [[UILabel alloc] initWithFrame:CGRectMake(15, 200, WIDTHFC - 30, 30)];
+        [self.view addSubview:_label];
+    }
+    return _label;
 }
 
 //+(void)load{
@@ -39,6 +52,16 @@
 //        _fs_hook_swizzle_class([self class],@selector(viewDidLoad),@selector(_fs_viewDidLoad));
 //    });
 //}
+
+- (void)_fs_viewDidLoad{
+    NSLog(@"走到hook(1)的方法里了");
+    [self _fs_viewDidLoad];
+}
+
+- (void)_fs_viewDidLoad_hookAgain{
+    NSLog(@"走到hook(2)的方法里了");
+    [self _fs_viewDidLoad_hookAgain];
+}
 
 - (void)dealloc{
     NSLog(@"%s",__FUNCTION__);
@@ -70,7 +93,9 @@
 }
 
 - (void)click{
-    [self aboutThreadOfQueue];
+    Class Class_VC = NSClassFromString(@"FSPageController");
+    UIViewController *vc = [[Class_VC alloc] init];
+    [self presentViewController:vc animated:YES completion:nil];
 }
 
 - (void)aboutThreadOfQueue{

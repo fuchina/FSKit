@@ -69,7 +69,7 @@ NSInteger _fs_integerTimeIntevalSince1970(void){
 }
 
 + (void)copyToPasteboard:(NSString *)copyString{
-    if (![copyString isKindOfClass:[NSString class]]) {
+    if (![copyString isKindOfClass:NSString.class]) {
         return;
     }
     UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
@@ -1137,7 +1137,7 @@ NSString* _fs_KMGUnit(NSInteger size){
 }
 
 + (BOOL)isStringContainsStringAndNumber:(NSString *)sourceString{
-    if ([sourceString isKindOfClass:[NSString class]]) {
+    if ([sourceString isKindOfClass:NSString.class]) {
         if (sourceString.length == 0) {
             return NO;
         }
@@ -1186,11 +1186,11 @@ NSString* _fs_KMGUnit(NSInteger size){
 }
 
 + (BOOL)isValidateString:(NSString *)string{
-    return [string isKindOfClass:[NSString class]] && string.length;
+    return [string isKindOfClass:NSString.class] && string.length;
 }
 
 BOOL _fs_isPureInt(NSString *string){
-    if (![string isKindOfClass:[NSString class]]) {
+    if (![string isKindOfClass:NSString.class]) {
         string = [string description];
     }
     if (string.length == 0) {
@@ -1202,7 +1202,7 @@ BOOL _fs_isPureInt(NSString *string){
 }
 
 BOOL _fs_isPureFloat(NSString *string){
-    if (![string isKindOfClass:[NSString class]]) {
+    if (![string isKindOfClass:NSString.class]) {
         string = [string description];
     }
     if (string.length == 0) {
@@ -1214,15 +1214,15 @@ BOOL _fs_isPureFloat(NSString *string){
 }
 
 BOOL _fs_isValidateString(NSString *string){
-    return [string isKindOfClass:[NSString class]] && string.length;
+    return [string isKindOfClass:NSString.class] && string.length;
 }
 
 BOOL _fs_isValidateArray(NSArray *array){
-    return [array isKindOfClass:[NSArray class]] && array.count;
+    return [array isKindOfClass:NSArray.class] && array.count;
 }
 
 BOOL _fs_isValidateDictionary(NSDictionary *dictionary){
-    return [dictionary isKindOfClass:[NSDictionary class]] && dictionary.count;
+    return [dictionary isKindOfClass:NSDictionary.class] && dictionary.count;
 }
 
 BOOL _fs_floatEqual(CGFloat aNumber,CGFloat bNumber){
@@ -1250,7 +1250,7 @@ BOOL _fs_floatEqual(CGFloat aNumber,CGFloat bNumber){
 }
 
 NSString *_fs_md5(NSString *str){
-    if (![str isKindOfClass:[NSString class]]) {
+    if (![str isKindOfClass:NSString.class]) {
         return nil;
     }
     const char *cStr = [str UTF8String];
@@ -1437,12 +1437,12 @@ NSString *_fs_md5(NSString *str){
 }
 
 + (NSString *)bankStyleDataThree:(id)data{
-    if ([data isKindOfClass:[NSNumber class]]) {
+    if ([data isKindOfClass:NSNumber.class]) {
         NSNumberFormatter *numberFormatter = [[NSNumberFormatter alloc] init];
         [numberFormatter setPositiveFormat:@"###,##0.00;"];    // 100,000.00
         NSString *formattedNumberString = [numberFormatter stringFromNumber:[NSNumber numberWithDouble:[data doubleValue]]];
         return formattedNumberString;
-    }else if([data isKindOfClass:[NSString class]]){
+    }else if([data isKindOfClass:NSString.class]){
         if (_fs_isPureFloat(data) || _fs_isPureInt(data)) {
             NSNumberFormatter *numberFormatter = [[NSNumberFormatter alloc] init];
             [numberFormatter setPositiveFormat:@"###,##0.00;"];    // 100,000.00
@@ -1457,13 +1457,13 @@ NSString *_fs_md5(NSString *str){
 }
 
 + (NSString *)bankStyleData:(id)data{
-    if ([data isKindOfClass:[NSNumber class]]) {
+    if ([data isKindOfClass:NSNumber.class]) {
         NSNumberFormatter *numberFormatter = [[NSNumberFormatter alloc] init];
         //        [numberFormatter setPositiveFormat:@"###,##0.00;"];    // 100,000.00
         [numberFormatter setPositiveFormat:@"0.00;"];
         NSString *formattedNumberString = [numberFormatter stringFromNumber:[NSNumber numberWithDouble:[data doubleValue]]];
         return formattedNumberString;
-    }else if([data isKindOfClass:[NSString class]]){
+    }else if([data isKindOfClass:NSString.class]){
         if (_fs_isPureFloat(data) || _fs_isPureInt(data)) {
             NSNumberFormatter *numberFormatter = [[NSNumberFormatter alloc] init];
             [numberFormatter setPositiveFormat:@"0.00;"];
@@ -1659,7 +1659,7 @@ NSString *_fs_md5(NSString *str){
     for (int index = 0; index < [features count]; index ++) {
         CIQRCodeFeature *feature = [features objectAtIndex:index];
         result = feature.messageString;
-        if ([result isKindOfClass:[NSString class]]) {
+        if ([result isKindOfClass:NSString.class]) {
             break;
         }
     }
@@ -1773,7 +1773,7 @@ NSString *_fs_md5(NSString *str){
 
 // 银行卡每4个隔空格
 + (NSString *)forthCarNumber:(NSString *)text{
-    if (![text isKindOfClass:[NSString class]]) {
+    if (![text isKindOfClass:NSString.class]) {
         text = text.description;
     }
     text = [text stringByReplacingOccurrencesOfString:@" " withString:@""];

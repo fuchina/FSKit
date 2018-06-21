@@ -13,7 +13,7 @@
 @implementation FSEntity
 
 - (instancetype)initWithDictionary:(NSDictionary *)dictionary{
-    if ([dictionary isKindOfClass:[NSDictionary class]]) {
+    if ([dictionary isKindOfClass:NSDictionary.class]) {
         [self setAttributes:dictionary];
     }
     return self;
@@ -64,9 +64,9 @@
     NSString *desc;
     
     if (customDesc && [customDesc length] > 0 ) {
-        desc = [NSString stringWithFormat:@"%@:{%@,%@}",[self class],attrsDesc,customDesc];
+        desc = [NSString stringWithFormat:@"%@:{%@,%@}",self.class,attrsDesc,customDesc];
     }else {
-        desc = [NSString stringWithFormat:@"%@:{%@}",[self class],attrsDesc];
+        desc = [NSString stringWithFormat:@"%@:{%@}",self.class,attrsDesc];
     }
     return desc;
 }
@@ -89,9 +89,9 @@
         if ([self respondsToSelector:sel]) {
             NSString *dataDicKey = [attrMapDic objectForKey:attributeName];
             NSObject *value = [dataDic objectForKey:dataDicKey];
-            if ([value isKindOfClass:[NSArray class]] || [value isKindOfClass:[NSDictionary class]] || [value isKindOfClass:[NSString class]]) {
+            if ([value isKindOfClass:NSArray.class] || [value isKindOfClass:NSDictionary.class] || [value isKindOfClass:NSString.class]) {
             }else{
-                if (value == nil || [value isEqual:[NSNull null]]) {
+                if (value == nil || [value isEqual:NSNull.null]) {
                     value = @"";
                 }else{
                     value = value.description;// nil变量调用description仍然为nil
@@ -178,7 +178,7 @@
 - (NSArray *)propertiesList{
     NSMutableArray *array = [[NSMutableArray alloc] init];
     unsigned int propertyCount = 0;
-    objc_property_t *properties = class_copyPropertyList([self class], &propertyCount);
+    objc_property_t *properties = class_copyPropertyList(self.class, &propertyCount);
     
     for (unsigned int i = 0; i < propertyCount; ++i) {
         objc_property_t property = properties[i];

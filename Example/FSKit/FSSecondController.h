@@ -10,4 +10,6 @@
 
 @interface FSSecondController : UIViewController
 
+- (void)setText:(NSString *)text;
+
 @end

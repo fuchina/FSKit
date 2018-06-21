@@ -9,6 +9,7 @@
 
 @implementation FSConstant
 
+// 横屏时会改变，这个不是常量
 + (CGFloat)screenWidth{
     static CGFloat w = 0;
     if (w < 1) {

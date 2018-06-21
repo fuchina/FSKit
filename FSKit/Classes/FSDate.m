@@ -84,7 +84,7 @@
 }
 
 + (NSDate *)dateByString:(NSString *)str formatter:(NSString *)formatter{
-    if (!([str isKindOfClass:[NSString class]] && str.length)) {
+    if (!([str isKindOfClass:NSString.class] && str.length)) {
         return nil;
     }
     static NSDateFormatter *dateFormatter = nil;
@@ -97,7 +97,7 @@
 }
 
 + (NSString *)stringWithDate:(NSDate *)date formatter:(NSString *)formatter{
-    if (![date isKindOfClass:[NSDate class]]) {
+    if (![date isKindOfClass:NSDate.class]) {
         return nil;
     }
     static NSDateFormatter *dateFormatter = nil;
@@ -109,7 +109,7 @@
 }
 
 + (NSDateComponents *)chineseDate:(NSDate *)date{
-    if (![date isKindOfClass:[NSDate class]]) {
+    if (![date isKindOfClass:NSDate.class]) {
         return nil;
     }
     NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierChinese];
@@ -118,7 +118,7 @@
 }
 
 + (NSArray<NSString *> *)chineseCalendarForDate:(NSDate *)date{
-    if (![date isKindOfClass:[NSDate class]]) {
+    if (![date isKindOfClass:NSDate.class]) {
         return nil;
     }
     NSDateComponents *components = [self chineseDate:date];
@@ -211,7 +211,7 @@
 }
 
 + (BOOL)isTheSameDayA:(NSDate *)aDate b:(NSDate *)bDate{
-    if (!([aDate isKindOfClass:[NSDate class]] && [bDate isKindOfClass:[NSDate class]])) {
+    if (!([aDate isKindOfClass:NSDate.class] && [bDate isKindOfClass:NSDate.class])) {
         return NO;
     }
     NSDateComponents *f = [self componentForDate:aDate];
@@ -263,7 +263,7 @@
 }
 
 + (NSInteger)publicFunction:(NSDate *)date str:(NSString *(^)(NSDateComponents *c))callback{
-    if (![date isKindOfClass:[NSDate class]]) {
+    if (![date isKindOfClass:NSDate.class]) {
         return 0;
     }
     NSDateComponents *c = [self componentForDate:date];

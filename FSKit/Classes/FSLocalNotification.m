@@ -47,10 +47,10 @@ static FSLocalNotification *_instance = nil;
 - (void)removeNotification:(NSArray<NSString *> *)identifiers delivered:(BOOL)delivered pending:(BOOL)pending{
     if (@available(iOS 10.0, *)) {
         if ((delivered || pending)) {
-            BOOL validateArray = [identifiers isKindOfClass:[NSArray class]] && identifiers;
+            BOOL validateArray = [identifiers isKindOfClass:NSArray.class] && identifiers;
             if (validateArray) {
                 BOOL allString = YES;
-                Class _Class_String = [NSString class];
+                Class _Class_String = NSString.class;
                 for (NSString *str in identifiers) {
                     if (![str isKindOfClass:_Class_String]) {
                         allString = NO;
@@ -95,12 +95,12 @@ static FSLocalNotification *_instance = nil;
 }
 
 - (void)addLocalNotificationWithIdentifier:(NSString *)identifier title:(NSString *)title subTitle:(NSString *)subTitle body:(NSString *)body userInfo:(NSDictionary *)userInfo date:(NSDate *)date calendarUnit:(NSCalendarUnit)unit repeats:(BOOL)repeats success:(void(^)(NSDate *date))success fail:(void(^)(NSError *error))fail{
-    Class StringClass = [NSString class];
+    Class StringClass = NSString.class;
     if (!([identifier isKindOfClass:StringClass] && identifier.length)) {
         NSAssert(identifier, @"LocalNotification's identifier has no length");
         return;
     }
-    if (![date isKindOfClass:[NSDate class]]) {
+    if (![date isKindOfClass:NSDate.class]) {
         return;
     }
     if (@available(iOS 10.0,*)) {
@@ -115,7 +115,7 @@ static FSLocalNotification *_instance = nil;
         if ([body isKindOfClass:StringClass] && body.length) {
             content.body = body;
         }
-        if ([userInfo isKindOfClass:[NSDictionary class]] && userInfo.count) {
+        if ([userInfo isKindOfClass:NSDictionary.class] && userInfo.count) {
             content.userInfo = userInfo;
         }
         content.sound = [UNNotificationSound defaultSound];
@@ -148,7 +148,7 @@ static FSLocalNotification *_instance = nil;
 }
 
 - (void)addLocalNotificationWithIdentifier:(NSString *)identifier title:(NSString *)title subTitle:(NSString *)subTitle body:(NSString *)body success:(void(^)(void))success fail:(void(^)(NSError *error))fail{
-    Class StringClass = [NSString class];
+    Class StringClass = NSString.class;
     if (!([identifier isKindOfClass:StringClass] && identifier.length)) {
         NSAssert(identifier, @"LocalNotification's identifier has no length");
         return;
@@ -207,7 +207,7 @@ static FSLocalNotification *_instance = nil;
     NSString *subtitle = content.subtitle;  // 推送消息的副标题
     NSString *title = content.title;  // 推送消息的标题
     
-    if([notification.request.trigger isKindOfClass:[UNPushNotificationTrigger class]]) {
+    if([notification.request.trigger isKindOfClass:UNPushNotificationTrigger.class]) {
         
     } else {
         NSLog(@"iOS10 前台收到本地通知:{\\\\nbody:%@，\\\\ntitle:%@,\\\\nsubtitle:%@,\\\\nbadge：%@，\\\\nsound：%@，\\\\nuserInfo：%@\\\\n}",body,title,subtitle,badge,sound,userInfo);

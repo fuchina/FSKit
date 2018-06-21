@@ -16,10 +16,10 @@
 }
 
 + (NSString *)pdfForString:(NSString *)text pdfName:(NSString *)pdfName password:(NSString *)password{
-    if (!([text isKindOfClass:[NSString class]] && text.length)) {
+    if (!([text isKindOfClass:NSString.class] && text.length)) {
         return nil;
     }
-    if (!([pdfName isKindOfClass:[NSString class]] && pdfName.length)) {
+    if (!([pdfName isKindOfClass:NSString.class] && pdfName.length)) {
         pdfName = [[NSString alloc] initWithFormat:@"%@.pdf",@((NSInteger)[[NSDate date] timeIntervalSince1970])];
     }
     
@@ -104,7 +104,7 @@
 }
 
 + (NSString *)pdfForView:(UIView *)view pdfName:(NSString *)pdfName{
-    if (!([pdfName isKindOfClass:[NSString class]] && pdfName.length)) {
+    if (!([pdfName isKindOfClass:NSString.class] && pdfName.length)) {
         return nil;
     }
     
@@ -145,7 +145,7 @@
     if (!data) {
         return nil;
     }
-    if (!([password isKindOfClass:[NSString class]] && password.length)) {
+    if (!([password isKindOfClass:NSString.class] && password.length)) {
         password = nil;
     }
     return [self FSCreatePDFFileWithSrc:data toDestFile:pdfName withPassword:password];

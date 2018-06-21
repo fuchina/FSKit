@@ -10,7 +10,7 @@
 @implementation FSURLSession
 
 + (void)sessionGet:(NSString *)urlString success:(void (^)(id value))success fail:(void (^)(void))fail{
-    if (!([urlString isKindOfClass:[NSString class]] && urlString.length)) {
+    if (!([urlString isKindOfClass:NSString.class] && urlString.length)) {
         return;
     }
     NSURL *url = [NSURL URLWithString:urlString];
@@ -38,7 +38,7 @@
 }
 
 + (void)sessionPost:(NSString *)urlString{
-    if (!([urlString isKindOfClass:[NSString class]] && urlString.length)) {
+    if (!([urlString isKindOfClass:NSString.class] && urlString.length)) {
         return;
     }
     NSURL *url = [NSURL URLWithString:urlString];

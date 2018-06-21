@@ -98,10 +98,10 @@
 }
 
 + (CGFloat)textHeight:(NSString *)text font:(UIFont *)font labelWidth:(CGFloat)labelWidth{
-    if (![font isKindOfClass:[UIFont class]]) {
+    if (![font isKindOfClass:UIFont.class]) {
         return 0;
     }
-    if (!([text isKindOfClass:[NSString class]] && text.length)) {
+    if (!([text isKindOfClass:NSString.class] && text.length)) {
         return 0;
     }
     NSMutableAttributedString *attrStr = [[NSMutableAttributedString alloc] initWithString:text];
@@ -118,10 +118,10 @@
 }
 
 + (CGFloat)textWidth:(NSString *)text font:(UIFont *)font labelHeight:(CGFloat)labelHeight{
-    if (![font isKindOfClass:[UIFont class]]) {
+    if (![font isKindOfClass:UIFont.class]) {
         return 0;
     }
-    if (!([text isKindOfClass:[NSString class]] && text.length)) {
+    if (!([text isKindOfClass:NSString.class] && text.length)) {
         return 0;
     }
     

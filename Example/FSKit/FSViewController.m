@@ -33,6 +33,7 @@
 
 - (void)click{
     FSSecondController *vc = [[FSSecondController alloc] init];
+    [vc setText:@"我不会出现"];
     [self.navigationController pushViewController:vc animated:YES];
 }
 

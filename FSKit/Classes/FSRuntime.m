@@ -63,7 +63,7 @@
 }
 
 + (void)setValue:(id)value forPropertyName:(NSString *)name ofObject:(id)object{
-    BOOL check = [name isKindOfClass:[NSString class]] && name.length;
+    BOOL check = [name isKindOfClass:NSString.class] && name.length;
     if (!check) {
         return;
     }
@@ -74,7 +74,7 @@
 }
 
 + (void)setValue:(id)value forIvarName:(NSString *)name ofObject:(id)object{
-    if (!(object && [name isKindOfClass:[NSString class]] && name.length)) {
+    if (!(object && [name isKindOfClass:NSString.class] && name.length)) {
         return;
     }
     SEL sel = [self setterSELWithAttibuteName:name];
@@ -88,7 +88,7 @@
         return nil;
     }
     id instance = [[Entity alloc] init];
-    BOOL check = [dic isKindOfClass:[NSDictionary class]] && dic.count;
+    BOOL check = [dic isKindOfClass:NSDictionary.class] && dic.count;
     if (check) {
         NSArray *keys = [dic allKeys];
         for (NSString *key in keys) {
@@ -100,7 +100,7 @@
 }
 
 + (id)valueForGetSelectorWithPropertyName:(NSString *)name object:(id)instance{
-    if (!([name isKindOfClass:[NSString class]]) && name.length) {
+    if (!([name isKindOfClass:NSString.class]) && name.length) {
         return nil;
     }
     return [instance valueForKey:name];
@@ -111,7 +111,7 @@
     NSMutableDictionary *dic = [[NSMutableDictionary alloc] initWithCapacity:ps.count];
     for (NSString *p in ps) {
         NSString *value = [self valueForGetSelectorWithPropertyName:p object:model];
-        if ([value isKindOfClass:[NSString class]] || [value isKindOfClass:[NSNumber class]]) {
+        if ([value isKindOfClass:NSString.class] || [value isKindOfClass:NSNumber.class]) {
             [dic setObject:value forKey:p];
         }else{
             [dic setObject:@"" forKey:p];
