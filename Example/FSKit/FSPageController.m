@@ -15,7 +15,8 @@
 @end
 
 @implementation FSPageController{
-    NSArray *_list;
+    NSArray         *_list;
+    NSInteger       _thePage;
 }
 
 - (void)viewDidLoad {
@@ -29,11 +30,18 @@
     
     UIViewController *vc1 = [UIViewController new];
     vc1.view.backgroundColor = [UIColor redColor];
+    vc1.view.tag = 1;
     
     UIViewController *vc2 = [UIViewController new];
     vc2.view.backgroundColor = [UIColor yellowColor];
+    vc2.view.tag = 2;
     
-    _list = @[vc1,vc2];
+    UIViewController *vc3 = [UIViewController new];
+    vc3.view.backgroundColor = [UIColor blueColor];
+    vc3.view.tag = 3;
+
+    
+    _list = @[vc1,vc2,vc3];
     
     [self.page setViewControllers:@[vc1] direction:UIPageViewControllerNavigationDirectionReverse animated:YES completion:nil];
 }
@@ -52,17 +60,35 @@
 
 #pragma mark
 - (UIViewController *)pageViewController:(UIPageViewController *)pageViewController viewControllerBeforeViewController:(UIViewController *)viewController{
+    NSInteger count = _list.count;
     if (viewController == _list.firstObject) {
-        return nil;
+        _selectedIndex = (_list.count -1);
+    }else{
+        NSInteger index = [_list indexOfObject:viewController];
+        if (_list.count > (index - 1)) {
+            _selectedIndex = index - 1;
+        }
     }
-    return _list.firstObject;
+    if (count > _selectedIndex) {
+        return _list[_selectedIndex];
+    }
+    return nil;
 }
 
 - (UIViewController *)pageViewController:(UIPageViewController *)pageViewController viewControllerAfterViewController:(UIViewController *)viewController{
+    NSInteger count = _list.count;
     if (viewController == _list.lastObject) {
-        return nil;
+        _selectedIndex = 0;
+    }else{
+        NSInteger index = [_list indexOfObject:viewController];
+        if (_list.count > (index + 1)) {
+            _selectedIndex = index + 1;
+        }
     }
-    return _list.lastObject;
+    if (count > _selectedIndex) {
+        return _list[_selectedIndex];
+    }
+    return nil;
 }
 
 - (void)setSelectedIndex:(NSInteger)selectedIndex{
@@ -81,12 +107,28 @@
     }
 }
 
-- (void)pageViewController:(UIPageViewController *)pageViewController didFinishAnimating:(BOOL)finished previousViewControllers:(NSArray<UIViewController *> *)previousViewControllers transitionCompleted:(BOOL)completed {
-    NSLog(@"didFinishAnimating");
+// Sent when a gesture-initiated transition begins.
+- (void)pageViewController:(UIPageViewController *)pageViewController willTransitionToViewControllers:(NSArray<UIViewController *> *)pendingViewControllers NS_AVAILABLE_IOS(6_0){
+    
+}
+
+// Sent when a gesture-initiated transition ends. The 'finished' parameter indicates whether the animation finished, while the 'completed' parameter indicates whether the transition completed or bailed out (if the user let go early).
+- (void)pageViewController:(UIPageViewController *)pageViewController didFinishAnimating:(BOOL)finished previousViewControllers:(NSArray<UIViewController *> *)previousViewControllers transitionCompleted:(BOOL)completed{
     if (completed) {
-//        self.segmentView.selectedIndex = ld_currentIndex ;
+     
+        NSLog(@"didFinishAnimating:%@",@(_selectedIndex));
     }
 }
+
+// Delegate may specify a different spine location for after the interface orientation change. Only sent for transition style 'UIPageViewControllerTransitionStylePageCurl'.
+// Delegate may set new view controllers or update double-sided state within this method's implementation as well.
+//- (UIPageViewControllerSpineLocation)pageViewController:(UIPageViewController *)pageViewController spineLocationForInterfaceOrientation:(UIInterfaceOrientation)orientation __TVOS_PROHIBITED{
+//    return <#expression#>
+//}
+
+//- (UIInterfaceOrientationMask)pageViewControllerSupportedInterfaceOrientations:(UIPageViewController *)pageViewController NS_AVAILABLE_IOS(7_0) __TVOS_PROHIBITED;
+//- (UIInterfaceOrientation)pageViewControllerPreferredInterfaceOrientationForPresentation:(UIPageViewController *)pageViewController NS_AVAILABLE_IOS(7_0) __TVOS_PROHIBITED;
+
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
