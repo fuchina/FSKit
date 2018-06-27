@@ -13,7 +13,6 @@
 		5C267B8A20CFC3FA00A8A001 /* FSLocalNotificationController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C267B8920CFC3FA00A8A001 /* FSLocalNotificationController.m */; };
 		5C269E3C201AEDB200403CA3 /* FSLeakView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C269E3B201AEDB200403CA3 /* FSLeakView.m */; };
 		5C2A3A9220511615002A55A7 /* FSBankWork.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C2A3A9120511615002A55A7 /* FSBankWork.m */; };
-		5C2B2D2020E37E1000E37281 /* FSBestUpdateController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C2B2D1F20E37E1000E37281 /* FSBestUpdateController.m */; };
 		5C33620C1F7F911900FE73CD /* FSAPP.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C33620B1F7F911900FE73CD /* FSAPP.m */; };
 		5C4259A71F4FCEE300DAED6A /* FSModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C4259A61F4FCEE300DAED6A /* FSModel.m */; };
 		5C91FED62028670C00D662BC /* FSBackWork.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C91FED52028670C00D662BC /* FSBackWork.m */; };
@@ -66,8 +65,6 @@
 		5C269E3B201AEDB200403CA3 /* FSLeakView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FSLeakView.m; sourceTree = "<group>"; };
 		5C2A3A9020511615002A55A7 /* FSBankWork.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FSBankWork.h; sourceTree = "<group>"; };
 		5C2A3A9120511615002A55A7 /* FSBankWork.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FSBankWork.m; sourceTree = "<group>"; };
-		5C2B2D1E20E37E1000E37281 /* FSBestUpdateController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FSBestUpdateController.h; sourceTree = "<group>"; };
-		5C2B2D1F20E37E1000E37281 /* FSBestUpdateController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FSBestUpdateController.m; sourceTree = "<group>"; };
 		5C33620A1F7F911900FE73CD /* FSAPP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSAPP.h; sourceTree = "<group>"; };
 		5C33620B1F7F911900FE73CD /* FSAPP.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSAPP.m; sourceTree = "<group>"; };
 		5C4259A51F4FCEE300DAED6A /* FSModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSModel.h; sourceTree = "<group>"; };
@@ -215,8 +212,6 @@
 				5C91FED52028670C00D662BC /* FSBackWork.m */,
 				5C2A3A9020511615002A55A7 /* FSBankWork.h */,
 				5C2A3A9120511615002A55A7 /* FSBankWork.m */,
-				5C2B2D1E20E37E1000E37281 /* FSBestUpdateController.h */,
-				5C2B2D1F20E37E1000E37281 /* FSBestUpdateController.m */,
 				71719F9D1E33DC2100824A3D /* LaunchScreen.storyboard */,
 				6003F5A8195388D20070C39A /* Images.xcassets */,
 				6003F594195388D20070C39A /* Supporting Files */,
@@ -455,7 +450,6 @@
 				5C1B13232089BBF600D50AB6 /* FSLeftController.m in Sources */,
 				5CD44A822088929E00A66E00 /* FSSQLite3Controller.m in Sources */,
 				5CF882CC2046CDF200896432 /* FSPullupView.m in Sources */,
-				5C2B2D2020E37E1000E37281 /* FSBestUpdateController.m in Sources */,
 				5C2A3A9220511615002A55A7 /* FSBankWork.m in Sources */,
 				6003F59A195388D20070C39A /* main.m in Sources */,
 			);
