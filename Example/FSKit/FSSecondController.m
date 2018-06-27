@@ -93,6 +93,10 @@
 }
 
 - (void)click{
+    [FSKit pushToViewControllerWithClass:@"FSBestUpdateController" navigationController:self.navigationController param:nil configBlock:nil];
+}
+
+- (void)clickClass{
     Class Class_VC = NSClassFromString(@"FSPageController");
     UIViewController *vc = [[Class_VC alloc] init];
     [self presentViewController:vc animated:YES completion:nil];
