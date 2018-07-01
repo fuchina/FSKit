@@ -126,30 +126,30 @@
 }
 
 - (void)url_12306{
-    // GET
-    static NSString *code = @"https://kyfw.12306.cn/otn/passcodeNew/getPassCodeNew.do?module=login&rand=sjrand&";   // 验证码
-    static NSString *people = @"https://kyfw.12306.cn/otn/passengers/init";// 联系人
-    static NSString *query = @"https://kyfw.12306.cn/otn/leftTicket/query?";// 查票
-    
-    // POST
-    
-    _imageView.image = nil;
-    [FSURLSession sessionGet:people success:^(id value) {
-        NSInteger type = 0;
-        if (type == 0) {
-            NSString *content = [[NSString alloc] initWithData:(NSData *)value encoding:NSUTF8StringEncoding];
-            if (content) {
-                NSLog(@"%@",content);
-            }
-        }else{
-            UIImage *image = [[UIImage alloc] initWithData:(NSData *)value];
-            if (image) {
-                self->_imageView.image = image;
-            }
-        }
-    } fail:^{
-        
-    }];
+//    // GET
+//    static NSString *code = @"https://kyfw.12306.cn/otn/passcodeNew/getPassCodeNew.do?module=login&rand=sjrand&";   // 验证码
+//    static NSString *people = @"https://kyfw.12306.cn/otn/passengers/init";// 联系人
+//    static NSString *query = @"https://kyfw.12306.cn/otn/leftTicket/query?";// 查票
+//    
+//    // POST
+//    
+//    _imageView.image = nil;
+//    [FSURLSession sessionGet:people success:^(id value) {
+//        NSInteger type = 0;
+//        if (type == 0) {
+//            NSString *content = [[NSString alloc] initWithData:(NSData *)value encoding:NSUTF8StringEncoding];
+//            if (content) {
+//                NSLog(@"%@",content);
+//            }
+//        }else{
+//            UIImage *image = [[UIImage alloc] initWithData:(NSData *)value];
+//            if (image) {
+//                self->_imageView.image = image;
+//            }
+//        }
+//    } fail:^{
+//        
+//    }];
 }
 
 - (void)clickSync{
