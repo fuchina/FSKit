@@ -2052,6 +2052,57 @@ void _fs_runloop_freeTime_event(void(^event)(void)){
     }
 }
 
+NSString *_fs_highAccuracy_add(NSString *a,NSString *b){
+    if (!_fs_isPureFloat(a)) {
+        a = @"0";
+    }
+    if (!_fs_isPureFloat(b)) {
+        b = @"0";
+    }
+    NSDecimalNumber *addendNumber = [NSDecimalNumber decimalNumberWithString:a];
+    NSDecimalNumber *augendNumber = [NSDecimalNumber decimalNumberWithString:b];
+    NSDecimalNumber *sumNumber = [addendNumber decimalNumberByAdding:augendNumber];
+    return [sumNumber stringValue];
+}
+
+NSString *_fs_highAccuracy_subtract(NSString *a,NSString *b){
+    if (!_fs_isPureFloat(a)) {
+        a = @"0";
+    }
+    if (!_fs_isPureFloat(b)) {
+        b = @"0";
+    }
+    NSDecimalNumber *addendNumber = [NSDecimalNumber decimalNumberWithString:a];
+    NSDecimalNumber *augendNumber = [NSDecimalNumber decimalNumberWithString:b];
+    NSDecimalNumber *sumNumber = [addendNumber decimalNumberBySubtracting:augendNumber];
+    return [sumNumber stringValue];
+}
+
+NSString *_fs_highAccuracy_multiply(NSString *a,NSString *b){
+    if (!_fs_isPureFloat(a)) {
+        a = @"0";
+    }
+    if (!_fs_isPureFloat(b)) {
+        b = @"0";
+    }
+    NSDecimalNumber *addendNumber = [NSDecimalNumber decimalNumberWithString:a];
+    NSDecimalNumber *augendNumber = [NSDecimalNumber decimalNumberWithString:b];
+    NSDecimalNumber *sumNumber = [addendNumber decimalNumberByMultiplyingBy:augendNumber];
+    return [sumNumber stringValue];
+}
+
+NSString *_fs_highAccuracy_divide(NSString *a,NSString *b){
+    if (!_fs_isPureFloat(a)) {
+        a = @"0";
+    }
+    if (!_fs_isPureFloat(b)) {
+        b = @"0";
+    }
+    NSDecimalNumber *addendNumber = [NSDecimalNumber decimalNumberWithString:a];
+    NSDecimalNumber *augendNumber = [NSDecimalNumber decimalNumberWithString:b];
+    NSDecimalNumber *sumNumber = [addendNumber decimalNumberByDividingBy:augendNumber];
+    return [sumNumber stringValue];
+}
 
 @end
 

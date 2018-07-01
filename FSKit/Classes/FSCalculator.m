@@ -219,32 +219,4 @@
         return @[@.45,@13505];
 }
 
-+ (NSString *)highAdd:(NSString *)aValue add:(NSString *)bValue{
-    NSDecimalNumber *addendNumber = [NSDecimalNumber decimalNumberWithString:aValue];
-    NSDecimalNumber *augendNumber = [NSDecimalNumber decimalNumberWithString:bValue];
-    NSDecimalNumber *sumNumber = [addendNumber decimalNumberByAdding:augendNumber];
-    return [sumNumber stringValue];
-}
-
-+ (NSString *)highSubtract:(NSString *)fontValue add:(NSString *)backValue{
-    NSDecimalNumber *addendNumber = [NSDecimalNumber decimalNumberWithString:fontValue];
-    NSDecimalNumber *augendNumber = [NSDecimalNumber decimalNumberWithString:backValue];
-    NSDecimalNumber *sumNumber = [addendNumber decimalNumberBySubtracting:augendNumber];
-    return [sumNumber stringValue];
-}
-
-+ (NSString *)highMultiply:(NSString *)aValue add:(NSString *)bValue{
-    NSDecimalNumber *addendNumber = [NSDecimalNumber decimalNumberWithString:aValue];
-    NSDecimalNumber *augendNumber = [NSDecimalNumber decimalNumberWithString:bValue];
-    NSDecimalNumber *sumNumber = [addendNumber decimalNumberByMultiplyingBy:augendNumber];
-    return [sumNumber stringValue];
-}
-
-+ (NSString *)highDivide:(NSString *)aValue add:(NSString *)bValue{
-    NSDecimalNumber *addendNumber = [NSDecimalNumber decimalNumberWithString:aValue];
-    NSDecimalNumber *augendNumber = [NSDecimalNumber decimalNumberWithString:bValue];
-    NSDecimalNumber *sumNumber = [addendNumber decimalNumberByDividingBy:augendNumber];
-    return [sumNumber stringValue];
-}
-
 @end

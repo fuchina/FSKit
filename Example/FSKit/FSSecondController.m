@@ -20,6 +20,7 @@
 #import "FSLocalNotificationController.h"
 #import <FSKit/FSDBMaster.h>
 #import "FSSQLite3Controller.h"
+#import <FSKit/FSCalculator.h>
 
 @interface FSSecondController ()
 
@@ -93,7 +94,11 @@
 }
 
 - (void)click{
-    [FSKit pushToViewControllerWithClass:@"FSBestUpdateController" navigationController:self.navigationController param:nil configBlock:nil];
+    NSString *a = @"10.429";
+    NSString *b = @"-5.23";
+    NSString *add = _fs_highAccuracy_add(a, b);
+    NSString *minus = _fs_highAccuracy_subtract(a, b);
+    NSLog(@"%@-%@",add,minus);
 }
 
 - (void)clickClass{

@@ -34,10 +34,4 @@
 // 返回税率（index[0]）和速算扣除数(index[1])
 + (NSArray *)taxRateForMoney:(CGFloat)money;
 
-// 高精度计算
-+ (NSString *)highAdd:(NSString *)aValue add:(NSString *)bValue;
-+ (NSString *)highSubtract:(NSString *)fontValue add:(NSString *)backValue;
-+ (NSString *)highMultiply:(NSString *)aValue add:(NSString *)bValue;
-+ (NSString *)highDivide:(NSString *)aValue add:(NSString *)bValue;
-
 @end
