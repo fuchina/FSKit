@@ -93,7 +93,7 @@
     return as;
 }
 
-- (void)click{
+- (void)clickHigh{
     NSString *a = @"10.429";
     NSString *b = @"-5.23";
     NSString *add = _fs_highAccuracy_add(a, b);
@@ -101,7 +101,7 @@
     NSLog(@"%@-%@",add,minus);
 }
 
-- (void)clickClass{
+- (void)click{
     Class Class_VC = NSClassFromString(@"FSPageController");
     UIViewController *vc = [[Class_VC alloc] init];
     [self presentViewController:vc animated:YES completion:nil];

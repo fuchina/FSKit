@@ -48,7 +48,7 @@
 
 - (UIPageViewController *)page{
     if (!_page) {
-        NSDictionary *option = @{UIPageViewControllerOptionInterPageSpacingKey:@10};
+        NSDictionary *option = @{UIPageViewControllerOptionInterPageSpacingKey:@1};
         _page = [[UIPageViewController alloc] initWithTransitionStyle:UIPageViewControllerTransitionStyleScroll navigationOrientation:UIPageViewControllerNavigationOrientationHorizontal options:option];
         _page.delegate = self;
         _page.dataSource = self;
