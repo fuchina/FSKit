@@ -174,6 +174,57 @@ static FSDBMaster *_instance = nil;
     return [self execSQL:sql type:@"新增数据"];
 }
 
+- (NSString *)insertSQL:(NSString *)sql fields_values:(NSDictionary<NSString *,id> *)list table:(NSString *)table{
+//    if (!([table isKindOfClass:NSString.class] && table.length)) {
+//        return @"表名为空";
+//    }
+//    NSString *error = [self createTableIfNotExists:table fields:fields];
+//    if (error) {
+//        return error;
+//    }
+//    return [self execSQL:sql type:@"新增数据"];
+    
+    if (!([list isKindOfClass:NSDictionary.class] && list.count)) {
+        return nil;
+    }
+    NSArray *keys = list.allKeys;
+    NSInteger count = keys.count;
+    NSMutableString *whys = [[NSMutableString alloc] init];
+    NSString *fies = [keys componentsJoinedByString:@","];
+    static NSString *_key_why = @"?";
+    static NSString *_key_why_space = @",?";
+    for (int x = 0; x < count; x ++) {
+        if (x) {
+            [whys appendString:_key_why_space];
+        }else{
+            [whys appendString:_key_why];
+        }
+    }
+    NSString *insert_sql = [[NSString alloc] initWithFormat:@"INSERT INTO %@ (%@) VALUES (%@)",table,fies,whys];
+    
+//    char *update = "INSERT OR REPLACE INTO PERSIONINFO(NAME,AGE,SEX,WEIGHT,ADDRESS)""VALUES(?,?,?,?,?);";
+    //上边的update也可以这样写：
+    //NSString *insert = [NSString stringWithFormat:@"INSERT OR REPLACE INTO PERSIONINFO('%@','%@','%@','%@','%@')VALUES(?,?,?,?,?)",NAME,AGE,SEX,WEIGHT,ADDRESS];
+    
+    char *errorMsg = NULL;
+    sqlite3_stmt *stmt;
+    
+    if (sqlite3_prepare_v2(_sqlite3, insert_sql.UTF8String, -1, &stmt, nil) == SQLITE_OK) {
+        
+        //【插入数据】在这里我们使用绑定数据的方法，参数一：sqlite3_stmt，参数二：插入列号，参数三：插入的数据，参数四：数据长度（-1代表全部），参数五：是否需要回调
+//        sqlite3_bind_text(stmt, 1, [self.nameTextField.text UTF8String], -1, NULL);
+//        sqlite3_bind_int(stmt, 2, [self.ageTextField.text intValue]);
+//        sqlite3_bind_text(stmt, 3, [self.sexTextField.text UTF8String], -1, NULL);
+//        sqlite3_bind_int(stmt, 4, [self.weightTextField.text integerValue]);
+//        sqlite3_bind_text(stmt, 5, [self.addressTextField.text UTF8String], -1, NULL);
+        
+    }
+    if (sqlite3_step(stmt) != SQLITE_DONE)
+        NSLog(@"数据更新失败");
+    
+    return nil;
+}
+
 - (NSString *)deleteSQL:(NSString *)sql{
     return [self execSQL:sql type:@"删除数据"];
 }
@@ -324,32 +375,34 @@ static FSDBMaster *_instance = nil;
 }
 
 - (NSString *)addField:(NSString *)field defaultValue:(NSString *)value toTable:(NSString *)table{
-    BOOL checkField = [field isKindOfClass:NSString.class] && field.length;
+    Class _class_NSString = NSString.class;
+    BOOL checkField = [field isKindOfClass:_class_NSString] && field.length;
     if (!checkField) {
         return @"字段不是字符串";
-    }
-    BOOL checkTable = [table isKindOfClass:NSString.class] && table.length;
-    if (!checkTable) {
-        return @"表不是字符串";
     }
     NSArray *keys = [self keywords];
     if ([keys containsObject:field]) {
         return @"字段名不能使用关键字";
+    }
+    BOOL checkTable = [table isKindOfClass:_class_NSString] && table.length;
+    if (!checkTable) {
+        return @"表名错误";
     }
     BOOL exist = [self checkTableExist:table];
     if (!exist) {
         return @"表不存在";
     }
     NSArray *fs = [self allFields:table];
-    BOOL fe = NO;
+    BOOL isFieldExist = NO;
+    NSString *_key_field_name = @"field_name";
     for (NSDictionary *dic in fs) {
-        NSString *f = [dic objectForKey:@"field_name"];
+        NSString *f = [dic objectForKey:_key_field_name];
         if ([f isEqualToString:field]) {
-            fe = YES;
+            isFieldExist = YES;
             break;
         }
     }
-    if (fe) {   // 表中已有改字段，算是增加成功了
+    if (isFieldExist) {   // 表中已有改字段，算是增加成功了
         return nil;
     }
     
@@ -407,9 +460,9 @@ int checkTableCallBack(void *param, int f_num, char **f_value, char **f_name){
     }
     
     if (number) {
-        [[NSUserDefaults standardUserDefaults] setObject:@(1) forKey:p];
+        [[NSUserDefaults standardUserDefaults] setObject:@YES forKey:p];
     }else{
-        [[NSUserDefaults standardUserDefaults] setObject:@"" forKey:p];
+        [[NSUserDefaults standardUserDefaults] setObject:@0 forKey:p];
     }
     return 0;
 }

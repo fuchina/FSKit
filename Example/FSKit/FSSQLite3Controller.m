@@ -23,8 +23,6 @@ static NSString *_table = @"apple";
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor whiteColor];
     
-    self.view.backgroundColor = [UIColor whiteColor];
-    
     UIButton *btn = [UIButton buttonWithType:UIButtonTypeSystem];
     btn.translatesAutoresizingMaskIntoConstraints = NO;
     btn.backgroundColor = [UIColor redColor];
@@ -39,13 +37,7 @@ static NSString *_table = @"apple";
     FSDBMaster *master = [FSDBMaster sharedInstance];
     NSLog(@"%@",master.dbPath);
     
-    NSString *error = [master dropTable:_table];
-    if (!error) {
-        NSLog(@"删除表成功");
-    }
-    
-    NSArray *allTables = [master allTables];
-    NSLog(@"\n\n\n\n%@",allTables);
+    [master insertSQL:nil fields_values:@{@"key":@"value"} table:@"name"];
 }
 
 - (void)addData{

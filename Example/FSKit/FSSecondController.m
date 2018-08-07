@@ -102,6 +102,10 @@
 }
 
 - (void)click{
+    
+}
+
+- (void)clickPage{
     Class Class_VC = NSClassFromString(@"FSPageController");
     UIViewController *vc = [[Class_VC alloc] init];
     [self presentViewController:vc animated:YES completion:nil];
