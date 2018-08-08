@@ -37,7 +37,10 @@ static NSString *_table = @"apple";
     FSDBMaster *master = [FSDBMaster sharedInstance];
     NSLog(@"%@",master.dbPath);
     
-    [master insertSQL:nil fields_values:@{@"key":@"value"} table:@"name"];
+    NSString *error = [master insert_fields_values:@{@"name":@"jack",@"age":@"20"} table:@"people"];
+    if (error) {
+        NSLog(@"error : %@",error);
+    }
 }
 
 - (void)addData{

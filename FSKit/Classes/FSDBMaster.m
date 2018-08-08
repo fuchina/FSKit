@@ -174,20 +174,21 @@ static FSDBMaster *_instance = nil;
     return [self execSQL:sql type:@"新增数据"];
 }
 
-- (NSString *)insertSQL:(NSString *)sql fields_values:(NSDictionary<NSString *,id> *)list table:(NSString *)table{
-//    if (!([table isKindOfClass:NSString.class] && table.length)) {
-//        return @"表名为空";
-//    }
-//    NSString *error = [self createTableIfNotExists:table fields:fields];
-//    if (error) {
-//        return error;
-//    }
-//    return [self execSQL:sql type:@"新增数据"];
+- (NSString *)insert_fields_values:(NSDictionary<NSString *,id> *)list table:(NSString *)table{
+    if (!([table isKindOfClass:NSString.class] && table.length)) {
+        return @"insertSQL : table name is null or non_length";
+    }
     
     if (!([list isKindOfClass:NSDictionary.class] && list.count)) {
         return nil;
     }
+    
     NSArray *keys = list.allKeys;
+    BOOL isTableExist = [self checkTableExist:table];
+    if (!isTableExist) {
+        [self insertSQL:nil fields:keys table:table];
+    }
+    
     NSInteger count = keys.count;
     NSMutableString *whys = [[NSMutableString alloc] init];
     NSString *fies = [keys componentsJoinedByString:@","];
@@ -201,27 +202,24 @@ static FSDBMaster *_instance = nil;
         }
     }
     NSString *insert_sql = [[NSString alloc] initWithFormat:@"INSERT INTO %@ (%@) VALUES (%@)",table,fies,whys];
-    
-//    char *update = "INSERT OR REPLACE INTO PERSIONINFO(NAME,AGE,SEX,WEIGHT,ADDRESS)""VALUES(?,?,?,?,?);";
-    //上边的update也可以这样写：
-    //NSString *insert = [NSString stringWithFormat:@"INSERT OR REPLACE INTO PERSIONINFO('%@','%@','%@','%@','%@')VALUES(?,?,?,?,?)",NAME,AGE,SEX,WEIGHT,ADDRESS];
-    
-    char *errorMsg = NULL;
+
     sqlite3_stmt *stmt;
-    
     if (sqlite3_prepare_v2(_sqlite3, insert_sql.UTF8String, -1, &stmt, nil) == SQLITE_OK) {
-        
-        //【插入数据】在这里我们使用绑定数据的方法，参数一：sqlite3_stmt，参数二：插入列号，参数三：插入的数据，参数四：数据长度（-1代表全部），参数五：是否需要回调
-//        sqlite3_bind_text(stmt, 1, [self.nameTextField.text UTF8String], -1, NULL);
-//        sqlite3_bind_int(stmt, 2, [self.ageTextField.text intValue]);
-//        sqlite3_bind_text(stmt, 3, [self.sexTextField.text UTF8String], -1, NULL);
-//        sqlite3_bind_int(stmt, 4, [self.weightTextField.text integerValue]);
-//        sqlite3_bind_text(stmt, 5, [self.addressTextField.text UTF8String], -1, NULL);
-        
+        for (NSString *k in keys) {
+            const char *kc = k.UTF8String;
+            int idx = sqlite3_bind_parameter_index(stmt, kc);
+            if (idx > 0) {
+                NSString *v = [list objectForKey:k];
+                sqlite3_bind_text(stmt, idx, v.UTF8String, -1, SQLITE_STATIC);
+            }
+        }
     }
-    if (sqlite3_step(stmt) != SQLITE_DONE)
-        NSLog(@"数据更新失败");
     
+    int result = sqlite3_step(stmt);
+    if (result != SQLITE_DONE) {
+        sqlite3_finalize(stmt);
+        return @"insertSQL : sqlite3_step(stmt) failed";
+    }
     return nil;
 }
 
