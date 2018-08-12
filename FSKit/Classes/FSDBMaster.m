@@ -206,11 +206,14 @@ static FSDBMaster *_instance = nil;
     sqlite3_stmt *stmt;
     if (sqlite3_prepare_v2(_sqlite3, insert_sql.UTF8String, -1, &stmt, nil) == SQLITE_OK) {
         for (NSString *k in keys) {
-            const char *kc = k.UTF8String;
-            int idx = sqlite3_bind_parameter_index(stmt, kc);
-            if (idx > 0) {
-                NSString *v = [list objectForKey:k];
-                sqlite3_bind_text(stmt, idx, v.UTF8String, -1, SQLITE_STATIC);
+            @autoreleasepool{
+                NSString *nk = [[NSString alloc] initWithFormat:@":%@",k];
+                const char *kc = nk.UTF8String;
+                int idx = sqlite3_bind_parameter_index(stmt, kc);
+                if (idx > 0) {
+                    NSString *v = [list objectForKey:k];
+                    sqlite3_bind_text(stmt, idx, v.UTF8String, -1, SQLITE_STATIC);
+                }
             }
         }
     }
