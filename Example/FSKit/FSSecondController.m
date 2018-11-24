@@ -20,7 +20,6 @@
 #import "FSLocalNotificationController.h"
 #import <FSKit/FSDBMaster.h>
 #import "FSSQLite3Controller.h"
-#import <FSKit/FSCalculator.h>
 
 @interface FSSecondController ()
 
