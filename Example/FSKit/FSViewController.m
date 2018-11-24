@@ -31,9 +31,7 @@
     [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-100-[btn(44)]" options:0 metrics:nil views:NSDictionaryOfVariableBindings(btn)]];
 }
 
-- (void)click{
-    [FSKit pushToViewControllerWithClass:@"FSSQLite3Controller" navigationController:self.navigationController param:nil configBlock:nil];
-    
+- (void)click{    
 //    FSSecondController *vc = [[FSSecondController alloc] init];
 //    [vc setText:@"我不会出现"];
 //    [self.navigationController pushViewController:vc animated:YES];
