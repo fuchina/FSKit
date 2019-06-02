@@ -69,8 +69,6 @@ typedef NS_ENUM(NSInteger, FSWeekdayIndex) {
  
  2.未过期的显示：“将在下周三提醒”，“将在本周五提醒”，根据现在的是周几与expitime比较确定是下周还是本周。
  
- 1.获取当前的时间，跟did时间比较，如果expitime小于等于did，返回；否则，获取当前时间的星期，如果该星期大于等于expitime，就应该提示。
-
  */
 - (void)alertWeekly{
     
