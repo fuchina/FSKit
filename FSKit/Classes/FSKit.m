@@ -1796,6 +1796,8 @@ NSString *_fs_md5(NSString *str){
 
 + (void)call:(NSString *)phone{
     if (phone != nil) {
+        phone = [[phone componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] componentsJoinedByString:@""];
+        
         NSString *telUrl = [NSString stringWithFormat:@"telprompt:%@",phone];
         NSURL *url = [[NSURL alloc] initWithString:telUrl];
         [[UIApplication sharedApplication] openURL:url];
@@ -1806,7 +1808,7 @@ NSString *_fs_md5(NSString *str){
     if (phone == nil) {
         return;
     }
-    NSString *str=[[NSString alloc] initWithFormat:@"tel:%@",phone];
+    NSString *str= [[NSString alloc] initWithFormat:@"tel:%@",phone];
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:str]];
 }
 
