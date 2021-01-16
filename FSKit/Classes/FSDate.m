@@ -280,4 +280,36 @@
     return [[NSString alloc] initWithFormat:@"%@",@(value)];
 }
 
++ (NSDate *)solarForLunar:(NSInteger)year month:(NSInteger)month day:(NSInteger)day {
+    NSString *string = [[NSString alloc] initWithFormat:@"%ld-%@-%@ 12:00:00",year,[self twoChar:month],[self twoChar:day]];
+    NSDate *date = [self dateByString:string formatter:nil];
+    NSDateComponents *lunarComponents = [self chineseDate:date];
+    BOOL found = (lunarComponents.month == month) && (lunarComponents.day == day);
+    if (found == YES) {
+        return date;
+    }
+    
+    // 农历日期会超过阳历日期吗？假设不会，那就往后找
+    while (found == NO) {
+        date = [NSDate dateWithTimeInterval:86400 sinceDate:date];//后一天
+        lunarComponents = [self chineseDate:date];
+        found = (lunarComponents.month == month) && (lunarComponents.day == day);
+    }
+    
+    return date;
+}
+
++ (NSDate *)lunarForSolar:(NSDate *)solar {
+    NSDateComponents *lunarComponents = [self chineseDate:solar];
+    NSDateComponents *solarComponents = [self componentForDate:solar];
+    NSInteger year = solarComponents.year;
+    if (lunarComponents.month > solarComponents.month) {
+        year = year - 1;
+    }
+    NSString *string = [[NSString alloc] initWithFormat:@"%ld-%@-%@ 12:00:00",year,[self twoChar:lunarComponents.month],[self twoChar:lunarComponents.day]];
+    NSDate *date = [FSDate dateByString:string formatter:nil];
+    return date;
+}
+
+
 @end

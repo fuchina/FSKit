@@ -38,7 +38,7 @@
 
 + (NSString *)stringWithDate:(NSDate *)date formatter:(NSString *)formatter;
 
-// 除了年不是当年数字，月日是当月日
+// 除了年不是当年数字，可能为60一甲子数组的索引+1，月日是当月日
 + (NSDateComponents *)chineseDate:(NSDate *)date;
 
 // 获取农历日期，数组共三个元素，分别是农历的年月日
@@ -65,5 +65,29 @@
 
 // 同一天
 + (BOOL)isTheSameDayA:(NSDate *)aDate b:(NSDate *)bDate;
+
+
+/**
+ *  1.先根据农历计算一个阳历，这样就比较相近
+ *  2.阳历肯定比农历大，那就是往后找
+ *  3.计算每个阳历的农历，如果农历的月跟日正好都对上，就是找到了
+ *
+ * 农历转阳历，2021年1月16日设计，这个方法依赖 chineseDate： 方法的正确性
+ * @param year 农历年
+ * @param month 农历月
+ * @param day 农历日
+ * @return 返回阳历日期
+ */
++ (NSDate *)solarForLunar:(NSInteger)year month:(NSInteger)month day:(NSInteger)day;
+
+/**
+ *  1.先根据系统方法获取到农历的月日
+ *  2.如果农历的月比阳历的月大，年就减1
+ *
+ * 阳历转农历，2021年1月16日设计，这个方法依赖 chineseDate： 方法的正确性
+ * @param solar 阳历日期
+ * @return 返回农历日期
+ */
++ (NSDate *)lunarForSolar:(NSDate *)solar;
 
 @end
