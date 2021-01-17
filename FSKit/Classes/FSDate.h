@@ -90,4 +90,9 @@
  */
 + (NSDate *)lunarForSolar:(NSDate *)solar;
 
+/**
+ * 参数为dateComponents的weekday
+ */
++ (NSString *)ChineseWeek:(NSInteger)week;
+
 @end

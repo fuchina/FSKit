@@ -311,5 +311,13 @@
     return date;
 }
 
++ (NSString *)ChineseWeek:(NSInteger)week {
+    static NSArray *weeks = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        weeks = @[@"",@"星期日",@"星期一",@"星期二",@"星期三",@"星期四",@"星期五",@"星期六"];
+    });
+    return weeks[week];
+}
 
 @end
