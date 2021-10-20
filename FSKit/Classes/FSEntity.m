@@ -1,10 +1,8 @@
-
 //
-//  FSEntity.m
-//  myhome
+//  HEBaseModel.m
+//  OxfordLibrary
 //
-//  Created by Fudongdong on 2017/8/10.
-//  Copyright © 2017年 fuhope. All rights reserved.
+//  Created by 扶冬冬 on 2021/3/15.
 //
 
 #import "FSEntity.h"
@@ -13,11 +11,17 @@
 @implementation FSEntity
 
 - (instancetype)initWithDictionary:(NSDictionary *)dictionary{
-    if ([dictionary isKindOfClass:NSDictionary.class]) {
-        [self setAttributes:dictionary];
+    self = [super init];
+    if (self) {
+        [self beforeInitWithDictionary];
+        if ([dictionary isKindOfClass:NSDictionary.class]) {
+            [self setAttributes:dictionary];
+        }
     }
     return self;
 }
+
+- (void)beforeInitWithDictionary {}
 
 -(NSDictionary*)attributeMapDictionary{
     return nil;
@@ -31,6 +35,46 @@
 
 - (NSString *)customDescription{
     return nil;
+}
+
++ (NSArray *)modelsFromDictionaries:(NSArray<NSDictionary *> *)dictionaries modelClass:(Class)CLS {
+    BOOL isArray = [dictionaries isKindOfClass:NSArray.class];
+    if (isArray) {
+        // 如果元素不是NSDictionary，直接返回
+        BOOL isCLS = YES;
+        for (NSDictionary *m in dictionaries) {
+            if (![m isKindOfClass:CLS]) {
+                isCLS = NO;
+                break;
+            }
+        }
+        if (isCLS) {
+            return dictionaries;
+        }
+    }
+    
+    NSMutableArray *results = nil;
+    if (isArray) {
+        results = [[NSMutableArray alloc] initWithCapacity:dictionaries.count];
+        for (int x = 0; x < dictionaries.count; x ++) {
+            NSDictionary *m = dictionaries[x];
+            id model = [self modelWithDictionary:m modelClass:CLS];
+            [results addObject:model];
+        }
+    }
+    return results;
+}
+
++ (id)modelWithDictionary:(NSDictionary *)m modelClass:(Class)CLS {
+    id obj = nil;
+    if ([m isKindOfClass:NSDictionary.class]) {
+        obj = [[CLS alloc] init];
+        if ([obj isKindOfClass:FSEntity.class]) {
+            FSEntity *model = (FSEntity *)obj;
+            [model setAttributes:m];
+        }
+    }
+    return obj;
 }
 
 - (NSString *)description{
@@ -71,7 +115,9 @@
     return desc;
 }
 
--(void)setAttributes:(NSDictionary*)dataDic{
+- (void)setAttributes:(NSDictionary *)dataDic{
+    _meta = dataDic;
+    
     NSDictionary *attrMapDic = [self attributeMapDictionary];
     if (attrMapDic == nil) {
         NSMutableDictionary *dic = [NSMutableDictionary dictionaryWithCapacity:[dataDic count]];
@@ -92,15 +138,14 @@
             if ([value isKindOfClass:NSArray.class] || [value isKindOfClass:NSDictionary.class] || [value isKindOfClass:NSString.class]) {
             }else{
                 if (value == nil || [value isEqual:NSNull.null]) {
-                    value = @"";
+//                     value = @"";
+                    value = nil;
                 }else{
                     value = value.description;// nil变量调用description仍然为nil
                 }
             }
             id attributeValue = value;
-            [self performSelectorOnMainThread:sel
-                                   withObject:attributeValue
-                                waitUntilDone:[NSThread isMainThread]];
+            [self performSelector:sel onThread:NSThread.currentThread withObject:attributeValue waitUntilDone:YES];
             
             if ([handleArray containsObject:attributeName]) {
                 [handleArray removeObject:attributeName];
@@ -108,20 +153,25 @@
         }
     }
     
-    if (handleArray) {
-        for (int x = 0; x < handleArray.count; x ++) {
-            NSString *nameString = handleArray[x];
-            if (nameString) {
-                SEL sel = [self getSetterSelWithAttibuteName:nameString];
-                if ([self respondsToSelector:sel]) {
-                    [self performSelectorOnMainThread:sel
-                                           withObject:@""   //类型不匹配，不会崩溃
-                                        waitUntilDone:[NSThread isMainThread]];
-                }
-            }
-        }
-    }
+    // 没必要赋值nil
+//    if (handleArray) { // 未赋值的参数赋值nil
+//        for (int x = 0; x < handleArray.count; x ++) {
+//            NSString *nameString = handleArray[x];
+//            if (nameString) {
+//                SEL sel = [self getSetterSelWithAttibuteName:nameString];
+//                if ([self respondsToSelector:sel]) {
+//                    [self performSelector:sel onThread:NSThread.currentThread
+//                               withObject:nil   //类型不匹配，不会崩溃
+//                            waitUntilDone:YES];
+//                }
+//            }
+//        }
+//    }
+    
+    [self afterSetAttributes];
 }
+
+- (void)afterSetAttributes {}
 
 - (id)initWithCoder:(NSCoder *)decoder{
     if( self = [super init] ){
@@ -135,9 +185,7 @@
             SEL sel = [self getSetterSelWithAttibuteName:attributeName];
             if ([self respondsToSelector:sel]) {
                 id obj = [decoder decodeObjectForKey:attributeName];
-                [self performSelectorOnMainThread:sel
-                                       withObject:obj
-                                    waitUntilDone:[NSThread isMainThread]];
+                [self performSelector:sel onThread:NSThread.currentThread withObject:obj waitUntilDone:YES];
             }
         }
     }
@@ -190,10 +238,4 @@
     return array;
 }
 
-#ifdef _FOR_DEBUG_
--(BOOL) respondsToSelector:(SEL)aSelector {
-    //    printf("SELECTOR: %s\n", [NSStringFromSelector(aSelector) UTF8String]);
-    return [super respondsToSelector:aSelector];
-}
-#endif
 @end
