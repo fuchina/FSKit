@@ -207,9 +207,9 @@ void _fs_dispatch_global_queue_sync(dispatch_block_t _global_block);
 void _fs_runloop_freeTime_event(void(^event)(void));
 
 // 高精度计算
-NSString *_fs_highAccuracy_add(NSString *a,NSString *b);
-NSString *_fs_highAccuracy_subtract(NSString *a,NSString *b);
-NSString *_fs_highAccuracy_multiply(NSString *a,NSString *b);
-NSString *_fs_highAccuracy_divide(NSString *a,NSString *b);
+NSString *_fs_highAccuracy_add(NSString *a,NSString *b);        // 加
+NSString *_fs_highAccuracy_subtract(NSString *a,NSString *b);   // 减
+NSString *_fs_highAccuracy_multiply(NSString *a,NSString *b);   // 乘
+NSString *_fs_highAccuracy_divide(NSString *a,NSString *b);     // 除
 
 @end
