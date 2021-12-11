@@ -18,12 +18,6 @@
     return self;
 }
 
-- (SEL)getSetterSelWithAttibuteName:(NSString *)attributeName {
-    NSString *capital = [[attributeName substringToIndex:1] uppercaseString];
-    NSString *setterSelStr = [NSString stringWithFormat:@"set%@%@:",capital,[attributeName substringFromIndex:1]];
-    return NSSelectorFromString(setterSelStr);
-}
-
 + (NSArray *)modelsFromDictionaries:(NSArray<NSDictionary *> *)dictionaries modelClass:(Class)CLS {
     BOOL isArray = [dictionaries isKindOfClass:NSArray.class];
     if (isArray) {
@@ -72,26 +66,29 @@
     
     NSArray *allKeys = [dataDic allKeys];
     for (NSString *key in allKeys) {
-        SEL sel = [self getSetterSelWithAttibuteName:key];
-        if ([self respondsToSelector:sel]) {
-            NSObject *value = [dataDic objectForKey:key];
-            if ([value isKindOfClass:NSArray.class] || [value isKindOfClass:NSDictionary.class] || [value isKindOfClass:NSString.class]) {
-                
+        NSObject *value = [dataDic objectForKey:key];
+        if ([value isKindOfClass:NSArray.class] || [value isKindOfClass:NSDictionary.class] || [value isKindOfClass:NSString.class]) {
+            
+        } else {
+            if (value == nil || [value isEqual:NSNull.null]) {
+                value = nil;
             } else {
-                if (value == nil || [value isEqual:NSNull.null]) {
-                    value = nil;
-                } else {
-                    value = value.description;
-                }
+                value = value.description;
             }
-
-            [self performSelector:sel onThread:NSThread.currentThread withObject:value waitUntilDone:YES];
         }
+
+        [self setValue:value forKey:key];
     }
     
     [self afterSetAttributes];
 }
 
 - (void)afterSetAttributes {}
+
+- (void)setValue:(id)value forUndefinedKey:(NSString *)key {
+#if DEBUG
+    NSLog(@"HEBaseModel set UndefinedKey (%@ - %@)", key, value);
+#endif
+}
 
 @end
