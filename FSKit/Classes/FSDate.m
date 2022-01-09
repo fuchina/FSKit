@@ -281,7 +281,7 @@
 }
 
 + (NSDate *)solarForLunar:(NSInteger)year month:(NSInteger)month day:(NSInteger)day {
-    NSString *string = [[NSString alloc] initWithFormat:@"%ld-%@-%@ 12:00:00",year,[self twoChar:month],[self twoChar:day]];
+    NSString *string = [[NSString alloc] initWithFormat:@"%ld-%@-%@ 23:59:59",year,[self twoChar:month],[self twoChar:day]];
     NSDate *date = [self dateByString:string formatter:nil];
     NSDateComponents *lunarComponents = [self chineseDate:date];
     BOOL found = (lunarComponents.month == month) && (lunarComponents.day == day);
