@@ -63,24 +63,28 @@
         return;
     }
     _meta = dataDic;
-    
+        
     NSArray *allKeys = [dataDic allKeys];
     for (NSString *key in allKeys) {
         NSObject *value = [dataDic objectForKey:key];
-        if ([value isKindOfClass:NSArray.class] || [value isKindOfClass:NSDictionary.class] || [value isKindOfClass:NSString.class]) {
-            
-        } else {
-            if (value == nil || [value isEqual:NSNull.null]) {
-                value = nil;
-            } else {
-                value = value.description;
-            }
-        }
-
         [self setValue:value forKey:key];
     }
     
     [self afterSetAttributes];
+}
+
+- (void)setValue:(id)value forKey:(NSString *)key {
+    if ([value isKindOfClass:NSArray.class] || [value isKindOfClass:NSDictionary.class] || [value isKindOfClass:NSString.class]) {
+        
+    } else {
+        if (value == nil || [value isEqual:NSNull.null]) {
+            value = nil;
+        } else {
+            NSObject *obj = (NSObject *)value;
+            value = obj.description;
+        }
+    }
+    [super setValue:value forKey:key];
 }
 
 - (void)afterSetAttributes {}
