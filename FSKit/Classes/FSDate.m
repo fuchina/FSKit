@@ -91,7 +91,8 @@
     if (!dateFormatter) {
         dateFormatter = [[NSDateFormatter alloc] init];
     }
-    [dateFormatter setDateFormat:formatter?:@"yyyy-MM-dd HH:mm:ss"];
+    static NSString *formatterstatic = @"yyyy-MM-dd HH:mm:ss";
+    [dateFormatter setDateFormat:formatter ? : formatterstatic];
     NSDate *date = [dateFormatter dateFromString:str];
     return date;
 }
