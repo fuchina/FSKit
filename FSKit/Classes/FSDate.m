@@ -98,10 +98,7 @@
     if (![date isKindOfClass:NSDate.class]) {
         return nil;
     }
-    static NSDateFormatter *dateFormatter = nil;
-    if (!dateFormatter) {
-        dateFormatter = [[NSDateFormatter alloc] init];
-    }
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     [dateFormatter setDateFormat:formatter?:@"yyyy-MM-dd HH:mm:ss"];
     return [dateFormatter stringFromDate:date];
 }
