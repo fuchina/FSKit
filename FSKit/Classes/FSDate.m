@@ -87,12 +87,9 @@
     if (!([str isKindOfClass:NSString.class] && str.length)) {
         return nil;
     }
-    static NSDateFormatter *dateFormatter = nil;
-    if (!dateFormatter) {
-        dateFormatter = [[NSDateFormatter alloc] init];
-    }
-    static NSString *formatterstatic = @"yyyy-MM-dd HH:mm:ss";
-    [dateFormatter setDateFormat:formatter ? : formatterstatic];
+    
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:formatter ? : @"yyyy-MM-dd HH:mm:ss"];
     NSDate *date = [dateFormatter dateFromString:str];
     return date;
 }
