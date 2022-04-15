@@ -212,4 +212,9 @@ NSString *_fs_highAccuracy_subtract(NSString *a,NSString *b);   // 减
 NSString *_fs_highAccuracy_multiply(NSString *a,NSString *b);   // 乘
 NSString *_fs_highAccuracy_divide(NSString *a,NSString *b);     // 除
 
+// 获取url中的参数
++ (NSDictionary *)urlParametersFromUrl:(NSURL *)url;
+// 交换方法
++ (void)method_Swizzle:(Class)cls origin:(SEL)oriSel swizzle:(SEL)swiSel;
+
 @end

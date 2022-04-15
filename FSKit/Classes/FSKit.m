@@ -18,6 +18,7 @@
 #import <CoreTelephony/CTCarrier.h>
 #import <CoreTelephony/CTTelephonyNetworkInfo.h>
 #import <sys/mount.h>
+#import <objc/runtime.h>
 
 @implementation FSKit
 
@@ -2102,6 +2103,30 @@ NSString *_fs_highAccuracy_divide(NSString *a,NSString *b){
     NSDecimalNumber *augendNumber = [NSDecimalNumber decimalNumberWithString:b];
     NSDecimalNumber *sumNumber = [addendNumber decimalNumberByDividingBy:augendNumber];
     return [sumNumber stringValue];
+}
+
++ (NSDictionary *)urlParametersFromUrl:(NSURL *)url {
+    if (![url isKindOfClass:NSURL.class]) {
+        return nil;
+    }
+    
+    NSMutableDictionary *parm = [[NSMutableDictionary alloc] init];
+    NSURLComponents *urlComponents = [[NSURLComponents alloc] initWithString:url.absoluteString];
+    [urlComponents.queryItems enumerateObjectsUsingBlock:^(NSURLQueryItem * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        [parm setObject:obj.value forKey:obj.name];
+    }];
+    return parm;
+}
+
++ (void)method_Swizzle:(Class)cls origin:(SEL)oriSel swizzle:(SEL)swiSel {
+    Method originMethod = class_getInstanceMethod(cls, oriSel);
+    Method swizzledMethod = class_getInstanceMethod(cls, swiSel);
+    BOOL hasMethod = class_addMethod(cls, oriSel, method_getImplementation(swizzledMethod), method_getTypeEncoding(swizzledMethod));
+    if (hasMethod) {
+        class_replaceMethod(cls, swiSel, method_getImplementation(originMethod), method_getTypeEncoding(originMethod));
+    } else {
+        method_exchangeImplementations(originMethod, swizzledMethod);
+    }
 }
 
 @end
