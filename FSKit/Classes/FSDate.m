@@ -83,14 +83,16 @@
     return components;
 }
 
-+ (NSDate *)dateByString:(NSString *)str formatter:(NSString *)formatter{
++ (NSDate *)dateByString:(NSString *)str formatter:(NSString *)formatter {
     if (!([str isKindOfClass:NSString.class] && str.length)) {
         return nil;
     }
     
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     [dateFormatter setDateFormat:formatter ? : @"yyyy-MM-dd HH:mm:ss"];
+    dateFormatter.locale = [NSLocale localeWithLocaleIdentifier:@"zh_CN"];
     NSDate *date = [dateFormatter dateFromString:str];
+    NSAssert([date isKindOfClass:NSDate.class], @"date创建失败");
     return date;
 }
 
