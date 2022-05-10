@@ -116,7 +116,6 @@
     return [self ymdhsByTimeInterval:t];
 }
 
-
 + (NSDateComponents *)chineseDate:(NSDate *)date{
     if (![date isKindOfClass:NSDate.class]) {
         return nil;
