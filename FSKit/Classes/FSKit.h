@@ -127,9 +127,6 @@ NSString *_fs_md5(NSString *str);
 + (NSString *)base64Code:(NSData *)data;                // 用来将图片转换为字符串
 + (NSString *)sessionID:(NSURLResponse *)response;
 
-+ (NSString *)ymdhsByTimeInterval:(NSTimeInterval)timeInterval;
-+ (NSString *)ymdhsByTimeIntervalString:(NSString *)timeInterval;
-
 + (NSString *)countOverTime:(NSTimeInterval)time;   // 把秒转换为天时分
 + (NSString *)convertNumbers:(NSString *)string;    // SQLite3的表名不能是数字，所以可以用这方法转成拼音
 + (NSString *)pinyinForHans:(NSString *)chinese;        // 获取汉字的拼音

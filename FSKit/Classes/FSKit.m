@@ -19,6 +19,7 @@
 #import <CoreTelephony/CTTelephonyNetworkInfo.h>
 #import <sys/mount.h>
 #import <objc/runtime.h>
+#import "FSDate.h"
 
 @implementation FSKit
 
@@ -1544,22 +1545,6 @@ NSString *_fs_md5(NSString *str){
         subSession = [session componentsSeparatedByString:@"="][1];
     }
     return subSession;
-}
-
-+ (NSString *)ymdhsByTimeInterval:(NSTimeInterval)fTI{
-    NSDate *date = [[NSDate alloc] initWithTimeIntervalSince1970:fTI];
-    static NSDateFormatter *dateFormatter = nil;
-    if (!dateFormatter) {
-        dateFormatter = [[NSDateFormatter alloc] init];
-        [dateFormatter  setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
-        NSTimeZone* localzone = [NSTimeZone localTimeZone];
-        [dateFormatter setTimeZone:localzone];
-    }
-    return [dateFormatter stringFromDate:date];
-}
-
-+ (NSString *)ymdhsByTimeIntervalString:(NSString *)timeInterval{
-    return [self ymdhsByTimeInterval:[timeInterval doubleValue]];
 }
 
 + (NSString *)countOverTime:(NSTimeInterval)time{

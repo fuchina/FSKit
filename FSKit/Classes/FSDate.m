@@ -96,7 +96,7 @@
     return date;
 }
 
-+ (NSString *)stringWithDate:(NSDate *)date formatter:(NSString *)formatter{
++ (NSString *)stringWithDate:(NSDate *)date formatter:(NSString *)formatter {
     if (![date isKindOfClass:NSDate.class]) {
         return nil;
     }
@@ -104,6 +104,18 @@
     [dateFormatter setDateFormat:formatter?:@"yyyy-MM-dd HH:mm:ss"];
     return [dateFormatter stringFromDate:date];
 }
+
++ (NSString *)ymdhsByTimeInterval:(NSTimeInterval)timeInterval {
+    NSDate *date = [[NSDate alloc] initWithTimeIntervalSince1970:timeInterval];
+    NSString *time = [FSDate stringWithDate:date formatter:nil];
+    return time;
+}
+
++ (NSString *)ymdhsByTimeIntervalString:(NSString *)timeInterval {
+    NSTimeInterval t = [timeInterval doubleValue];
+    return [self ymdhsByTimeInterval:t];
+}
+
 
 + (NSDateComponents *)chineseDate:(NSDate *)date{
     if (![date isKindOfClass:NSDate.class]) {

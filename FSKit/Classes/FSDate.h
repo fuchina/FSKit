@@ -35,8 +35,9 @@
 + (NSDateComponents *)componentForDate:(NSDate *)date;
 
 + (NSDate *)dateByString:(NSString *)str formatter:(NSString *)formatter;
-
 + (NSString *)stringWithDate:(NSDate *)date formatter:(NSString *)formatter;
++ (NSString *)ymdhsByTimeInterval:(NSTimeInterval)timeInterval;
++ (NSString *)ymdhsByTimeIntervalString:(NSString *)timeInterval;
 
 // 除了年不是当年数字，可能为60一甲子数组的索引+1，月日是当月日
 + (NSDateComponents *)chineseDate:(NSDate *)date;
