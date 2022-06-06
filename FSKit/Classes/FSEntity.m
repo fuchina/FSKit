@@ -73,7 +73,7 @@
     [self afterSetAttributes];
 }
 
-- (void)setValue:(id)value forKey:(NSString *)key {
+- (void)setValue:(id)value forKey:(NSString *)key {    
     if ([value isKindOfClass:NSArray.class] || [value isKindOfClass:NSDictionary.class] || [value isKindOfClass:NSString.class]) {
         
     } else {
