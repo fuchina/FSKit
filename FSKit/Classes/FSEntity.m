@@ -74,7 +74,7 @@
 }
 
 - (void)setValue:(id)value forKey:(NSString *)key {    
-    if ([value isKindOfClass:NSArray.class] || [value isKindOfClass:NSDictionary.class] || [value isKindOfClass:NSString.class]) {
+    if ([value isKindOfClass:NSString.class] || [value isKindOfClass:NSNumber.class] || [value isKindOfClass:NSArray.class] || [value isKindOfClass:NSDictionary.class]) {
         
     } else {
         if (value == nil || [value isEqual:NSNull.null]) {
