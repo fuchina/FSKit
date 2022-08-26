@@ -8,8 +8,10 @@
 #import <Foundation/Foundation.h>
 #import "FSUIAdapterModel.h"
 
-#define UIScreenWidth               FSUIAdapter.sharedInstance.screenbiggerValue
-#define UIScreenHeight              FSUIAdapter.sharedInstance.screenSmallerValue
+#define UIScreenLong                FSUIAdapter.sharedInstance.screenbiggerValue
+#define UIScreenShort               FSUIAdapter.sharedInstance.screenSmallerValue
+#define UIScreenHeight              [UIScreen mainScreen].bounds.size.height
+#define UIScreenWidth               [UIScreen mainScreen].bounds.size.width
 
 #define UIAdapterModel              FSUIAdapter.sharedInstance.model            // 全比例
 #define UIAdapterModel1p8           FSUIAdapter.sharedInstance.model1p88        // 高高比例
