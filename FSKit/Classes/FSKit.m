@@ -82,7 +82,7 @@ void _fs_userDefaults_setObjectForKey(id object,NSString *key){
     if (object && _fs_isValidateString(key)) {
         NSUserDefaults *fdd = [NSUserDefaults standardUserDefaults];
         [fdd setObject:object forKey:key];
-        [fdd synchronize];
+//        [fdd synchronize];
     }
 }
 
@@ -99,7 +99,7 @@ void _fs_clearUserDefaults(void){
     for(id key in dict) {
         [defs removeObjectForKey:key];
     }
-    [defs synchronize];
+//    [defs synchronize];
 }
 
 + (void)letScreenLock:(BOOL)lock{
@@ -1933,7 +1933,7 @@ void _fs_userDefaultsOnce(NSString *key,void (^event)(void)){
             event();
         }
         [ud setObject:@(1) forKey:key];
-        [ud synchronize];
+//        [ud synchronize];
     }
 }
 
