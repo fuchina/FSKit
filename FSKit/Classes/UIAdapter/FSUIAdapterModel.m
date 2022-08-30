@@ -53,6 +53,7 @@
     _value36 = ceil(36 * ratio);
     _value40 = ceil(40 * ratio);
     _value45 = ceil(45 * ratio);
+    _value46 = ceil(46 * ratio);
     _value47 = ceil(47 * ratio);
     _value50 = ceil(50 * ratio);
     _value55 = ceil(55 * ratio);
@@ -85,6 +86,7 @@
     _value260 = ceil(260 * ratio);
     _value270 = ceil(270 * ratio);
     _value280 = ceil(280 * ratio);
+    _value290 = ceil(290 * ratio);
     _value300 = ceil(300 * ratio);
     _value310 = ceil(310 * ratio);
     _value320 = ceil(320 * ratio);
