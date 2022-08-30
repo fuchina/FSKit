@@ -72,6 +72,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) CGFloat  value210;
 @property (nonatomic, readonly) CGFloat  value230;
 @property (nonatomic, readonly) CGFloat  value250;
+@property (nonatomic, readonly) CGFloat  value260;
 @property (nonatomic, readonly) CGFloat  value270;
 @property (nonatomic, readonly) CGFloat  value280;
 @property (nonatomic, readonly) CGFloat  value300;

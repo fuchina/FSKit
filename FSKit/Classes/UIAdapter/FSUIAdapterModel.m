@@ -82,6 +82,7 @@
     _value210 = ceil(210 * ratio);
     _value230 = ceil(230 * ratio);
     _value250 = ceil(250 * ratio);
+    _value260 = ceil(260 * ratio);
     _value270 = ceil(270 * ratio);
     _value280 = ceil(280 * ratio);
     _value300 = ceil(300 * ratio);
