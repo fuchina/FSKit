@@ -116,6 +116,12 @@ NSString *_fs_md5(NSString *str);
 + (NSString *)bankStyleDataThree:(id)data;
 + (NSString *)fourNoFiveYes:(float)number afterPoint:(int)position;  // 四舍五入
 + (NSString *)decimalNumberMutiplyWithString:(NSString *)multiplierValue  valueB:(NSString *)multiplicandValue;
+
+/**
+ *  高精度，浮点数转整数
+ */
++ (NSInteger)floatToInt:(NSString *)floatString;
+
 + (NSString *)deviceModel;
 + (NSString *)easySeeTimesBySeconds:(NSInteger)seconds;
 + (NSString *)tenThousandNumber:(double)value;

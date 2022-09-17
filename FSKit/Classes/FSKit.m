@@ -1513,6 +1513,11 @@ NSString *_fs_md5(NSString *str){
     return [product stringValue];
 }
 
++ (NSInteger)floatToInt:(NSString *)floatString {
+    NSDecimalNumber *decNumber = [NSDecimalNumber decimalNumberWithString:floatString];
+    return [decNumber integerValue];
+}
+
 + (NSString *)base64StringForText:(NSString *)text{
     if (text && [text isKindOfClass:NSString.class]) {
         NSData *data = [text dataUsingEncoding:NSUTF8StringEncoding];
