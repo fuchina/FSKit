@@ -1518,6 +1518,40 @@ NSString *_fs_md5(NSString *str){
     return [decNumber integerValue];
 }
 
+// 只能是数字和点，并且小数点后最多2位
++ (BOOL)isFSAccountNumber:(NSString *)text {
+    NSInteger pointNumber = 0;  // 少数点的个数
+    NSString *point = @".";
+    BOOL findPoint = NO;
+    NSInteger afterPointNumber = 0;  // 小数点后的数字个数
+    NSArray *chars = @[@"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9", @"0", point];
+    for (int x = 0; x < text.length; x ++) {
+        NSString *sub = [text substringWithRange:NSMakeRange(x, 1)];
+        if (![chars containsObject:sub]) {
+            return NO;
+        }
+        
+        if ([sub isEqualToString:point]) {
+            pointNumber ++;
+            findPoint = YES;
+        } else {
+            if (findPoint) {
+                afterPointNumber ++;
+            }
+        }
+    }
+    
+    if (pointNumber > 1) {  // 最多一个少数点
+        return NO;
+    }
+    
+    if (afterPointNumber > 2) {
+        return NO;
+    }
+    
+    return YES;
+}
+
 + (NSString *)base64StringForText:(NSString *)text{
     if (text && [text isKindOfClass:NSString.class]) {
         NSData *data = [text dataUsingEncoding:NSUTF8StringEncoding];

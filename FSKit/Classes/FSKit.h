@@ -122,6 +122,11 @@ NSString *_fs_md5(NSString *str);
  */
 + (NSInteger)floatToInt:(NSString *)floatString;
 
+/**
+ *  记账的数字必须符合规范：只能是数字或小数点，小数点最多只能有1个，小数点后最多只能2位数
+ */
++ (BOOL)isFSAccountNumber:(NSString *)text;
+
 + (NSString *)deviceModel;
 + (NSString *)easySeeTimesBySeconds:(NSInteger)seconds;
 + (NSString *)tenThousandNumber:(double)value;
