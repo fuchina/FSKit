@@ -203,11 +203,6 @@ CGFloat _differentValueForIPad(CGFloat iPad, CGFloat iPhone);
 @property CGFloat bottom;
 @property CGFloat right;
 
-/**
- * 安全区适配
- */
-@property (nonatomic, readonly) UIEdgeInsets safeAreaInsets_HE;
-
 
 /**
  * 圆角
