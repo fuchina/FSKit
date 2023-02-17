@@ -23,6 +23,8 @@ void _fs_clearUserDefaults(void);
 + (BOOL)popToController:(NSString *)className navigationController:(UINavigationController *)navigationController animated:(BOOL)animated;
 
 + (void)pushToViewControllerWithClass:(NSString *)className navigationController:(UINavigationController *)navigationController param:(NSDictionary *)param configBlock:(void (^)(id vc))configBlockParam;
++ (id)controllerWithClass:(NSString *)className param:(NSDictionary *)param configBlock:(void (^)(id vc))configBlockParam;
+
 + (void)presentToViewControllerWithClass:(NSString *)className controller:(UIViewController *)viewController param:(NSDictionary *)param configBlock:(void (^)(UIViewController *vc))configBlockParam presentCompletion:(void(^)(void))completion;
 + (void)copyToPasteboard:(NSString *)copyString;
 

@@ -23,18 +23,26 @@
 
 @implementation FSKit
 
-NSTimeInterval _fs_timeIntevalSince1970(void){
+NSTimeInterval _fs_timeIntevalSince1970(void) {
     return [[NSDate date] timeIntervalSince1970];
 }
 
-NSInteger _fs_integerTimeIntevalSince1970(void){
+NSInteger _fs_integerTimeIntevalSince1970(void) {
     return (NSInteger)[[NSDate date] timeIntervalSince1970];
 }
 
-+ (void)pushToViewControllerWithClass:(NSString *)className navigationController:(UINavigationController *)navigationController param:(NSDictionary *)param configBlock:(void (^)(id vc))configBlockParam{
++ (void)pushToViewControllerWithClass:(NSString *)className navigationController:(UINavigationController *)navigationController param:(NSDictionary *)param configBlock:(void (^)(id vc))configBlockParam {
+    UIViewController *controller = [self controllerWithClass:className param:param configBlock:configBlockParam];
+    if (controller) {
+        [navigationController pushViewController:controller animated:YES];
+    }
+}
+
++ (id)controllerWithClass:(NSString *)className param:(NSDictionary *)param configBlock:(void (^)(id vc))configBlockParam {
     Class Controller = NSClassFromString(className);
+    UIViewController *viewController = nil;
     if (Controller) {
-        UIViewController *viewController = [[Controller alloc] init];
+        viewController = [[Controller alloc] init];
         //... 根据字典给属性赋值
         for (NSString *key in param) {
             SEL setSEL = [FSRuntime setterSELWithAttibuteName:key];
@@ -46,8 +54,8 @@ NSInteger _fs_integerTimeIntevalSince1970(void){
         if (configBlockParam) {
             configBlockParam(viewController);
         }
-        [navigationController pushViewController:viewController animated:YES];
     }
+    return viewController;
 }
 
 + (void)presentToViewControllerWithClass:(NSString *)className controller:(UIViewController *)viewController param:(NSDictionary *)param configBlock:(void (^)(UIViewController *vc))configBlockParam presentCompletion:(void(^)(void))completion{
