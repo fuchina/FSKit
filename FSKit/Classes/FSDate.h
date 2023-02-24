@@ -96,4 +96,9 @@
  */
 + (NSString *)ChineseWeek:(NSInteger)week;
 
+/**
+ *  获取日期
+ */
++ (NSDate *)date;
+
 @end

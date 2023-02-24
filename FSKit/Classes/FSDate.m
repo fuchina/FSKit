@@ -328,4 +328,9 @@
     return weeks[week];
 }
 
++ (NSDate *)date {
+    NSDate *date = [NSDate date];
+    return date;
+}
+
 @end
