@@ -33,16 +33,7 @@ void _fs_clearUserDefaults(void);
 + (void)setStatusBarBackgroundColor:(UIColor *)color;       // 设置状态栏颜色
 
 + (BOOL)isValidateEmail:(NSString *)str;
-+ (BOOL)keyedArchiverWithArray:(NSArray *)array toFilePath:(NSString *)fileName;
-+ (BOOL)keyedArchiverWithData:(NSData *)data toFilePath:(NSString *)fileName;
-+ (BOOL)keyedArchiverWithNumber:(NSNumber *)number toFilePath:(NSString *)fileName;
-+ (BOOL)keyedArchiverWithString:(NSString *)string toFilePath:(NSString *)fileName;
-+ (BOOL)keyedArchiverWithDictionary:(NSDictionary *)dic toFilePath:(NSString *)fileName;
-+ (BOOL)createFile:(NSString *)fileName withContent:(NSString *)string;
-+ (BOOL)moveFile:(NSString *)filePath toPath:(NSString *)newPath;
-+ (BOOL)renameFile:(NSString *)filePath toPath:(NSString *)newPath;
-+ (BOOL)copyFile:(NSString *)filePath toPath:(NSString *)newPath;
-+ (BOOL)removeFile:(NSString *)filePath;
+
 + (BOOL)isChinese:(NSString *)string;
 + (BOOL)isValidateUserPasswd :(NSString *)str;
 + (BOOL)isChar:(NSString *)str;
@@ -100,12 +91,13 @@ BOOL _fs_floatEqual(CGFloat aNumber,CGFloat bNumber);
 + (NSString *)blankInChars:(NSString *)string byCellNo:(int)num;
 + (NSString *)jsonStringWithObject:(id)dic;
 + (NSString *)JSONString:(NSString *)aString;
-+ (NSString *)dataToString:(NSData *)data withEncoding:(NSStringEncoding)encode;
+
 + (NSString *)homeDirectoryPath:(NSString *)fileName;
-+ (NSString *)keyedUnarchiverWithString:(NSString *)fileName;
 + (NSString *)documentsPath:(NSString *)fileName;
 + (NSString *)temporaryDirectoryFile:(NSString *)fileName;
+
 NSString *_fs_md5(NSString *str);
+
 + (NSString *)stringDeleteNewLineAndWhiteSpace:(NSString *)string;
 + (NSString *)macaddress;
 + (NSString *)identifierForVendorFromKeyChain;
@@ -167,21 +159,16 @@ NSString *_fs_md5(NSString *str);
 
 + (NSArray *)arrayFromArray:(NSArray *)array withString:(NSString *)string;
 + (NSArray *)arrayByOneCharFromString:(NSString *)string;
-+ (NSArray *)keyedUnarchiverWithArray:(NSString *)fileName;
 + (NSArray *)arrayReverseWithArray:(NSArray *)array;
 + (NSArray *)maxandMinNumberInArray:(NSArray *)array;                           // 找出数组中最大的数 First Max, Last Min
 + (NSArray *)maopaoArray:(NSArray *)array;
 + (NSArray *)addCookies:(NSArray *)nameArray value:(NSArray *)valueArray cookieDomain:(NSString *)cookName;
 + (NSArray *)deviceInfos;
 
-+ (NSDictionary *)keyedUnarchiverWithDictionary:(NSString *)fileName;
-
-+ (NSData *)keyedUnarchiverWithData:(NSString *)fileName;
 + (NSData*)rsaEncryptString:(SecKeyRef)key data:(NSString*) data;
 //压缩图片到指定文件大小
 + (NSData *)compressOriginalImage:(UIImage *)image toMaxDataSizeKBytes:(CGFloat)size;
 
-+ (NSNumber *)keyedUnarchiverWithNumber:(NSString *)fileName;
 + (NSNumber *)fileSize:(NSString *)filePath;
 
 UIColor *_fs_randomColor(void);

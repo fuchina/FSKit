@@ -804,11 +804,7 @@ NSString* _fs_KMGUnit(NSInteger size){
     return success;
 }
 
-+ (NSString *)dataToString:(NSData *)data withEncoding:(NSStringEncoding)encode{
-    return [[NSString alloc] initWithData:data encoding:encode];
-}
-
-+ (NSString *)homeDirectoryPath:(NSString *)fileName{
++ (NSString *)homeDirectoryPath:(NSString *)fileName {
     if (fileName.length == 0) {
         return nil;
     }
@@ -817,7 +813,7 @@ NSString* _fs_KMGUnit(NSInteger size){
     return filePath;
 }
 
-+ (NSString *)documentsPath:(NSString *)fileName{
++ (NSString *)documentsPath:(NSString *)fileName {
     if (fileName.length == 0) {
         return nil;
     }
@@ -834,54 +830,6 @@ NSString* _fs_KMGUnit(NSInteger size){
     NSString *tmpDirectory = NSTemporaryDirectory();
     NSString *filePath = [tmpDirectory stringByAppendingPathComponent:fileName];
     return filePath;
-}
-
-+ (BOOL)keyedArchiverWithArray:(NSArray *)array toFilePath:(NSString *)fileName{
-    if (array.count == 0 || fileName.length == 0) {
-        return NO;
-    }
-    NSArray *arrayPath = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsPath = [arrayPath lastObject];
-    NSString *filePath = [documentsPath stringByAppendingPathComponent:fileName];
-    BOOL success = [NSKeyedArchiver archiveRootObject:array toFile:filePath];
-    if (success) {
-        return YES;
-    }
-    return NO;
-}
-
-+ (NSArray *)keyedUnarchiverWithArray:(NSString *)fileName{
-    if (fileName.length == 0) {
-        return nil;
-    }
-    NSArray *arrayPath = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsPath = [arrayPath lastObject];
-    NSString *filePath = [documentsPath stringByAppendingPathComponent:fileName];
-    return [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
-}
-
-+ (BOOL)keyedArchiverWithData:(NSData *)data toFilePath:(NSString *)fileName{
-    if (data.length == 0 || fileName.length == 0) {
-        return NO;
-    }
-    NSArray *arrayPath = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsPath = [arrayPath lastObject];
-    NSString *filePath = [documentsPath stringByAppendingPathComponent:fileName];
-    BOOL success = [NSKeyedArchiver archiveRootObject:data toFile:filePath];
-    if (success) {
-        return YES;
-    }
-    return NO;
-}
-
-+ (NSData *)keyedUnarchiverWithData:(NSString *)fileName{
-    if (fileName.length == 0) {
-        return nil;
-    }
-    NSArray *arrayPath = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsPath = [arrayPath lastObject];
-    NSString *filePath = [documentsPath stringByAppendingPathComponent:fileName];
-    return [NSKeyedUnarchiver unarchiveObjectWithFile:filePath ];
 }
 
 + (NSData*)rsaEncryptString:(SecKeyRef)key data:(NSString*)data{
@@ -914,7 +862,7 @@ NSString* _fs_KMGUnit(NSInteger size){
 }
 
 //压缩图片到指定文件大小
-+ (NSData *)compressOriginalImage:(UIImage *)image toMaxDataSizeKBytes:(CGFloat)size{
++ (NSData *)compressOriginalImage:(UIImage *)image toMaxDataSizeKBytes:(CGFloat)size {
     NSData *data = UIImageJPEGRepresentation(image, 1.0);
     CGFloat dataKBytes = data.length/1000.0;
     CGFloat maxQuality = 0.9f;
@@ -922,7 +870,7 @@ NSString* _fs_KMGUnit(NSInteger size){
     while (dataKBytes > size && maxQuality > 0.01f) {
         maxQuality = maxQuality - 0.01f;
         data = UIImageJPEGRepresentation(image, maxQuality);
-        dataKBytes = data.length/1000.0;
+        dataKBytes = data.length / 1000.0;
         if (lastData == dataKBytes) {
             break;
         }else{
@@ -930,128 +878,6 @@ NSString* _fs_KMGUnit(NSInteger size){
         }
     }
     return data;
-}
-
-+ (BOOL)keyedArchiverWithNumber:(NSNumber *)number toFilePath:(NSString *)fileName{
-    if (number == nil || fileName.length == 0) {
-        return NO;
-    }
-    NSArray *arrayPath = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsPath = [arrayPath lastObject];
-    NSString *filePath = [documentsPath stringByAppendingPathComponent:fileName];
-    BOOL success = [NSKeyedArchiver archiveRootObject:number toFile:filePath];
-    if (success) {
-        return YES;
-    }
-    return NO;
-}
-
-+ (NSNumber *)keyedUnarchiverWithNumber:(NSString *)fileName{
-    if (fileName.length == 0) {
-        return nil;
-    }
-    NSArray *arrayPath = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsPath = [arrayPath lastObject];
-    NSString *filePath = [documentsPath stringByAppendingPathComponent:fileName];
-    return  [NSKeyedUnarchiver unarchiveObjectWithFile:filePath ];
-}
-
-+ (BOOL)keyedArchiverWithString:(NSString *)string toFilePath:(NSString *)fileName{
-    if (string.length == 0 || fileName.length == 0) {
-        return NO;
-    }
-    NSArray *arrayPath = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsPath = [arrayPath lastObject];
-    NSString *filePath = [documentsPath stringByAppendingPathComponent:fileName];
-    BOOL success = [NSKeyedArchiver archiveRootObject:string toFile:filePath];
-    if (success) {
-        return YES;
-    }
-    return NO;
-}
-
-+ (NSString *)keyedUnarchiverWithString:(NSString *)fileName{
-    if (fileName.length == 0) {
-        return nil;
-    }
-    NSArray *arrayPath = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsPath = [arrayPath lastObject];
-    NSString *filePath = [documentsPath stringByAppendingPathComponent:fileName];
-    return [NSKeyedUnarchiver unarchiveObjectWithFile:filePath ];
-}
-
-+ (BOOL)keyedArchiverWithDictionary:(NSDictionary *)dic toFilePath:(NSString *)fileName{
-    if (dic.count == 0 || fileName.length == 0) {
-        return NO;
-    }
-    NSArray *arrayPath = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsPath = [arrayPath lastObject];
-    NSString *filePath = [documentsPath stringByAppendingPathComponent:fileName];
-    BOOL success = [NSKeyedArchiver archiveRootObject:dic toFile:filePath];
-    if (success) {
-        return YES;
-    }
-    return NO;
-}
-
-+ (NSDictionary *)keyedUnarchiverWithDictionary:(NSString *)fileName{
-    if (fileName.length == 0) {
-        return nil;
-    }
-    NSArray *arrayPath = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsPath = [arrayPath lastObject];
-    NSString *filePath = [documentsPath stringByAppendingPathComponent:fileName];
-    return  [NSKeyedUnarchiver unarchiveObjectWithFile:filePath ];
-}
-
-+ (BOOL)createFile:(NSString *)fileName withContent:(NSString *)string{
-    if (fileName.length == 0 || string.length == 0) {
-        return NO;
-    }
-    NSArray *arrayPath = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsPath = [arrayPath lastObject];
-    NSString *filePath = [documentsPath stringByAppendingPathComponent:fileName];
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    NSData *data = [string dataUsingEncoding:NSUTF8StringEncoding];
-    return [fileManager createFileAtPath:filePath contents:data attributes:nil];
-}
-
-+ (BOOL)moveFile:(NSString *)filePath toPath:(NSString *)newPath{
-    if (filePath.length == 0 || newPath.length == 0) {
-        return NO;
-    }
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    return [fileManager moveItemAtPath:filePath toPath:newPath error:nil];
-}
-
-+ (BOOL)renameFile:(NSString *)filePath toPath:(NSString *)newPath{
-    if (filePath.length == 0 || newPath.length == 0) {
-        return NO;
-    }
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    return [fileManager moveItemAtPath:filePath toPath:newPath error:nil];
-}
-
-+ (BOOL)copyFile:(NSString *)filePath toPath:(NSString *)newPath{
-    if (filePath.length == 0 || newPath.length == 0) {
-        return NO;
-    }
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    NSError *error = nil;
-    BOOL success = [fileManager copyItemAtPath:filePath toPath:newPath error:&error];
-    return success;
-}
-
-+ (BOOL)removeFile:(NSString *)filePath{
-    if (filePath.length == 0) {
-        return NO;
-    }
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    BOOL isExist = [fileManager fileExistsAtPath:filePath];
-    if (isExist) {
-        return [fileManager removeItemAtPath:filePath error:nil];
-    }
-    return NO;
 }
 
 + (BOOL)isChinese:(NSString *)string{
