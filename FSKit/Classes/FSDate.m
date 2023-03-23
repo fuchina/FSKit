@@ -288,23 +288,57 @@
     return [[NSString alloc] initWithFormat:@"%@",@(value)];
 }
 
-+ (NSDate *)solarForLunar:(NSInteger)year month:(NSInteger)month day:(NSInteger)day {
-    NSString *string = [[NSString alloc] initWithFormat:@"%ld-%@-%@ 23:59:59",year,[self twoChar:month],[self twoChar:day]];
++ (NSArray<NSDate *> *)solarsForLunar:(NSInteger)year month:(NSInteger)month day:(NSInteger)day {
+    NSString *string = [[NSString alloc] initWithFormat:@"%ld-%@-%@ 23:59:59", year, [self twoChar:month], [self twoChar:day]];
     NSDate *date = [self dateByString:string formatter:nil];
     NSDateComponents *lunarComponents = [self chineseDate:date];
     BOOL found = (lunarComponents.month == month) && (lunarComponents.day == day);
     if (found == YES) {
-        return date;
+        NSAssert(YES == NO, @"这种情况应该不会出现");
+        return @[date];
     }
     
     // 农历日期会超过阳历日期吗？假设不会，那就往后找
+    NSMutableArray *dates = [[NSMutableArray alloc] init];
     while (found == NO) {
-        date = [NSDate dateWithTimeInterval:86400 sinceDate:date];//后一天
+        date = [NSDate dateWithTimeInterval:86400 sinceDate:date];  //  后一天
         lunarComponents = [self chineseDate:date];
         found = (lunarComponents.month == month) && (lunarComponents.day == day);
+        
+        if (found) {  // 再往后找32天，处理农历闰月的情况
+            [dates addObject:date];
+            
+            // 下一个月是不是闰月，农历每个月有30天或29天，取35天跳到下一个月
+            NSInteger addDays = 35;
+            if (day > 20) {
+                addDays = 15;
+            }
+            NSDate *runDate = [NSDate dateWithTimeInterval:86400 * addDays sinceDate:date];
+            lunarComponents = [self chineseDate:runDate];
+            if (lunarComponents.isLeapMonth) {  // 是闰月，需要找到该闰月日期下的阳历
+                runDate = [NSDate dateWithTimeInterval:86400 * (day - lunarComponents.day) sinceDate:runDate];
+                
+                [dates addObject:runDate];
+            }
+        }
     }
     
-    return date;
+    return dates.copy;
+}
+
++ (NSDate *)usefulSolarForLunar:(NSInteger)year month:(NSInteger)month day:(NSInteger)day forDateTimestamp:(NSTimeInterval)timestamp {
+    NSArray *dates = [self solarsForLunar:year month:month day:day];
+    if (dates.count == 1) {
+        return dates.firstObject;
+    }
+    
+    NSDate *first = dates.firstObject;
+    NSInteger tf = [first timeIntervalSince1970];
+    if (tf > timestamp) {
+        return first;
+    }
+    NSDate *last = dates.lastObject;
+    return last;
 }
 
 + (NSDate *)lunarForSolar:(NSDate *)solar {

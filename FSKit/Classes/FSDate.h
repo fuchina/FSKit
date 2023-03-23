@@ -72,6 +72,7 @@
  *  1.先根据农历计算一个阳历，这样就比较相近
  *  2.阳历肯定比农历大，那就是往后找
  *  3.计算每个阳历的农历，如果农历的月跟日正好都对上，就是找到了
+ *  4.在农历有闰月时，会得到2个日期，就返回最近的那个
  *
  * 农历转阳历，2021年1月16日设计，这个方法依赖 chineseDate： 方法的正确性
  * @param year 农历年
@@ -79,7 +80,11 @@
  * @param day 农历日
  * @return 返回阳历日期
  */
-+ (NSDate *)solarForLunar:(NSInteger)year month:(NSInteger)month day:(NSInteger)day;
++ (NSArray<NSDate *> *)solarsForLunar:(NSInteger)year month:(NSInteger)month day:(NSInteger)day;
+/**
+ *  较近的阳历日期
+ */
++ (NSDate *)usefulSolarForLunar:(NSInteger)year month:(NSInteger)month day:(NSInteger)day forDateTimestamp:(NSTimeInterval)timestamp;
 
 /**
  *  1.先根据系统方法获取到农历的月日
