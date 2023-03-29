@@ -219,7 +219,7 @@
     return @"";
 }
 
-+ (BOOL)isTheSameDayA:(NSDate *)aDate b:(NSDate *)bDate{
++ (BOOL)isTheSameDayA:(NSDate *)aDate b:(NSDate *)bDate {
     if (!([aDate isKindOfClass:NSDate.class] && [bDate isKindOfClass:NSDate.class])) {
         return NO;
     }
@@ -228,14 +228,14 @@
     return (f.year == s.year) && (f.month == s.month) && (f.day == s.day);
 }
 
-+ (NSInteger)theFirstSecondOfMonth:(NSDate *)date{
++ (NSInteger)theFirstSecondOfMonth:(NSDate *)date {
     return [self publicFunction:date str:^NSString *(NSDateComponents *c) {
         NSString *str = [[NSString alloc] initWithFormat:@"%d-%@-01 00:00:00",(int)c.year,[FSKit twoChar:c.month]];
         return str;
     }];
 }
 
-+ (NSInteger)theLastSecondOfMonth:(NSDate *)date{
++ (NSInteger)theLastSecondOfMonth:(NSDate *)date {
     return [self publicFunction:date str:^NSString *(NSDateComponents *c) {
         NSInteger days = [self daysForMonth:c.month year:c.year];
         NSString *str = [[NSString alloc] initWithFormat:@"%d-%@-%d 23:59:59",(int)c.year,[FSKit twoChar:c.month],(int)days];
@@ -243,41 +243,57 @@
     }];
 }
 
-+ (NSInteger)theFirstSecondOfDay:(NSDate *)date{
++ (NSInteger)theFirstSecondOfDay:(NSDate *)date {
     return [self publicFunction:date str:^NSString *(NSDateComponents *c) {
         NSString *str = [[NSString alloc] initWithFormat:@"%d-%@-%@ 00:00:00",(int)c.year,[FSKit twoChar:c.month],[FSKit twoChar:c.day]];
         return str;
     }];
 }
 
-+ (NSInteger)theLastSecondOfDay:(NSDate *)date{
++ (NSInteger)theLastSecondOfDay:(NSDate *)date {
     return [self publicFunction:date str:^NSString *(NSDateComponents *c) {
         NSString *str = [[NSString alloc] initWithFormat:@"%d-%@-%@ 23:59:59",(int)c.year,[FSKit twoChar:c.month],[FSKit twoChar:c.day]];
         return str;
     }];
 }
 
-+ (NSInteger)theFirstSecondOfYear:(NSInteger)year{
++ (NSInteger)theFirstSecondOfYear:(NSInteger)year {
     NSString *str = [[NSString alloc] initWithFormat:@"%@-01-01 00:00:00",@(year)];
     NSDate *result = [self dateByString:str formatter:nil];
     NSTimeInterval t = (NSInteger)[result timeIntervalSince1970];
     return t;
 }
 
-+ (NSInteger)theLastSecondOfYear:(NSInteger)year{
++ (NSInteger)theLastSecondOfYear:(NSInteger)year {
     NSString *str = [[NSString alloc] initWithFormat:@"%@-12-31 23:59:59",@(year)];
     NSDate *result = [self dateByString:str formatter:nil];
     NSTimeInterval t = (NSInteger)[result timeIntervalSince1970];
     return t;
 }
 
-+ (NSInteger)publicFunction:(NSDate *)date str:(NSString *(^)(NSDateComponents *c))callback{
++ (void)theFirstAndLastSecondOfYear:(NSInteger)year first:(NSInteger *)firstSecond last:(NSInteger *)lastSecond {
+    NSString *first = [[NSString alloc] initWithFormat:@"%ld-01-01 00:00:00", year];
+    NSString *last = [[NSString alloc] initWithFormat:@"%ld-12-31 23:59:59", year];
+    NSDate *firstDate = [self dateByString:first formatter:nil];
+    NSDate *lastDate = [self dateByString:last formatter:nil];
+    *firstSecond = (NSInteger)[firstDate timeIntervalSince1970];
+    *lastSecond = (NSInteger)[firstDate timeIntervalSince1970];
+}
+
++ (NSInteger)publicFunction:(NSDate *)date str:(NSString *(^)(NSDateComponents *c))callback {
     if (![date isKindOfClass:NSDate.class]) {
         return 0;
     }
     NSDateComponents *c = [self componentForDate:date];
     NSString *str = callback(c);
-    NSDate *result = [self dateByString:str formatter:nil];
+    return [self secondsForComponents:c dateString:str];
+}
+
++ (NSInteger)secondsForComponents:(NSDateComponents *)c dateString:(NSString *)dateString {
+    if (![c isKindOfClass:NSDateComponents.class]) {
+        return 0;
+    }
+    NSDate *result = [self dateByString:dateString formatter:nil];
     NSTimeInterval t = (NSInteger)[result timeIntervalSince1970];
     return t;
 }

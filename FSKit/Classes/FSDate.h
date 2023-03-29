@@ -19,6 +19,7 @@
 // 该年第一秒/最后一秒
 + (NSInteger)theFirstSecondOfYear:(NSInteger)year;
 + (NSInteger)theLastSecondOfYear:(NSInteger)year;
++ (void)theFirstAndLastSecondOfYear:(NSInteger)year first:(NSInteger *)firstSecond last:(NSInteger *)lastSecond;
 
 // 解决差8小时问题
 + (NSDate *)chinaDateByDate:(NSDate *)date;
