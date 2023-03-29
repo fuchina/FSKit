@@ -1270,45 +1270,33 @@ NSString *_fs_md5(NSString *str){
     return string;
 }
 
-+ (NSString *)bankStyleDataThree:(id)data{
-    if ([data isKindOfClass:NSNumber.class]) {
-        NSNumberFormatter *numberFormatter = [[NSNumberFormatter alloc] init];
-        [numberFormatter setPositiveFormat:@"###,##0.00;"];    // 100,000.00
-        NSString *formattedNumberString = [numberFormatter stringFromNumber:[NSNumber numberWithDouble:[data doubleValue]]];
-        return formattedNumberString;
-    }else if([data isKindOfClass:NSString.class]){
-        if (_fs_isPureFloat(data) || _fs_isPureInt(data)) {
-            NSNumberFormatter *numberFormatter = [[NSNumberFormatter alloc] init];
-            [numberFormatter setPositiveFormat:@"###,##0.00;"];    // 100,000.00
-            NSString *formattedNumberString = [numberFormatter stringFromNumber:[NSNumber numberWithDouble:[data doubleValue]]];
-            return formattedNumberString;
-        }else{
-            return @"0.00";
-        }
-    }else{
-        return @"0.00";
-    }
++ (NSNumberFormatter *)bankStyleFormatter {
+    NSNumberFormatter *numberFormatter = [[NSNumberFormatter alloc] init];
+    [numberFormatter setPositiveFormat:@"###,##0.00;"];    // 100,000.00
+    return numberFormatter;
 }
 
-+ (NSString *)bankStyleData:(id)data{
-    if ([data isKindOfClass:NSNumber.class]) {
-        NSNumberFormatter *numberFormatter = [[NSNumberFormatter alloc] init];
-        //        [numberFormatter setPositiveFormat:@"###,##0.00;"];    // 100,000.00
-        [numberFormatter setPositiveFormat:@"0.00;"];
-        NSString *formattedNumberString = [numberFormatter stringFromNumber:[NSNumber numberWithDouble:[data doubleValue]]];
-        return formattedNumberString;
-    }else if([data isKindOfClass:NSString.class]){
-        if (_fs_isPureFloat(data) || _fs_isPureInt(data)) {
-            NSNumberFormatter *numberFormatter = [[NSNumberFormatter alloc] init];
-            [numberFormatter setPositiveFormat:@"0.00;"];
-            NSString *formattedNumberString = [numberFormatter stringFromNumber:[NSNumber numberWithDouble:[data doubleValue]]];
-            return formattedNumberString;
-        }else{
-            return @"0.00";
-        }
-    }else{
-        return @"0.00";
-    }
++ (NSString *)bankStyleDataThreeForCents:(NSInteger)cents {
+    NSNumberFormatter *numberFormatter = [self bankStyleFormatter];
+    return [self bankStyleDataThreeForCents:cents formatter:numberFormatter];
+}
+
++ (NSString *)bankStyleDataThreeForCents:(NSInteger)cents formatter:(NSNumberFormatter *)formatter {
+    NSString *string = [formatter stringFromNumber:[NSNumber numberWithDouble:cents / 100.0]];
+    return string;
+}
+
++ (NSString *)bankStyleDataThree:(CGFloat)data {
+    NSNumberFormatter *numberFormatter = [self bankStyleFormatter];
+    NSString *formattedNumberString = [numberFormatter stringFromNumber:[NSNumber numberWithDouble:data]];
+    return formattedNumberString;
+}
+
++ (NSString *)bankStyleData:(CGFloat)data {
+    NSNumberFormatter *numberFormatter = [[NSNumberFormatter alloc] init];
+    [numberFormatter setPositiveFormat:@"0.00;"];
+    NSString *formattedNumberString = [numberFormatter stringFromNumber:[NSNumber numberWithDouble:data]];
+    return formattedNumberString;
 }
 
 + (NSString *)fourNoFiveYes:(float)number afterPoint:(int)position{  // 只入不舍

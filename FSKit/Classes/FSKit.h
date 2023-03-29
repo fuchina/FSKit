@@ -106,8 +106,14 @@ NSString *_fs_md5(NSString *str);
 + (NSString *)DataToHex:(NSData *)data;                          // 将二进制转换为16进制再用字符串表示
 + (NSString *)cleanString:(NSString *)str;
 + (NSString *)stringByDate:(NSDate *)date;                       // 解决差8小时的问题
-+ (NSString *)bankStyleData:(id)data;
-+ (NSString *)bankStyleDataThree:(id)data;
+
++ (NSString *)bankStyleData:(CGFloat)data;
++ (NSString *)bankStyleDataThree:(CGFloat)data;
+
++ (NSNumberFormatter *)bankStyleFormatter;
++ (NSString *)bankStyleDataThreeForCents:(NSInteger)cents;
++ (NSString *)bankStyleDataThreeForCents:(NSInteger)cents formatter:(NSNumberFormatter *)formatter;
+
 + (NSString *)fourNoFiveYes:(float)number afterPoint:(int)position;  // 四舍五入
 + (NSString *)decimalNumberMutiplyWithString:(NSString *)multiplierValue  valueB:(NSString *)multiplicandValue;
 
