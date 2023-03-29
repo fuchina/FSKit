@@ -36,7 +36,7 @@
     return sum;
 }
 
-+ (BOOL)isLeapYear:(int)year{
++ (BOOL)isLeapYear:(NSInteger)year {
     if ((year % 4  == 0 && year % 100 != 0)  || year % 400 == 0)
         return YES;
     else
