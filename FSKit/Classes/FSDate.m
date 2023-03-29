@@ -277,7 +277,7 @@
     NSDate *firstDate = [self dateByString:first formatter:nil];
     NSDate *lastDate = [self dateByString:last formatter:nil];
     *firstSecond = (NSInteger)[firstDate timeIntervalSince1970];
-    *lastSecond = (NSInteger)[firstDate timeIntervalSince1970];
+    *lastSecond = (NSInteger)[lastDate timeIntervalSince1970];
 }
 
 + (NSInteger)publicFunction:(NSDate *)date str:(NSString *(^)(NSDateComponents *c))callback {
