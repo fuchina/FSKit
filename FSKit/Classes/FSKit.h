@@ -118,6 +118,10 @@ NSString *_fs_md5(NSString *str);
 + (NSString *)decimalNumberMutiplyWithString:(NSString *)multiplierValue  valueB:(NSString *)multiplicandValue;
 
 /**
+ *  将以元为单位的字符串数字转化为以分为单位的整数
+ */
++ (NSInteger)numberStringToCentInt:(NSString *)string;
+/**
  *  高精度，浮点数转整数
  */
 + (NSInteger)floatToInt:(NSString *)floatString;
