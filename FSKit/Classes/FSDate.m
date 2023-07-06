@@ -377,4 +377,19 @@
     return date;
 }
 
++ (NSDate *)theLastYearThisDay:(NSDateComponents *)components {
+    NSInteger lastYearYear = components.year - 1;
+    NSInteger lastYearMonth = components.month;
+    NSInteger lastYearDay = components.day;
+    if (components.month == 2 && components.day == 29) {
+        BOOL isLeapYear = [FSDate isLeapYear:lastYearYear];
+        if (!isLeapYear) {
+            lastYearDay = 28;
+        }
+    }
+    NSString *lastYearString = [[NSString alloc] initWithFormat:@"%ld-%@-%@", lastYearYear, [FSKit twoChar:lastYearMonth], [FSKit twoChar:lastYearDay]];
+    NSDate *lastYearThisDay = [FSDate dateByString:lastYearString formatter:@"yyyy-MM-dd 00:00:00"];
+    return lastYearThisDay;
+}
+
 @end

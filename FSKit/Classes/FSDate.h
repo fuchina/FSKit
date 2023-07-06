@@ -107,4 +107,9 @@
  */
 + (NSDate *)date;
 
+/**
+ *  前一年的这一天
+ */
++ (NSDate *)theLastYearThisDay:(NSDateComponents *)components;
+
 @end
