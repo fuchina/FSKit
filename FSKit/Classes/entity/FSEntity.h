@@ -9,10 +9,10 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef NS_ENUM(NSInteger, HETriBool) {
-    HETriBoolUnknown = -1,          // 未知
-    HETriBoolNO = 0,                // 否
-    HETriBoolYES = 1,               // 是
+typedef NS_ENUM(NSInteger, FSTriBool) {
+    FSTriBoolUnknown = -1,          // 未知
+    FSTriBoolNO = 0,                // 否
+    FSTriBoolYES = 1,               // 是
 };
 
 @interface FSEntity : NSObject
