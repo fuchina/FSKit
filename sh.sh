@@ -103,7 +103,7 @@ commitEven "$commit"
 start=$(date +%s)
 git tag $joinedVersion
 git push --tags
-pod spec lint --verbose --allow-warnings
+#pod spec lint --verbose --allow-warnings
 pod trunk push ${pod_file_name}.podspec --verbose --allow-warnings --use-libraries
 
 pushRepoResult=$?
