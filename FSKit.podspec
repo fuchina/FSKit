@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'FSKit'
-  s.version          = '1.3.5'
+  s.version          = '1.3.6'
   s.summary          = 'FSKit is a gift for iOS developer'
 
 # This description is used to generate tags and improve search results.

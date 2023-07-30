@@ -104,7 +104,7 @@ start=$(date +%s)
 git tag $joinedVersion
 git push --tags
 #pod spec lint --verbose --allow-warnings
-pod trunk push ${pod_file_name}.podspec --verbose --allow-warnings --use-libraries
+pod trunk push ${pod_file_name} --verbose --allow-warnings --use-libraries
 
 pushRepoResult=$?
 echo "发布结果：${pushRepoResult}"
