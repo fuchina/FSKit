@@ -1,6 +1,0 @@
-framework module Pods_FSKit_Example {
-  umbrella header "Pods-FSKit_Example-umbrella.h"
-
-  export *
-  module * { export * }
-}
