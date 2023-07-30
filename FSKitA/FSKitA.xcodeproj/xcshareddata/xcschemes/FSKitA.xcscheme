@@ -14,10 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "2D98B0B62A76976B007201D5"
-               BuildableName = "libFSPublickKit.a"
-               BlueprintName = "FSPublickKit"
-               ReferencedContainer = "container:FSPublickKit.xcodeproj">
+               BlueprintIdentifier = "2D98B0CC2A769CA9007201D5"
+               BuildableName = "libFSKitA.a"
+               BlueprintName = "FSKitA"
+               ReferencedContainer = "container:FSKitA.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -50,10 +50,10 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "2D98B0B62A76976B007201D5"
-            BuildableName = "libFSPublickKit.a"
-            BlueprintName = "FSPublickKit"
-            ReferencedContainer = "container:FSPublickKit.xcodeproj">
+            BlueprintIdentifier = "2D98B0CC2A769CA9007201D5"
+            BuildableName = "libFSKitA.a"
+            BlueprintName = "FSKitA"
+            ReferencedContainer = "container:FSKitA.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
    </ProfileAction>

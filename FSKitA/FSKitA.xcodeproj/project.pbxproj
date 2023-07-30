@@ -6,8 +6,12 @@
 	objectVersion = 56;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		2D98B0DC2A769F26007201D5 /* Classes in Sources */ = {isa = PBXBuildFile; fileRef = 2D98B0D92A769CC6007201D5 /* Classes */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXCopyFilesBuildPhase section */
-		2D98B0B52A76976B007201D5 /* CopyFiles */ = {
+		2D98B0CB2A769CA9007201D5 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "include/$(PRODUCT_NAME)";
@@ -19,12 +23,12 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		2D98B0B72A76976B007201D5 /* libFSPublickKit.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libFSPublickKit.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		2D98B0C32A7697BF007201D5 /* Classes */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Classes; path = ../../FSKit/Classes; sourceTree = "<group>"; };
+		2D98B0CD2A769CA9007201D5 /* libFSKitA.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libFSKitA.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		2D98B0D92A769CC6007201D5 /* Classes */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Classes; path = ../../FSKit/Classes; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		2D98B0B42A76976B007201D5 /* Frameworks */ = {
+		2D98B0CA2A769CA9007201D5 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -34,65 +38,65 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		2D98B0AE2A76976B007201D5 = {
+		2D98B0C42A769CA9007201D5 = {
 			isa = PBXGroup;
 			children = (
-				2D98B0B92A76976B007201D5 /* FSPublickKit */,
-				2D98B0B82A76976B007201D5 /* Products */,
+				2D98B0CF2A769CA9007201D5 /* FSKitA */,
+				2D98B0CE2A769CA9007201D5 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		2D98B0B82A76976B007201D5 /* Products */ = {
+		2D98B0CE2A769CA9007201D5 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				2D98B0B72A76976B007201D5 /* libFSPublickKit.a */,
+				2D98B0CD2A769CA9007201D5 /* libFSKitA.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		2D98B0B92A76976B007201D5 /* FSPublickKit */ = {
+		2D98B0CF2A769CA9007201D5 /* FSKitA */ = {
 			isa = PBXGroup;
 			children = (
-				2D98B0C32A7697BF007201D5 /* Classes */,
+				2D98B0D92A769CC6007201D5 /* Classes */,
 			);
-			path = FSPublickKit;
+			path = FSKitA;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		2D98B0B62A76976B007201D5 /* FSPublickKit */ = {
+		2D98B0CC2A769CA9007201D5 /* FSKitA */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 2D98B0C02A76976B007201D5 /* Build configuration list for PBXNativeTarget "FSPublickKit" */;
+			buildConfigurationList = 2D98B0D62A769CAA007201D5 /* Build configuration list for PBXNativeTarget "FSKitA" */;
 			buildPhases = (
-				2D98B0B32A76976B007201D5 /* Sources */,
-				2D98B0B42A76976B007201D5 /* Frameworks */,
-				2D98B0B52A76976B007201D5 /* CopyFiles */,
+				2D98B0C92A769CA9007201D5 /* Sources */,
+				2D98B0CA2A769CA9007201D5 /* Frameworks */,
+				2D98B0CB2A769CA9007201D5 /* CopyFiles */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
-			name = FSPublickKit;
-			productName = FSPublickKit;
-			productReference = 2D98B0B72A76976B007201D5 /* libFSPublickKit.a */;
+			name = FSKitA;
+			productName = FSKitA;
+			productReference = 2D98B0CD2A769CA9007201D5 /* libFSKitA.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		2D98B0AF2A76976B007201D5 /* Project object */ = {
+		2D98B0C52A769CA9007201D5 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastUpgradeCheck = 1420;
 				TargetAttributes = {
-					2D98B0B62A76976B007201D5 = {
+					2D98B0CC2A769CA9007201D5 = {
 						CreatedOnToolsVersion = 14.2;
 					};
 				};
 			};
-			buildConfigurationList = 2D98B0B22A76976B007201D5 /* Build configuration list for PBXProject "FSPublickKit" */;
+			buildConfigurationList = 2D98B0C82A769CA9007201D5 /* Build configuration list for PBXProject "FSKitA" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -100,28 +104,29 @@
 				en,
 				Base,
 			);
-			mainGroup = 2D98B0AE2A76976B007201D5;
-			productRefGroup = 2D98B0B82A76976B007201D5 /* Products */;
+			mainGroup = 2D98B0C42A769CA9007201D5;
+			productRefGroup = 2D98B0CE2A769CA9007201D5 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				2D98B0B62A76976B007201D5 /* FSPublickKit */,
+				2D98B0CC2A769CA9007201D5 /* FSKitA */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
-		2D98B0B32A76976B007201D5 /* Sources */ = {
+		2D98B0C92A769CA9007201D5 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2D98B0DC2A769F26007201D5 /* Classes in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		2D98B0BE2A76976B007201D5 /* Debug */ = {
+		2D98B0D42A769CAA007201D5 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -179,7 +184,7 @@
 			};
 			name = Debug;
 		};
-		2D98B0BF2A76976B007201D5 /* Release */ = {
+		2D98B0D52A769CAA007201D5 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -231,11 +236,10 @@
 			};
 			name = Release;
 		};
-		2D98B0C12A76976B007201D5 /* Debug */ = {
+		2D98B0D72A769CAA007201D5 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -243,11 +247,10 @@
 			};
 			name = Debug;
 		};
-		2D98B0C22A76976B007201D5 /* Release */ = {
+		2D98B0D82A769CAA007201D5 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -258,25 +261,25 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		2D98B0B22A76976B007201D5 /* Build configuration list for PBXProject "FSPublickKit" */ = {
+		2D98B0C82A769CA9007201D5 /* Build configuration list for PBXProject "FSKitA" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				2D98B0BE2A76976B007201D5 /* Debug */,
-				2D98B0BF2A76976B007201D5 /* Release */,
+				2D98B0D42A769CAA007201D5 /* Debug */,
+				2D98B0D52A769CAA007201D5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		2D98B0C02A76976B007201D5 /* Build configuration list for PBXNativeTarget "FSPublickKit" */ = {
+		2D98B0D62A769CAA007201D5 /* Build configuration list for PBXNativeTarget "FSKitA" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				2D98B0C12A76976B007201D5 /* Debug */,
-				2D98B0C22A76976B007201D5 /* Release */,
+				2D98B0D72A769CAA007201D5 /* Debug */,
+				2D98B0D82A769CAA007201D5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = 2D98B0AF2A76976B007201D5 /* Project object */;
+	rootObject = 2D98B0C52A769CA9007201D5 /* Project object */;
 }
