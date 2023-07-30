@@ -7,10 +7,9 @@
 //
 
 #import "FSViewController.h"
-#import "FSKit-umbrella.h"
 #import "FSModel.h"
 #import "FSSecondController.h"
-#import <FSDate.h>
+#import <FSKit/FSDate.h>
 
 
 typedef NS_ENUM(NSInteger, FSWeekdayIndex) {

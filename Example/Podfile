@@ -1,8 +1,8 @@
 use_frameworks!
 
 target 'FSKit_Example' do
-   pod 'FSKit', :path => '../'
-#  pod 'FSKitA', :path => '../'
+#   pod 'FSKit', :path => '../'
+  pod 'FSKitA', :path => '../'
 
 #  pod 'MLeaksFinder'
 

@@ -29,13 +29,17 @@ Pod::Spec.new do |s|
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
   s.ios.deployment_target = '8.0'
+  s.static_framework = true
 
-  #s.public_header_files = 'sdks/Headers/*.{h}'
-  s.source_files = 'FSKitA/Headers/*.{h}'
+  s.public_header_files = 'FSKitA/FSKit.framework/Headers/*.{h}'
+  s.source_files = 'FSKitA/FSKit.framework/Headers/*.{h}'
 
   #s.ios.vendored_libraries = 'sdks/c/FSKit.a'
-  s.vendored_libraries = 'FSKitA/libFSKit.a'
-  
+  #s.vendored_libraries = 'FSKitA/libFSKit.a'
+  s.vendored_frameworks = 'FSKitA/FSKit.framework'
+  s.preserve_paths      = 'FSKitA/FSKit.framework'
+
+
   # s.resource_bundles = {
   #   'FSKit' => ['FSKit/Assets/*.png']
   # }
@@ -44,4 +48,5 @@ Pod::Spec.new do |s|
   #s.frameworks = 'UIKit', 'MapKit','CoreLocation','CoreTelephony','AVFoundation'
   #s.libraries  = 'sqlite3'
   # s.dependency 'AFNetworking', '~> 2.3'
+
 end

@@ -246,7 +246,7 @@
 				6003F586195388D20070C39A /* Sources */,
 				6003F587195388D20070C39A /* Frameworks */,
 				6003F588195388D20070C39A /* Resources */,
-				A2F98037C0F994CFA4CB1212 /* [CP] Embed Pods Frameworks */,
+				557E22E663895BA1BBDF590B /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -306,14 +306,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		A2F98037C0F994CFA4CB1212 /* [CP] Embed Pods Frameworks */ = {
+		557E22E663895BA1BBDF590B /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-FSKit_Example/Pods-FSKit_Example-frameworks.sh",
-				"${BUILT_PRODUCTS_DIR}/FSKit/FSKit.framework",
+				"${PODS_ROOT}/../../FSKitA/FSKit.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (

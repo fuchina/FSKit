@@ -7,6 +7,7 @@
 
 #import <Foundation/Foundation.h>
 #import "FSUIAdapterModel.h"
+#import <UIKit/UIKit.h>
 
 #define UIScreenLong                FSUIAdapter.sharedInstance.screenbiggerValue
 #define UIScreenShort               FSUIAdapter.sharedInstance.screenSmallerValue
