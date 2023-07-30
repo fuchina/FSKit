@@ -7,9 +7,9 @@
 //
 
 #import "FSLocalNotificationController.h"
-#import <FSKit/FSLocalNotification.h>
-#import <FSKit/FuSoft.h>
-#import <FSKit/FSKit.h>
+#import <FSLocalNotification.h>
+#import <FuSoft.h>
+#import <FSKit.h>
 
 @interface FSLocalNotificationController ()<UITableViewDelegate,UITableViewDataSource>
 

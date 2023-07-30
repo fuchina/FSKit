@@ -7,16 +7,16 @@
 //
 
 #import "FSSecondController.h"
-#import <FSKit/FSKit.h>
-#import <FSKit/FSURLSession.h>
+#import <FSKit.h>
+#import <FSURLSession.h>
 #import "FSBackWork.h"
 #import "FSBankWork.h"
 #import "FSModel.h"
 #import <objc/runtime.h>
-#import <FSKit/FSRuntime.h>
-#import <FSKit/FuSoft.h>
-#import <FSKit/FSHook.h>
-#import <FSKit/FSLocalNotification.h>
+#import <FSRuntime.h>
+#import <FuSoft.h>
+#import <FSHook.h>
+#import <FSLocalNotification.h>
 #import "FSLocalNotificationController.h"
 
 @interface FSSecondController ()

@@ -1,12 +1,9 @@
 use_frameworks!
 
 target 'FSKit_Example' do
-  pod 'FSKit', :path => '../'
+   pod 'FSKit', :path => '../'
+#  pod 'FSKitA', :path => '../'
+
 #  pod 'MLeaksFinder'
 
-  target 'FSKit_Tests' do
-    inherit! :search_paths
-
-    
-  end
 end
