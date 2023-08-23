@@ -9,7 +9,7 @@
 
 @interface FSEntity ()
 
-@property (nonatomic, copy) void (^config)(id self_object);
+@property (nonatomic, weak) void (^config)(id self_object);
 
 @end
 
