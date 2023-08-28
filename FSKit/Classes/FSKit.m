@@ -90,7 +90,7 @@ void _fs_userDefaults_setObjectForKey(id object,NSString *key){
     if (object && _fs_isValidateString(key)) {
         NSUserDefaults *fdd = [NSUserDefaults standardUserDefaults];
         [fdd setObject:object forKey:key];
-//        [fdd synchronize];
+        [fdd synchronize];
     }
 }
 
