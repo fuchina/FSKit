@@ -10,13 +10,13 @@
 
 @implementation FSDate
 
-+ (NSDate *)chinaDateByDate:(NSDate *)date{
++ (NSDate *)chinaDateByDate:(NSDate *)date {
     NSTimeZone *zone = [NSTimeZone systemTimeZone];
     NSInteger interval = [zone secondsFromGMTForDate:date];
     return [date dateByAddingTimeInterval: interval];
 }
 
-+ (NSInteger)daythOfYearForDate:(NSDate *)date{
++ (NSInteger)daythOfYearForDate:(NSDate *)date {
     if (date == nil) {
         date = [NSDate date];
     }
@@ -44,7 +44,7 @@
         return NO;
 }
 
-+ (NSInteger)daysForMonth:(NSInteger)month year:(NSInteger)year{
++ (NSInteger)daysForMonth:(NSInteger)month year:(NSInteger)year {
     NSInteger days = 0;
     BOOL isLeapYear = [self isLeapYear:(int)year];
     BOOL isBigMonth = NO;
@@ -52,7 +52,7 @@
         if (month % 2 == 1) {
             isBigMonth = YES;
         }
-    }else{
+    } else {
         if (month % 2 == 0) {
             isBigMonth = YES;
         }
@@ -61,24 +61,24 @@
     if (isLeapYear) {
         if (month == 2) {
             days = 29;
-        }else if (isBigMonth){
+        } else if (isBigMonth) {
             days = 31;
-        }else{
+        } else {
             days = 30;
         }
-    }else{
+    } else {
         if (month == 2) {
             days = 28;
-        }else if (isBigMonth){
+        } else if (isBigMonth) {
             days = 31;
-        }else{
+        } else {
             days = 30;
         }
     }
     return days;
 }
 
-+ (NSDateComponents *)componentForDate:(NSDate *)date{
++ (NSDateComponents *)componentForDate:(NSDate *)date {
     NSCalendar *calendar = [NSCalendar calendarWithIdentifier:NSCalendarIdentifierGregorian];
     NSDateComponents *components = [calendar components:NSCalendarUnitYear | NSCalendarUnitMonth | NSCalendarUnitDay | NSCalendarUnitHour | NSCalendarUnitMinute | NSCalendarUnitSecond | NSCalendarUnitWeekOfMonth | NSCalendarUnitWeekday | NSCalendarUnitWeekOfMonth | NSCalendarUnitWeekOfYear fromDate:date];
     return components;
@@ -117,7 +117,7 @@
     return [self ymdhsByTimeInterval:t];
 }
 
-+ (NSDateComponents *)chineseDate:(NSDate *)date{
++ (NSDateComponents *)chineseDate:(NSDate *)date {
     if (![date isKindOfClass:NSDate.class]) {
         return nil;
     }
@@ -126,7 +126,7 @@
     return components;
 }
 
-+ (NSArray<NSString *> *)chineseCalendarForDate:(NSDate *)date{
++ (NSArray<NSString *> *)chineseCalendarForDate:(NSDate *)date {
     if (![date isKindOfClass:NSDate.class]) {
         return nil;
     }
@@ -134,7 +134,7 @@
     return @[[self chineseCalendarYear:components.year - 1],[self chineseCalendarMonth:components.month - 1],[self chineseCalendarDay:components.day - 1]];
 }
 
-+ (NSString *)chineseCalendarYear:(NSInteger)index{
++ (NSString *)chineseCalendarYear:(NSInteger)index {
     NSArray *chineseYears = @[@"甲子",  @"乙丑",  @"丙寅",  @"丁卯",  @"戊辰",  @"己巳",  @"庚午",  @"辛未",  @"壬申",  @"癸酉",
                               @"甲戌",   @"乙亥",  @"丙子",  @"丁丑",  @"戊寅",  @"己卯",  @"庚辰",  @"辛己",  @"壬午",  @"癸未",
                               @"甲申",   @"乙酉",  @"丙戌",  @"丁亥",  @"戊子",  @"己丑",  @"庚寅",  @"辛卯",  @"壬辰",  @"癸巳",
@@ -144,12 +144,12 @@
     return chineseYears[index % chineseYears.count];
 }
 
-+ (NSString *)chineseCalendarMonth:(NSInteger)index{
++ (NSString *)chineseCalendarMonth:(NSInteger)index {
     NSArray *chineseYears = @[@"正月", @"二月", @"三月", @"四月", @"五月", @"六月", @"七月", @"八月",@"九月", @"十月", @"冬月", @"腊月"];
     return chineseYears[index % chineseYears.count];
 }
 
-+ (NSString *)chineseCalendarDay:(NSInteger)index{
++ (NSString *)chineseCalendarDay:(NSInteger)index {
     NSArray *chineseYears = @[  @"初一", @"初二", @"初三", @"初四", @"初五", @"初六", @"初七", @"初八", @"初九", @"初十",
                                 @"十一", @"十二", @"十三", @"十四", @"十五", @"十六", @"十七", @"十八", @"十九", @"二十",
                                 @"廿一", @"廿二", @"廿三", @"廿四", @"廿五", @"廿六", @"廿七", @"廿八", @"廿九", @"三十"];
@@ -169,9 +169,9 @@
 + (NSString *)timeIntervalFromLastTime:(NSString *)lastTime
                         lastTimeFormat:(NSString *)format1
                          ToCurrentTime:(NSString *)currentTime
-                     currentTimeFormat:(NSString *)format2{
+                     currentTimeFormat:(NSString *)format2 {
     //上次时间
-    NSDateFormatter *dateFormatter1 = [[NSDateFormatter alloc]init];
+    NSDateFormatter *dateFormatter1 = [[NSDateFormatter alloc] init];
     dateFormatter1.dateFormat = format1;
     NSDate *lastDate = [dateFormatter1 dateFromString:lastTime];
     //当前时间
@@ -181,7 +181,7 @@
     return [self timeIntervalFromLastTime:lastDate ToCurrentTime:currentDate];
 }
 
-+ (NSString *)timeIntervalFromLastTime:(NSDate *)lastTime ToCurrentTime:(NSDate *)currentTime{
++ (NSString *)timeIntervalFromLastTime:(NSDate *)lastTime ToCurrentTime:(NSDate *)currentTime {
     NSTimeZone *timeZone = [NSTimeZone systemTimeZone];
     //上次时间
     NSDate *lastDate = [lastTime dateByAddingTimeInterval:[timeZone secondsFromGMTForDate:lastTime]];
@@ -199,19 +199,19 @@
     
     if (minutes <= 10) {
         return  @"刚刚";
-    }else if (minutes < 60){
+    } else if (minutes < 60) {
         return [NSString stringWithFormat: @"%ld分钟前",(long)minutes];
-    }else if (hours < 24){
+    } else if (hours < 24) {
         return [NSString stringWithFormat: @"%ld小时前",(long)hours];
-    }else if (day < 30){
+    } else if (day < 30) {
         return [NSString stringWithFormat: @"%ld天前",(long)day];
-    }else if (month < 12){
-        NSDateFormatter * df =[[NSDateFormatter alloc]init];
+    } else if (month < 12) {
+        NSDateFormatter * df =[[NSDateFormatter alloc] init];
         df.dateFormat = @"M月d日";
         NSString * time = [df stringFromDate:lastDate];
         return time;
-    }else if (yers >= 1){
-        NSDateFormatter * df =[[NSDateFormatter alloc]init];
+    } else if (yers >= 1) {
+        NSDateFormatter * df =[[NSDateFormatter alloc] init];
         df.dateFormat = @"yyyy年M月d日";
         NSString * time = [df stringFromDate:lastDate];
         return time;
