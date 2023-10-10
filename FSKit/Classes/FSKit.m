@@ -1382,6 +1382,16 @@ NSString *_fs_md5(NSString *str){
     return YES;
 }
 
++ (CGFloat)growthRate:(CGFloat)number base:(CGFloat)base {
+    CGFloat rate = 0;
+    if (base > 0) {
+        rate = number / base - 1;
+    } else if (base < 0) {
+        rate = 1 - number / base;
+    }
+    return rate;
+}
+
 + (NSString *)base64StringForText:(NSString *)text{
     if (text && [text isKindOfClass:NSString.class]) {
         NSData *data = [text dataUsingEncoding:NSUTF8StringEncoding];

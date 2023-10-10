@@ -117,6 +117,9 @@ NSString *_fs_md5(NSString *str);
 + (NSString *)fourNoFiveYes:(float)number afterPoint:(int)position;  // 四舍五入
 + (NSString *)decimalNumberMutiplyWithString:(NSString *)multiplierValue  valueB:(NSString *)multiplicandValue;
 
+// 计算增长率
++ (CGFloat)growthRate:(CGFloat)number base:(CGFloat)base;
+
 /**
  *  将以元为单位的字符串数字转化为以分为单位的整数
  */
