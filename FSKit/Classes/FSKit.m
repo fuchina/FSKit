@@ -2002,6 +2002,16 @@ NSString *_fs_highAccuracy_divide(NSString *a,NSString *b){
      }
 }
 
++ (NSString *)showStringPart:(NSString *)string part:(NSInteger)part {
+    if (string.length <= part) {
+        return string;
+    }
+    
+    NSString *front = [string substringToIndex:part];
+    NSString *last = [string substringWithRange:NSMakeRange(string.length - part, part)];
+    return [[NSString alloc] initWithFormat:@"%@***%@", front, last];
+}
+
 @end
 
 
