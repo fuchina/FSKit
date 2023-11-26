@@ -1993,6 +1993,15 @@ NSString *_fs_highAccuracy_divide(NSString *a,NSString *b){
     }
 }
 
++ (void)fitScrollViewOperate:(UIScrollView *)scrollView navigationController:(UINavigationController *)navigationController {
+    NSArray *gestureArray = navigationController.view.gestureRecognizers;
+     for (UIGestureRecognizer *gestureRecognizer in gestureArray) {
+         if ([gestureRecognizer isKindOfClass:[UIScreenEdgePanGestureRecognizer class]]) {
+             [scrollView.panGestureRecognizer requireGestureRecognizerToFail:gestureRecognizer];
+         }
+     }
+}
+
 @end
 
 

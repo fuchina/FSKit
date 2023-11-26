@@ -227,4 +227,7 @@ NSString *_fs_highAccuracy_divide(NSString *a,NSString *b);     // 除
 // 交换方法
 + (void)method_Swizzle:(Class)cls origin:(SEL)oriSel swizzle:(SEL)swiSel;
 
+// 优化左滑手势与滑动视图的冲突
++ (void)fitScrollViewOperate:(UIScrollView *)scrollView navigationController:(UINavigationController *)navigationController;
+
 @end
