@@ -2002,14 +2002,14 @@ NSString *_fs_highAccuracy_divide(NSString *a,NSString *b){
      }
 }
 
-+ (NSString *)showStringPart:(NSString *)string part:(NSInteger)part {
-    if (string.length <= part) {
++ (NSString *)showStringPart:(NSString *)string front:(NSInteger)front tail:(NSInteger)tail {
+    if (string.length <= front || string.length <= tail) {
         return string;
     }
     
-    NSString *front = [string substringToIndex:part];
-    NSString *last = [string substringWithRange:NSMakeRange(string.length - part, part)];
-    return [[NSString alloc] initWithFormat:@"%@***%@", front, last];
+    NSString *frontStr = [string substringToIndex:front];
+    NSString *last = [string substringWithRange:NSMakeRange(string.length - tail, tail)];
+    return [[NSString alloc] initWithFormat:@"%@***%@", frontStr, last];
 }
 
 @end

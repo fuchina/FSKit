@@ -231,8 +231,8 @@ NSString *_fs_highAccuracy_divide(NSString *a,NSString *b);     // 除
 + (void)fitScrollViewOperate:(UIScrollView *)scrollView navigationController:(UINavigationController *)navigationController;
 
 /**
- *  显示字符串的部分信息，其他用*代替，part为前后显示的长度
+ *  显示字符串的部分信息，其他用*代替，front、tail为前后显示的长度
  */
-+ (NSString *)showStringPart:(NSString *)string part:(NSInteger)part;
++ (NSString *)showStringPart:(NSString *)string front:(NSInteger)front tail:(NSInteger)tail;
 
 @end
