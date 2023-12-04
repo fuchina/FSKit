@@ -2003,13 +2003,17 @@ NSString *_fs_highAccuracy_divide(NSString *a,NSString *b){
 }
 
 + (NSString *)showStringPart:(NSString *)string front:(NSInteger)front tail:(NSInteger)tail {
+    return [self showStringPart:string front:front tail:tail placeholder:@"***"];
+}
+
++ (NSString *)showStringPart:(NSString *)string front:(NSInteger)front tail:(NSInteger)tail placeholder:(NSString *)placeholder {
     if (string.length <= front || string.length <= tail) {
         return string;
     }
     
     NSString *frontStr = [string substringToIndex:front];
     NSString *last = [string substringWithRange:NSMakeRange(string.length - tail, tail)];
-    return [[NSString alloc] initWithFormat:@"%@***%@", frontStr, last];
+    return [[NSString alloc] initWithFormat:@"%@%@%@", frontStr, placeholder, last];
 }
 
 @end
