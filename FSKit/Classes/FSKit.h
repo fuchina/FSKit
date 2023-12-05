@@ -134,7 +134,6 @@ NSString *_fs_md5(NSString *str);
  */
 + (BOOL)isFSAccountNumber:(NSString *)text;
 
-+ (NSString *)deviceModel;
 + (NSString *)easySeeTimesBySeconds:(NSInteger)seconds;
 + (NSString *)tenThousandNumber:(double)value;
 + (NSString *)tenThousandNumberString:(NSString *)value;
