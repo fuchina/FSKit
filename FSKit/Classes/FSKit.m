@@ -1438,24 +1438,7 @@ NSString *_fs_md5(NSString *str) {
 }
 
 + (NSString *)pinyinForHans:(NSString *)string {
-    NSMutableString *preString = (NSMutableString *)[self pinyinForHansSimple:string];
-    /*多音字处理*/
-    if ([[(NSString *)string substringToIndex:1] compare:@"长"] == NSOrderedSame){
-        [preString replaceCharactersInRange:NSMakeRange(0, 5) withString:@"chang"];
-    }
-    
-    if ([[(NSString *)string substringToIndex:1] compare:@"沈"] == NSOrderedSame){
-        [preString replaceCharactersInRange:NSMakeRange(0, 4) withString:@"shen"];
-    }
-    if ([[(NSString *)string substringToIndex:1] compare:@"厦"] == NSOrderedSame){
-        [preString replaceCharactersInRange:NSMakeRange(0, 3) withString:@"xia"];
-    }
-    if ([[(NSString *)string substringToIndex:1] compare:@"地"] == NSOrderedSame){
-        [preString replaceCharactersInRange:NSMakeRange(0, 3) withString:@"di"];
-    }
-    if ([[(NSString *)string substringToIndex:1] compare:@"重"] == NSOrderedSame){
-        [preString replaceCharactersInRange:NSMakeRange(0, 5) withString:@"chong"];
-    }
+    NSString *preString = [self pinyinForHansSimple:string];
     return preString;
 }
 
