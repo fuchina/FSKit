@@ -9,6 +9,9 @@
 
 @interface FSDate : NSObject
 
+NSTimeInterval _fs_timeIntevalSince1970(void);
+NSInteger _fs_integerTimeIntevalSince1970(void);
+
 // 该月第一秒/最后一秒
 + (NSInteger)theFirstSecondOfMonth:(NSDate *)date;
 + (NSInteger)theLastSecondOfMonth:(NSDate *)date;

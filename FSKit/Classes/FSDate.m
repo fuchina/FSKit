@@ -10,6 +10,14 @@
 
 @implementation FSDate
 
+NSTimeInterval _fs_timeIntevalSince1970(void) {
+    return [[NSDate date] timeIntervalSince1970];
+}
+
+NSInteger _fs_integerTimeIntevalSince1970(void) {
+    return (NSInteger)[[NSDate date] timeIntervalSince1970];
+}
+
 + (NSDate *)chinaDateByDate:(NSDate *)date {
     NSTimeZone *zone = [NSTimeZone systemTimeZone];
     NSInteger interval = [zone secondsFromGMTForDate:date];

@@ -8,11 +8,9 @@
 
 #import <UIKit/UIKit.h>
 #import "FSRuntime.h"
+#import "FSDate.h"
 
 @interface FSKit : NSObject
-
-NSTimeInterval _fs_timeIntevalSince1970(void);
-NSInteger _fs_integerTimeIntevalSince1970(void);
 
 void _fs_userDefaults_setObjectForKey(id object,NSString *key);
 id _fs_userDefaults_objectForKey(NSString *key);
@@ -103,7 +101,6 @@ NSString *_fs_md5(NSString *str);
 + (NSString *)stringFromASCIIString:(NSString *)string;
 + (NSString *)DataToHex:(NSData *)data;                          // 将二进制转换为16进制再用字符串表示
 + (NSString *)cleanString:(NSString *)str;
-+ (NSString *)stringByDate:(NSDate *)date;                       // 解决差8小时的问题
 
 + (NSString *)bankStyleData:(CGFloat)data;
 + (NSString *)bankStyleDataThree:(CGFloat)data;
@@ -132,7 +129,6 @@ NSString *_fs_md5(NSString *str);
  */
 + (BOOL)isFSAccountNumber:(NSString *)text;
 
-+ (NSString *)easySeeTimesBySeconds:(NSInteger)seconds;
 + (NSString *)tenThousandNumber:(double)value;
 + (NSString *)tenThousandNumberString:(NSString *)value;
 + (NSString *)urlEncodedString:(NSString *)urlString;

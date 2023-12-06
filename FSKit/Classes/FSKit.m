@@ -19,17 +19,8 @@
 #import <CoreTelephony/CTTelephonyNetworkInfo.h>
 #import <sys/mount.h>
 #import <objc/runtime.h>
-#import "FSDate.h"
 
 @implementation FSKit
-
-NSTimeInterval _fs_timeIntevalSince1970(void) {
-    return [[NSDate date] timeIntervalSince1970];
-}
-
-NSInteger _fs_integerTimeIntevalSince1970(void) {
-    return (NSInteger)[[NSDate date] timeIntervalSince1970];
-}
 
 + (void)pushToViewControllerWithClass:(NSString *)className navigationController:(UINavigationController *)navigationController param:(NSDictionary *)param configBlock:(void (^)(id vc))configBlockParam {
     UIViewController *controller = [self controllerWithClass:className param:param configBlock:configBlockParam];
@@ -1245,14 +1236,6 @@ NSString *_fs_md5(NSString *str) {
     return cleanString;
 }
 
-+ (NSString *)stringByDate:(NSDate *)date {
-    NSTimeZone *zone = [NSTimeZone systemTimeZone];
-    NSInteger interval = [zone secondsFromGMTForDate:date];
-    NSDate *localeDate = [date  dateByAddingTimeInterval: interval];
-    NSString *string = [[NSString alloc] initWithFormat:@"%@",localeDate];
-    return string;
-}
-
 + (NSNumberFormatter *)bankStyleFormatter {
     NSNumberFormatter *numberFormatter = [[NSNumberFormatter alloc] init];
     [numberFormatter setPositiveFormat:@"###,##0.00;"];    // 100,000.00
@@ -1641,36 +1624,6 @@ NSString *_fs_md5(NSString *str) {
     }
     NSString *str= [[NSString alloc] initWithFormat:@"tel:%@",phone];
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:str]];
-}
-
-+ (NSString *)easySeeTimesBySeconds:(NSInteger)timeInterVal {
-    NSDate *date = [[NSDate alloc] initWithTimeIntervalSince1970:timeInterVal];
-    NSCalendar *greCalendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
-    NSDateComponents *dateComponents = [greCalendar components:NSCalendarUnitYear | NSCalendarUnitMonth | NSCalendarUnitDay | NSCalendarUnitHour | NSCalendarUnitMinute | NSCalendarUnitSecond fromDate:date];
-    NSInteger year = dateComponents.year - 1970;
-    NSInteger month = dateComponents.month - 1;
-    NSInteger day = dateComponents.day - 1;
-    NSInteger hour = dateComponents.hour - 8;
-    NSInteger minute = dateComponents.minute;
-    NSInteger second = dateComponents.second;
-    if (hour < 0) {
-        hour += 24;
-        day --;
-    }
-    NSMutableString *valueString = [[NSMutableString alloc] init];
-    if (year > 0) {
-        [valueString appendString:[[NSString alloc] initWithFormat:@"%@年",@(year)]];
-    }
-    if (month > 0) {
-        [valueString appendString:[[NSString alloc] initWithFormat:@"%@月",@(month)]];
-    }
-    if (day > 0) {
-        [valueString appendString:[[NSString alloc] initWithFormat:@"%@天",@(day)]];
-    }
-    [valueString appendString:[[NSString alloc] initWithFormat:@"%@时",@(hour)]];
-    [valueString appendString:[[NSString alloc] initWithFormat:@"%@分",@(minute)]];
-    [valueString appendString:[[NSString alloc] initWithFormat:@"%@秒",@(second)]];
-    return valueString;
 }
 
 + (NSString *)tenThousandNumber:(double)value {
