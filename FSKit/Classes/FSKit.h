@@ -56,8 +56,6 @@ BOOL _fs_floatEqual(CGFloat aNumber,CGFloat bNumber);
 // 判断是否为中文语言环境
 + (BOOL)isChineseEnvironment;
 
-+ (NSInteger)weekdayStringFromDate:(NSDate *)inputDate;
-
 + (double)forwardValue:(double)number afterPoint:(int)position;  // 只入不舍
 + (double)usedMemory;                                                               // 获得应用占用的内存，单位为M
 + (double)availableMemory;                                                          // 获得当前设备可用内存,单位为M

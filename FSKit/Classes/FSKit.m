@@ -623,16 +623,6 @@ NSString* _fs_KMGUnit(NSInteger size) {
     }
 }
 
-+ (NSInteger)weekdayStringFromDate:(NSDate*)inputDate {
-    NSArray *weekdays = [NSArray arrayWithObjects: @(0), @(7), @(1), @(2), @(3), @(4), @(5), @(6), nil];
-    NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
-    NSTimeZone *timeZone = [[NSTimeZone alloc] initWithName:@"Asia/Shanghai"];
-    [calendar setTimeZone: timeZone];
-    NSCalendarUnit calendarUnit = NSCalendarUnitWeekday;
-    NSDateComponents *theComponents = [calendar components:calendarUnit fromDate:inputDate];
-    return [[weekdays objectAtIndex:theComponents.weekday] integerValue];
-}
-
 + (NSString *)iPAddress {
     NSString *address = @"error";
     struct ifaddrs *interfaces = NULL;
