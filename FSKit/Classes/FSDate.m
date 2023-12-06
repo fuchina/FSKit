@@ -406,4 +406,9 @@ NSInteger _fs_integerTimeIntevalSince1970(void) {
     return [[NSString alloc] initWithFormat:@"%ld", value];
 }
 
++ (CGFloat)daysForSeconds:(CGFloat)seconds {
+    CGFloat daySecond = 86400.0f;
+    return seconds / daySecond;
+}
+
 @end

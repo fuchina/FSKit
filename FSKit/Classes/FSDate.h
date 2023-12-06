@@ -115,6 +115,14 @@ NSInteger _fs_integerTimeIntevalSince1970(void);
  */
 + (NSDate *)theLastYearThisDay:(NSDateComponents *)components;
 
+/**
+ *  将数字转换为至少2位的字符
+ */
 + (NSString *)twoChar:(NSInteger)value;
+
+/**
+ *  将秒换算为多少天
+ */
++ (CGFloat)daysForSeconds:(CGFloat)seconds;
 
 @end
