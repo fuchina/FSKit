@@ -143,7 +143,6 @@ NSString *_fs_md5(NSString *str);
 + (NSString *)pinyinForHans:(NSString *)chinese;        // 获取汉字的拼音
 + (NSString *)pinyinForHansClear:(NSString *)chinese;        // 获取汉字的拼音，没有空格
 + (NSString*)reverseWordsInString:(NSString*)str;       // 字符串反转
-+ (NSString *)twoChar:(NSInteger)value;
 + (NSString *)scanQRCode:(UIImage *)image;  // 解析二维码
 + (NSString *)dataToHex:(NSData *)data;
 + (NSData *)convertHexStrToData:(NSString *)str;

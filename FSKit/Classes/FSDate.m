@@ -6,7 +6,6 @@
 //
 
 #import "FSDate.h"
-#import "FSKit.h"
 
 @implementation FSDate
 
@@ -238,7 +237,7 @@ NSInteger _fs_integerTimeIntevalSince1970(void) {
 
 + (NSInteger)theFirstSecondOfMonth:(NSDate *)date {
     return [self publicFunction:date str:^NSString *(NSDateComponents *c) {
-        NSString *str = [[NSString alloc] initWithFormat:@"%d-%@-01 00:00:00",(int)c.year,[FSKit twoChar:c.month]];
+        NSString *str = [[NSString alloc] initWithFormat:@"%d-%@-01 00:00:00",(int)c.year, [self twoChar:c.month]];
         return str;
     }];
 }
@@ -246,21 +245,21 @@ NSInteger _fs_integerTimeIntevalSince1970(void) {
 + (NSInteger)theLastSecondOfMonth:(NSDate *)date {
     return [self publicFunction:date str:^NSString *(NSDateComponents *c) {
         NSInteger days = [self daysForMonth:c.month year:c.year];
-        NSString *str = [[NSString alloc] initWithFormat:@"%d-%@-%d 23:59:59",(int)c.year,[FSKit twoChar:c.month],(int)days];
+        NSString *str = [[NSString alloc] initWithFormat:@"%d-%@-%d 23:59:59",(int)c.year, [self twoChar:c.month],(int)days];
         return str;
     }];
 }
 
 + (NSInteger)theFirstSecondOfDay:(NSDate *)date {
     return [self publicFunction:date str:^NSString *(NSDateComponents *c) {
-        NSString *str = [[NSString alloc] initWithFormat:@"%d-%@-%@ 00:00:00",(int)c.year,[FSKit twoChar:c.month],[FSKit twoChar:c.day]];
+        NSString *str = [[NSString alloc] initWithFormat:@"%d-%@-%@ 00:00:00",(int)c.year, [self twoChar:c.month], [self twoChar:c.day]];
         return str;
     }];
 }
 
 + (NSInteger)theLastSecondOfDay:(NSDate *)date {
     return [self publicFunction:date str:^NSString *(NSDateComponents *c) {
-        NSString *str = [[NSString alloc] initWithFormat:@"%d-%@-%@ 23:59:59",(int)c.year,[FSKit twoChar:c.month],[FSKit twoChar:c.day]];
+        NSString *str = [[NSString alloc] initWithFormat:@"%d-%@-%@ 23:59:59",(int)c.year, [self twoChar:c.month], [self twoChar:c.day]];
         return str;
     }];
 }
@@ -307,7 +306,7 @@ NSInteger _fs_integerTimeIntevalSince1970(void) {
 }
 
 + (NSArray<NSDate *> *)solarsForLunar:(NSInteger)year month:(NSInteger)month day:(NSInteger)day {
-    NSString *string = [[NSString alloc] initWithFormat:@"%ld-%@-%@ 23:59:59", year, [FSKit twoChar:month], [FSKit twoChar:day]];
+    NSString *string = [[NSString alloc] initWithFormat:@"%ld-%@-%@ 23:59:59", year, [self twoChar:month], [self twoChar:day]];
     NSDate *date = [self dateByString:string formatter:nil];
     NSDateComponents *lunarComponents = [self chineseDate:date];
     BOOL found = (lunarComponents.month == month) && (lunarComponents.day == day);
@@ -366,7 +365,7 @@ NSInteger _fs_integerTimeIntevalSince1970(void) {
     if (lunarComponents.month > solarComponents.month) {
         year = year - 1;
     }
-    NSString *string = [[NSString alloc] initWithFormat:@"%ld-%@-%@ 12:00:00",year,[FSKit twoChar:lunarComponents.month],[FSKit twoChar:lunarComponents.day]];
+    NSString *string = [[NSString alloc] initWithFormat:@"%ld-%@-%@ 12:00:00",year, [self twoChar:lunarComponents.month], [self twoChar:lunarComponents.day]];
     NSDate *date = [FSDate dateByString:string formatter:nil];
     return date;
 }
@@ -395,9 +394,16 @@ NSInteger _fs_integerTimeIntevalSince1970(void) {
             lastYearDay = 28;
         }
     }
-    NSString *lastYearString = [[NSString alloc] initWithFormat:@"%ld-%@-%@", lastYearYear, [FSKit twoChar:lastYearMonth], [FSKit twoChar:lastYearDay]];
+    NSString *lastYearString = [[NSString alloc] initWithFormat:@"%ld-%@-%@", lastYearYear, [self twoChar:lastYearMonth], [self twoChar:lastYearDay]];
     NSDate *lastYearThisDay = [FSDate dateByString:lastYearString formatter:@"yyyy-MM-dd 00:00:00"];
     return lastYearThisDay;
+}
+
++ (NSString *)twoChar:(NSInteger)value {
+    if (value < 10) {
+        return [[NSString alloc] initWithFormat:@"0%ld", value];
+    }
+    return [[NSString alloc] initWithFormat:@"%ld", value];
 }
 
 @end

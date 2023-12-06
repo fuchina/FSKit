@@ -1456,13 +1456,6 @@ NSString *_fs_md5(NSString *str) {
     return reverString;
 }
 
-+ (NSString *)twoChar:(NSInteger)value {
-    if (value < 10) {
-        return [[NSString alloc] initWithFormat:@"0%@",@(value)];
-    }
-    return [[NSString alloc] initWithFormat:@"%@",@(value)];
-}
-
 + (NSString *)scanQRCode:(UIImage *)image {
     CIDetector*detector = [CIDetector detectorOfType:CIDetectorTypeQRCode context:nil options:@{ CIDetectorAccuracy : CIDetectorAccuracyHigh }];
     NSArray *features = [detector featuresInImage:[CIImage imageWithCGImage:image.CGImage]];

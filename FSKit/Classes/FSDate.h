@@ -115,4 +115,6 @@ NSInteger _fs_integerTimeIntevalSince1970(void);
  */
 + (NSDate *)theLastYearThisDay:(NSDateComponents *)components;
 
++ (NSString *)twoChar:(NSInteger)value;
+
 @end
