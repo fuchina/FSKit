@@ -31,26 +31,12 @@
     return self;
 }
 
-+ (NSArray *)modelsFromDictionaries:(NSArray<NSDictionary *> *)dictionaries modelClass:(Class)CLS {
++ (NSMutableArray *)modelsFromDictionaries:(NSArray<NSDictionary *> *)dictionaries modelClass:(Class)CLS {
     return [self modelsFromDictionaries:dictionaries modelClass:CLS config:nil];
 }
 
-+ (NSArray *)modelsFromDictionaries:(NSArray<NSDictionary *> *)dictionaries modelClass:(Class)CLS config:(nullable void(^)(id model))config {
++ (NSMutableArray *)modelsFromDictionaries:(NSArray<NSDictionary *> *)dictionaries modelClass:(Class)CLS config:(nullable void(^)(id model))config {
     BOOL isArray = [dictionaries isKindOfClass:NSArray.class];
-    if (isArray) {
-        // 如果元素不是NSDictionary，直接返回
-        BOOL isCLS = YES;
-        for (NSDictionary *m in dictionaries) {
-            if (![m isKindOfClass:CLS]) {
-                isCLS = NO;
-                break;
-            }
-        }
-        if (isCLS) {
-            return dictionaries;
-        }
-    }
-    
     NSMutableArray *results = nil;
     if (isArray) {
         results = [[NSMutableArray alloc] initWithCapacity:dictionaries.count];
@@ -60,7 +46,7 @@
             [results addObject:model];
         }
     }
-    return results.copy;
+    return results;
 }
 
 + (id)modelWithDictionary:(NSDictionary *)m modelClass:(Class)CLS {
