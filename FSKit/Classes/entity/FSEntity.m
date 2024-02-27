@@ -9,7 +9,7 @@
 
 @interface FSEntity ()
 
-@property (nonatomic, weak) void (^config)(id self_object);
+@property (nonatomic, weak) void (^base_model_xxx_config)(id self_object);
 
 @end
 
@@ -25,7 +25,7 @@
     self = [super init];
     if (self) {
         [self beforeSetProperties];
-        _config = config;
+        _base_model_xxx_config = config;
         [self setProperties:dictionary];
     }
     return self;
@@ -59,7 +59,7 @@
         obj = [[CLS alloc] init];
         if ([obj isKindOfClass:FSEntity.class]) {
             FSEntity *model = (FSEntity *)obj;
-            model.config = config;
+            model.base_model_xxx_config = config;
             [model setProperties:m];
         }
     }
@@ -72,8 +72,8 @@
     }
     _meta = dataDic;
     
-    if (_config) {
-        _config(self);
+    if (_base_model_xxx_config) {
+        _base_model_xxx_config(self);
     }
     
     NSArray *allKeys = [dataDic allKeys];
