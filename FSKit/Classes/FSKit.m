@@ -1634,6 +1634,22 @@ NSString *_fs_md5(NSString *str) {
     return [[NSString alloc] initWithFormat:@"%.2f万",number / 10000];
 }
 
++ (NSString *)showBetterForCentInteger:(NSInteger)value {
+    NSInteger mode = value % 100;
+    NSString *ret = nil;
+    if (mode == 0) {
+        ret = [[NSString alloc] initWithFormat:@"%ld", value / 100];
+    } else {
+        mode = value % 10;
+        if (mode == 0) {
+            ret = [[NSString alloc] initWithFormat:@"%.1f", value / 100.0];
+        } else {
+            ret = [[NSString alloc] initWithFormat:@"%.2f", value / 100.0];
+        }
+    }
+    return ret;
+}
+
 + (NSString *)urlEncodedString:(NSString *)urlString {
     return (NSString *)CFBridgingRelease(CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault,(CFStringRef)urlString,NULL,CFSTR("!*'();:@&=+$,/?%#[]"),kCFStringEncodingUTF8));
 }

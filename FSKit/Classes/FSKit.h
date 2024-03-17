@@ -131,6 +131,8 @@ NSString *_fs_md5(NSString *str);
 
 + (NSString *)tenThousandNumber:(double)value;
 + (NSString *)tenThousandNumberString:(NSString *)value;
++ (NSString *)showBetterForCentInteger:(NSInteger)value;
+
 + (NSString *)urlEncodedString:(NSString *)urlString;
 + (NSString *)urlDecodedString:(NSString *)urlString;
 + (NSString *)base64StringForText:(NSString *)text;     // 将字符串转换为base64编码
