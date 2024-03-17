@@ -1634,7 +1634,7 @@ NSString *_fs_md5(NSString *str) {
     return [[NSString alloc] initWithFormat:@"%.2f万",number / 10000];
 }
 
-+ (NSString *)showBetterForCentInteger:(NSInteger)value {
++ (NSString *)showBetterFor2DigitInteger:(NSInteger)value {
     if (value == 0) {
         return @"";
     }
@@ -1648,6 +1648,41 @@ NSString *_fs_md5(NSString *str) {
             ret = [[NSString alloc] initWithFormat:@"%.1f", value / 100.0];
         } else {
             ret = [[NSString alloc] initWithFormat:@"%.2f", value / 100.0];
+        }
+    }
+    return ret;
+}
+
++ (NSString *)showBetterFor5DigitInteger:(NSInteger)value {
+    if (value == 0) {
+        return @"";
+    }
+    
+    NSInteger mode = value % 100000;
+    NSString *ret = nil;
+    if (mode == 0) {
+        ret = [[NSString alloc] initWithFormat:@"%ld", value / 100000];
+    } else {
+        mode = value % 10000;
+        if (mode == 0) {
+            ret = [[NSString alloc] initWithFormat:@"%.1f", value / 100000.0f];
+        } else {
+            mode = value % 1000;
+            if (mode == 0) {
+                ret = [[NSString alloc] initWithFormat:@"%.2f", value / 100000.0f];
+            } else {
+                mode = value % 100;
+                if (mode == 0) {
+                    ret = [[NSString alloc] initWithFormat:@"%.3f", value / 100000.0f];
+                } else {
+                    mode = value % 10;
+                    if (mode == 0) {
+                        ret = [[NSString alloc] initWithFormat:@"%.4f", value / 100000.0f];
+                    } else {
+                        ret = [[NSString alloc] initWithFormat:@"%.5f", value / 100000.0f];
+                    }
+                }
+            }
         }
     }
     return ret;

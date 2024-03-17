@@ -131,7 +131,9 @@ NSString *_fs_md5(NSString *str);
 
 + (NSString *)tenThousandNumber:(double)value;
 + (NSString *)tenThousandNumberString:(NSString *)value;
-+ (NSString *)showBetterForCentInteger:(NSInteger)value;
+
++ (NSString *)showBetterFor2DigitInteger:(NSInteger)value;
++ (NSString *)showBetterFor5DigitInteger:(NSInteger)value;
 
 + (NSString *)urlEncodedString:(NSString *)urlString;
 + (NSString *)urlDecodedString:(NSString *)urlString;
