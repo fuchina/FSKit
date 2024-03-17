@@ -1635,6 +1635,9 @@ NSString *_fs_md5(NSString *str) {
 }
 
 + (NSString *)showBetterForCentInteger:(NSInteger)value {
+    if (value == 0) {
+        return @"";
+    }
     NSInteger mode = value % 100;
     NSString *ret = nil;
     if (mode == 0) {
