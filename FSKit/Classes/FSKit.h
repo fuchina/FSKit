@@ -10,6 +10,8 @@
 #import "FSRuntime.h"
 #import "FSDate.h"
 
+static NSInteger FSThreeDecimalPlaces = 1000;    // 支持小数点后3位
+
 @interface FSKit : NSObject
 
 void _fs_userDefaults_setObjectForKey(id object,NSString *key);
