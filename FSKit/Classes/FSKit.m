@@ -1653,25 +1653,30 @@ NSString *_fs_md5(NSString *str) {
     return ret;
 }
 
-+ (NSString *)showBetterFor3DigitInteger:(NSInteger)value {
++ (NSString *)showBetterFor4DigitInteger:(NSInteger)value {
     if (value == 0) {
         return @"";
     }
     
-    NSInteger mode = value % 1000;
+    NSInteger mode = value % 10000;
     NSString *ret = nil;
     if (mode == 0) {
-        ret = [[NSString alloc] initWithFormat:@"%ld", value / 1000];
+        ret = [[NSString alloc] initWithFormat:@"%ld", value / 10000];
     } else {
-        mode = value % 100;
+        mode = value % 1000;
         if (mode == 0) {
-            ret = [[NSString alloc] initWithFormat:@"%.1f", value / 1000.0];
+            ret = [[NSString alloc] initWithFormat:@"%.1f", value / 10000.0];
         } else {
-            mode = value % 10;
+            mode = value % 100;
             if (mode == 0) {
-                ret = [[NSString alloc] initWithFormat:@"%.2f", value / 1000.0];
+                ret = [[NSString alloc] initWithFormat:@"%.2f", value / 10000.0];
             } else {
-                ret = [[NSString alloc] initWithFormat:@"%.3f", value / 1000.0];
+                mode = value % 10;
+                if (mode == 0) {
+                    ret = [[NSString alloc] initWithFormat:@"%.3f", value / 10000.0];
+                } else {
+                    ret = [[NSString alloc] initWithFormat:@"%.4f", value / 10000.0];
+                }
             }
         }
     }
