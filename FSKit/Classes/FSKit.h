@@ -143,7 +143,6 @@ NSString *_fs_md5(NSString *str);
 
 + (NSString *)showBetterFor2DigitInteger:(NSInteger)value;
 + (NSString *)showBetterFor3DigitInteger:(NSInteger)value;
-+ (NSString *)showBetterFor5DigitInteger:(NSInteger)value;
 
 + (NSString *)urlEncodedString:(NSString *)urlString;
 + (NSString *)urlDecodedString:(NSString *)urlString;
