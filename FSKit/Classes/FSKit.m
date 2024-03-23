@@ -1309,6 +1309,14 @@ NSString *_fs_md5(NSString *str) {
     return je;
 }
 
++ (NSInteger)numberStringToFourDecimalPlaces:(NSString *)floatString {
+    CGFloat flt = floatString.doubleValue;
+    CGFloat centFlt = round(flt * 10000.0f);
+    NSString *fltString = @(centFlt).stringValue;
+    NSInteger je = [FSKit floatToInt:fltString];
+    return je;
+}
+
 + (NSInteger)floatToInt:(NSString *)floatString {
     NSDecimalNumber *decNumber = [NSDecimalNumber decimalNumberWithString:floatString];
     return [decNumber integerValue];

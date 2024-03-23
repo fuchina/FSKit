@@ -128,6 +128,12 @@ NSString *_fs_md5(NSString *str);
  *  将以元为单位的字符串数字转化为以分为单位的整数
  */
 + (NSInteger)numberStringToCentInt:(NSString *)string;
+
+/**
+ *  浮点数转整数，扩大10000倍，如1.0001变为 10001
+ */
++ (NSInteger)numberStringToFourDecimalPlaces:(NSString *)floatString;
+
 /**
  *  高精度，浮点数转整数
  */
