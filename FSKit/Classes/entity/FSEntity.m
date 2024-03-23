@@ -71,15 +71,15 @@
         return;
     }
     _meta = dataDic;
-    
-    if (_base_model_xxx_config) {
-        _base_model_xxx_config(self);
-    }
-    
+        
     NSArray *allKeys = [dataDic allKeys];
     for (NSString *key in allKeys) {
         NSObject *value = [dataDic objectForKey:key];
         [self setValue:value forKey:key];
+    }
+    
+    if (_base_model_xxx_config) {
+        _base_model_xxx_config(self);
     }
     
     [self afterSetProperties];
