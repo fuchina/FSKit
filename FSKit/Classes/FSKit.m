@@ -1653,6 +1653,31 @@ NSString *_fs_md5(NSString *str) {
     return ret;
 }
 
++ (NSString *)showBetterFor3DigitInteger:(NSInteger)value {
+    if (value == 0) {
+        return @"";
+    }
+    
+    NSInteger mode = value % 1000;
+    NSString *ret = nil;
+    if (mode == 0) {
+        ret = [[NSString alloc] initWithFormat:@"%ld", value / 1000];
+    } else {
+        mode = value % 100;
+        if (mode == 0) {
+            ret = [[NSString alloc] initWithFormat:@"%.1f", value / 1000.0];
+        } else {
+            mode = value % 10;
+            if (mode == 0) {
+                ret = [[NSString alloc] initWithFormat:@"%.2f", value / 1000.0];
+            } else {
+                ret = [[NSString alloc] initWithFormat:@"%.3f", value / 1000.0];
+            }
+        }
+    }
+    return ret;
+}
+
 + (NSString *)showBetterFor5DigitInteger:(NSInteger)value {
     if (value == 0) {
         return @"";
