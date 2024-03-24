@@ -1642,48 +1642,34 @@ NSString *_fs_md5(NSString *str) {
     return [[NSString alloc] initWithFormat:@"%.2f万",number / 10000];
 }
 
-+ (NSString *)showBetterFor2DigitInteger:(NSInteger)value {
-    if (value == 0) {
-        return @"";
-    }
-    NSInteger mode = value % 100;
-    NSString *ret = nil;
-    if (mode == 0) {
-        ret = [[NSString alloc] initWithFormat:@"%ld", value / 100];
-    } else {
-        mode = value % 10;
-        if (mode == 0) {
-            ret = [[NSString alloc] initWithFormat:@"%.1f", value / 100.0];
-        } else {
-            ret = [[NSString alloc] initWithFormat:@"%.2f", value / 100.0];
-        }
-    }
-    return ret;
-}
-
-+ (NSString *)showBetterFor4DigitInteger:(NSInteger)value {
++ (NSString *)showBetterFor5DigitInteger:(NSInteger)value {
     if (value == 0) {
         return @"0";
     }
     
-    NSInteger mode = value % 10000;
+    NSInteger mode = value % FSFiveDecimalPlaces;
     NSString *ret = nil;
     if (mode == 0) {
-        ret = [[NSString alloc] initWithFormat:@"%ld", value / 10000];
+        ret = [[NSString alloc] initWithFormat:@"%ld", value / FSFiveDecimalPlaces];
     } else {
-        mode = value % 1000;
+        mode = value % 10000;
         if (mode == 0) {
-            ret = [[NSString alloc] initWithFormat:@"%.1f", value / 10000.0];
+            ret = [[NSString alloc] initWithFormat:@"%.1f", ((CGFloat)value) / FSFiveDecimalPlaces];
         } else {
-            mode = value % 100;
+            mode = value % 1000;
             if (mode == 0) {
-                ret = [[NSString alloc] initWithFormat:@"%.2f", value / 10000.0];
+                ret = [[NSString alloc] initWithFormat:@"%.2f", ((CGFloat)value) / FSFiveDecimalPlaces];
             } else {
-                mode = value % 10;
+                mode = value % 100;
                 if (mode == 0) {
-                    ret = [[NSString alloc] initWithFormat:@"%.3f", value / 10000.0];
+                    ret = [[NSString alloc] initWithFormat:@"%.3f", ((CGFloat)value) / FSFiveDecimalPlaces];
                 } else {
-                    ret = [[NSString alloc] initWithFormat:@"%.4f", value / 10000.0];
+                    mode = value % 10;
+                    if (mode == 0) {
+                        ret = [[NSString alloc] initWithFormat:@"%.4f", ((CGFloat)value) / FSFiveDecimalPlaces];
+                    } else {
+                        ret = [[NSString alloc] initWithFormat:@"%.5f", ((CGFloat)value) / FSFiveDecimalPlaces];
+                    }
                 }
             }
         }
