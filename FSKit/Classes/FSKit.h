@@ -17,7 +17,7 @@ static CGFloat FSKitYearSeconds = 31556926.08;
  *  64位能表示的最大带符号整数是9223372036854775807，也就是约922 3372 0368 5477 5807，922亿亿，精确到小数点后5位，即能表示的最大数是922000 亿，92万亿
  *  现在已经有几十万亿市值的公司，所以精确到小数点后5位是有一定风险的；精确到小数点后4位，能表示的最大数是9220000 亿，920万亿，够用到2100年了吧
  */
-static NSInteger FSFourDecimalPlaces = 10000;    // 支持小数点后4位，支持汇率
+static NSInteger FSFiveDecimalPlaces = 100000;    // 支持小数点后5位，支持汇率（4位）
 
 @interface FSKit : NSObject
 
