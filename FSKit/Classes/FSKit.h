@@ -130,9 +130,9 @@ NSString *_fs_md5(NSString *str);
 + (NSInteger)numberStringToCentInt:(NSString *)string;
 
 /**
- *  浮点数转整数，扩大10000倍，如1.0001变为 10001
+ *  浮点数转整数，扩大100000倍，如1.00001变为 100001
  */
-+ (NSInteger)numberStringToFourDecimalPlaces:(NSString *)floatString;
++ (NSInteger)numberStringToFiveDecimalPlaces:(NSString *)floatString;
 
 /**
  *  高精度，浮点数转整数
