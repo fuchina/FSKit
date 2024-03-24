@@ -1663,7 +1663,7 @@ NSString *_fs_md5(NSString *str) {
 
 + (NSString *)showBetterFor4DigitInteger:(NSInteger)value {
     if (value == 0) {
-        return @"";
+        return @"0";
     }
     
     NSInteger mode = value % 10000;
