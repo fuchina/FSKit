@@ -28,14 +28,14 @@ typedef NS_ENUM(NSInteger, FSTriBool) {
 - (void)beforeSetProperties;
 
 - (instancetype)initWithDictionary:(NSDictionary *)dictionary;
-- (instancetype)initWithDictionary:(NSDictionary *)dictionary config:(nullable void(^)(id model))config;
+- (instancetype)initWithDictionary:(NSDictionary *)dictionary config:(nullable void(^)(id each_model))config;
 
 - (void)setProperties:(NSDictionary *)dictionary;
 
 - (void)afterSetProperties;
 
 + (id)modelWithDictionary:(NSDictionary *)m modelClass:(Class)CLS;
-+ (id)modelWithDictionary:(NSDictionary *)m modelClass:(Class)CLS config:(nullable void(^)(id model))config;
++ (id)modelWithDictionary:(NSDictionary *)m modelClass:(Class)CLS config:(nullable void(^)(id each_model))config;
 
 + (NSMutableArray *)modelsFromDictionaries:(NSArray<NSDictionary *> *)dictionaries modelClass:(Class)CLS;
 + (NSMutableArray *)modelsFromDictionaries:(NSArray<NSDictionary *> *)dictionaries modelClass:(Class)CLS config:(nullable void(^)(id model))config;
