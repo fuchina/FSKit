@@ -28,17 +28,17 @@ typedef NS_ENUM(NSInteger, FSTriBool) {
 - (void)beforeSetProperties;
 
 - (instancetype)initWithDictionary:(NSDictionary *)dictionary;
-- (instancetype)initWithDictionary:(NSDictionary *)dictionary config:(nullable void(^)(id each_model))config;
+- (instancetype)initWithDictionary:(NSDictionary *)dictionary beforeSetProperties:(nullable void(^)(id each_model))beforeSetProperties afterSetProperties:(nullable void(^)(id each_model))afterSetProperties;
 
 - (void)setProperties:(NSDictionary *)dictionary;
 
 - (void)afterSetProperties;
 
 + (id)modelWithDictionary:(NSDictionary *)m modelClass:(Class)CLS;
-+ (id)modelWithDictionary:(NSDictionary *)m modelClass:(Class)CLS config:(nullable void(^)(id each_model))config;
++ (id)modelWithDictionary:(NSDictionary *)m modelClass:(Class)CLS beforeSetProperties:(nullable void(^)(id each_model))beforeSetProperties afterSetProperties:(nullable void(^)(id each_model))afterSetProperties;
 
 + (NSMutableArray *)modelsFromDictionaries:(NSArray<NSDictionary *> *)dictionaries modelClass:(Class)CLS;
-+ (NSMutableArray *)modelsFromDictionaries:(NSArray<NSDictionary *> *)dictionaries modelClass:(Class)CLS config:(nullable void(^)(id model))config;
++ (NSMutableArray *)modelsFromDictionaries:(NSArray<NSDictionary *> *)dictionaries modelClass:(Class)CLS beforeSetProperties:(nullable void(^)(id each_model))beforeSetProperties afterSetProperties:(nullable void(^)(id each_model))afterSetProperties;
 
 @end
 
