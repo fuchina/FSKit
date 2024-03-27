@@ -121,6 +121,10 @@ NSString *_fs_md5(NSString *str);
 + (NSString *)fourNoFiveYes:(float)number afterPoint:(int)position;  // 四舍五入
 + (NSString *)decimalNumberMutiplyWithString:(NSString *)multiplierValue  valueB:(NSString *)multiplicandValue;
 
+NSComparisonResult _fs_highAccuracy_compare(NSString *a, NSString *b);
+
++ (NSString *)dayMonthYearForNumber:(CGFloat)number;
+
 // 计算增长率
 + (CGFloat)growthRate:(CGFloat)number base:(CGFloat)base;
 

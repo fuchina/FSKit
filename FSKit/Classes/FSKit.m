@@ -1301,6 +1301,29 @@ NSString *_fs_md5(NSString *str) {
     return [product stringValue];
 }
 
+NSComparisonResult _fs_highAccuracy_compare(NSString *a, NSString *b) {
+    if (!_fs_isPureFloat(a)) {
+        a = @"0";
+    }
+    if (!_fs_isPureFloat(b)) {
+        b = @"0";
+    }
+    NSDecimalNumber *addendNumber = [NSDecimalNumber decimalNumberWithString:a];
+    NSDecimalNumber *augendNumber = [NSDecimalNumber decimalNumberWithString:b];
+    NSComparisonResult result = [addendNumber compare:augendNumber];
+    return result;
+}
+
++ (NSString *)dayMonthYearForNumber:(CGFloat)number{
+    if (number > 365) {
+        return [[NSString alloc] initWithFormat:@"%.2f年", number / 365.0];
+    }else if (number > 30){
+        return [[NSString alloc] initWithFormat:@"%.2f月", number / 30];
+    }else{
+        return [[NSString alloc] initWithFormat:@"%.2f天", number];
+    }
+}
+
 + (NSInteger)numberStringToCentInt:(NSString *)floatString {
     CGFloat flt = floatString.doubleValue;
     CGFloat centFlt = round(flt * 100.0f);
