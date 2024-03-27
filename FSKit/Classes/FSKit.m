@@ -596,10 +596,6 @@ UIColor *_fs_randomColor(void) {
     return [sb instantiateViewControllerWithIdentifier:storybbordID];
 }
 
-+ (BOOL)isNeedCompress:(NSData *)imageData {
-    return imageData.length > 500 * 1024;
-}
-
 + (BOOL)isPortait:(UIImage *)image {
     return image.size.height >= image.size.width;
 }
