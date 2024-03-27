@@ -95,7 +95,6 @@ BOOL _fs_floatEqual(CGFloat aNumber,CGFloat bNumber);
 + (NSString *)randomNumberWithDigit:(int)digit;
 + (NSString *)blankInChars:(NSString *)string byCellNo:(int)num;
 + (NSString *)jsonStringWithObject:(id)dic;
-+ (NSString *)JSONString:(NSString *)aString;
 
 + (NSString *)homeDirectoryPath:(NSString *)fileName;
 + (NSString *)documentsPath:(NSString *)fileName;

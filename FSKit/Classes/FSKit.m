@@ -742,24 +742,12 @@ NSString* _fs_KMGUnit(NSInteger size) {
     return nil;
 }
 
-+ (NSString *)JSONString:(NSString *)aString {
-    NSMutableString *s = [NSMutableString stringWithString:aString];
-    [s replaceOccurrencesOfString:@"\"" withString:@"\\\"" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [s length])];
-    [s replaceOccurrencesOfString:@"/" withString:@"\\/" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [s length])];
-    [s replaceOccurrencesOfString:@"\n" withString:@"\\n" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [s length])];
-    [s replaceOccurrencesOfString:@"\b" withString:@"\\b" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [s length])];
-    [s replaceOccurrencesOfString:@"\f" withString:@"\\f" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [s length])];
-    [s replaceOccurrencesOfString:@"\r" withString:@"\\r" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [s length])];
-    [s replaceOccurrencesOfString:@"\t" withString:@"\\t" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [s length])];
-    return [NSString stringWithString:s];
-}
-
 + (id)objectFromJSonstring:(NSString *)jsonString {
     if (jsonString.length == 0) {
         return nil;
     }
     NSError *error;
-    NSData *data = [jsonString dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:NO];
+    NSData *data = [jsonString dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion: NO];
     id dataClass = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingAllowFragments error:&error];
     return dataClass;
 }
@@ -989,10 +977,6 @@ NSString* _fs_KMGUnit(NSInteger size) {
         }
     }
     return YES;
-}
-
-+ (BOOL)isValidateString:(NSString *)string {
-    return [string isKindOfClass:NSString.class] && string.length;
 }
 
 BOOL _fs_isPureInt(NSString *string) {
@@ -1450,9 +1434,10 @@ NSComparisonResult _fs_highAccuracy_compare(NSString *a, NSString *b) {
 }
 
 + (NSString *)convertNumbers:(NSString *)string {
-    if (![self isValidateString:string]) {
+    if (!_fs_isValidateString(string)) {
         return nil;
     }
+    
     NSArray *numbers = @[@"0",@"1",@"2",@"3",@"4",@"5",@"6",@"7",@"8",@"9"];
     NSArray *array = @[@"零",@"一",@"二",@"三",@"四",@"五",@"六",@"七",@"八",@"九"];
     NSMutableString *name = [[NSMutableString alloc] init];
@@ -1609,7 +1594,7 @@ NSComparisonResult _fs_highAccuracy_compare(NSString *a, NSString *b) {
         text = text.description;
     }
     text = [text stringByReplacingOccurrencesOfString:@" " withString:@""];
-    if (![self isValidateString:text]) {
+    if (!_fs_isValidateString(text)) {
         return nil;
     }
     
