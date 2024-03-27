@@ -96,7 +96,7 @@
     if ([value isKindOfClass:NSArray.class] || [value isKindOfClass:NSDictionary.class] || [value isKindOfClass:NSString.class]) {
         
     } else {
-        if (value == nil || [value isEqual:NSNull.null]) {
+        if ([value isEqual: NSNull.null]) {
             value = nil;
         } else {
             NSObject *obj = (NSObject *)value;
