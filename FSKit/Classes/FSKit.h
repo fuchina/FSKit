@@ -37,7 +37,6 @@ void _fs_clearUserDefaults(void);
 
 + (void)letScreenLock:(BOOL)lock;                           // YES:让屏幕锁屏    NO：让屏幕不锁屏   【未测】
 + (void)gotoAppCentPageWithAppId:(NSString *)appID;         // 去App评分页
-+ (void)setStatusBarBackgroundColor:(UIColor *)color;       // 设置状态栏颜色
 
 + (BOOL)isValidateEmail:(NSString *)str;
 

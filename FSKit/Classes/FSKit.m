@@ -111,13 +111,6 @@ void _fs_clearUserDefaults(void) {
     [UIApplication.sharedApplication openURL: u options:@{} completionHandler:^(BOOL success) {}];
 }
 
-+ (void)setStatusBarBackgroundColor:(UIColor *)color {
-    UIView *statusBar = [[[UIApplication sharedApplication] valueForKey:@"statusBarWindow"] valueForKey:@"statusBar"];
-    if ([statusBar respondsToSelector:@selector(setBackgroundColor:)]){
-        statusBar.backgroundColor = color;
-    }
-}
-
 + (double)usedMemory {
     task_basic_info_data_t taskInfo;
     mach_msg_type_number_t infoCount = TASK_BASIC_INFO_COUNT;
