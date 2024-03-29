@@ -88,6 +88,7 @@ BOOL _fs_floatEqual(CGFloat aNumber,CGFloat bNumber);
 + (CGSize)keyboardSizeFromNotification:(NSNotification *)notification;
 
 + (NSString *)appVersionNumber;                                                     // 获得版本号
++ (NSString *)appLongVersionNumber;                                                 // 获得版本号
 + (NSString *)appName;  // App名字
 + (NSString *)appBundleName; // 获得应用Bundle，如com.hope.myhome的myhome
 + (NSString *)iPAddress;

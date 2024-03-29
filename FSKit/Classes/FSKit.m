@@ -480,17 +480,24 @@ void _fs_clearUserDefaults(void) {
 }
 
 + (NSString *)appVersionNumber {
-    NSDictionary* infoDict =[[NSBundle mainBundle] infoDictionary];
+    NSDictionary *infoDict = NSBundle.mainBundle.infoDictionary;
+    NSString *js = [FSKit jsonStringWithObject: infoDict];
+    NSLog(@"FSLog %@", js);
     return [infoDict objectForKey:@"CFBundleShortVersionString"];
 }
 
++ (NSString *)appLongVersionNumber {
+    NSDictionary *infoDict = NSBundle.mainBundle.infoDictionary;
+    return [infoDict objectForKey:@"CFBundleVersion"];
+}
+
 + (NSString *)appBundleName {
-    NSString *name = [[[NSBundle mainBundle] infoDictionary] objectForKey:(NSString*)kCFBundleNameKey];
+    NSString *name = [NSBundle.mainBundle.infoDictionary objectForKey:(NSString *)kCFBundleNameKey];
     return name;
 }
 
 + (NSString *)appName {
-    NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];
+    NSDictionary *infoDictionary = NSBundle.mainBundle.infoDictionary;
     return [infoDictionary objectForKey:@"CFBundleDisplayName"];
 }
 
