@@ -104,7 +104,6 @@ NSString *_fs_md5(NSString *str);
 
 + (NSString *)stringDeleteNewLineAndWhiteSpace:(NSString *)string;
 + (NSString *)macaddress;
-+ (NSString *)identifierForVendorFromKeyChain;
 + (NSString *)asciiCodeWithString:(NSString *)string;
 + (NSString *)stringFromASCIIString:(NSString *)string;
 + (NSString *)DataToHex:(NSData *)data;                          // 将二进制转换为16进制再用字符串表示

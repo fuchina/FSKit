@@ -379,10 +379,11 @@ void _fs_clearUserDefaults(void) {
     CGFloat height = rect.size.height * scale;
     NSDictionary *dic5 = @{name:@"屏幕分辨率",value:[[NSString alloc] initWithFormat:@"%@ x %@",@(width),@(height)]};
     CTTelephonyNetworkInfo *info = [[CTTelephonyNetworkInfo alloc] init];
-    CTCarrier *carrier = [info subscriberCellularProvider];
-    NSString *mCarrier = [NSString stringWithFormat:@"%@",[carrier carrierName]];
-    NSDictionary *dic6 = @{name:@"运营商",value:mCarrier};
-    NSDictionary *dic7 = @{name:@"网络类型",value:[self networkTypeForType:info.currentRadioAccessTechnology]};
+//    CTCarrier *carrier = [info subscriberCellularProvider];
+//    NSString *mCarrier = [NSString stringWithFormat:@"%@",[carrier carrierName]];
+//    NSDictionary *dic6 = @{name:@"运营商",value:mCarrier};
+//    NSDictionary *netType = info.serviceCurrentRadioAccessTechnology;
+//    NSDictionary *dic7 = @{name:@"网络类型",value:[self networkTypeForType:info.currentRadioAccessTechnology]};
     NSDictionary *dic8 = @{name:@"电池信息",value:[self getBatteryState]};
     NSDictionary *dic9 = @{name:@"电量",value:@(device.batteryLevel).stringValue};
     NSDictionary *dic10 = @{name:@"iP地址",value:[self iPAddress]};
@@ -397,8 +398,8 @@ void _fs_clearUserDefaults(void) {
     [array addObject:dic3];
     [array addObject:dic4];
     [array addObject:dic5];
-    [array addObject:dic6];
-    [array addObject:dic7];
+//    [array addObject:dic6];
+//    [array addObject:dic7];
     [array addObject:dic8];
     [array addObject:dic9];
     [array addObject:dic10];
@@ -1103,22 +1104,6 @@ NSString *_fs_md5(NSString *str) {
     return outstring;
 }
 
-+ (NSString *)identifierForVendorFromKeyChain {
-    NSString *identifierStr = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
-    NSString * const KEY_USERNAME_PASSWORD = @"com.fuhope.myapp";
-    NSString * const KEY_PASSWORD = @"com.fuhope.myapp";
-    
-    NSMutableDictionary *readUserPwd = (NSMutableDictionary *)[self load:KEY_USERNAME_PASSWORD];
-    if (!readUserPwd) {
-        NSMutableDictionary *usernamepasswordKVPairs = [NSMutableDictionary dictionary];
-        [usernamepasswordKVPairs setObject:identifierStr forKey:KEY_PASSWORD];
-        [self save:KEY_USERNAME_PASSWORD data:usernamepasswordKVPairs];
-        return identifierStr;
-    }else{
-        return [readUserPwd objectForKey:KEY_PASSWORD];
-    }
-}
-
 + (NSString *)asciiCodeWithString:(NSString *)string {
     NSMutableString *str = [[NSMutableString alloc] init];
     for (int x = 0; x < string.length; x ++) {
@@ -1131,50 +1116,6 @@ NSString *_fs_md5(NSString *str) {
 + (NSString *)stringFromASCIIString:(NSString *)string {
     unsigned short asciiCode = [string intValue];
     return [[NSString alloc] initWithFormat:@"%C",asciiCode];
-}
-
-+ (void)save:(NSString *)service data:(id)data {
-    //Get search dictionary
-    NSMutableDictionary *keychainQuery = [self getKeychainQuery:service];
-    //Delete old item before add new item
-    SecItemDelete((__bridge CFDictionaryRef)keychainQuery);
-    //Add new object to search dictionary(Attention:the data format)
-    [keychainQuery setObject:[NSKeyedArchiver archivedDataWithRootObject:data] forKey:(__bridge id)kSecValueData];
-    //Add item to keychain with the search dictionary
-    SecItemAdd((__bridge CFDictionaryRef)keychainQuery, NULL);
-}
-
-+ (NSMutableDictionary *)getKeychainQuery:(NSString *)service {
-    return [NSMutableDictionary dictionaryWithObjectsAndKeys:
-            (__bridge id)kSecClassGenericPassword,(__bridge id)kSecClass,
-            service, (__bridge id)kSecAttrService,
-            service, (__bridge id)kSecAttrAccount,
-            (__bridge id)kSecAttrAccessibleAfterFirstUnlock,(__bridge id)kSecAttrAccessible,
-            nil];
-}
-
-//取
-+ (id)load:(NSString *)service {
-    id ret = nil;
-    NSMutableDictionary *keychainQuery = [self getKeychainQuery:service];
-    [keychainQuery setObject:(__bridge id)kCFBooleanTrue forKey:(__bridge id)kSecReturnData];
-    [keychainQuery setObject:(__bridge id)kSecMatchLimitOne forKey:(__bridge id)kSecMatchLimit];
-    CFDataRef keyData = NULL;
-    if (SecItemCopyMatching((__bridge CFDictionaryRef)keychainQuery, (CFTypeRef *)&keyData) == noErr) {
-        @try {
-            ret = [NSKeyedUnarchiver unarchiveObjectWithData:(__bridge NSData *)keyData];
-        } @catch (NSException *e) {
-        } @finally {
-        }
-    }
-    if (keyData)
-        CFRelease(keyData);
-    return ret;
-}
-
-+ (void)delete:(NSString *)service {
-    NSMutableDictionary *keychainQuery = [self getKeychainQuery:service];
-    SecItemDelete((__bridge CFDictionaryRef)keychainQuery);
 }
 
 + (NSString *)DataToHex:(NSData *)data {
