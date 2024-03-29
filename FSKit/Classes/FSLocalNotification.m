@@ -87,9 +87,6 @@ static FSLocalNotification *_instance = nil;
                     });
                 }];
             }];
-        }else{
-            NSInteger i = 2;
-            NSAssert(i == 1, @"待实现");
         }
     }
 }

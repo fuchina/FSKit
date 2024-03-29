@@ -108,7 +108,9 @@ void _fs_clearUserDefaults(void) {
 + (void)gotoAppCentPageWithAppId:(NSString *)appID {
     NSString *url = [[NSString alloc] initWithFormat: @"itms-apps://itunes.apple.com/WebObjects/MZStore.woa/wa/viewContentsUserReviews?type=Purple+Software&id=%@", appID];
     NSURL *u = [NSURL URLWithString: url];
-    [UIApplication.sharedApplication openURL: u options:@{} completionHandler:^(BOOL success) {}];
+    if (@available(iOS 10.0, *)) {
+        [UIApplication.sharedApplication openURL: u options:@{} completionHandler:^(BOOL success) {}];
+    }
 }
 
 + (double)usedMemory {
@@ -1562,7 +1564,9 @@ NSComparisonResult _fs_highAccuracy_compare(NSString *a, NSString *b) {
         
         NSString *telUrl = [NSString stringWithFormat:@"telprompt:%@",phone];
         NSURL *url = [[NSURL alloc] initWithString:telUrl];
-        [UIApplication.sharedApplication openURL: url options: @{} completionHandler:^(BOOL success) {}];
+        if (@available(iOS 10.0, *)) {
+            [UIApplication.sharedApplication openURL: url options: @{} completionHandler:^(BOOL success) {}];
+        }
     }
 }
 
@@ -1572,7 +1576,9 @@ NSComparisonResult _fs_highAccuracy_compare(NSString *a, NSString *b) {
     }
     NSString *str= [[NSString alloc] initWithFormat:@"tel:%@",phone];
     NSURL *url = [NSURL URLWithString:str];
-    [UIApplication.sharedApplication openURL: url options: @{} completionHandler:^(BOOL success) {}];
+    if (@available(iOS 10.0, *)) {
+        [UIApplication.sharedApplication openURL: url options: @{} completionHandler:^(BOOL success) {}];
+    }
 }
 
 + (NSString *)tenThousandNumber:(double)value {
@@ -1628,7 +1634,9 @@ NSComparisonResult _fs_highAccuracy_compare(NSString *a, NSString *b) {
 + (void)openAppByURLString:(NSString *)str {
     NSString *string = [NSString stringWithFormat:@"%@://://",str];
     NSURL *myURL_APP_A = [NSURL URLWithString:string];
-    [UIApplication.sharedApplication openURL: myURL_APP_A options: @{} completionHandler:^(BOOL success) {}];
+    if (@available(iOS 10.0, *)) {
+        [UIApplication.sharedApplication openURL: myURL_APP_A options: @{} completionHandler:^(BOOL success) {}];
+    }
 }
 
 void _fs_spendTimeInDoSomething(void(^body)(void),void(^time)(double time)) {
