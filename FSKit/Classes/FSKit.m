@@ -378,7 +378,7 @@ void _fs_clearUserDefaults(void) {
     CGFloat width = rect.size.width * scale;
     CGFloat height = rect.size.height * scale;
     NSDictionary *dic5 = @{name:@"屏幕分辨率",value:[[NSString alloc] initWithFormat:@"%@ x %@",@(width),@(height)]};
-    CTTelephonyNetworkInfo *info = [[CTTelephonyNetworkInfo alloc] init];
+//    CTTelephonyNetworkInfo *info = [[CTTelephonyNetworkInfo alloc] init];
 //    CTCarrier *carrier = [info subscriberCellularProvider];
 //    NSString *mCarrier = [NSString stringWithFormat:@"%@",[carrier carrierName]];
 //    NSDictionary *dic6 = @{name:@"运营商",value:mCarrier};
@@ -1562,7 +1562,7 @@ NSComparisonResult _fs_highAccuracy_compare(NSString *a, NSString *b) {
         
         NSString *telUrl = [NSString stringWithFormat:@"telprompt:%@",phone];
         NSURL *url = [[NSURL alloc] initWithString:telUrl];
-        [[UIApplication sharedApplication] openURL:url];
+        [UIApplication.sharedApplication openURL: url options: @{} completionHandler:^(BOOL success) {}];
     }
 }
 
@@ -1571,7 +1571,8 @@ NSComparisonResult _fs_highAccuracy_compare(NSString *a, NSString *b) {
         return;
     }
     NSString *str= [[NSString alloc] initWithFormat:@"tel:%@",phone];
-    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:str]];
+    NSURL *url = [NSURL URLWithString:str];
+    [UIApplication.sharedApplication openURL: url options: @{} completionHandler:^(BOOL success) {}];
 }
 
 + (NSString *)tenThousandNumber:(double)value {
@@ -1624,20 +1625,10 @@ NSComparisonResult _fs_highAccuracy_compare(NSString *a, NSString *b) {
     return ret;
 }
 
-+ (NSString *)urlEncodedString:(NSString *)urlString {
-    return (NSString *)CFBridgingRelease(CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault,(CFStringRef)urlString,NULL,CFSTR("!*'();:@&=+$,/?%#[]"),kCFStringEncodingUTF8));
-}
-
-+ (NSString *)urlDecodedString:(NSString *)urlString {
-    return (NSString *)CFBridgingRelease(CFURLCreateStringByReplacingPercentEscapesUsingEncoding(kCFAllocatorDefault,(CFStringRef)urlString,CFSTR(""),kCFStringEncodingUTF8));
-}
-
 + (void)openAppByURLString:(NSString *)str {
     NSString *string = [NSString stringWithFormat:@"%@://://",str];
     NSURL *myURL_APP_A = [NSURL URLWithString:string];
-    if ([[UIApplication sharedApplication] canOpenURL:myURL_APP_A]) {
-        [[UIApplication sharedApplication] openURL:myURL_APP_A];
-    }
+    [UIApplication.sharedApplication openURL: myURL_APP_A options: @{} completionHandler:^(BOOL success) {}];
 }
 
 void _fs_spendTimeInDoSomething(void(^body)(void),void(^time)(double time)) {
