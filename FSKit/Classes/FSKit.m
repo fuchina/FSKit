@@ -106,7 +106,9 @@ void _fs_clearUserDefaults(void) {
 }
 
 + (void)gotoAppCentPageWithAppId:(NSString *)appID {
-    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:[[NSString alloc] initWithFormat:@"itms-apps://itunes.apple.com/WebObjects/MZStore.woa/wa/viewContentsUserReviews?type=Purple+Software&id=%@",appID]]];
+    NSString *url = [[NSString alloc] initWithFormat: @"itms-apps://itunes.apple.com/WebObjects/MZStore.woa/wa/viewContentsUserReviews?type=Purple+Software&id=%@", appID];
+    NSURL *u = [NSURL URLWithString: url];
+    [UIApplication.sharedApplication openURL: u options:@{} completionHandler:^(BOOL success) {}];
 }
 
 + (void)setStatusBarBackgroundColor:(UIColor *)color {
