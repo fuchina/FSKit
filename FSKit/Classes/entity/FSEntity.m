@@ -98,12 +98,14 @@
     } else {
         if ([value isEqual: NSNull.null]) {
             value = nil;
-        } else {
-            NSObject *obj = (NSObject *)value;
-            value = obj.description;
         }
+//        else {
+//            NSObject *obj = (NSObject *)value;
+//            value = obj.description;
+//        }
     }
-    [super setValue:value forKey:key];
+    
+    [super setValue: value forKey: key];
 }
 
 - (void)afterSetProperties {}
