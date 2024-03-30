@@ -110,7 +110,7 @@
 
 - (void)setValue:(id)value forUndefinedKey:(NSString *)key {
 #if DEBUG
-    NSLog(@"FSEntity set UndefinedKey (%@ - %@)", key, value);
+    NSLog(@"%@ set UndefinedKey (%@ - %@)", self.class, key, value);
 #endif
 }
 
