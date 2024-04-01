@@ -100,12 +100,11 @@
             value = nil;
         } else if ([value isKindOfClass: NSNumber.class]) {
             value = [value stringValue];
+        } else {
+            NSAssert(1==2, @"什么情况？");
+            NSObject *obj = (NSObject *)value;
+            value = obj.description;
         }
-        
-//        else {
-//            NSObject *obj = (NSObject *)value;
-//            value = obj.description;
-//        }
     }
     
     [super setValue: value forKey: key];
