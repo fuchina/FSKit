@@ -98,7 +98,10 @@
     } else {
         if ([value isEqual: NSNull.null]) {
             value = nil;
+        } else if ([value isKindOfClass: NSNumber.class]) {
+            value = [value stringValue];
         }
+        
 //        else {
 //            NSObject *obj = (NSObject *)value;
 //            value = obj.description;
