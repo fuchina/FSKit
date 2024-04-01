@@ -185,8 +185,6 @@ static FSLocalNotification *_instance = nil;
         UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
         [center removeAllDeliveredNotifications];
         [center removeAllPendingNotificationRequests];
-    }else{
-        [[UIApplication sharedApplication] cancelAllLocalNotifications];        
     }
 }
 
