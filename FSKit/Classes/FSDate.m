@@ -130,8 +130,8 @@ NSInteger _fs_integerTimeIntevalSince1970(void) {
     if (![date isKindOfClass:NSDate.class]) {
         return nil;
     }
-    NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierChinese];
-    NSDateComponents *components = [calendar components:NSCalendarUnitYear | NSCalendarUnitMonth | NSCalendarUnitDay fromDate:date];
+    NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier: NSCalendarIdentifierChinese];
+    NSDateComponents *components = [calendar components:NSCalendarUnitYear | NSCalendarUnitMonth | NSCalendarUnitDay | NSCalendarUnitHour | NSCalendarUnitMinute | NSCalendarUnitSecond fromDate:date];
     return components;
 }
 
@@ -335,7 +335,7 @@ NSInteger _fs_integerTimeIntevalSince1970(void) {
             NSDate *runDate = [NSDate dateWithTimeInterval:86400 * addDays sinceDate:date];
             lunarComponents = [self chineseDate:runDate];
             if (lunarComponents.isLeapMonth) {  // 是闰月，需要找到该闰月日期下的阳历
-                runDate = [NSDate dateWithTimeInterval:86400 * (day - lunarComponents.day) sinceDate:runDate];
+                runDate = [NSDate dateWithTimeInterval: 86400 * (day - lunarComponents.day) sinceDate: runDate];
                 
                 [dates addObject:runDate];
             }
@@ -360,24 +360,27 @@ NSInteger _fs_integerTimeIntevalSince1970(void) {
     return last;
 }
 
-+ (NSDate *)lunarForSolar:(NSDate *)solar {
++ (FSLunarDate *)lunarDateForSolar:(NSDate *)solar {
     NSDateComponents *lunarComponents = [self chineseDate:solar];
     NSDateComponents *solarComponents = [self componentForDate:solar];
     NSInteger year = solarComponents.year;
     if (lunarComponents.month > solarComponents.month) {
         year = year - 1;
     }
-    NSString *string = [[NSString alloc] initWithFormat:@"%ld-%@-%@ 12:00:00",year, [self twoChar:lunarComponents.month], [self twoChar:lunarComponents.day]];
-    NSDate *date = [FSDate dateByString:string formatter:nil];
-    return date;
+    
+    FSLunarDate *lunar = [FSLunarDate lunarWithYear: year month: lunarComponents.month day: lunarComponents.day hour: lunarComponents.hour minute: lunarComponents.minute second: lunarComponents.second];
+    return lunar;
+    
+//    NSString *string = [[NSString alloc] initWithFormat:@"%ld-%@-%@ 12:00:00",year, [self twoChar:lunarComponents.month], [self twoChar:lunarComponents.day]];
+//    NSDate *date = [FSDate dateByString:string formatter:nil];
+//    return date;
 }
 
 + (NSString *)ChineseWeek:(NSInteger)week {
     static NSArray *weeks = nil;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        weeks = @[@"",@"星期日",@"星期一",@"星期二",@"星期三",@"星期四",@"星期五",@"星期六"];
-    });
+    if (!weeks) {
+        weeks = @[@"",@"星期日",@"星期一",@"星期二",@"星期三",@"星期四",@"星期五",@"星期六"];;
+    }
     return weeks[week];
 }
 

@@ -6,6 +6,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "FSLunarDate.h"
 
 @interface FSDate : NSObject
 
@@ -98,7 +99,7 @@ NSInteger _fs_integerTimeIntevalSince1970(void);
  * @param solar 阳历日期
  * @return 返回农历日期
  */
-+ (NSDate *)lunarForSolar:(NSDate *)solar;
++ (FSLunarDate *)lunarDateForSolar:(NSDate *)solar;
 
 /**
  * 参数为dateComponents的weekday
