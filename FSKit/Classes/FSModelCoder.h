@@ -9,18 +9,30 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef NS_ENUM(NSInteger, FSTriBool) {
+    FSTriBoolUnknown = -1,          // 未知
+    FSTriBoolNO = 0,                // 否
+    FSTriBoolYES = 1,               // 是
+};
+
 @interface FSModelCoder : NSObject <NSCoding, NSSecureCoding>
 
-// 服务端下发数据，不能是自定义model
+// 服务端下发数据，不能包含自定义model
 @property (nonatomic, strong) NSDictionary                      *meta;
 @property (nonatomic, strong) NSArray                           *list;
+@property (nonatomic, assign) FSTriBool                         boolean;
+@property (nonatomic, copy)   NSString                          *string;
 
 /**
- *  key是为了支持iOS12以前的系统，如果只支持iOS12及以后，key可以不传
+ *  只支持iOS12及以后
  */
-+ (NSError *)save:(NSDictionary * _Nullable)meta list:(NSArray * _Nullable)list filePath:(NSString *)filePath forKey:( NSString * _Nullable)key;
++ (NSError *)saveBoolean:(FSTriBool)boolean forKey:(NSString *)key;
++ (NSError *)saveString:(NSString *)string forKey:(NSString *)key;
++ (NSError *)saveList:(NSArray *)list forKey:(NSString *)key;
++ (NSError *)saveDictionary:(NSDictionary *)dictionary forKey:(NSString *)key;
++ (NSError *)save:(NSDictionary * _Nullable)meta list:(NSArray * _Nullable)list boolean:(FSTriBool)boolean string:(NSString * _Nullable)string forKey:(NSString *)key;
 
-+ (FSModelCoder *)fetch:(NSString *)filePath key:(NSString *)key;
++ (FSModelCoder *)fetch:(NSString *)key;
 
 @end
 

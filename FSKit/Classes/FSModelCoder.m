@@ -18,6 +18,8 @@
     if (self) {
         self.meta = [coder decodeObjectForKey: @"meta"];
         self.list = [coder decodeObjectForKey: @"list"];
+        self.boolean = [coder decodeIntegerForKey: @"boolean"];
+        self.string = [coder decodeObjectForKey: @"string"];
     }
     return self;
 }
@@ -25,37 +27,52 @@
 - (void)encodeWithCoder:(NSCoder *)coder {
     [coder encodeObject: self.meta forKey: @"meta"];
     [coder encodeObject: self.list forKey: @"list"];
+    [coder encodeInteger: self.boolean forKey: @"boolean"];
+    [coder encodeObject: self.string forKey: @"string"];
 }
 
-+ (NSError *)save:(NSDictionary * _Nullable)meta list:(NSArray * _Nullable)list filePath:(NSString *)filePath forKey:( NSString * _Nullable)key {
++ (NSError *)saveBoolean:(FSTriBool)boolean forKey:(NSString *)key {
+    return [self save: nil list: nil boolean: boolean string: nil forKey: key];
+}
+
++ (NSError *)saveString:(NSString *)string forKey:(NSString *)key {
+    return [self save: nil list: nil boolean: FSTriBoolUnknown string: string forKey: key];
+}
+
++ (NSError *)saveList:(NSArray *)list forKey:(NSString *)key {
+    return [self save: nil list: list boolean: FSTriBoolUnknown string: nil forKey: key];
+}
+
++ (NSError *)saveDictionary:(NSDictionary *)dictionary forKey:(NSString *)key {
+    return [self save: dictionary list: nil boolean: FSTriBoolUnknown string: nil forKey: key];
+}
+
++ (NSError *)save:(NSDictionary * _Nullable)meta list:(NSArray * _Nullable)list boolean:(FSTriBool)boolean string:(NSString * _Nullable)string forKey:(NSString *)key {
     FSModelCoder *coder = [[FSModelCoder alloc] init];
     coder.meta = meta;
     coder.list = list;
+    coder.boolean = boolean;
+    coder.string = string;
     
     NSError *error = nil;
     NSMutableData *data = nil;
     if (@available(iOS 12.0, *)) {
         data = (NSMutableData *)[NSKeyedArchiver archivedDataWithRootObject: coder requiringSecureCoding: YES error: &error];
-        NSAssert([data isKindOfClass:NSData.class], @"HEModelCoder：用户信息data创建失败: %@", error);
+        NSAssert([data isKindOfClass:NSData.class], @"FSModelCoder：data创建失败: %@", error);
         if (error) {
             return error;
         }
-    } else {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-        data = [[NSMutableData alloc] init];
-        NSKeyedArchiver *archiver = [[NSKeyedArchiver alloc] initForWritingWithMutableData: data];
-        [archiver encodeObject: coder forKey: key];
-        [archiver finishEncoding];
-#pragma clang diagnostic pop
     }
     
-    __unused BOOL succeed = [data writeToFile: filePath options: NSDataWritingAtomic error: &error];
-    NSAssert(succeed == YES, @"HEModelCoder：用户登录信息存入本地失败");
+    NSString *path = [self filePath: key];
+    __unused BOOL succeed = [data writeToFile: path options: NSDataWritingAtomic error: &error];
+    NSAssert(succeed == YES, @"FSModelCoder：信息存入本地失败");
     return error;
 }
 
-+ (FSModelCoder *)fetch:(NSString *)filePath key:(NSString *)key {
++ (FSModelCoder *)fetch:(NSString *)key {
+    NSString *filePath = [self filePath: key];
+    
     NSFileManager *fm = NSFileManager.defaultManager;
     BOOL fileExists = [fm fileExistsAtPath: filePath];
     FSModelCoder *coder = nil;
@@ -66,14 +83,7 @@
                 NSError *error = nil;
                 NSSet *sets = [NSSet setWithObjects: FSModelCoder.class, NSDictionary.class, NSArray.class, NSNumber.class, NSString.class, nil];  // 有哪些类类型，就传入
                 coder = [NSKeyedUnarchiver unarchivedObjectOfClasses: sets fromData: data error: &error];
-                NSAssert(error == nil && coder, @"HEModelCoder：本地获取登录信息失败，可以通过查看error中的描述信息找出问题原因");
-            } else {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-                NSKeyedUnarchiver *unarchiver = [[NSKeyedUnarchiver alloc] initForReadingWithData: data];
-                coder = [unarchiver decodeObjectForKey: key];
-                [unarchiver finishDecoding];
-#pragma clang diagnostic pop
+                NSAssert(error == nil && coder, @"FSModelCoder：本地获取信息失败，可以通过查看error中的描述信息找出问题原因");
             }
         }
         
@@ -87,6 +97,27 @@
     }
     
     return coder;
+}
+
++ (NSString *)filePath:(NSString *)key {
+    BOOL checkKey = [key isKindOfClass: NSString.class] && key.length;
+    if (checkKey == NO) {
+        return nil;
+    }
+    
+    NSString *libraryDirectory = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
+    NSString *dir = [libraryDirectory stringByAppendingPathComponent: @"FSModelCoder"];
+    NSFileManager *fm = NSFileManager.defaultManager;
+    BOOL isDir = YES;
+    BOOL isDirectoryExist = [fm fileExistsAtPath: dir isDirectory: &isDir];
+    if (isDirectoryExist && isDir) {} else {
+        NSError *error = nil;
+        __unused BOOL su = [fm createDirectoryAtPath: dir withIntermediateDirectories: YES attributes: @{} error: &error];
+        NSAssert(su == YES && error == nil, @"FSModelCoder: createDirectoryAtPath fail - error %@", error);
+    }
+    
+    NSString *filePath = [dir stringByAppendingPathComponent: key];
+    return filePath;
 }
 
 @end
