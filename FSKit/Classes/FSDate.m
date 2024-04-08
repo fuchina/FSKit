@@ -100,7 +100,9 @@ NSInteger _fs_integerTimeIntevalSince1970(void) {
     [dateFormatter setDateFormat:formatter ? : @"yyyy-MM-dd HH:mm:ss"];
     dateFormatter.locale = [NSLocale localeWithLocaleIdentifier:@"zh_CN"];  // 必须写，否则date会为nil
     NSDate *date = [dateFormatter dateFromString:str];
-    NSAssert([date isKindOfClass:NSDate.class], @"date创建失败");
+    if (date == nil) {
+        NSAssert([date isKindOfClass:NSDate.class], @"date创建失败");
+    }
     return date;
 }
 
