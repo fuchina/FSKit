@@ -28,7 +28,7 @@
 }
 
 + (NSError *)save:(NSDictionary * _Nullable)meta list:(NSArray * _Nullable)list filePath:(NSString *)filePath forKey:( NSString * _Nullable)key {
-    HEModelCoder *coder = [[FSModelCoder alloc] init];
+    FSModelCoder *coder = [[FSModelCoder alloc] init];
     coder.meta = meta;
     coder.list = list;
     
