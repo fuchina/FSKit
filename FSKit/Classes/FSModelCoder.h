@@ -18,7 +18,7 @@ typedef NS_ENUM(NSInteger, FSTriBool) {
 @interface FSModelCoder : NSObject <NSCoding, NSSecureCoding>
 
 // 服务端下发数据，不能包含自定义model
-@property (nonatomic, strong) NSDictionary                      *meta;
+@property (nonatomic, strong) NSDictionary                      *dictionary;
 @property (nonatomic, strong) NSArray                           *list;
 @property (nonatomic, assign) FSTriBool                         boolean;
 @property (nonatomic, copy)   NSString                          *string;
@@ -30,7 +30,7 @@ typedef NS_ENUM(NSInteger, FSTriBool) {
 + (NSError *)saveString:(NSString *)string forKey:(NSString *)key;
 + (NSError *)saveList:(NSArray *)list forKey:(NSString *)key;
 + (NSError *)saveDictionary:(NSDictionary *)dictionary forKey:(NSString *)key;
-+ (NSError *)save:(NSDictionary * _Nullable)meta list:(NSArray * _Nullable)list boolean:(FSTriBool)boolean string:(NSString * _Nullable)string forKey:(NSString *)key;
++ (NSError *)save:(NSDictionary * _Nullable)dictionary list:(NSArray * _Nullable)list boolean:(FSTriBool)boolean string:(NSString * _Nullable)string forKey:(NSString *)key;
 
 + (FSModelCoder *)fetch:(NSString *)key;
 

@@ -16,7 +16,7 @@
 - (instancetype)initWithCoder:(NSCoder *)coder {
     self = [self init];
     if (self) {
-        self.meta = [coder decodeObjectForKey: @"meta"];
+        self.dictionary = [coder decodeObjectForKey: @"dictionary"];
         self.list = [coder decodeObjectForKey: @"list"];
         self.boolean = [coder decodeIntegerForKey: @"boolean"];
         self.string = [coder decodeObjectForKey: @"string"];
@@ -25,7 +25,7 @@
 }
 
 - (void)encodeWithCoder:(NSCoder *)coder {
-    [coder encodeObject: self.meta forKey: @"meta"];
+    [coder encodeObject: self.dictionary forKey: @"dictionary"];
     [coder encodeObject: self.list forKey: @"list"];
     [coder encodeInteger: self.boolean forKey: @"boolean"];
     [coder encodeObject: self.string forKey: @"string"];
@@ -47,9 +47,9 @@
     return [self save: dictionary list: nil boolean: FSTriBoolUnknown string: nil forKey: key];
 }
 
-+ (NSError *)save:(NSDictionary * _Nullable)meta list:(NSArray * _Nullable)list boolean:(FSTriBool)boolean string:(NSString * _Nullable)string forKey:(NSString *)key {
++ (NSError *)save:(NSDictionary * _Nullable)dictionary list:(NSArray * _Nullable)list boolean:(FSTriBool)boolean string:(NSString * _Nullable)string forKey:(NSString *)key {
     FSModelCoder *coder = [[FSModelCoder alloc] init];
-    coder.meta = meta;
+    coder.dictionary = dictionary;
     coder.list = list;
     coder.boolean = boolean;
     coder.string = string;
