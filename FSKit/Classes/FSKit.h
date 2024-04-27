@@ -188,7 +188,6 @@ NSComparisonResult _fs_highAccuracy_compare(NSString *a, NSString *b);
 + (NSArray *)addCookies:(NSArray *)nameArray value:(NSArray *)valueArray cookieDomain:(NSString *)cookName;
 + (NSArray *)deviceInfos;
 
-+ (NSData*)rsaEncryptString:(SecKeyRef)key data:(NSString*) data;
 //压缩图片到指定文件大小
 + (NSData *)compressOriginalImage:(UIImage *)image toMaxDataSizeKBytes:(CGFloat)size;
 

@@ -797,35 +797,6 @@ NSString* _fs_KMGUnit(NSInteger size) {
     return filePath;
 }
 
-+ (NSData*)rsaEncryptString:(SecKeyRef)key data:(NSString*)data {
-    if (key == nil) {
-        return nil;
-    }
-    size_t cipherBufferSize = SecKeyGetBlockSize(key);
-    uint8_t *cipherBuffer = malloc(cipherBufferSize * sizeof(uint8_t));
-    NSData *stringBytes = [data dataUsingEncoding:NSUTF8StringEncoding];
-    size_t blockSize = cipherBufferSize - 11;
-    size_t blockCount = (size_t)ceil([stringBytes length] / (double)blockSize);
-    NSMutableData *encryptedData = [[NSMutableData alloc] init];
-    for (int i=0; i<blockCount; i++) {
-        int bufferSize = (int)MIN(blockSize,[stringBytes length] - i * blockSize);
-        NSData *buffer = [stringBytes subdataWithRange:NSMakeRange(i * blockSize, bufferSize)];
-        OSStatus status = SecKeyEncrypt(key, kSecPaddingPKCS1, (const uint8_t *)[buffer bytes],
-                                        [buffer length], cipherBuffer, &cipherBufferSize);
-        if (status == noErr){
-            NSData *encryptedBytes = [[NSData alloc] initWithBytes:(const void *)cipherBuffer length:cipherBufferSize];
-            [encryptedData appendData:encryptedBytes];
-        }else{
-            if (cipherBuffer)
-                free(cipherBuffer);
-            return nil;
-        }
-    }
-    if (cipherBuffer)
-        free(cipherBuffer);
-    return encryptedData;
-}
-
 //压缩图片到指定文件大小
 + (NSData *)compressOriginalImage:(UIImage *)image toMaxDataSizeKBytes:(CGFloat)size {
     NSData *data = UIImageJPEGRepresentation(image, 1.0);
