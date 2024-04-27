@@ -22,6 +22,10 @@
     return [self initWithDictionary:dictionary beforeSetProperties: nil afterSetProperties: nil];
 }
 
+- (instancetype)initWithDictionary:(NSDictionary *)dictionary beforeSetProperties:(nullable void(^)(id each_model))beforeSetProperties {
+    return [self initWithDictionary:dictionary beforeSetProperties: beforeSetProperties afterSetProperties: nil];
+}
+
 - (instancetype)initWithDictionary:(NSDictionary *)dictionary beforeSetProperties:(nullable void (^)(id _Nonnull))beforeSetProperties afterSetProperties:(nullable void (^)(id _Nonnull))afterSetProperties {
     self = [super init];
     if (self) {
@@ -35,6 +39,10 @@
 
 + (NSMutableArray *)modelsFromDictionaries:(NSArray<NSDictionary *> *)dictionaries modelClass:(Class)CLS {
     return [self modelsFromDictionaries:dictionaries modelClass:CLS beforeSetProperties: nil afterSetProperties: nil];
+}
+
++ (NSMutableArray *)modelsFromDictionaries:(NSArray<NSDictionary *> *)dictionaries modelClass:(Class)CLS beforeSetProperties:(nullable void(^)(id each_model))beforeSetProperties {
+    return [self modelsFromDictionaries:dictionaries modelClass:CLS beforeSetProperties: beforeSetProperties afterSetProperties: nil];
 }
 
 + (NSMutableArray *)modelsFromDictionaries:(NSArray<NSDictionary *> *)dictionaries modelClass:(Class)CLS beforeSetProperties:(nullable void (^)(id _Nonnull))beforeSetProperties afterSetProperties:(nullable void (^)(id _Nonnull))afterSetProperties {
