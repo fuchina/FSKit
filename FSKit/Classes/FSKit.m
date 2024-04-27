@@ -1841,13 +1841,14 @@ NSString *_fs_highAccuracy_divide(NSString *a,NSString *b) {
 
 + (UIWindowScene *)currentWindowScene {
     NSSet *scenes = UIApplication.sharedApplication.connectedScenes;
-    if (scenes.count == 1) {
-        return scenes.anyObject;
-    }
     for (UIScene *sc in scenes) {
         if (sc.activationState == UISceneActivationStateForegroundActive) {
             return (UIWindowScene *)sc;
         }
+    }
+    
+    if (scenes.count) {
+        return scenes.anyObject;
     }
     NSAssert(1==2, @"%@ currentWindowScene", self.class);
     return nil;
