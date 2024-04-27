@@ -1865,6 +1865,17 @@ NSString *_fs_highAccuracy_divide(NSString *a,NSString *b) {
     return [[NSString alloc] initWithFormat:@"%@%@%@", frontStr, placeholder, last];
 }
 
++ (UIWindowScene *)currentWindowScene {
+    NSSet *scenes = UIApplication.sharedApplication.connectedScenes;
+    for (UIScene *sc in scenes) {
+        if (sc.activationState == UISceneActivationStateForegroundActive) {
+            return (UIWindowScene *)sc;
+        }
+    }
+    NSAssert(1==2, @"%@ currentWindowScene", self.class);
+    return nil;
+}
+
 @end
 
 

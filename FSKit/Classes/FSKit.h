@@ -246,4 +246,9 @@ NSString *_fs_highAccuracy_divide(NSString *a,NSString *b);     // 除
 + (NSString *)showStringPart:(NSString *)string front:(NSInteger)front tail:(NSInteger)tail;
 + (NSString *)showStringPart:(NSString *)string front:(NSInteger)front tail:(NSInteger)tail placeholder:(NSString *)placeholder;
 
+/**
+ *  当前的 Window Scene
+ */
++ (UIWindowScene *)currentWindowScene;
+
 @end
