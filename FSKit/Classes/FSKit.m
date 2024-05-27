@@ -992,8 +992,8 @@ BOOL _fs_isValidateDictionary(NSDictionary *dictionary) {
 }
 
 BOOL _fs_floatEqual(CGFloat aNumber,CGFloat bNumber) {
-    NSNumber *a=[NSNumber numberWithFloat:aNumber];
-    NSNumber *b=[NSNumber numberWithFloat:bNumber];
+    NSNumber *a= [NSNumber numberWithFloat: aNumber];
+    NSNumber *b= [NSNumber numberWithFloat: bNumber];
     return [a compare:b] == NSOrderedSame;
 }
 
