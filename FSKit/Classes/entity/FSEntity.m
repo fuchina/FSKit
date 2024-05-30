@@ -59,10 +59,6 @@
     return results;
 }
 
-+ (id)modelWithDictionary:(NSDictionary *)m modelClass:(Class)CLS {
-    return [self modelWithDictionary:m modelClass:CLS beforeSetProperties: nil afterSetProperties: nil];
-}
-
 + (id)modelWithDictionary:(NSDictionary *)m modelClass:(Class)CLS beforeSetProperties:(nullable void (^)(id _Nonnull))beforeSetProperties afterSetProperties:(nullable void (^)(id _Nonnull))afterSetProperties {
     id obj = nil;
     if ([m isKindOfClass:NSDictionary.class]) {
@@ -101,7 +97,7 @@
 }
 
 - (void)setValue:(id)value forKey:(NSString *)key {
-    if ([value isKindOfClass:NSArray.class] || [value isKindOfClass:NSDictionary.class] || [value isKindOfClass:NSString.class]) {
+    if ([value isKindOfClass: NSArray.class] || [value isKindOfClass: NSDictionary.class] || [value isKindOfClass: NSString.class]) {
         
     } else {
         if ([value isEqual: NSNull.null]) {
