@@ -149,6 +149,7 @@ NSComparisonResult _fs_highAccuracy_compare(NSString *a, NSString *b);
 + (NSString *)tenThousandNumber:(double)value;
 + (NSString *)tenThousandNumberString:(NSString *)value;
 
++ (NSString *)showBetterFor2DigitInteger:(NSInteger)value;
 + (NSString *)showBetterFor5DigitInteger:(NSInteger)value;
 
 + (NSString *)base64StringForText:(NSString *)text;     // 将字符串转换为base64编码

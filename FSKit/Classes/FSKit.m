@@ -1570,6 +1570,26 @@ NSComparisonResult _fs_highAccuracy_compare(NSString *a, NSString *b) {
     return [[NSString alloc] initWithFormat:@"%.2f万",number / 10000];
 }
 
++ (NSString *)showBetterFor2DigitInteger:(NSInteger)value {
+    if (value == 0) {
+        return @"0";
+    }
+    
+    NSInteger mode = value % 100;
+    NSString *ret = nil;
+    if (mode == 0) {
+        ret = [[NSString alloc] initWithFormat:@"%ld", value / 100];
+    } else {
+        mode = value % 10;
+        if (mode == 0) {
+            ret = [[NSString alloc] initWithFormat:@"%.1f", ((CGFloat)value) / 100];
+        } else {
+            ret = [[NSString alloc] initWithFormat:@"%.2f", ((CGFloat)value) / 100];
+        }
+    }
+    return ret;
+}
+
 + (NSString *)showBetterFor5DigitInteger:(NSInteger)value {
     if (value == 0) {
         return @"0";
