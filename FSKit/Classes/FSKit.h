@@ -127,9 +127,9 @@ NSComparisonResult _fs_highAccuracy_compare(NSString *a, NSString *b);
 + (CGFloat)growthRate:(CGFloat)number base:(CGFloat)base;
 
 /**
- *  将以元为单位的字符串数字转化为以分为单位的整数
+ *  浮点数转整数，扩大100倍，如1.01变为 101；将以元为单位的字符串数字转化为以分为单位的整数
  */
-+ (NSInteger)numberStringToCentInt:(NSString *)string;
++ (NSInteger)numberStringToTwoDecimalPlaces:(NSString *)floatString;
 
 /**
  *  浮点数转整数，扩大100000倍，如1.00001变为 100001

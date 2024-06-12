@@ -1223,11 +1223,11 @@ NSComparisonResult _fs_highAccuracy_compare(NSString *a, NSString *b) {
     }
 }
 
-+ (NSInteger)numberStringToCentInt:(NSString *)floatString {
++ (NSInteger)numberStringToTwoDecimalPlaces:(NSString *)floatString {
     CGFloat flt = floatString.doubleValue;
     CGFloat centFlt = round(flt * 100.0f);
     NSString *fltString = @(centFlt).stringValue;
-    NSInteger je = [FSKit floatToInt:fltString];
+    NSInteger je = [FSKit floatToInt: fltString];
     return je;
 }
 
@@ -1235,7 +1235,7 @@ NSComparisonResult _fs_highAccuracy_compare(NSString *a, NSString *b) {
     CGFloat flt = floatString.doubleValue;
     CGFloat centFlt = round(flt * FSFiveDecimalPlaces);
     NSString *fltString = @(centFlt).stringValue;
-    NSInteger je = [FSKit floatToInt:fltString];
+    NSInteger je = [FSKit floatToInt: fltString];
     return je;
 }
 
