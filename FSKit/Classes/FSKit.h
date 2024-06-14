@@ -147,7 +147,6 @@ NSComparisonResult _fs_highAccuracy_compare(NSString *a, NSString *b);
 + (BOOL)isFSAccountNumber:(NSString *)text;
 
 + (NSString *)tenThousandNumber:(double)value;
-+ (NSString *)tenThousandNumberString:(NSString *)value;
 
 + (NSString *)showBetterFor2DigitInteger:(NSInteger)value;
 + (NSString *)showBetterFor5DigitInteger:(NSInteger)value;

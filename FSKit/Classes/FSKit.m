@@ -1559,14 +1559,6 @@ NSComparisonResult _fs_highAccuracy_compare(NSString *a, NSString *b) {
     return [[NSString alloc] initWithFormat:@"%.2f万",value / 10000];
 }
 
-+ (NSString *)tenThousandNumberString:(NSString *)value {
-    double number = [value doubleValue];
-    if (number <= 100000) {
-        return value;
-    }
-    return [[NSString alloc] initWithFormat:@"%.2f万",number / 10000];
-}
-
 + (NSString *)showBetterFor2DigitInteger:(NSInteger)value {
     if (value == 0) {
         return @"0";
