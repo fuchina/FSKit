@@ -1556,7 +1556,17 @@ NSComparisonResult _fs_highAccuracy_compare(NSString *a, NSString *b) {
 }
 
 + (NSString *)tenThousandNumber:(double)value {
+    if (value < 10000) {
+        return [[NSString alloc] initWithFormat:@"%.2f",value];
+    }
     return [[NSString alloc] initWithFormat:@"%.2f万",value / 10000];
+}
+
++ (NSString *)tenThousandFormatterForCents:(NSInteger)cent {
+    if (cent < 1000000) {
+        return [self showBetterFor2DigitInteger: cent];
+    }
+    return [[NSString alloc] initWithFormat:@"%.2f万", cent / 1000000.0];
 }
 
 + (NSString *)showBetterFor2DigitInteger:(NSInteger)value {
