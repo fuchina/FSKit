@@ -19,11 +19,11 @@
 - (void)beforeSetProperties {}
 
 - (instancetype)initWithDictionary:(NSDictionary *)dictionary {
-    return [self initWithDictionary:dictionary beforeSetProperties: nil afterSetProperties: nil];
+    return [self initWithDictionary: dictionary beforeSetProperties: nil afterSetProperties: nil];
 }
 
 - (instancetype)initWithDictionary:(NSDictionary *)dictionary beforeSetProperties:(nullable void(^)(id each_model))beforeSetProperties {
-    return [self initWithDictionary:dictionary beforeSetProperties: beforeSetProperties afterSetProperties: nil];
+    return [self initWithDictionary: dictionary beforeSetProperties: beforeSetProperties afterSetProperties: nil];
 }
 
 - (instancetype)initWithDictionary:(NSDictionary *)dictionary beforeSetProperties:(nullable void (^)(id _Nonnull))beforeSetProperties afterSetProperties:(nullable void (^)(id _Nonnull))afterSetProperties {
@@ -32,17 +32,18 @@
         [self beforeSetProperties];
         _base_model_xxx_config_before = beforeSetProperties;
         _base_model_xxx_config_after = afterSetProperties;
-        [self setProperties:dictionary];
+        
+        [self setProperties: dictionary];
     }
     return self;
 }
 
 + (NSMutableArray *)modelsFromDictionaries:(NSArray<NSDictionary *> *)dictionaries modelClass:(Class)CLS {
-    return [self modelsFromDictionaries:dictionaries modelClass:CLS beforeSetProperties: nil afterSetProperties: nil];
+    return [self modelsFromDictionaries: dictionaries modelClass: CLS beforeSetProperties: nil afterSetProperties: nil];
 }
 
 + (NSMutableArray *)modelsFromDictionaries:(NSArray<NSDictionary *> *)dictionaries modelClass:(Class)CLS beforeSetProperties:(nullable void(^)(id each_model))beforeSetProperties {
-    return [self modelsFromDictionaries:dictionaries modelClass:CLS beforeSetProperties: beforeSetProperties afterSetProperties: nil];
+    return [self modelsFromDictionaries: dictionaries modelClass: CLS beforeSetProperties: beforeSetProperties afterSetProperties: nil];
 }
 
 + (NSMutableArray *)modelsFromDictionaries:(NSArray<NSDictionary *> *)dictionaries modelClass:(Class)CLS beforeSetProperties:(nullable void (^)(id _Nonnull))beforeSetProperties afterSetProperties:(nullable void (^)(id _Nonnull))afterSetProperties {
@@ -52,8 +53,8 @@
         results = [[NSMutableArray alloc] initWithCapacity:dictionaries.count];
         for (int x = 0; x < dictionaries.count; x ++) {
             NSDictionary *m = dictionaries[x];
-            id model = [self modelWithDictionary:m modelClass:CLS beforeSetProperties: beforeSetProperties afterSetProperties: afterSetProperties];
-            [results addObject:model];
+            id model = [self modelWithDictionary: m modelClass: CLS beforeSetProperties: beforeSetProperties afterSetProperties: afterSetProperties];
+            [results addObject: model];
         }
     }
     return results;
@@ -67,6 +68,7 @@
             FSEntity *model = (FSEntity *)obj;
             model.base_model_xxx_config_before = beforeSetProperties;
             model.base_model_xxx_config_after = afterSetProperties;
+           
             [model setProperties:m];
         }
     }
@@ -74,7 +76,7 @@
 }
 
 - (void)setProperties:(NSDictionary *)dataDic {
-    if (![dataDic isKindOfClass:NSDictionary.class]) {
+    if (![dataDic isKindOfClass: NSDictionary.class]) {
         return;
     }
     _meta = dataDic;
@@ -82,7 +84,7 @@
     NSArray *allKeys = [dataDic allKeys];
     for (NSString *key in allKeys) {
         NSObject *value = [dataDic objectForKey:key];
-        [self setValue:value forKey:key];
+        [self setValue: value forKey: key];
     }
     
     if (_base_model_xxx_config_before) {
