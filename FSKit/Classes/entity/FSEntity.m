@@ -79,6 +79,7 @@
     if (![dataDic isKindOfClass: NSDictionary.class]) {
         return;
     }
+    _valid = YES;
     _meta = dataDic;
         
     NSArray *allKeys = [dataDic allKeys];

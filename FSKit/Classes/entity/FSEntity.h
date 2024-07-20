@@ -15,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
  *  元数据，还可以通过其判断dictionary是否为NSDictianry，判断属性是否已经被设置
  */
 @property (nonatomic, readonly) NSDictionary    *meta;  // 原数据
+@property (nonatomic, assign)   BOOL            valid;  // 有效
 
 /**
  *  比如一个映射的属性需要设置默认值，就可以调用这个方法
