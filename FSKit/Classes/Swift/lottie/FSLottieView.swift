@@ -50,11 +50,7 @@ open class FSLottieView : UIView {
     }
     
     @objc public func play(fromFrame: CGFloat, toFrame: CGFloat, completion: LottieCompletionBlock? = nil) {
-        
-            let from_start = Double(fromFrame) / Double(lotView.animation?.framerate ?? 0)
-            let to_frame = Double(toFrame) / Double(lotView.animation?.framerate ?? 0)
-
-            lotView.play(fromFrame: from_start, toFrame: to_frame) { completed in
+            lotView.play(fromFrame: 0, toFrame: 90) { completed in
                 if (completion != nil) {
                     completion!(completed)
                 }
