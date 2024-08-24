@@ -16,11 +16,13 @@ open class FSLottieView : UIView {
     @objc public convenience init(frame: CGRect, name: String) {
         self.init(frame: frame)
         
-        let animation = LottieAnimation.named(name, bundle: Bundle.main, subdirectory: "json12")
-        mAnimationView.animation = animation
         mAnimationView.frame = self.bounds
         mAnimationView.loopMode = .loop
         self.addSubview(mAnimationView)
+
+        let animation = LottieAnimation.named(name, bundle: Bundle.main, subdirectory: "json12")
+        mAnimationView.animation = animation
+        
         mAnimationView.play()
       }
     
