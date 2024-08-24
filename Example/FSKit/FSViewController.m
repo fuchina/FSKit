@@ -96,13 +96,13 @@ typedef NS_ENUM(NSInteger, FSWeekdayIndex) {
 //    anView.backgroundColor = UIColor.yellowColor;
 //    [self.view addSubview: anView];
     
-    CGFloat maxWidth = UIScreen.mainScreen.bounds.size.width;
-    CGFloat maxHeight = UIScreen.mainScreen.bounds.size.height;
-    
-    FSLottieView *lotView = [[FSLottieView alloc] initWithName: @"data"];
+    FSLottieView *lotView = [[FSLottieView alloc] initWithFrame: CGRectMake(20, 300, 310.5, 672) name: @"data"];
     lotView.backgroundColor = UIColor.yellowColor;
-    lotView.frame = CGRectMake(200, 200, 310.5, 672);
     [self.view addSubview: lotView];
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        lotView.frame = CGRectMake(20, 200, 310.5, 672);
+    });
 }
 
 
