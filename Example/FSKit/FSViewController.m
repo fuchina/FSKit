@@ -96,9 +96,22 @@ typedef NS_ENUM(NSInteger, FSWeekdayIndex) {
 //    anView.backgroundColor = UIColor.yellowColor;
 //    [self.view addSubview: anView];
     
-    FSLottieView *lotView = [[FSLottieView alloc] initWithFrame: CGRectMake(20, 300, 310.5, 672) name: @"data" bundle: @"main"];
+    FSLottieView *lotView = [[FSLottieView alloc] initWithFrame: CGRectMake(20, 300, 310.5, 672) name: @"data" bundle: nil subdirectory: @"json12"];
     [self.view addSubview: lotView];
     lotView.lotView.backgroundColor = UIColor.yellowColor;
+//    [lotView playWithCompletion: ^ (BOOL finished) {
+//        NSLog(@"HELog here");
+//    }];
+//    [lotView play];
+//    [lotView loop_modeWithLoop: YES];
+    
+//    [lotView playFromFrame: 1 toFrame: 90 completion:^(BOOL finished) {
+//        NSLog(@"HELog here");
+//    }];
+    
+    [lotView playFromProgress: 0 toProgress: 1 completion:^(BOOL finished) {
+            NSLog(@"HELog here");
+    }];
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         lotView.frame = CGRectMake(20, 200, 372.6, 806.4);
