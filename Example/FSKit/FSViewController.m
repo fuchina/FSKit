@@ -10,7 +10,8 @@
 #import "FSModel.h"
 #import "FSSecondController.h"
 #import <FSKit/FSDate.h>
-
+#import <Lottie/Lottie-Swift.h>
+#import <FSKit/FSKit-Swift.h>
 
 typedef NS_ENUM(NSInteger, FSWeekdayIndex) {
     FSWeekdayIndexMonday = 1,
@@ -41,6 +42,8 @@ typedef NS_ENUM(NSInteger, FSWeekdayIndex) {
     [self.view addSubview:btn];
     [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-15-[btn]-15-|" options:0 metrics:nil views:NSDictionaryOfVariableBindings(btn)]];
     [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-100-[btn(44)]" options:0 metrics:nil views:NSDictionaryOfVariableBindings(btn)]];
+    
+    [self showLottieView];
 }
 
 - (void)click{    
@@ -87,10 +90,20 @@ typedef NS_ENUM(NSInteger, FSWeekdayIndex) {
     return FSWeekdayIndexSunday;
 }
 
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+- (void)showLottieView {
+    
+//    LottieAnimationView *anView = [[LottieAnimationView alloc] initWithFrame: CGRectMake(200, 200, 100, 100)];
+//    anView.backgroundColor = UIColor.yellowColor;
+//    [self.view addSubview: anView];
+    
+    CGFloat maxWidth = UIScreen.mainScreen.bounds.size.width;
+    CGFloat maxHeight = UIScreen.mainScreen.bounds.size.height;
+    
+    FSLottieView *lotView = [[FSLottieView alloc] initWithName: @"data"];
+    lotView.backgroundColor = UIColor.yellowColor;
+    lotView.frame = CGRectMake(200, 200, 310.5, 672);
+    [self.view addSubview: lotView];
 }
+
 
 @end

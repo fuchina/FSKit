@@ -5,6 +5,9 @@ target 'FSKit_Example' do
 
    pod 'FSKit', :path => '../'
 
+
+   pod 'lottie-ios'
+
 #  pod 'MLeaksFinder'
 
 end

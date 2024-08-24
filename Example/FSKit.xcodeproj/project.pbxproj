@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2D3395AC2C7992B000EEC78D /* json12 in Resources */ = {isa = PBXBuildFile; fileRef = 2D3395AB2C7992B000EEC78D /* json12 */; };
 		5C1B13232089BBF600D50AB6 /* FSLeftController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C1B13222089BBF600D50AB6 /* FSLeftController.m */; };
 		5C235EC5200DA506009A718E /* FSSecondController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C235EC4200DA506009A718E /* FSSecondController.m */; };
 		5C24E5F120DB458E008FD766 /* FSPageController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C24E5F020DB458E008FD766 /* FSPageController.m */; };
@@ -30,9 +31,12 @@
 		715DC7A71F4486A700209763 /* libsqlite3.0.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 715DC7A61F4486A700209763 /* libsqlite3.0.tbd */; };
 		71719F9F1E33DC2100824A3D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 71719F9D1E33DC2100824A3D /* LaunchScreen.storyboard */; };
 		873B8AEB1B1F5CCA007FD442 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 873B8AEA1B1F5CCA007FD442 /* Main.storyboard */; };
+		CC317B8BBECF236AFE72DB66 /* Pods_FSKit_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00899F27DDB9E2B2EF38F93F /* Pods_FSKit_Example.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		00899F27DDB9E2B2EF38F93F /* Pods_FSKit_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_FSKit_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		2D3395AB2C7992B000EEC78D /* json12 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = json12; sourceTree = "<group>"; };
 		368C77F8F9C048A3415DD619 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 		5C1B13212089BBF600D50AB6 /* FSLeftController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FSLeftController.h; sourceTree = "<group>"; };
 		5C1B13222089BBF600D50AB6 /* FSLeftController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FSLeftController.m; sourceTree = "<group>"; };
@@ -93,6 +97,7 @@
 				6003F590195388D20070C39A /* CoreGraphics.framework in Frameworks */,
 				6003F592195388D20070C39A /* UIKit.framework in Frameworks */,
 				6003F58E195388D20070C39A /* Foundation.framework in Frameworks */,
+				CC317B8BBECF236AFE72DB66 /* Pods_FSKit_Example.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -139,6 +144,7 @@
 				6003F58D195388D20070C39A /* Foundation.framework */,
 				6003F58F195388D20070C39A /* CoreGraphics.framework */,
 				6003F591195388D20070C39A /* UIKit.framework */,
+				00899F27DDB9E2B2EF38F93F /* Pods_FSKit_Example.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -173,6 +179,7 @@
 				6003F594195388D20070C39A /* Supporting Files */,
 				5C33620A1F7F911900FE73CD /* FSAPP.h */,
 				5C33620B1F7F911900FE73CD /* FSAPP.m */,
+				2D3395AB2C7992B000EEC78D /* json12 */,
 			);
 			name = "Example for FSKit";
 			path = FSKit;
@@ -289,6 +296,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2D3395AC2C7992B000EEC78D /* json12 in Resources */,
 				873B8AEB1B1F5CCA007FD442 /* Main.storyboard in Resources */,
 				71719F9F1E33DC2100824A3D /* LaunchScreen.storyboard in Resources */,
 				6003F5A9195388D20070C39A /* Images.xcassets in Resources */,
@@ -307,10 +315,12 @@
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-FSKit_Example/Pods-FSKit_Example-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/FSKit/FSKit.framework",
+				"${BUILT_PRODUCTS_DIR}/lottie-ios/Lottie.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FSKit.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Lottie.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -510,6 +520,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.ihumand.oxfordbook.staging;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "oxfordbook [staging] DEBUG";
+				SWIFT_VERSION = 5.0;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -532,6 +543,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "oxfordbook [staging] DEBUG";
+				SWIFT_VERSION = 5.0;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
