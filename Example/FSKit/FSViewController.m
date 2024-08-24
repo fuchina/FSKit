@@ -105,10 +105,10 @@ typedef NS_ENUM(NSInteger, FSWeekdayIndex) {
 //    [lotView play];
 //    [lotView loop_modeWithLoop: YES];
     
-    [lotView playFromFrame: 1 toFrame: 90 completion:^(BOOL finished) {
+    [lotView playFromFrame: 0 toFrame: 90 completion:^(BOOL finished) {
         NSLog(@"HELog here");
     }];
-    
+        
 //    [lotView playFromProgress: 0 toProgress: 1 completion:^(BOOL finished) {
 //            NSLog(@"HELog here");
 //    }];
