@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 54;
+	objectVersion = 53;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -30,13 +30,10 @@
 		715DC7A71F4486A700209763 /* libsqlite3.0.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 715DC7A61F4486A700209763 /* libsqlite3.0.tbd */; };
 		71719F9F1E33DC2100824A3D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 71719F9D1E33DC2100824A3D /* LaunchScreen.storyboard */; };
 		873B8AEB1B1F5CCA007FD442 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 873B8AEA1B1F5CCA007FD442 /* Main.storyboard */; };
-		B6769BE10AE471552390D0F0 /* Pods_FSKit_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A839B73BEEF9CD11FA28A3A /* Pods_FSKit_Example.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		368C77F8F9C048A3415DD619 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
-		4E236457D14880D225E4A0F1 /* Pods-FSKit_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FSKit_Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-FSKit_Tests/Pods-FSKit_Tests.debug.xcconfig"; sourceTree = "<group>"; };
-		5A839B73BEEF9CD11FA28A3A /* Pods_FSKit_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_FSKit_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5C1B13212089BBF600D50AB6 /* FSLeftController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FSLeftController.h; sourceTree = "<group>"; };
 		5C1B13222089BBF600D50AB6 /* FSLeftController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FSLeftController.m; sourceTree = "<group>"; };
 		5C235EC3200DA506009A718E /* FSSecondController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FSSecondController.h; sourceTree = "<group>"; };
@@ -80,7 +77,6 @@
 		606FC2411953D9B200FFA9A0 /* Tests-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Tests-Prefix.pch"; sourceTree = "<group>"; };
 		67216D52004FA03BF87068C1 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		6C92F3B49CE3BA9154E0B21C /* Pods-FSKit_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FSKit_Example.debug.xcconfig"; path = "Pods/Target Support Files/Pods-FSKit_Example/Pods-FSKit_Example.debug.xcconfig"; sourceTree = "<group>"; };
-		702FC77CD522515FF0C14578 /* Pods-FSKit_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FSKit_Tests.release.xcconfig"; path = "Pods/Target Support Files/Pods-FSKit_Tests/Pods-FSKit_Tests.release.xcconfig"; sourceTree = "<group>"; };
 		715DC7A61F4486A700209763 /* libsqlite3.0.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.0.tbd; path = usr/lib/libsqlite3.0.tbd; sourceTree = SDKROOT; };
 		71719F9E1E33DC2100824A3D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		873B8AEA1B1F5CCA007FD442 /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = Main.storyboard; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -97,7 +93,6 @@
 				6003F590195388D20070C39A /* CoreGraphics.framework in Frameworks */,
 				6003F592195388D20070C39A /* UIKit.framework in Frameworks */,
 				6003F58E195388D20070C39A /* Foundation.framework in Frameworks */,
-				B6769BE10AE471552390D0F0 /* Pods_FSKit_Example.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -144,7 +139,6 @@
 				6003F58D195388D20070C39A /* Foundation.framework */,
 				6003F58F195388D20070C39A /* CoreGraphics.framework */,
 				6003F591195388D20070C39A /* UIKit.framework */,
-				5A839B73BEEF9CD11FA28A3A /* Pods_FSKit_Example.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -229,8 +223,6 @@
 			children = (
 				6C92F3B49CE3BA9154E0B21C /* Pods-FSKit_Example.debug.xcconfig */,
 				ACC7F0B44215F340E427D347 /* Pods-FSKit_Example.release.xcconfig */,
-				4E236457D14880D225E4A0F1 /* Pods-FSKit_Tests.debug.xcconfig */,
-				702FC77CD522515FF0C14578 /* Pods-FSKit_Tests.release.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
@@ -314,7 +306,7 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-FSKit_Example/Pods-FSKit_Example-frameworks.sh",
-				"${PODS_ROOT}/../../FSKitA/FSKit.framework",
+				"${BUILT_PRODUCTS_DIR}/FSKit/FSKit.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
@@ -509,6 +501,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 5A28NPWUX4;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "FSKit/FSKit-Prefix.pch";
 				INFOPLIST_FILE = "FSKit/FSKit-Info.plist";
@@ -529,6 +522,7 @@
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 5A28NPWUX4;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "FSKit/FSKit-Prefix.pch";
 				INFOPLIST_FILE = "FSKit/FSKit-Info.plist";
