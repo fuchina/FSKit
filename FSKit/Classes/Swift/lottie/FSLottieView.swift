@@ -10,25 +10,27 @@ import Lottie
 
 @objc
 open class FSLottieView : UIView {
-    @objc public var mAnimationView = LottieAnimationView()
+    @objc public var lotView = LottieAnimationView()
     
     ///名称--创建动画
-    @objc public convenience init(frame: CGRect, name: String) {
+    @objc public convenience init(frame: CGRect, name: String, bundle: String? = nil) {
         self.init(frame: frame)
         
-        mAnimationView.frame = self.bounds
-        mAnimationView.loopMode = .loop
-        self.addSubview(mAnimationView)
+        let bundle_obj = Bundle(path: bundle ?? "main") ?? Bundle.main
+            
+        lotView.frame = self.bounds
+        lotView.loopMode = .loop
+        self.addSubview(lotView)
 
-        let animation = LottieAnimation.named(name, bundle: Bundle.main, subdirectory: "json12")
-        mAnimationView.animation = animation
+        let animation = LottieAnimation.named(name, bundle: bundle_obj, subdirectory: "json12")
+        lotView.animation = animation
         
-        mAnimationView.play()
+        lotView.play()
       }
     
     open override func layoutSubviews() {
         super.layoutSubviews()
         
-        mAnimationView.frame = self.bounds
+        lotView.frame = self.bounds
     }
 }
