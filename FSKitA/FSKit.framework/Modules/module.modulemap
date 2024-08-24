@@ -1,6 +1,0 @@
-framework module FSKit {
-  umbrella header "FSKit-umbrella.h"
-
-  export *
-  module * { export * }
-}
