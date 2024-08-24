@@ -102,11 +102,15 @@ typedef NS_ENUM(NSInteger, FSWeekdayIndex) {
 //    [lotView playWithCompletion: ^ (BOOL finished) {
 //        NSLog(@"HELog here");
 //    }];
-//    [lotView play];
-//    [lotView loop_modeWithLoop: YES];
+    [lotView play];
+    [lotView loop_modeWithLoop: YES];
     
-    [lotView playFromFrame: 0 toFrame: 90 completion:^(BOOL finished) {
-        NSLog(@"HELog here");
+//    [lotView playFromFrame: 0 toFrame: 90 completion:^(BOOL finished) {
+//        NSLog(@"HELog here");
+//    }];
+    
+    [lotView addTapWithEvent:^(CGPoint p) {
+        NSLog(@"HELog tap %f, %f", p.x, p.y);
     }];
         
 //    [lotView playFromProgress: 0 toProgress: 1 completion:^(BOOL finished) {
@@ -115,6 +119,8 @@ typedef NS_ENUM(NSInteger, FSWeekdayIndex) {
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         lotView.frame = CGRectMake(20, 200, 372.6, 806.4);
+        
+        [lotView playFromFrame: 0 toFrame: 45 completion: nil];
     });
 }
 

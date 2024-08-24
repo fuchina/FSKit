@@ -8,8 +8,11 @@
 import Foundation
 import Lottie
 
+public typealias LottieTapBlock = (_ point: CGPoint) -> Void
+
 @objc
 open class FSLottieView : UIView {
+    var _add_tap_callback : LottieTapBlock? = nil
     @objc public var lotView = LottieAnimationView()
     
     open override func layoutSubviews() {
@@ -61,6 +64,22 @@ open class FSLottieView : UIView {
         lotView.play(fromProgress: fromProgress, toProgress: toProgress) { completed in
             if (completion != nil) {
                 completion!(completed)
+            }
+        }
+    }
+    
+    @objc public func addTap(event: LottieTapBlock? = nil) {
+        _add_tap_callback = event
+        
+        let tap = UITapGestureRecognizer(target: self, action: #selector(tapEvent))
+        lotView.addGestureRecognizer(tap)
+    }
+    
+    @objc func tapEvent(tap: UITapGestureRecognizer) {
+        if tap.view != nil {
+            let _p : CGPoint = tap.location(in: tap.view)
+            if _add_tap_callback != nil {
+                _add_tap_callback!(_p)
             }
         }
     }
