@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2D3395AC2C7992B000EEC78D /* json12 in Resources */ = {isa = PBXBuildFile; fileRef = 2D3395AB2C7992B000EEC78D /* json12 */; };
 		5C1B13232089BBF600D50AB6 /* FSLeftController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C1B13222089BBF600D50AB6 /* FSLeftController.m */; };
 		5C235EC5200DA506009A718E /* FSSecondController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C235EC4200DA506009A718E /* FSSecondController.m */; };
 		5C24E5F120DB458E008FD766 /* FSPageController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C24E5F020DB458E008FD766 /* FSPageController.m */; };
@@ -36,7 +35,6 @@
 
 /* Begin PBXFileReference section */
 		00899F27DDB9E2B2EF38F93F /* Pods_FSKit_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_FSKit_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		2D3395AB2C7992B000EEC78D /* json12 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = json12; sourceTree = "<group>"; };
 		368C77F8F9C048A3415DD619 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 		5C1B13212089BBF600D50AB6 /* FSLeftController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FSLeftController.h; sourceTree = "<group>"; };
 		5C1B13222089BBF600D50AB6 /* FSLeftController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FSLeftController.m; sourceTree = "<group>"; };
@@ -179,7 +177,6 @@
 				6003F594195388D20070C39A /* Supporting Files */,
 				5C33620A1F7F911900FE73CD /* FSAPP.h */,
 				5C33620B1F7F911900FE73CD /* FSAPP.m */,
-				2D3395AB2C7992B000EEC78D /* json12 */,
 			);
 			name = "Example for FSKit";
 			path = FSKit;
@@ -296,7 +293,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2D3395AC2C7992B000EEC78D /* json12 in Resources */,
 				873B8AEB1B1F5CCA007FD442 /* Main.storyboard in Resources */,
 				71719F9F1E33DC2100824A3D /* LaunchScreen.storyboard in Resources */,
 				6003F5A9195388D20070C39A /* Images.xcassets in Resources */,

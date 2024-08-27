@@ -10,8 +10,6 @@
 #import "FSModel.h"
 #import "FSSecondController.h"
 #import <FSKit/FSDate.h>
-#import <Lottie/Lottie-Swift.h>
-#import <FSKit/FSKit-Swift.h>
 
 typedef NS_ENUM(NSInteger, FSWeekdayIndex) {
     FSWeekdayIndexMonday = 1,
@@ -41,9 +39,7 @@ typedef NS_ENUM(NSInteger, FSWeekdayIndex) {
     [btn addTarget:self action:@selector(click) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:btn];
     [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-15-[btn]-15-|" options:0 metrics:nil views:NSDictionaryOfVariableBindings(btn)]];
-    [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-100-[btn(44)]" options:0 metrics:nil views:NSDictionaryOfVariableBindings(btn)]];
-    
-    [self showLottieView];
+    [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-100-[btn(44)]" options:0 metrics:nil views:NSDictionaryOfVariableBindings(btn)]];    
 }
 
 - (void)click{    
@@ -89,40 +85,5 @@ typedef NS_ENUM(NSInteger, FSWeekdayIndex) {
     }
     return FSWeekdayIndexSunday;
 }
-
-- (void)showLottieView {
-    
-//    LottieAnimationView *anView = [[LottieAnimationView alloc] initWithFrame: CGRectMake(200, 200, 100, 100)];
-//    anView.backgroundColor = UIColor.yellowColor;
-//    [self.view addSubview: anView];
-    
-    FSLottieView *lotView = [[FSLottieView alloc] initWithFrame: CGRectMake(20, 300, 310.5, 672) name: @"data" bundle: nil subdirectory: @"json12"];
-    [self.view addSubview: lotView];
-    lotView.lotView.backgroundColor = UIColor.yellowColor;
-//    [lotView playWithCompletion: ^ (BOOL finished) {
-//        NSLog(@"HELog here");
-//    }];
-    [lotView play];
-    [lotView loop_modeWithLoop: YES];
-    
-//    [lotView playFromFrame: 0 toFrame: 90 completion:^(BOOL finished) {
-//        NSLog(@"HELog here");
-//    }];
-    
-    [lotView addTapWithEvent:^(CGPoint p) {
-        NSLog(@"HELog tap %f, %f", p.x, p.y);
-    }];
-        
-//    [lotView playFromProgress: 0 toProgress: 1 completion:^(BOOL finished) {
-//            NSLog(@"HELog here");
-//    }];
-    
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        lotView.frame = CGRectMake(20, 200, 372.6, 806.4);
-        
-        [lotView playFromFrame: 0 toFrame: 45 completion: nil];
-    });
-}
-
 
 @end
