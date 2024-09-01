@@ -40,6 +40,6 @@ Pod::Spec.new do |s|
   s.frameworks = 'UIKit', 'MapKit','CoreLocation','CoreTelephony','AVFoundation'
   s.libraries  = 'sqlite3'
   # s.dependency 'AFNetworking', '~> 2.3'
-  s.dependency 'lottie-ios' #, '2.5.3'
+  #s.dependency 'lottie-ios' #, '2.5.3'
 
 end
