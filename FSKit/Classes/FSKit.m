@@ -1548,10 +1548,22 @@ NSComparisonResult _fs_highAccuracy_compare(NSString *a, NSString *b) {
     if (phone == nil) {
         return;
     }
-    NSString *str= [[NSString alloc] initWithFormat:@"tel:%@",phone];
-    NSURL *url = [NSURL URLWithString:str];
+    
+    NSMutableString *numbers = [[NSMutableString alloc] init];
+    
+    NSMutableArray *charArray = [NSMutableArray array];
+    for (NSInteger i = 0; i < phone.length; i++) {
+        NSString *sub = [phone substringWithRange: NSMakeRange(i, 1)];
+        BOOL isn = [self isNumber: sub];
+        if (isn) {
+            [numbers appendString: sub];
+        }
+    }
+    
+    NSString *str= [[NSString alloc] initWithFormat: @"tel:%@", numbers];
+    NSURL *url = [NSURL URLWithString: str];
     if (@available(iOS 10.0, *)) {
-        [UIApplication.sharedApplication openURL: url options: @{} completionHandler:^(BOOL success) {}];
+        [UIApplication.sharedApplication openURL: url options: @{} completionHandler: ^(BOOL success) {}];
     }
 }
 
