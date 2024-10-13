@@ -1532,39 +1532,43 @@ NSComparisonResult _fs_highAccuracy_compare(NSString *a, NSString *b) {
     return [value componentsJoinedByString:@" "];
 }
 
-//+ (void)call:(NSString *)phone {
-//    if (phone != nil) {
-//        phone = [[phone componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] componentsJoinedByString:@""];
-//
-//        NSString *telUrl = [NSString stringWithFormat:@"telprompt:%@",phone];
-//        NSURL *url = [[NSURL alloc] initWithString:telUrl];
-//        if (@available(iOS 10.0, *)) {
-//            [UIApplication.sharedApplication openURL: url options: @{} completionHandler:^(BOOL success) {}];
-//        }
-//    }
-//}
++ (void)call:(NSString *)phone {
+    if (phone != nil) {        
+        NSString *numbers = [self stringsNumbersLeft: phone];
+        
+        NSString *telUrl = [NSString stringWithFormat: @"telprompt:%@", numbers];
+        NSURL *url = [[NSURL alloc] initWithString:telUrl];
+        if (@available(iOS 10.0, *)) {
+            [UIApplication.sharedApplication openURL: url options: @{} completionHandler:^(BOOL success) {}];
+        }
+    }
+}
 
 + (void)callPhoneWithNoNotice:(NSString *)phone {
     if (phone == nil) {
         return;
     }
     
-    NSMutableString *numbers = [[NSMutableString alloc] init];
-    
-//    NSMutableArray *charArray = [NSMutableArray array];
-    for (NSInteger i = 0; i < phone.length; i++) {
-        NSString *sub = [phone substringWithRange: NSMakeRange(i, 1)];
-        BOOL isn = [self isNumber: sub];
-        if (isn) {
-            [numbers appendString: sub];
-        }
-    }
-    
+    NSString *numbers = [self stringsNumbersLeft: phone];
+
     NSString *str= [[NSString alloc] initWithFormat: @"tel:%@", numbers];
     NSURL *url = [NSURL URLWithString: str];
     if (@available(iOS 10.0, *)) {
         [UIApplication.sharedApplication openURL: url options: @{} completionHandler: ^(BOOL success) {}];
     }
+}
+
++ (NSString *)stringsNumbersLeft:(NSString *)text {
+    NSMutableString *numbers = [[NSMutableString alloc] init];
+    
+    for (NSInteger i = 0; i < text.length; i++) {
+        NSString *sub = [text substringWithRange: NSMakeRange(i, 1)];
+        BOOL isn = [self isNumber: sub];
+        if (isn) {
+            [numbers appendString: sub];
+        }
+    }
+    return numbers;
 }
 
 + (NSString *)tenThousandNumber:(double)value {
