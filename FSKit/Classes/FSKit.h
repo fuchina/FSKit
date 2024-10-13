@@ -177,7 +177,7 @@ NSComparisonResult _fs_highAccuracy_compare(NSString *a, NSString *b);
 - (NSAttributedString *)middleLineForLabel:(NSString *)text;    // 中划线
 - (NSAttributedString *)underLineForLabel:(NSString *)text;     // 下划线
 
-+ (void)call:(NSString *)phone;
+//+ (void)call:(NSString *)phone;
 + (void)callPhoneWithNoNotice:(NSString *)phone;
 + (void)openAppByURLString:(NSString *)str;
 

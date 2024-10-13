@@ -1532,17 +1532,17 @@ NSComparisonResult _fs_highAccuracy_compare(NSString *a, NSString *b) {
     return [value componentsJoinedByString:@" "];
 }
 
-+ (void)call:(NSString *)phone {
-    if (phone != nil) {
-        phone = [[phone componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] componentsJoinedByString:@""];
-        
-        NSString *telUrl = [NSString stringWithFormat:@"telprompt:%@",phone];
-        NSURL *url = [[NSURL alloc] initWithString:telUrl];
-        if (@available(iOS 10.0, *)) {
-            [UIApplication.sharedApplication openURL: url options: @{} completionHandler:^(BOOL success) {}];
-        }
-    }
-}
+//+ (void)call:(NSString *)phone {
+//    if (phone != nil) {
+//        phone = [[phone componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] componentsJoinedByString:@""];
+//
+//        NSString *telUrl = [NSString stringWithFormat:@"telprompt:%@",phone];
+//        NSURL *url = [[NSURL alloc] initWithString:telUrl];
+//        if (@available(iOS 10.0, *)) {
+//            [UIApplication.sharedApplication openURL: url options: @{} completionHandler:^(BOOL success) {}];
+//        }
+//    }
+//}
 
 + (void)callPhoneWithNoNotice:(NSString *)phone {
     if (phone == nil) {
@@ -1551,7 +1551,7 @@ NSComparisonResult _fs_highAccuracy_compare(NSString *a, NSString *b) {
     
     NSMutableString *numbers = [[NSMutableString alloc] init];
     
-    NSMutableArray *charArray = [NSMutableArray array];
+//    NSMutableArray *charArray = [NSMutableArray array];
     for (NSInteger i = 0; i < phone.length; i++) {
         NSString *sub = [phone substringWithRange: NSMakeRange(i, 1)];
         BOOL isn = [self isNumber: sub];
