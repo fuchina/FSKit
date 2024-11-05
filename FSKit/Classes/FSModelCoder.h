@@ -34,6 +34,8 @@ typedef NS_ENUM(NSInteger, FSTriBool) {
 
 + (FSModelCoder *)fetch:(NSString *)key;
 
++ (BOOL)remove:(NSString *)key error:(NSError *_Nullable)error;
+
 @end
 
 NS_ASSUME_NONNULL_END

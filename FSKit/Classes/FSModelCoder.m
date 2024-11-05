@@ -99,6 +99,16 @@
     return coder;
 }
 
++ (BOOL)remove:(NSString *)key error:(NSError *)error {
+    NSString *filePath = [self filePath: key];
+    NSFileManager *fm = NSFileManager.defaultManager;
+    BOOL fileExists = [fm fileExistsAtPath: filePath];
+    if (fileExists) {
+        return [fm removeItemAtPath: filePath error: &error];
+    }
+    return YES;
+}
+
 + (NSString *)filePath:(NSString *)key {
     BOOL checkKey = [key isKindOfClass: NSString.class] && key.length;
     if (checkKey == NO) {
