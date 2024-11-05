@@ -24,7 +24,7 @@ typedef NS_ENUM(NSInteger, FSTriBool) {
 @property (nonatomic, copy)   NSString                          *string;
 
 /**
- *  只支持iOS12及以后
+ *  只支持iOS11及以后
  */
 + (NSError *)saveBoolean:(FSTriBool)boolean forKey:(NSString *)key;
 + (NSError *)saveString:(NSString *)string forKey:(NSString *)key;

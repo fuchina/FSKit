@@ -56,7 +56,7 @@
     
     NSError *error = nil;
     NSMutableData *data = nil;
-    if (@available(iOS 12.0, *)) {
+    if (@available(iOS 11.0, *)) {
         data = (NSMutableData *)[NSKeyedArchiver archivedDataWithRootObject: coder requiringSecureCoding: YES error: &error];
         NSAssert([data isKindOfClass:NSData.class], @"FSModelCoder：data创建失败: %@", error);
         if (error) {
@@ -79,7 +79,7 @@
     if (fileExists) {
         @try {
             NSMutableData *data = [[NSMutableData alloc] initWithContentsOfFile: filePath];
-            if (@available(iOS 12.0, *)) {
+            if (@available(iOS 11.0, *)) {
                 NSError *error = nil;
                 NSSet *sets = [NSSet setWithObjects: FSModelCoder.class, NSDictionary.class, NSArray.class, NSNumber.class, NSString.class, nil];  // 有哪些类类型，就传入
                 coder = [NSKeyedUnarchiver unarchivedObjectOfClasses: sets fromData: data error: &error];
