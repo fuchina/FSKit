@@ -1640,20 +1640,20 @@ NSComparisonResult _fs_highAccuracy_compare(NSString *a, NSString *b) {
     return ret;
 }
 
-+ (NSString *)showByTenThousand:(CGFloat)_rest {
++ (NSString *)showByTenThousand:(CGFloat)_rest money:(BOOL)money {
     NSString *_rest_show = nil;
-    if (_rest < 10000) {
-        _rest_show = @(_rest).stringValue;
-    } else if (_rest < 100000) {
-        _rest_show = [[NSString alloc] initWithFormat: @"%.2f万", _rest / 10000.0];
+    if (_rest < 100000) {
+        if (money) {
+            _rest_show = [self bankStyleDataThree: _rest];
+        } else {
+            _rest_show = @(_rest).stringValue;
+        }
     } else if (_rest < 1000000) {
-        _rest_show = [[NSString alloc] initWithFormat: @"%.1f万", _rest / 10000.0];
+        _rest_show = [[NSString alloc] initWithFormat: @"%.2f万", _rest / 10000.0];
     } else if (_rest < 100000000) {
         _rest_show = [[NSString alloc] initWithFormat: @"%.0f万", _rest / 10000.0];
-    } else if (_rest < 1000000000) {
-        _rest_show = [[NSString alloc] initWithFormat: @"%.2f亿", _rest / 100000000.0];
     } else if (_rest < 10000000000) {
-        _rest_show = [[NSString alloc] initWithFormat: @"%.1f亿", _rest / 100000000.0];
+        _rest_show = [[NSString alloc] initWithFormat: @"%.2f亿", _rest / 100000000.0];
     } else {
         _rest_show = [[NSString alloc] initWithFormat: @"%.0f亿", _rest / 100000000.0];
     }

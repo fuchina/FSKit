@@ -152,7 +152,7 @@ NSComparisonResult _fs_highAccuracy_compare(NSString *a, NSString *b);
 + (NSString *)showBetterFor2DigitInteger:(NSInteger)value;
 + (NSString *)showBetterFor5DigitInteger:(NSInteger)value;
 
-+ (NSString *)showByTenThousand:(CGFloat)value;
++ (NSString *)showByTenThousand:(CGFloat)value money:(BOOL)money;
 
 + (NSString *)base64StringForText:(NSString *)text;     // 将字符串转换为base64编码
 + (NSString *)textFromBase64String:(NSString *)text;    // 将base64转换为字符串
