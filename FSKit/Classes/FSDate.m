@@ -14,7 +14,7 @@ NSTimeInterval _fs_timeIntevalSince1970(void) {
 }
 
 NSInteger _fs_integerTimeIntevalSince1970(void) {
-    return (NSInteger)[[NSDate date] timeIntervalSince1970];
+    return (NSInteger)_fs_timeIntevalSince1970();
 }
 
 + (NSDate *)chinaDateByDate:(NSDate *)date {
