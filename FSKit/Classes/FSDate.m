@@ -416,4 +416,17 @@ NSInteger _fs_integerTimeIntevalSince1970(void) {
     return seconds / daySecond;
 }
 
++ (NSString *)yearDaysForSeconds:(CGFloat)seconds {
+    NSInteger days = ceil([self daysForSeconds: seconds]);
+    NSInteger years = days / 365;
+    NSInteger rest_days = days % 365;
+    if (years > 0) {
+        NSString *days_show = [[NSString alloc] initWithFormat: @"%ld年%ld天", years, rest_days];
+        return days_show;
+    } else {
+        NSString *days_show = [[NSString alloc] initWithFormat: @"%ld天", rest_days];
+        return days_show;
+    }
+}
+
 @end

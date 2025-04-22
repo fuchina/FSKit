@@ -126,4 +126,9 @@ NSInteger _fs_integerTimeIntevalSince1970(void);
  */
 + (CGFloat)daysForSeconds:(CGFloat)seconds;
 
+/**
+ *  X年Y天
+ */
++ (NSString *)yearDaysForSeconds:(CGFloat)seconds;
+
 @end
