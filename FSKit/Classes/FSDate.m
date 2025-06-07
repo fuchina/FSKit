@@ -116,8 +116,12 @@ NSInteger _fs_integerTimeIntevalSince1970(void) {
 }
 
 + (NSString *)ymdhsByTimeInterval:(NSTimeInterval)timeInterval {
-    NSDate *date = [[NSDate alloc] initWithTimeIntervalSince1970:timeInterval];
-    NSString *time = [FSDate stringWithDate:date formatter:nil];
+    return [self ymdhsByTimeInterval: timeInterval formatter: nil];
+}
+
++ (NSString *)ymdhsByTimeInterval:(NSTimeInterval)timeInterval formatter:(NSString *)formatter {
+    NSDate *date = [[NSDate alloc] initWithTimeIntervalSince1970: timeInterval];
+    NSString *time = [FSDate stringWithDate: date formatter: formatter];
     return time;
 }
 
