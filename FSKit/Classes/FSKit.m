@@ -1579,15 +1579,41 @@ NSComparisonResult _fs_highAccuracy_compare(NSString *a, NSString *b) {
     NSInteger mode = value % 100;
     NSString *ret = nil;
     if (mode == 0) {
-        ret = [[NSString alloc] initWithFormat:@"%ld", value / 100];
+        ret = [[NSString alloc] initWithFormat: @"%ld", value / 100];
     } else {
         mode = value % 10;
         if (mode == 0) {
-            ret = [[NSString alloc] initWithFormat:@"%.1f", ((CGFloat)value) / 100];
+            ret = [[NSString alloc] initWithFormat: @"%.1f", ((CGFloat)value) / 100];
         } else {
-            ret = [[NSString alloc] initWithFormat:@"%.2f", ((CGFloat)value) / 100];
+            ret = [[NSString alloc] initWithFormat: @"%.2f", ((CGFloat)value) / 100];
         }
     }
+    return ret;
+}
+
++ (NSString *)showBetterFor3DigitInteger:(NSInteger)value {
+    if (value == 0) {
+        return @"0";
+    }
+    
+    NSInteger mode = value % 1000;
+    NSString *ret = nil;
+    if (mode == 0) {
+        ret = [[NSString alloc] initWithFormat: @"%ld", value / 1000];
+    } else {
+        mode = value % 100;
+        if (mode == 0) {
+            ret = [[NSString alloc] initWithFormat: @"%.1f", ((CGFloat)value) / 1000];
+        } else {
+            mode = value % 10;
+            if (mode == 0) {
+                ret = [[NSString alloc] initWithFormat: @"%.2f", ((CGFloat)value) / 1000];
+            } else {
+                ret = [[NSString alloc] initWithFormat: @"%.3f", ((CGFloat)value) / 1000];
+            }
+        }
+    }
+    
     return ret;
 }
 
