@@ -11,6 +11,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface FSEntity : NSObject
 
+@property (nonatomic, assign)   NSInteger       aid;     // 数据id
+
 /**
  *  元数据，还可以通过其判断dictionary是否为NSDictianry，判断属性是否已经被设置
  */
