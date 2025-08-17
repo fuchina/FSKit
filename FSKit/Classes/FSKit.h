@@ -251,4 +251,9 @@ NSString *_fs_highAccuracy_divide(NSString *a,NSString *b);     // 除
  */
 + (UIWindowScene *)currentWindowScene;
 
+/**
+ *  字符串中只保留数字部分
+ */
++ (NSString *)digitalOnlyString:(NSString *)inputString;
+
 @end

@@ -1921,6 +1921,21 @@ NSString *_fs_highAccuracy_divide(NSString *a,NSString *b) {
     return nil;
 }
 
++ (NSString *)digitalOnlyString:(NSString *)inputString {
+    if (!inputString || inputString.length == 0) {
+        return @""; // 处理空输入
+    }
+    
+    // 正则表达式：匹配所有非数字字符（\D 等效于 [^0-9]）
+    NSString *regexPattern = @"\\D";
+    // 使用正则替换：移除非数字字符
+    NSString *result = [inputString stringByReplacingOccurrencesOfString: regexPattern
+                                                              withString: @""
+                                                                 options: NSRegularExpressionSearch
+                                                                   range: NSMakeRange(0, inputString.length)];
+    return result;
+}
+
 @end
 
 
