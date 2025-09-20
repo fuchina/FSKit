@@ -230,7 +230,7 @@ CGFloat _differentValueForIPad(CGFloat iPad, CGFloat iPhone);
  */
 + (CAGradientLayer *)gradientView:(UIView *)view frame:(CGRect)frame startPoint:(CGPoint)startPoint endPoint:(CGPoint)endPoint colors:(NSArray *)colors locations:(NSArray *)locations;
 
-- (UIEdgeInsets)safeAreaInsets_fs;
+//- (UIEdgeInsets)safeAreaInsets;
 
 @end
 

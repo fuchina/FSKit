@@ -277,12 +277,12 @@ CGFloat _differentValueForIPad(CGFloat iPad, CGFloat iPhone) {
     return gl;
 }
 
-- (UIEdgeInsets)safeAreaInsets_fs {
-    if (@available(iOS 11.0, *)) {
-        return self.safeAreaInsets;
-    } else {
-        return UIEdgeInsetsZero;
-    }
-}
+//- (UIEdgeInsets)safeAreaInsets {
+//    if (@available(iOS 11.0, *)) {
+//        return self.safeAreaInsets;
+//    } else {
+//        return UIEdgeInsetsZero;
+//    }
+//}
 
 @end
