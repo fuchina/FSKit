@@ -104,7 +104,8 @@
         
     } else {
         if ([value isEqual: NSNull.null]) {
-            value = nil;
+//            value = nil;  会崩
+            value = @"";
         } else if ([value isKindOfClass: NSNumber.class]) {
             value = [value stringValue];
         } else {
@@ -114,7 +115,13 @@
         }
     }
     
-    [super setValue: value forKey: key];
+    @try {
+        [super setValue: value forKey: key];
+    } @catch (NSException *exception) {
+//        NSLog(@"%@", exception);
+    } @finally {
+        
+    }
 }
 
 - (void)afterSetProperties {}
