@@ -433,4 +433,44 @@ NSInteger _fs_integerTimeIntevalSince1970(void) {
     }
 }
 
++ (NSString *)formatTimeDuration:(NSTimeInterval)totalSeconds {
+    if (totalSeconds < 0) {
+        return @"-";
+    }
+    
+    // 定义时间常量
+    const NSInteger secondsPerMinute = 60;
+    const NSInteger secondsPerHour = 60 * secondsPerMinute;   // 3600
+    const NSInteger secondsPerDay = 24 * secondsPerHour;      // 86400
+    const NSInteger secondsPerYear = 365 * secondsPerDay;     // 31536000
+    
+    // 计算各时间单位
+    NSInteger years = totalSeconds / secondsPerYear;
+    NSInteger days = ((NSInteger)totalSeconds % secondsPerYear) / secondsPerDay;
+    NSInteger hours = ((NSInteger)totalSeconds % secondsPerDay) / secondsPerHour;
+    NSInteger minutes = ((NSInteger)totalSeconds % secondsPerHour) / secondsPerMinute;
+    NSInteger seconds = (NSInteger)totalSeconds % secondsPerMinute;
+    
+    // 使用可变字符串拼接结果
+    NSMutableString *result = [NSMutableString string];
+    
+    if (years > 0) {
+        [result appendFormat: @"%ld年", (long)years];
+    }
+    if (days > 0) {
+        [result appendFormat: @"%ld天", (long)days];
+    }
+    if (hours > 0) {
+        [result appendFormat: @"%ld时", (long)hours];
+    }
+    if (minutes > 0) {
+        [result appendFormat: @"%ld分", (long)minutes];
+    }
+    if (seconds > 0 || result.length == 0) { // 确保即使所有单位都为0时，也至少显示"0秒"
+        [result appendFormat: @"%ld秒", (long)seconds];
+    }
+    
+    return [result copy];
+}
+
 @end
