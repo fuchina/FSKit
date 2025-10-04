@@ -1936,6 +1936,37 @@ NSString *_fs_highAccuracy_divide(NSString *a,NSString *b) {
     return result;
 }
 
++ (NSString *)bundleFile:(NSString *)pathForResource name:(NSString *)name ofType:(NSString *)type {
+    NSBundle *bundle = [self bundleWithName: pathForResource];
+    
+    NSString *filePath = [bundle pathForResource:name ofType:type];
+    NSAssert([filePath isKindOfClass: NSString.class], @"bundleURL filePath == nil", pathForResource, name, type);
+    if (!filePath) {
+        return nil;
+    }
+    
+#if DEBUG
+    NSFileManager *fm = [NSFileManager defaultManager];
+    __unused BOOL exist = [fm fileExistsAtPath: filePath];
+    NSAssert(exist == YES, @"文件不存在，bundle: %@, name: %@, type: %@", pathForResource, name, type);
+#endif
+    
+    return filePath;
+}
+
++ (NSBundle *)bundleWithName:(NSString *)bundle_name {
+    if (!([bundle_name isKindOfClass: NSString.class] && bundle_name.length)) {
+        bundle_name = @"main";
+    }
+        
+    NSBundle *bundle = [NSBundle bundleWithPath: [[NSBundle bundleForClass: [self class]] pathForResource: bundle_name ofType: @"bundle"]];
+
+//    NSString *bundlePath = [NSBundle.mainBundle pathForResource: bundle_name ofType: @"bundle"];
+//    NSBundle *bundle = [NSBundle bundleWithPath: bundlePath]; // 这种方式不行，当组件被打到静态库里面去的时候，就引用不到了
+    return bundle;
+}
+
+
 @end
 
 

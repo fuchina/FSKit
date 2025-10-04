@@ -256,4 +256,6 @@ NSString *_fs_highAccuracy_divide(NSString *a,NSString *b);     // 除
  */
 + (NSString *)digitalOnlyString:(NSString *)inputString;
 
++ (NSString *)bundleFile:(NSString *)bundle name:(NSString *)name ofType:(NSString *)type;
+
 @end
