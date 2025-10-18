@@ -1656,7 +1656,8 @@ NSComparisonResult _fs_highAccuracy_compare(NSString *a, NSString *b) {
     NSString *_rest_show = nil;
     if (_rest < 100000) {
         if (money) {
-            _rest_show = [self bankStyleDataThree: _rest];
+            _rest_show = [FSKit showBetterFor2DigitInteger: _rest * 100];
+//            [self bankStyleDataThree: _rest];
         } else {
             _rest_show = @(_rest).stringValue;
         }
