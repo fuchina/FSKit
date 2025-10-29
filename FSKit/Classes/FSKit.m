@@ -1966,6 +1966,13 @@ NSString *_fs_highAccuracy_divide(NSString *a,NSString *b) {
     return bundle;
 }
 
++ (void)feedback:(UIImpactFeedbackStyle)style {
+    
+    UIImpactFeedbackGenerator *impactGenerator = [[UIImpactFeedbackGenerator alloc] initWithStyle: style];
+    [impactGenerator prepare]; // 提前准备Taptic Engine，降低延迟
+    [impactGenerator impactOccurred];
+    
+}
 
 @end
 

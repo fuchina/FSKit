@@ -258,4 +258,9 @@ NSString *_fs_highAccuracy_divide(NSString *a,NSString *b);     // 除
 
 + (NSString *)bundleFile:(NSString *)bundle name:(NSString *)name ofType:(NSString *)type;
 
+/**
+ *  触感
+ */
++ (void)feedback:(UIImpactFeedbackStyle)style;
+
 @end
