@@ -1974,6 +1974,33 @@ NSString *_fs_highAccuracy_divide(NSString *a,NSString *b) {
     
 }
 
+//#import <mach/mach.h>
+//#import <sys/sysctl.h>
+
++ (void)printMemoryUsage {
+    // 获取当前应用内存使用
+    struct mach_task_basic_info info;
+    mach_msg_type_number_t size = sizeof(info);
+    kern_return_t kerr = task_info(mach_task_self(),
+                                   MACH_TASK_BASIC_INFO,
+                                   (task_info_t)&info,
+                                   &size);
+    
+    if (kerr == KERN_SUCCESS) {
+        int64_t usedMemory = info.resident_size;
+        int64_t totalMemory = [NSProcessInfo processInfo].physicalMemory;
+        
+        CGFloat usedMB = usedMemory / 1024.0 / 1024.0;
+        CGFloat totalMB = totalMemory / 1024.0 / 1024.0;
+        CGFloat usagePercentage = (CGFloat)usedMemory / (CGFloat)totalMemory * 100.0;
+        
+        NSLog(@"FSLog 内存使用: %.2f MB / %.2f MB (%.1f%%)",
+              usedMB, totalMB, usagePercentage);
+    } else {
+        NSLog(@"获取内存信息失败");
+    }
+}
+
 @end
 
 

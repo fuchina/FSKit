@@ -263,4 +263,6 @@ NSString *_fs_highAccuracy_divide(NSString *a,NSString *b);     // 除
  */
 + (void)feedback:(UIImpactFeedbackStyle)style;
 
++ (void)printMemoryUsage;
+
 @end
