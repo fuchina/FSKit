@@ -10,7 +10,7 @@
 @implementation FSDate
 
 NSTimeInterval _fs_timeIntevalSince1970(void) {
-    return [[NSDate date] timeIntervalSince1970];
+    return [NSDate.date timeIntervalSince1970];
 }
 
 NSInteger _fs_integerTimeIntevalSince1970(void) {
@@ -19,24 +19,26 @@ NSInteger _fs_integerTimeIntevalSince1970(void) {
 
 + (NSDate *)chinaDateByDate:(NSDate *)date {
     NSTimeZone *zone = [NSTimeZone systemTimeZone];
-    NSInteger interval = [zone secondsFromGMTForDate:date];
+    NSInteger interval = [zone secondsFromGMTForDate: date];
     return [date dateByAddingTimeInterval: interval];
 }
 
 + (NSInteger)daythOfYearForDate:(NSDate *)date {
     if (date == nil) {
-        date = [NSDate date];
+        date = NSDate.date;
     }
-    NSDateComponents *component = [self componentForDate:date];
+    
+    NSDateComponents *component = [self componentForDate: date];
     NSInteger year = component.year;
     NSInteger month = component.month;
     NSInteger day = component.day;
-    int a[12]={31,28,31,30,31,30,31,31,30,31,30,31};
-    int b[12]={31,29,31,30,31,30,31,31,30,31,30,31};
-    int i,sum=0;
-    if([self isLeapYear:(int)year])
-        for(i=0;i<month-1;i++)
-            sum+=b[i];
+    int a[12] = {31,28,31,30,31,30,31,31,30,31,30,31};
+    int b[12] = {31,29,31,30,31,30,31,31,30,31,30,31};
+    int i, sum= 0;
+    
+    if([self isLeapYear: year])
+        for(i = 0; i < month-1; i++)
+            sum += b[i];
     else
         for(i=0;i<month-1;i++)
             sum+=a[i];
@@ -45,17 +47,18 @@ NSInteger _fs_integerTimeIntevalSince1970(void) {
 }
 
 + (BOOL)isLeapYear:(NSInteger)year {
-    if ((year % 4  == 0 && year % 100 != 0)  || year % 400 == 0)
+    if ((year % 4  == 0 && year % 100 != 0)  || year % 400 == 0) {
         return YES;
-    else
-        return NO;
+    }
+    
+    return NO;
 }
 
 + (NSInteger)daysForMonth:(NSInteger)month year:(NSInteger)year {
     NSInteger days = 0;
-    BOOL isLeapYear = [self isLeapYear:(int)year];
+    BOOL isLeapYear = [self isLeapYear: year];
     BOOL isBigMonth = NO;
-    if (month <=7) {
+    if (month <= 7) {
         if (month % 2 == 1) {
             isBigMonth = YES;
         }
@@ -86,33 +89,45 @@ NSInteger _fs_integerTimeIntevalSince1970(void) {
 }
 
 + (NSDateComponents *)componentForDate:(NSDate *)date {
-    NSCalendar *calendar = [NSCalendar calendarWithIdentifier:NSCalendarIdentifierGregorian];
-    NSDateComponents *components = [calendar components:NSCalendarUnitYear | NSCalendarUnitMonth | NSCalendarUnitDay | NSCalendarUnitHour | NSCalendarUnitMinute | NSCalendarUnitSecond | NSCalendarUnitWeekOfMonth | NSCalendarUnitWeekday | NSCalendarUnitWeekOfMonth | NSCalendarUnitWeekOfYear fromDate:date];
+    
+    NSCalendar *calendar = [NSCalendar calendarWithIdentifier: NSCalendarIdentifierGregorian];  // UTC
+    
+    /**
+     *  NSTimeZone.localTimeZone，即设备当前时区，可以不写，因为方法会隐含；写上是为了增加可读性。
+     *  比如中国是UTC+8，所以在英国下午15点59分59秒（不考虑冬令时夏令时），中国已经23点59分59秒了，也就是下一秒中国就要跨天了。
+     */
+    calendar.timeZone = NSTimeZone.localTimeZone;
+    
+    NSDateComponents *components = [calendar components: NSCalendarUnitYear | NSCalendarUnitMonth | NSCalendarUnitDay | NSCalendarUnitHour | NSCalendarUnitMinute | NSCalendarUnitSecond | NSCalendarUnitWeekOfMonth | NSCalendarUnitWeekday | NSCalendarUnitWeekOfMonth | NSCalendarUnitWeekOfYear fromDate: date];
+    
     return components;
 }
 
 + (NSDate *)dateByString:(NSString *)str formatter:(NSString *)formatter {
-    if (!([str isKindOfClass:NSString.class] && str.length)) {
+    if (!([str isKindOfClass: NSString.class] && str.length)) {
         return nil;
     }
     
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    [dateFormatter setDateFormat:formatter ? : @"yyyy-MM-dd HH:mm:ss"];
-    dateFormatter.locale = [NSLocale localeWithLocaleIdentifier:@"zh_CN"];  // 必须写，否则date会为nil
-    NSDate *date = [dateFormatter dateFromString:str];
+    [dateFormatter setDateFormat: formatter ? : @"yyyy-MM-dd HH:mm:ss"];
+    dateFormatter.locale = [NSLocale localeWithLocaleIdentifier: @"zh_CN"];  // 必须写，否则date会为nil
+    NSDate *date = [dateFormatter dateFromString: str];
+    
     if (date == nil) {
-        NSAssert([date isKindOfClass:NSDate.class], @"date创建失败");
+        NSAssert([date isKindOfClass: NSDate.class], @"date创建失败");
     }
+    
     return date;
 }
 
 + (NSString *)stringWithDate:(NSDate *)date formatter:(NSString *)formatter {
-    if (![date isKindOfClass:NSDate.class]) {
+    if (![date isKindOfClass: NSDate.class]) {
         return nil;
     }
+    
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    [dateFormatter setDateFormat:formatter?:@"yyyy-MM-dd HH:mm:ss"];
-    return [dateFormatter stringFromDate:date];
+    [dateFormatter setDateFormat: formatter ? : @"yyyy-MM-dd HH:mm:ss"];
+    return [dateFormatter stringFromDate: date];
 }
 
 + (NSString *)ymdhsByTimeInterval:(NSTimeInterval)timeInterval {
@@ -127,15 +142,15 @@ NSInteger _fs_integerTimeIntevalSince1970(void) {
 
 + (NSString *)ymdhsByTimeIntervalString:(NSString *)timeInterval {
     NSTimeInterval t = [timeInterval doubleValue];
-    return [self ymdhsByTimeInterval:t];
+    return [self ymdhsByTimeInterval: t];
 }
 
 + (NSDateComponents *)chineseDate:(NSDate *)date {
-    if (![date isKindOfClass:NSDate.class]) {
+    if (![date isKindOfClass: NSDate.class]) {
         return nil;
     }
     NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier: NSCalendarIdentifierChinese];
-    NSDateComponents *components = [calendar components:NSCalendarUnitYear | NSCalendarUnitMonth | NSCalendarUnitDay | NSCalendarUnitHour | NSCalendarUnitMinute | NSCalendarUnitSecond fromDate:date];
+    NSDateComponents *components = [calendar components:NSCalendarUnitYear | NSCalendarUnitMonth | NSCalendarUnitDay | NSCalendarUnitHour | NSCalendarUnitMinute | NSCalendarUnitSecond fromDate: date];
     return components;
 }
 
@@ -143,8 +158,8 @@ NSInteger _fs_integerTimeIntevalSince1970(void) {
     if (![date isKindOfClass:NSDate.class]) {
         return nil;
     }
-    NSDateComponents *components = [self chineseDate:date];
-    return @[[self chineseCalendarYear:components.year - 1],[self chineseCalendarMonth:components.month - 1],[self chineseCalendarDay:components.day - 1]];
+    NSDateComponents *components = [self chineseDate: date];
+    return @[[self chineseCalendarYear: components.year - 1], [self chineseCalendarMonth: components.month - 1], [self chineseCalendarDay: components.day - 1]];
 }
 
 + (NSString *)chineseCalendarYear:(NSInteger)index {
@@ -186,20 +201,20 @@ NSInteger _fs_integerTimeIntevalSince1970(void) {
     //上次时间
     NSDateFormatter *dateFormatter1 = [[NSDateFormatter alloc] init];
     dateFormatter1.dateFormat = format1;
-    NSDate *lastDate = [dateFormatter1 dateFromString:lastTime];
+    NSDate *lastDate = [dateFormatter1 dateFromString: lastTime];
     //当前时间
-    NSDateFormatter *dateFormatter2 = [[NSDateFormatter alloc]init];
+    NSDateFormatter *dateFormatter2 = [[NSDateFormatter alloc] init];
     dateFormatter2.dateFormat = format2;
-    NSDate *currentDate = [dateFormatter2 dateFromString:currentTime];
-    return [self timeIntervalFromLastTime:lastDate ToCurrentTime:currentDate];
+    NSDate *currentDate = [dateFormatter2 dateFromString: currentTime];
+    return [self timeIntervalFromLastTime: lastDate ToCurrentTime: currentDate];
 }
 
 + (NSString *)timeIntervalFromLastTime:(NSDate *)lastTime ToCurrentTime:(NSDate *)currentTime {
     NSTimeZone *timeZone = [NSTimeZone systemTimeZone];
     //上次时间
-    NSDate *lastDate = [lastTime dateByAddingTimeInterval:[timeZone secondsFromGMTForDate:lastTime]];
+    NSDate *lastDate = [lastTime dateByAddingTimeInterval: [timeZone secondsFromGMTForDate: lastTime]];
     //当前时间
-    NSDate *currentDate = [currentTime dateByAddingTimeInterval:[timeZone secondsFromGMTForDate:currentTime]];
+    NSDate *currentDate = [currentTime dateByAddingTimeInterval: [timeZone secondsFromGMTForDate: currentTime]];
     //时间间隔
     NSInteger intevalTime = [currentDate timeIntervalSinceReferenceDate] - [lastDate timeIntervalSinceReferenceDate];
     
@@ -213,108 +228,112 @@ NSInteger _fs_integerTimeIntevalSince1970(void) {
     if (minutes <= 10) {
         return  @"刚刚";
     } else if (minutes < 60) {
-        return [NSString stringWithFormat: @"%ld分钟前",(long)minutes];
+        return [NSString stringWithFormat: @"%ld分钟前", minutes];
     } else if (hours < 24) {
-        return [NSString stringWithFormat: @"%ld小时前",(long)hours];
+        return [NSString stringWithFormat: @"%ld小时前", hours];
     } else if (day < 30) {
-        return [NSString stringWithFormat: @"%ld天前",(long)day];
+        return [NSString stringWithFormat: @"%ld天前", day];
     } else if (month < 12) {
         NSDateFormatter * df =[[NSDateFormatter alloc] init];
         df.dateFormat = @"M月d日";
-        NSString * time = [df stringFromDate:lastDate];
+        NSString * time = [df stringFromDate: lastDate];
         return time;
     } else if (yers >= 1) {
         NSDateFormatter * df =[[NSDateFormatter alloc] init];
         df.dateFormat = @"yyyy年M月d日";
-        NSString * time = [df stringFromDate:lastDate];
+        NSString * time = [df stringFromDate: lastDate];
         return time;
     }
+    
     return @"";
 }
 
 + (BOOL)isTheSameDayA:(NSDate *)aDate b:(NSDate *)bDate {
-    if (!([aDate isKindOfClass:NSDate.class] && [bDate isKindOfClass:NSDate.class])) {
+    if (!([aDate isKindOfClass: NSDate.class] && [bDate isKindOfClass: NSDate.class])) {
         return NO;
     }
-    NSDateComponents *f = [self componentForDate:aDate];
-    NSDateComponents *s = [self componentForDate:bDate];
+    
+    NSDateComponents *f = [self componentForDate: aDate];
+    NSDateComponents *s = [self componentForDate: bDate];
     return (f.year == s.year) && (f.month == s.month) && (f.day == s.day);
 }
 
 + (NSInteger)theFirstSecondOfMonth:(NSDate *)date {
-    return [self publicFunction:date str:^NSString *(NSDateComponents *c) {
-        NSString *str = [[NSString alloc] initWithFormat:@"%d-%@-01 00:00:00",(int)c.year, [self twoChar:c.month]];
+    return [self publicFunction: date str: ^ NSString *(NSDateComponents *c) {
+        NSString *str = [[NSString alloc] initWithFormat: @"%ld-%@-01 00:00:00", c.year, [self twoChar: c.month]];
         return str;
     }];
 }
 
 + (NSInteger)theLastSecondOfMonth:(NSDate *)date {
-    return [self publicFunction:date str:^NSString *(NSDateComponents *c) {
-        NSInteger days = [self daysForMonth:c.month year:c.year];
-        NSString *str = [[NSString alloc] initWithFormat:@"%d-%@-%d 23:59:59",(int)c.year, [self twoChar:c.month],(int)days];
+    return [self publicFunction: date str: ^ NSString *(NSDateComponents *c) {
+        NSInteger days = [self daysForMonth: c.month year: c.year];
+        NSString *str = [[NSString alloc] initWithFormat: @"%ld-%@-%ld 23:59:59", c.year, [self twoChar: c.month], days];
         return str;
     }];
 }
 
 + (NSInteger)theFirstSecondOfDay:(NSDate *)date {
-    return [self publicFunction:date str:^NSString *(NSDateComponents *c) {
-        NSString *str = [[NSString alloc] initWithFormat:@"%d-%@-%@ 00:00:00",(int)c.year, [self twoChar:c.month], [self twoChar:c.day]];
+    return [self publicFunction: date str: ^ NSString *(NSDateComponents *c) {
+        NSString *str = [[NSString alloc] initWithFormat: @"%ld-%@-%@ 00:00:00", c.year, [self twoChar: c.month], [self twoChar: c.day]];
         return str;
     }];
 }
 
 + (NSInteger)theLastSecondOfDay:(NSDate *)date {
-    return [self publicFunction:date str:^NSString *(NSDateComponents *c) {
-        NSString *str = [[NSString alloc] initWithFormat:@"%d-%@-%@ 23:59:59",(int)c.year, [self twoChar:c.month], [self twoChar:c.day]];
+    return [self publicFunction: date str: ^ NSString *(NSDateComponents *c) {
+        NSString *str = [[NSString alloc] initWithFormat: @"%ld-%@-%@ 23:59:59", c.year, [self twoChar: c.month], [self twoChar: c.day]];
         return str;
     }];
 }
 
 + (NSInteger)theFirstSecondOfYear:(NSInteger)year {
-    NSString *str = [[NSString alloc] initWithFormat:@"%@-01-01 00:00:00",@(year)];
-    NSDate *result = [self dateByString:str formatter:nil];
+    NSString *str = [[NSString alloc] initWithFormat: @"%ld-01-01 00:00:00", year];
+    NSDate *result = [self dateByString: str formatter: nil];
     NSTimeInterval t = (NSInteger)[result timeIntervalSince1970];
     return t;
 }
 
 + (NSInteger)theLastSecondOfYear:(NSInteger)year {
-    NSString *str = [[NSString alloc] initWithFormat:@"%@-12-31 23:59:59",@(year)];
-    NSDate *result = [self dateByString:str formatter:nil];
+    NSString *str = [[NSString alloc] initWithFormat: @"%@-12-31 23:59:59",@(year)];
+    NSDate *result = [self dateByString: str formatter: nil];
     NSTimeInterval t = (NSInteger)[result timeIntervalSince1970];
     return t;
 }
 
 + (void)theFirstAndLastSecondOfYear:(NSInteger)year first:(NSInteger *)firstSecond last:(NSInteger *)lastSecond {
-    NSString *first = [[NSString alloc] initWithFormat:@"%ld-01-01 00:00:00", year];
-    NSString *last = [[NSString alloc] initWithFormat:@"%ld-12-31 23:59:59", year];
-    NSDate *firstDate = [self dateByString:first formatter:nil];
-    NSDate *lastDate = [self dateByString:last formatter:nil];
+    NSString *first = [[NSString alloc] initWithFormat: @"%ld-01-01 00:00:00", year];
+    NSString *last = [[NSString alloc] initWithFormat: @"%ld-12-31 23:59:59", year];
+    NSDate *firstDate = [self dateByString: first formatter: nil];
+    NSDate *lastDate = [self dateByString: last formatter: nil];
     *firstSecond = (NSInteger)[firstDate timeIntervalSince1970];
     *lastSecond = (NSInteger)[lastDate timeIntervalSince1970];
 }
 
 + (NSInteger)publicFunction:(NSDate *)date str:(NSString *(^)(NSDateComponents *c))callback {
-    if (![date isKindOfClass:NSDate.class]) {
+    if (![date isKindOfClass: NSDate.class]) {
         return 0;
     }
-    NSDateComponents *c = [self componentForDate:date];
+    
+    NSDateComponents *c = [self componentForDate: date];
     NSString *str = callback(c);
-    return [self secondsForComponents:c dateString:str];
+    return [self secondsForComponents:c dateString: str];
 }
 
 + (NSInteger)secondsForComponents:(NSDateComponents *)c dateString:(NSString *)dateString {
-    if (![c isKindOfClass:NSDateComponents.class]) {
+    if (![c isKindOfClass: NSDateComponents.class]) {
         return 0;
     }
-    NSDate *result = [self dateByString:dateString formatter:nil];
+    
+    NSDate *result = [self dateByString: dateString formatter: nil];
     NSTimeInterval t = (NSInteger)[result timeIntervalSince1970];
     return t;
 }
 
 + (NSArray<NSDate *> *)solarsForLunar:(NSInteger)year month:(NSInteger)month day:(NSInteger)day {
-    NSString *string = [[NSString alloc] initWithFormat:@"%ld-%@-%@ 23:59:59", year, [self twoChar:month], [self twoChar:day]];
-    NSDate *date = [self dateByString:string formatter:nil];
-    NSDateComponents *lunarComponents = [self chineseDate:date];
+    NSString *string = [[NSString alloc] initWithFormat: @"%ld-%@-%@ 23:59:59", year, [self twoChar: month], [self twoChar: day]];
+    NSDate *date = [self dateByString: string formatter: nil];
+    NSDateComponents *lunarComponents = [self chineseDate: date];
     BOOL found = (lunarComponents.month == month) && (lunarComponents.day == day);
     if (found == YES) {
         NSAssert(YES == NO, @"这种情况应该不会出现");
@@ -324,24 +343,24 @@ NSInteger _fs_integerTimeIntevalSince1970(void) {
     // 农历日期会超过阳历日期吗？假设不会，那就往后找
     NSMutableArray *dates = [[NSMutableArray alloc] init];
     while (found == NO) {
-        date = [NSDate dateWithTimeInterval:86400 sinceDate:date];  //  后一天
+        date = [NSDate dateWithTimeInterval: 86400 sinceDate: date];  //  后一天
         lunarComponents = [self chineseDate:date];
         found = (lunarComponents.month == month) && (lunarComponents.day == day);
         
         if (found) {  // 再往后找32天，处理农历闰月的情况
-            [dates addObject:date];
+            [dates addObject: date];
             
             // 下一个月是不是闰月，农历每个月有30天或29天，取35天跳到下一个月
             NSInteger addDays = 35;
             if (day > 20) {
                 addDays = 15;
             }
-            NSDate *runDate = [NSDate dateWithTimeInterval:86400 * addDays sinceDate:date];
-            lunarComponents = [self chineseDate:runDate];
+            NSDate *runDate = [NSDate dateWithTimeInterval: 86400 * addDays sinceDate: date];
+            lunarComponents = [self chineseDate: runDate];
             if (lunarComponents.isLeapMonth) {  // 是闰月，需要找到该闰月日期下的阳历
                 runDate = [NSDate dateWithTimeInterval: 86400 * (day - lunarComponents.day) sinceDate: runDate];
                 
-                [dates addObject:runDate];
+                [dates addObject: runDate];
             }
         }
     }
@@ -350,7 +369,7 @@ NSInteger _fs_integerTimeIntevalSince1970(void) {
 }
 
 + (NSDate *)usefulSolarForLunar:(NSInteger)year month:(NSInteger)month day:(NSInteger)day forDateTimestamp:(NSTimeInterval)timestamp {
-    NSArray *dates = [self solarsForLunar:year month:month day:day];
+    NSArray *dates = [self solarsForLunar: year month: month day: day];
     if (dates.count == 1) {
         return dates.firstObject;
     }
@@ -365,8 +384,8 @@ NSInteger _fs_integerTimeIntevalSince1970(void) {
 }
 
 + (FSLunarDate *)lunarDateForSolar:(NSDate *)solar {
-    NSDateComponents *lunarComponents = [self chineseDate:solar];
-    NSDateComponents *solarComponents = [self componentForDate:solar];
+    NSDateComponents *lunarComponents = [self chineseDate: solar];
+    NSDateComponents *solarComponents = [self componentForDate: solar];
     NSInteger year = solarComponents.year;
     if (lunarComponents.month > solarComponents.month) {
         year = year - 1;
@@ -383,13 +402,13 @@ NSInteger _fs_integerTimeIntevalSince1970(void) {
 + (NSString *)ChineseWeek:(NSInteger)week {
     static NSArray *weeks = nil;
     if (!weeks) {
-        weeks = @[@"",@"星期日",@"星期一",@"星期二",@"星期三",@"星期四",@"星期五",@"星期六"];;
+        weeks = @[@"", @"星期日", @"星期一", @"星期二", @"星期三", @"星期四", @"星期五", @"星期六"];
     }
     return weeks[week];
 }
 
 + (NSDate *)date {
-    NSDate *date = [NSDate date];
+    NSDate *date = NSDate.date;
     return date;
 }
 
@@ -398,21 +417,22 @@ NSInteger _fs_integerTimeIntevalSince1970(void) {
     NSInteger lastYearMonth = components.month;
     NSInteger lastYearDay = components.day;
     if (components.month == 2 && components.day == 29) {
-        BOOL isLeapYear = [FSDate isLeapYear:lastYearYear];
+        BOOL isLeapYear = [FSDate isLeapYear: lastYearYear];
         if (!isLeapYear) {
             lastYearDay = 28;
         }
     }
-    NSString *lastYearString = [[NSString alloc] initWithFormat:@"%ld-%@-%@", lastYearYear, [self twoChar:lastYearMonth], [self twoChar:lastYearDay]];
-    NSDate *lastYearThisDay = [FSDate dateByString:lastYearString formatter:@"yyyy-MM-dd 00:00:00"];
+    
+    NSString *lastYearString = [[NSString alloc] initWithFormat: @"%ld-%@-%@", lastYearYear, [self twoChar: lastYearMonth], [self twoChar: lastYearDay]];
+    NSDate *lastYearThisDay = [FSDate dateByString: lastYearString formatter: @"yyyy-MM-dd 00:00:00"];
     return lastYearThisDay;
 }
 
 + (NSString *)twoChar:(NSInteger)value {
     if (value < 10) {
-        return [[NSString alloc] initWithFormat:@"0%ld", value];
+        return [[NSString alloc] initWithFormat: @"0%ld", value];
     }
-    return [[NSString alloc] initWithFormat:@"%ld", value];
+    return [[NSString alloc] initWithFormat: @"%ld", value];
 }
 
 + (CGFloat)daysForSeconds:(CGFloat)seconds {
@@ -455,22 +475,22 @@ NSInteger _fs_integerTimeIntevalSince1970(void) {
     NSMutableString *result = [NSMutableString string];
     
     if (years > 0) {
-        [result appendFormat: @"%ld年", (long)years];
+        [result appendFormat: @"%ld年", years];
     }
     if (days > 0) {
-        [result appendFormat: @"%ld天", (long)days];
+        [result appendFormat: @"%ld天", days];
     }
     if (hours > 0) {
-        [result appendFormat: @"%ld时", (long)hours];
+        [result appendFormat: @"%ld时", hours];
     }
     if (minutes > 0) {
-        [result appendFormat: @"%ld分", (long)minutes];
+        [result appendFormat: @"%ld分", minutes];
     }
     if (seconds > 0 || result.length == 0) { // 确保即使所有单位都为0时，也至少显示"0秒"
-        [result appendFormat: @"%ld秒", (long)seconds];
+        [result appendFormat: @"%ld秒", seconds];
     }
     
-    return [result copy];
+    return result.copy;
 }
 
 @end
