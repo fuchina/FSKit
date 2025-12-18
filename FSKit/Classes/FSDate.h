@@ -5,6 +5,11 @@
 //  Created by Fudongdong on 2018/4/3.
 //
 
+/**
+ *  在地球的任何地方，UTC时间秒数都是一样的
+ *  拿到UTC的时间秒数，在北京（+8）表达出来比伦敦（+0）要快8个小时，所以很多方法都隐含了本地时区
+ */
+
 #import <Foundation/Foundation.h>
 #import "FSLunarDate.h"
 

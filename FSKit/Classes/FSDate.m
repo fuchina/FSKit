@@ -128,6 +128,7 @@ NSInteger _fs_integerTimeIntevalSince1970(void) {
     
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     [dateFormatter setDateFormat: formatter ? : @"yyyy-MM-dd HH:mm:ss"];
+    //  这里应该隐含了   dateFormatter.timeZone = NSTimeZone.localTimeZone;
     return [dateFormatter stringFromDate: date];
 }
 
@@ -151,6 +152,7 @@ NSInteger _fs_integerTimeIntevalSince1970(void) {
         return nil;
     }
     NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier: NSCalendarIdentifierChinese];
+    // 同上，肯定隐含了     calendar.timeZone = NSTimeZone.localTimeZone;
     NSDateComponents *components = [calendar components:NSCalendarUnitYear | NSCalendarUnitMonth | NSCalendarUnitDay | NSCalendarUnitHour | NSCalendarUnitMinute | NSCalendarUnitSecond fromDate: date];
     return components;
 }
