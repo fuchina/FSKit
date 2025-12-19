@@ -17,35 +17,6 @@ NSInteger _fs_integerTimeIntevalSince1970(void) {
     return (NSInteger)_fs_timeIntevalSince1970();
 }
 
-+ (NSDate *)chinaDateByDate:(NSDate *)date {
-    NSTimeZone *zone = [NSTimeZone systemTimeZone];
-    NSInteger interval = [zone secondsFromGMTForDate: date];
-    return [date dateByAddingTimeInterval: interval];
-}
-
-+ (NSInteger)daythOfYearForDate:(NSDate *)date {
-    if (date == nil) {
-        date = NSDate.date;
-    }
-    
-    NSDateComponents *component = [self componentForDate: date];
-    NSInteger year = component.year;
-    NSInteger month = component.month;
-    NSInteger day = component.day;
-    int a[12] = {31,28,31,30,31,30,31,31,30,31,30,31};
-    int b[12] = {31,29,31,30,31,30,31,31,30,31,30,31};
-    int i, sum= 0;
-    
-    if([self isLeapYear: year])
-        for(i = 0; i < month-1; i++)
-            sum += b[i];
-    else
-        for(i=0;i<month-1;i++)
-            sum+=a[i];
-    sum+=day;
-    return sum;
-}
-
 + (BOOL)isLeapYear:(NSInteger)year {
     if ((year % 4  == 0 && year % 100 != 0)  || year % 400 == 0) {
         return YES;
@@ -158,7 +129,7 @@ NSInteger _fs_integerTimeIntevalSince1970(void) {
 }
 
 + (NSArray<NSString *> *)chineseCalendarForDate:(NSDate *)date {
-    if (![date isKindOfClass:NSDate.class]) {
+    if (![date isKindOfClass: NSDate.class]) {
         return nil;
     }
     NSDateComponents *components = [self chineseDate: date];
@@ -187,70 +158,6 @@ NSInteger _fs_integerTimeIntevalSince1970(void) {
     return chineseYears[index % chineseYears.count];
 }
 
-/**
- *  计算上次日期距离现在多久
- *
- *  @param lastTime    上次日期(需要和格式对应)
- *  @param format1     上次日期格式
- *  @param currentTime 最近日期(需要和格式对应)
- *  @param format2     最近日期格式
- *
- *  @return xx分钟前、xx小时前、xx天前
- */
-+ (NSString *)timeIntervalFromLastTime:(NSString *)lastTime
-                        lastTimeFormat:(NSString *)format1
-                         ToCurrentTime:(NSString *)currentTime
-                     currentTimeFormat:(NSString *)format2 {
-    //上次时间
-    NSDateFormatter *dateFormatter1 = [[NSDateFormatter alloc] init];
-    dateFormatter1.dateFormat = format1;
-    NSDate *lastDate = [dateFormatter1 dateFromString: lastTime];
-    //当前时间
-    NSDateFormatter *dateFormatter2 = [[NSDateFormatter alloc] init];
-    dateFormatter2.dateFormat = format2;
-    NSDate *currentDate = [dateFormatter2 dateFromString: currentTime];
-    return [self timeIntervalFromLastTime: lastDate ToCurrentTime: currentDate];
-}
-
-+ (NSString *)timeIntervalFromLastTime:(NSDate *)lastTime ToCurrentTime:(NSDate *)currentTime {
-    NSTimeZone *timeZone = [NSTimeZone systemTimeZone];
-    //上次时间
-    NSDate *lastDate = [lastTime dateByAddingTimeInterval: [timeZone secondsFromGMTForDate: lastTime]];
-    //当前时间
-    NSDate *currentDate = [currentTime dateByAddingTimeInterval: [timeZone secondsFromGMTForDate: currentTime]];
-    //时间间隔
-    NSInteger intevalTime = [currentDate timeIntervalSinceReferenceDate] - [lastDate timeIntervalSinceReferenceDate];
-    
-    //秒、分、小时、天、月、年
-    NSInteger minutes = intevalTime / 60;
-    NSInteger hours = intevalTime / 60 / 60;
-    NSInteger day = intevalTime / 60 / 60 / 24;
-    NSInteger month = intevalTime / 60 / 60 / 24 / 30;
-    NSInteger yers = intevalTime / 60 / 60 / 24 / 365;
-    
-    if (minutes <= 10) {
-        return  @"刚刚";
-    } else if (minutes < 60) {
-        return [NSString stringWithFormat: @"%ld分钟前", minutes];
-    } else if (hours < 24) {
-        return [NSString stringWithFormat: @"%ld小时前", hours];
-    } else if (day < 30) {
-        return [NSString stringWithFormat: @"%ld天前", day];
-    } else if (month < 12) {
-        NSDateFormatter * df =[[NSDateFormatter alloc] init];
-        df.dateFormat = @"M月d日";
-        NSString * time = [df stringFromDate: lastDate];
-        return time;
-    } else if (yers >= 1) {
-        NSDateFormatter * df =[[NSDateFormatter alloc] init];
-        df.dateFormat = @"yyyy年M月d日";
-        NSString * time = [df stringFromDate: lastDate];
-        return time;
-    }
-    
-    return @"";
-}
-
 + (BOOL)isTheSameDayA:(NSDate *)aDate b:(NSDate *)bDate {
     if (!([aDate isKindOfClass: NSDate.class] && [bDate isKindOfClass: NSDate.class])) {
         return NO;
@@ -262,74 +169,98 @@ NSInteger _fs_integerTimeIntevalSince1970(void) {
 }
 
 + (NSInteger)theFirstSecondOfMonth:(NSDate *)date {
-    return [self publicFunction: date str: ^ NSString *(NSDateComponents *c) {
-        NSString *str = [[NSString alloc] initWithFormat: @"%ld-%@-01 00:00:00", c.year, [self twoChar: c.month]];
-        return str;
-    }];
+    NSCalendar *calendar = NSCalendar.currentCalendar;
+    calendar.timeZone = NSTimeZone.localTimeZone;
+    
+    NSDateComponents *com =  [self componentForDate: date];
+    com.day = 1;
+    com.hour = 0;
+    com.minute = 0;
+    com.second = 0;
+    
+    NSDate *endOfDay = [calendar dateFromComponents: com];
+    NSInteger time = endOfDay.timeIntervalSince1970;
+    
+    return time;
 }
 
 + (NSInteger)theLastSecondOfMonth:(NSDate *)date {
-    return [self publicFunction: date str: ^ NSString *(NSDateComponents *c) {
-        NSInteger days = [self daysForMonth: c.month year: c.year];
-        NSString *str = [[NSString alloc] initWithFormat: @"%ld-%@-%ld 23:59:59", c.year, [self twoChar: c.month], days];
-        return str;
-    }];
+    NSCalendar *calendar = NSCalendar.currentCalendar;
+    calendar.timeZone = NSTimeZone.localTimeZone;
+    
+    NSDateComponents *com =  [self componentForDate: date];
+    NSInteger days = [self daysForMonth: com.month year: com.year];
+
+    com.day = days;
+    com.hour = 23;
+    com.minute = 59;
+    com.second = 59;
+    
+    NSDate *endOfDay = [calendar dateFromComponents: com];
+    NSInteger time = endOfDay.timeIntervalSince1970;
+    
+    return time;
 }
 
 + (NSInteger)theFirstSecondOfDay:(NSDate *)date {
-    return [self publicFunction: date str: ^ NSString *(NSDateComponents *c) {
-        NSString *str = [[NSString alloc] initWithFormat: @"%ld-%@-%@ 00:00:00", c.year, [self twoChar: c.month], [self twoChar: c.day]];
-        return str;
-    }];
+    NSCalendar *calendar = NSCalendar.currentCalendar;
+    calendar.timeZone = NSTimeZone.localTimeZone;
+    
+    NSDate *t = [calendar startOfDayForDate: date];
+    NSInteger time = t.timeIntervalSince1970;
+    return time;
 }
 
 + (NSInteger)theLastSecondOfDay:(NSDate *)date {
-    return [self publicFunction: date str: ^ NSString *(NSDateComponents *c) {
-        NSString *str = [[NSString alloc] initWithFormat: @"%ld-%@-%@ 23:59:59", c.year, [self twoChar: c.month], [self twoChar: c.day]];
-        return str;
-    }];
+    
+    NSDateComponents *com = [self componentForDate: date];
+    
+    [com setHour: 23];
+    [com setMinute: 59];
+    [com setSecond: 59];
+    
+    NSCalendar *calendar = NSCalendar.currentCalendar;
+    calendar.timeZone = NSTimeZone.localTimeZone;
+    
+    NSDate *endOfDay = [calendar dateFromComponents: com];
+    NSInteger time = endOfDay.timeIntervalSince1970;
+    
+    return time;
 }
 
 + (NSInteger)theFirstSecondOfYear:(NSInteger)year {
-    NSString *str = [[NSString alloc] initWithFormat: @"%ld-01-01 00:00:00", year];
-    NSDate *result = [self dateByString: str formatter: nil];
-    NSTimeInterval t = (NSInteger)[result timeIntervalSince1970];
+    
+    NSDateComponents *yearComponents = [[NSDateComponents alloc] init];
+    yearComponents.year = year;
+    yearComponents.month = 1;
+    yearComponents.day = 1;
+    yearComponents.hour = 0;
+    yearComponents.minute = 0;
+    yearComponents.second = 0;
+    
+    NSCalendar *calendar = NSCalendar.currentCalendar;
+    calendar.timeZone = NSTimeZone.localTimeZone;
+
+    NSDate *firstSecondOfYear = [calendar dateFromComponents: yearComponents];
+    NSTimeInterval t = [firstSecondOfYear timeIntervalSince1970];
     return t;
 }
 
 + (NSInteger)theLastSecondOfYear:(NSInteger)year {
-    NSString *str = [[NSString alloc] initWithFormat: @"%@-12-31 23:59:59",@(year)];
-    NSDate *result = [self dateByString: str formatter: nil];
-    NSTimeInterval t = (NSInteger)[result timeIntervalSince1970];
-    return t;
-}
-
-+ (void)theFirstAndLastSecondOfYear:(NSInteger)year first:(NSInteger *)firstSecond last:(NSInteger *)lastSecond {
-    NSString *first = [[NSString alloc] initWithFormat: @"%ld-01-01 00:00:00", year];
-    NSString *last = [[NSString alloc] initWithFormat: @"%ld-12-31 23:59:59", year];
-    NSDate *firstDate = [self dateByString: first formatter: nil];
-    NSDate *lastDate = [self dateByString: last formatter: nil];
-    *firstSecond = (NSInteger)[firstDate timeIntervalSince1970];
-    *lastSecond = (NSInteger)[lastDate timeIntervalSince1970];
-}
-
-+ (NSInteger)publicFunction:(NSDate *)date str:(NSString *(^)(NSDateComponents *c))callback {
-    if (![date isKindOfClass: NSDate.class]) {
-        return 0;
-    }
     
-    NSDateComponents *c = [self componentForDate: date];
-    NSString *str = callback(c);
-    return [self secondsForComponents:c dateString: str];
-}
-
-+ (NSInteger)secondsForComponents:(NSDateComponents *)c dateString:(NSString *)dateString {
-    if (![c isKindOfClass: NSDateComponents.class]) {
-        return 0;
-    }
+    NSDateComponents *yearComponents = [[NSDateComponents alloc] init];
+    yearComponents.year = year;
+    yearComponents.month = 12;
+    yearComponents.day = 31;
+    yearComponents.hour = 23;
+    yearComponents.minute = 59;
+    yearComponents.second = 59;
     
-    NSDate *result = [self dateByString: dateString formatter: nil];
-    NSTimeInterval t = (NSInteger)[result timeIntervalSince1970];
+    NSCalendar *calendar = NSCalendar.currentCalendar;
+    calendar.timeZone = NSTimeZone.localTimeZone;
+
+    NSDate *firstSecondOfYear = [calendar dateFromComponents: yearComponents];
+    NSTimeInterval t = [firstSecondOfYear timeIntervalSince1970];
     return t;
 }
 
@@ -396,10 +327,6 @@ NSInteger _fs_integerTimeIntevalSince1970(void) {
     
     FSLunarDate *lunar = [FSLunarDate lunarWithYear: year month: lunarComponents.month day: lunarComponents.day hour: lunarComponents.hour minute: lunarComponents.minute second: lunarComponents.second];
     return lunar;
-    
-//    NSString *string = [[NSString alloc] initWithFormat:@"%ld-%@-%@ 12:00:00",year, [self twoChar:lunarComponents.month], [self twoChar:lunarComponents.day]];
-//    NSDate *date = [FSDate dateByString:string formatter:nil];
-//    return date;
 }
 
 + (NSString *)ChineseWeek:(NSInteger)week {
