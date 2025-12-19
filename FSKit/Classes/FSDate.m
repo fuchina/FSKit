@@ -100,22 +100,9 @@ NSInteger _fs_integerTimeIntevalSince1970(void) {
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     [dateFormatter setDateFormat: formatter ? : @"yyyy-MM-dd HH:mm:ss"];
     //  这里应该隐含了   dateFormatter.timeZone = NSTimeZone.localTimeZone;
+    dateFormatter.timeZone = NSTimeZone.localTimeZone;
+    
     return [dateFormatter stringFromDate: date];
-}
-
-+ (NSString *)ymdhsByTimeInterval:(NSTimeInterval)timeInterval {
-    return [self ymdhsByTimeInterval: timeInterval formatter: nil];
-}
-
-+ (NSString *)ymdhsByTimeInterval:(NSTimeInterval)timeInterval formatter:(NSString *)formatter {
-    NSDate *date = [[NSDate alloc] initWithTimeIntervalSince1970: timeInterval];
-    NSString *time = [FSDate stringWithDate: date formatter: formatter];
-    return time;
-}
-
-+ (NSString *)ymdhsByTimeIntervalString:(NSString *)timeInterval {
-    NSTimeInterval t = [timeInterval doubleValue];
-    return [self ymdhsByTimeInterval: t];
 }
 
 + (NSDateComponents *)chineseDate:(NSDate *)date {

@@ -39,9 +39,6 @@ NSInteger _fs_integerTimeIntevalSince1970(void);
 
 + (NSDate *)dateByString:(NSString *)str formatter:(NSString *)formatter;
 + (NSString *)stringWithDate:(NSDate *)date formatter:(NSString *)formatter;
-+ (NSString *)ymdhsByTimeInterval:(NSTimeInterval)timeInterval;
-+ (NSString *)ymdhsByTimeIntervalString:(NSString *)timeInterval;
-+ (NSString *)ymdhsByTimeInterval:(NSTimeInterval)timeInterval formatter:(NSString *)formatter;
 
 // 除了年不是当年数字，可能为60一甲子数组的索引+1，月日是当月日
 + (NSDateComponents *)chineseDate:(NSDate *)date;
