@@ -32,6 +32,8 @@ Pod::Spec.new do |s|
 
   s.source_files = 'FSKit/Classes/**/*'
   
+  s.swift_version = '5.9'
+  
   # s.resource_bundles = {
   #   'FSKit' => ['FSKit/Assets/*.png']
   # }
