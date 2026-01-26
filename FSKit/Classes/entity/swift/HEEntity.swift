@@ -20,17 +20,17 @@ protocol HEEntityProtocol: AnyObject {
 }
 
 // MARK: - 基类实现
-class HEEntity: NSObject, HEEntityProtocol {
-    var aid: Int = 0
-    var meta: [String: Any]?
-    var valid: Bool = true
-    var insets: UIEdgeInsets = .zero
+open class HEEntity: NSObject, HEEntityProtocol {
+    public var aid: Int = 0
+    public var meta: [String: Any]?
+    public var valid: Bool = true
+    public var insets: UIEdgeInsets = .zero
     
     // 钩子闭包（用于批量转换时的回调）
     private var beforeSetPropertiesBlock: ((HEEntity) -> Void)?
     private var afterSetPropertiesBlock: ((HEEntity) -> Void)?
     
-    required override init() {
+    required public override init() {
         super.init()
     }
     
@@ -116,14 +116,14 @@ class HEEntity: NSObject, HEEntityProtocol {
     }
     
     // MARK: - KVC 支持
-    override func setValue(_ value: Any?, forUndefinedKey key: String) {
+    public override func setValue(_ value: Any?, forUndefinedKey key: String) {
         #if DEBUG
         print("⚠️ \(type(of: self)) 设置未定义的属性: \(key) = \(String(describing: value))")
         #endif
     }
     
     // MARK: - 批量转换
-    static func models<T: HEEntity>(from dictionaries: [[String: Any]]) -> [T] {
+    public static func models<T: HEEntity>(from dictionaries: [[String: Any]]) -> [T] {
         return models(from: dictionaries, modelClass: T.self, beforeSetProperties: nil, afterSetProperties: nil)
     }
     
