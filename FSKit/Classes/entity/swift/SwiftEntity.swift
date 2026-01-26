@@ -22,9 +22,9 @@ protocol SwiftEntityProtocol: AnyObject {
 }
 
 // MARK: - 纯 Swift 基类
-class SwiftEntity: SwiftEntityProtocol {
-    var aid: Int = 0
-    var meta: [String: Any]?
+open class SwiftEntity: SwiftEntityProtocol {
+    public var aid: Int = 0
+    public var meta: [String: Any]?
     var valid: Bool = true
     var insets: UIEdgeInsets = .zero
     
@@ -32,7 +32,7 @@ class SwiftEntity: SwiftEntityProtocol {
     private var beforeSetPropertiesBlock: ((SwiftEntity) -> Void)?
     private var afterSetPropertiesBlock: ((SwiftEntity) -> Void)?
     
-    required init() {}
+    required public init() {}
     
     // MARK: - 初始化方法
     convenience init(dictionary: [String: Any]) {
@@ -56,11 +56,11 @@ class SwiftEntity: SwiftEntityProtocol {
     }
     
     // MARK: - 生命周期钩子
-    func beforeSetProperties() {
+    open func beforeSetProperties() {
         // 子类重写
     }
     
-    func afterSetProperties() {
+    open func afterSetProperties() {
         // 子类重写
         
         // 执行外部传入的钩子
@@ -266,7 +266,7 @@ class SwiftEntity: SwiftEntityProtocol {
     }
     
     // MARK: - 批量转换
-    static func models<T: SwiftEntity>(from dictionaries: [[String: Any]]) -> [T] {
+    public static func models<T: SwiftEntity>(from dictionaries: [[String: Any]]) -> [T] {
         return models(from: dictionaries, modelClass: T.self, beforeSetProperties: nil, afterSetProperties: nil)
     }
     

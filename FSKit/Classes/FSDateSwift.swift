@@ -51,4 +51,18 @@ public class FSDateSwift {
         return Int(time)
     }
     
+    public static func stringWithDate(date: Date?, formatter: String?) -> String {
+        if date == nil {
+            return ""
+        }
+        
+        var dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = formatter ?? "yyyy-MM-dd HH:mm:ss"
+        
+        //  这里应该隐含了   dateFormatter.timeZone = NSTimeZone.localTimeZone;
+        dateFormatter.timeZone = TimeZone.current
+        let v = dateFormatter.string(from: date!)
+        return v
+    }
+    
 }

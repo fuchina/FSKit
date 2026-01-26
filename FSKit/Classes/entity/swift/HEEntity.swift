@@ -15,6 +15,7 @@ protocol HEEntityProtocol: AnyObject {
     var insets: UIEdgeInsets { get set }
     
     init()
+    
     func beforeSetProperties()
     func afterSetProperties()
 }
@@ -56,11 +57,11 @@ open class HEEntity: NSObject, HEEntityProtocol {
     }
     
     // MARK: - 生命周期钩子
-    @objc dynamic func beforeSetProperties() {
+    @objc public dynamic func beforeSetProperties() {
         // 子类重写
     }
     
-    @objc dynamic func afterSetProperties() {
+    @objc public dynamic func afterSetProperties() {
         // 子类重写
         
         // 执行外部传入的钩子
