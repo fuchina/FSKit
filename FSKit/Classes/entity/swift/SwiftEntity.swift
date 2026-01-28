@@ -73,7 +73,7 @@ open class SwiftEntity: SwiftEntityProtocol {
         guard !dictionary.isEmpty else { return }
         
         self.meta = dictionary
-        
+                
         // 使用 Mirror 反射获取所有属性
         let mirror = Mirror(reflecting: self)
         
@@ -85,7 +85,7 @@ open class SwiftEntity: SwiftEntityProtocol {
                 handleUndefinedKey(key: key, value: value)
             }
         }
-        
+                
         self.afterSetProperties()
     }
     
@@ -110,12 +110,12 @@ open class SwiftEntity: SwiftEntityProtocol {
     private func setPropertyValue(property: Mirror.Child, value: Any, key: String) {
         let propertyValue = property.value
         let propertyType = type(of: propertyValue)
-        
+                
         // 转换值
         guard let convertedValue = convertValue(value, to: propertyType) else {
             return
         }
-        
+                
         // 使用类型匹配来设置值
         setValueByType(key: key, value: convertedValue, originalType: propertyType)
     }
@@ -226,7 +226,7 @@ open class SwiftEntity: SwiftEntityProtocol {
     private func setValueByType(key: String, value: Any, originalType: Any.Type) {
         // 使用 KeyPath 的方式（需要子类提供具体的 KeyPath）
         // 这里我们使用一个更通用的方法：通过协议扩展
-        
+                
         // 由于 Swift 的类型安全，我们需要为每种类型提供设置方法
         if let strValue = value as? String {
             setStringValue(strValue, forKey: key)
@@ -242,6 +242,8 @@ open class SwiftEntity: SwiftEntityProtocol {
             setArrayValue(arrayValue, forKey: key)
         } else if let dictValue = value as? [String: Any] {
             setDictValue(dictValue, forKey: key)
+        } else {
+            assert(1==2, "\(self) 解析错误：key = \(key), value = \(value)")
         }
     }
     
@@ -249,6 +251,8 @@ open class SwiftEntity: SwiftEntityProtocol {
     func setStringValue(_ value: String, forKey key: String) {
         // 子类通过 switch 或 if-else 来设置具体属性
         // 这是纯 Swift 的限制，无法像 OC 的 KVC 那样动态设置
+        
+        
     }
     
     func setIntValue(_ value: Int, forKey key: String) {}
@@ -300,6 +304,7 @@ open class SwiftEntity: SwiftEntityProtocol {
             guard !dict.isEmpty else { continue }
             
             let model = modelClass.init()
+                    
             model.beforeSetPropertiesBlock = { entity in
                 if let typedEntity = entity as? T {
                     beforeSetProperties?(typedEntity)
@@ -312,7 +317,7 @@ open class SwiftEntity: SwiftEntityProtocol {
             }
             model.beforeSetProperties()
             model.setProperties(dict)
-            
+                        
             results.append(model)
         }
         
