@@ -36,7 +36,11 @@ open class FSEntitySwift {
         for (key, value) in dict {
             mapper[key]?(self, value)
         }
+        
+        self.afterSetProperties()
     }
+    
+    open func afterSetProperties() {}
     
     /// 单个
     static public func tom<T: FSEntitySwift>(from dict: [String: Any]) -> T {
