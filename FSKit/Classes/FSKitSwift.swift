@@ -46,4 +46,18 @@ open class FSKitSwift {
         return formatter
     }()
     
+    static func currentWindowScene() -> UIWindowScene? {
+        let scenes = UIApplication.shared.connectedScenes
+        for sc in scenes {
+            if sc.activationState == .foregroundActive {
+                return sc as? UIWindowScene
+            }
+        }
+        
+        if scenes.count > 0 {
+            return scenes.first as? UIWindowScene
+        }
+        
+        return nil
+    }
 }
