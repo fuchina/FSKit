@@ -66,10 +66,12 @@ open class FSEntitySwift {
            return (
                key,
                { obj, value in
+                   
                    guard
                        let obj = obj as? T,
                        let v = value as? V
                    else { return }
+                   
                    setter(obj, v)
                }
            )
