@@ -485,7 +485,6 @@ void _fs_clearUserDefaults(void) {
 + (NSString *)appVersionNumber {
     NSDictionary *infoDict = NSBundle.mainBundle.infoDictionary;
     NSString *js = [FSKit jsonStringWithObject: infoDict];
-    NSLog(@"FSLog %@", js);
     return [infoDict objectForKey:@"CFBundleShortVersionString"];
 }
 
@@ -1994,8 +1993,8 @@ NSString *_fs_highAccuracy_divide(NSString *a,NSString *b) {
         CGFloat totalMB = totalMemory / 1024.0 / 1024.0;
         CGFloat usagePercentage = (CGFloat)usedMemory / (CGFloat)totalMemory * 100.0;
         
-        NSLog(@"FSLog 内存使用: %.2f MB / %.2f MB (%.1f%%)",
-              usedMB, totalMB, usagePercentage);
+//        NSLog(@"FSLog 内存使用: %.2f MB / %.2f MB (%.1f%%)",
+//              usedMB, totalMB, usagePercentage);
     } else {
         NSLog(@"获取内存信息失败");
     }
