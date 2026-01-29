@@ -46,4 +46,32 @@ open class FSKitSwift {
         return formatter
     }()
     
+    public static func currentWindowScene() -> UIWindowScene? {
+        let scenes = UIApplication.shared.connectedScenes
+        for sc in scenes {
+            if sc.activationState == .foregroundActive {
+                return sc as? UIWindowScene
+            }
+        }
+        
+        if scenes.count > 0 {
+            return scenes.first as? UIWindowScene
+        }
+        
+        return nil
+    }
+    
+    public static func fitScrollViewOperate(scrollView: UIScrollView, navigationController: UINavigationController) {
+        
+        let gestureArray = navigationController.view.gestureRecognizers
+        if gestureArray == nil {
+            return
+        }
+        
+        for gr in gestureArray! {
+            if gr is UIScreenEdgePanGestureRecognizer {
+                scrollView.panGestureRecognizer.require(toFail: gr)
+            }
+        }
+    }    
 }
