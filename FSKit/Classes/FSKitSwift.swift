@@ -60,4 +60,18 @@ open class FSKitSwift {
         
         return nil
     }
+    
+    public static func fitScrollViewOperate(scrollView: UIScrollView, navigationController: UINavigationController) {
+        
+        let gestureArray = navigationController.view.gestureRecognizers
+        if gestureArray == nil {
+            return
+        }
+        
+        for gr in gestureArray! {
+            if gr is UIScreenEdgePanGestureRecognizer {
+                scrollView.panGestureRecognizer.require(toFail: gr)
+            }
+        }
+    }    
 }
