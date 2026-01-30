@@ -7,11 +7,11 @@
 
 import Foundation
 
-open class FSEntitySwift {
+open class FSEntitySwift: NSObject {
     public var     aid      :   Int = 0
     public var     meta     :   Dictionary<String, Any>? = nil
     
-    required public init() {}
+    required public override init() {}
     
        /// 子类 override：定义 key -> setter 映射
     class open func keyMapper() -> [String: (FSEntitySwift, Any) -> Void] {
