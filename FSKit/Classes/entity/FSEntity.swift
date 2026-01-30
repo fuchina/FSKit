@@ -92,7 +92,7 @@ open class FSEntitySwift: NSObject {
                     // 2. 尝试将原始值转换为目标类型V（新增核心：兼容类型转换）
                     guard let targetValue = Self.convertValue(rawValue, to: V.self) else {
                         // 转换失败（无兼容类型），才返回不解析
-                        print("⚠️ 字段\(key)类型不匹配，原始值：\(rawValue)，目标类型：\(V.self)，已跳过解析")
+                        print("FSLog 字段\(key)类型不匹配，原始值：\(rawValue)，目标类型：\(V.self)，已跳过解析")
                         return
                     }
                     
