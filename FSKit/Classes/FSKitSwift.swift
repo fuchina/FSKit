@@ -9,7 +9,7 @@ import Foundation
 
 open class FSKitSwift {
     
-    public static func showByTenThousand(rest: Float, money: Bool) -> String {
+    public static func showByTenThousand(rest: Double, money: Bool) -> String {
         
         var _rest_show = ""
         if rest < 100000 {
@@ -40,7 +40,7 @@ open class FSKitSwift {
         return formatter
     }()
     
-    static func bankStyleDataThree(data: Float) -> String? {
+    static func bankStyleDataThree(data: Double) -> String? {
         
         let numberFormatter = self.numberFormatter
     
