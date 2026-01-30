@@ -18,16 +18,27 @@ open class FSKitSwift {
             } else {
                 _rest_show = String(rest)
             }
+        } else if rest < 1000000 {
+            _rest_show = String(format: "%.2f万", rest / 10000.0)
         } else if rest < 100000000 {
-            _rest_show = String(format: ".2f万", rest / 10000.0)
+            _rest_show = String(format: "%.0f万", rest / 10000.0)
         } else if rest < 10000000000 {
-            _rest_show = String(format: ".2f亿", rest / 100000000.0)
+            _rest_show = String(format: "%.2f亿", rest / 100000000.0)
         } else {
-            _rest_show = String(format: ".2f亿", rest / 100000000.0)
+            _rest_show = String(format: "%.0f亿", rest / 100000000.0)
         }
         
         return _rest_show
     }
+        
+    // 类属性，懒加载
+    static let number_formatter: NumberFormatter = {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.minimumFractionDigits = 2
+        formatter.maximumFractionDigits = 2
+        return formatter
+    }()
     
     static func bankStyleDataThree(data: Float) -> String? {
         
