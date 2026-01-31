@@ -265,4 +265,7 @@ NSString *_fs_highAccuracy_divide(NSString *a,NSString *b);     // 除
 
 + (void)printMemoryUsage;
 
++ (BOOL)isInt:(NSString *)string;
++ (BOOL)isFloat:(NSString *)string;
+
 @end
