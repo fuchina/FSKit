@@ -954,6 +954,10 @@ NSString* _fs_KMGUnit(NSInteger size) {
     return YES;
 }
 
++ (BOOL)isInt:(NSString *)string {
+    return _fs_isPureInt(string);
+}
+
 BOOL _fs_isPureInt(NSString *string) {
     if (![string isKindOfClass:NSString.class]) {
         string = [string description];
@@ -964,6 +968,10 @@ BOOL _fs_isPureInt(NSString *string) {
     NSScanner *scan = [NSScanner scannerWithString:string];
     int val;
     return [scan scanInt:&val] && [scan isAtEnd];
+}
+
++ (BOOL)isFloat:(NSString *)string {
+    return _fs_isPureFloat(string);
 }
 
 BOOL _fs_isPureFloat(NSString *string) {

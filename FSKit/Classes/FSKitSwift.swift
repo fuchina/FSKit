@@ -84,5 +84,5 @@ open class FSKitSwift {
                 scrollView.panGestureRecognizer.require(toFail: gr)
             }
         }
-    }    
+    }
 }
