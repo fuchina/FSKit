@@ -1125,3 +1125,39 @@ public func fs_userDefaultsOnce(key: String, event: () -> Void) {
         ud.set(1, forKey: key)
     }
 }
+
+public func showBetterFor5DigitInteger(_ value: Int) -> String {
+    if value == 0 {
+        return "0"
+    }
+    
+    var mode = value % FSFiveDecimalPlaces
+    var ret: String = "0"
+    if mode == 0 {
+        ret = String(value / FSFiveDecimalPlaces)
+    } else {
+        mode = value % 10000
+        if mode == 0 {
+            ret = String(format: "%.1f", Double(value) / Double(FSFiveDecimalPlaces))
+        } else {
+            mode = value % 1000
+            if mode == 0 {
+                ret = String(format: "%.2f", Double(value) / Double(FSFiveDecimalPlaces))
+            } else {
+                mode = value % 100
+                if mode == 0 {
+                    ret = String(format: "%.3f", Double(value) / Double(FSFiveDecimalPlaces))
+                } else {
+                    mode = value % 10
+                    if mode == 0 {
+                        ret = String(format: "%.4f", Double(value) / Double(FSFiveDecimalPlaces))
+                    } else {
+                        ret = String(format: "%.5f", Double(value) / Double(FSFiveDecimalPlaces))
+                    }
+                }
+            }
+        }
+    }
+    
+    return ret
+}
