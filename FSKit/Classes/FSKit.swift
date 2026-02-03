@@ -1126,7 +1126,7 @@ public func fs_userDefaultsOnce(key: String, event: () -> Void) {
     }
 }
 
-public func showBetterFor5DigitInteger(_ value: Int) -> String {
+public static func showBetterFor5DigitInteger(_ value: Int) -> String {
     if value == 0 {
         return "0"
     }
