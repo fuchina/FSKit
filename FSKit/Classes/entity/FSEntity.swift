@@ -7,18 +7,18 @@
 
 import Foundation
 
-open class FSEntitySwift: NSObject {
+open class FSEntity: NSObject {
     public var     aid      :   Int = 0
     public var     meta     :   Dictionary<String, Any>? = nil
     
     required public override init() {}
     
        /// 子类 override：定义 key -> setter 映射
-    class open func keyMapper() -> [String: (FSEntitySwift, Any) -> Void] {
+    class open func keyMapper() -> [String: (FSEntity, Any) -> Void] {
         
         let mapper = Dictionary(uniqueKeysWithValues: [
 
-            FSEntitySwift.map("aid") { (obj: FSEntitySwift, v: Int) in
+            FSEntity.map("aid") { (obj: FSEntity, v: Int) in
                 obj.aid = v
             },
         ])
@@ -43,14 +43,14 @@ open class FSEntitySwift: NSObject {
     open func afterSetProperties() {}
     
     /// 单个
-    static public func tom<T: FSEntitySwift>(from dict: [String: Any]) -> T {
+    static public func tom<T: FSEntity>(from dict: [String: Any]) -> T {
         let model = T.init()
         model.fill(from: dict)
         return model
     }
 
     /// 批量
-    static public func toms<T: FSEntitySwift>(from dictionaries: [[String: Any]]) -> [T] {
+    static public func toms<T: FSEntity>(from dictionaries: [[String: Any]]) -> [T] {
         dictionaries.map {
             let model = T.init()
             model.fill(from: $0)
@@ -78,10 +78,10 @@ open class FSEntitySwift: NSObject {
 //       }
     
     // 原泛型map方法 + 兼容类型转换扩展（核心修改：新增value转换逻辑）
-        public static func map<T: FSEntitySwift, V>(
+        public static func map<T: FSEntity, V>(
             _ key: String,
             _ setter: @escaping (T, V) -> Void
-        ) -> (String, (FSEntitySwift, Any) -> Void) {
+        ) -> (String, (FSEntity, Any) -> Void) {
             
             return (
                 key,
