@@ -1,14 +1,14 @@
+////
+////  FSURLSession.h
+////  FBRetainCycleDetector
+////
+////  Created by Fudongdong on 2018/2/2.
+////
 //
-//  FSURLSession.h
-//  FBRetainCycleDetector
+//#import <Foundation/Foundation.h>
 //
-//  Created by Fudongdong on 2018/2/2.
+//@interface FSURLSession : NSObject
 //
-
-#import <Foundation/Foundation.h>
-
-@interface FSURLSession : NSObject
-
-+ (void)sessionGet:(NSString *)urlString success:(void (^)(id value))success fail:(void (^)(void))fail;
-
-@end
+//+ (void)sessionGet:(NSString *)urlString success:(void (^)(id value))success fail:(void (^)(void))fail;
+//
+//@end
