@@ -8,8 +8,8 @@
 import UIKit
 
 // MARK: - Convenience Accessors
-public var UIScreenLong: CGFloat { FSUIAdapterManager.shared.screenBiggerValue }
-public var UIScreenShort: CGFloat { FSUIAdapterManager.shared.screenSmallerValue }
+public var UIScreenLong: CGFloat { FSUIAdapter.shared.screenBiggerValue }
+public var UIScreenShort: CGFloat { FSUIAdapter.shared.screenSmallerValue }
 public var UIScreenHeight: CGFloat { UIScreen.main.bounds.height }
 public var UIScreenWidth: CGFloat { UIScreen.main.bounds.width }
 
@@ -174,9 +174,9 @@ public class FSUIAdapterModel: NSObject {
 
 
 // MARK: - FSUIAdapterManager
-public class FSUIAdapterManager: NSObject {
+public class FSUIAdapter: NSObject {
     
-    public static let shared = FSUIAdapterManager()
+    public static let shared = FSUIAdapter()
     
     public let isIPad: Bool
     public let isIPhone: Bool
@@ -322,7 +322,7 @@ public class FSUIAdapterManager: NSObject {
 
 // MARK: - Helper Function
 public func differentValueForIPad(_ iPad: CGFloat, _ iPhone: CGFloat) -> CGFloat {
-    return FSUIAdapterManager.shared.isIPad ? iPad : iPhone
+    return FSUIAdapter.shared.isIPad ? iPad : iPhone
 }
 
 // MARK: - UIView Extension
