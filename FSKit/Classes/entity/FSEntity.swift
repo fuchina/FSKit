@@ -29,7 +29,7 @@ open class FSEntity: NSObject {
     }
 
     /// 从 dictionary 映射
-    func fill(from dict: [String: Any]) {
+    public func fill(from dict: [String: Any]) {
         self.meta = dict
         
         let mapper = type(of: self).keyMapper()
