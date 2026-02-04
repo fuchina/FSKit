@@ -7,20 +7,12 @@
 
 import UIKit
 
-public let WIDTHFC: Float = Float(UIScreen.main.bounds.width)
-let HEIGHTFC: Float = Float(UIScreen.main.bounds.height)
-let tb_password = "password"
-let TAG_LABEL = 1001
-let TEXT_NAME = "TEXT_NAME"
-let Notifi_sendSqlite3 = "Notifi_sendSqlite3"
-let appCfg_pasteboard_content = "appCfg_pasteboard_content"
-let UMeng_Event_pwd_add = "UMeng_Event_pwd_add"
+public let WIDTHFC: CGFloat = UIScreen.main.bounds.width
+public let HEIGHTFC: CGFloat = UIScreen.main.bounds.height
 
 // MARK: - Colors
-let FSAPPCOLOR = UIColor(red: 18/255.0, green: 152/255.0, blue: 233/255.0, alpha: 1)
-let APPCOLOR = FSAPPCOLOR
-let FS_TextColor_Dark = UIColor.darkGray
-let FS_GreenColor = UIColor(red: 61/255.0, green: 186/255.0, blue: 67/255.0, alpha: 1)
+public let FSAPPCOLOR = UIColor(red: 18/255.0, green: 152/255.0, blue: 233/255.0, alpha: 1)
+public let APPCOLOR = FSAPPCOLOR
 
 // MARK: - Debug Log
 public func FSLog(_ format: String, file: String = #file, function: String = #function, line: Int = #line) {
@@ -39,11 +31,13 @@ public func IOSGE(_ version: Float) -> Bool {
 }
 
 public var isIPAD: Bool {
-    return UI_USER_INTERFACE_IDIOM() == .pad
+    let isPad = UIDevice.current.userInterfaceIdiom == .pad
+    return isPad
 }
 
 public var isIPHONE: Bool {
-    return UI_USER_INTERFACE_IDIOM() == .phone
+    let isPhone = UIDevice.current.userInterfaceIdiom == .phone
+    return isPhone
 }
 
 // MARK: - Color Helpers
