@@ -7,6 +7,21 @@
 
 import UIKit
 
+public let WIDTHFC: Float = Float(UIScreen.main.bounds.width)
+let HEIGHTFC: Float = Float(UIScreen.main.bounds.height)
+let tb_password = "password"
+let TAG_LABEL = 1001
+let TEXT_NAME = "TEXT_NAME"
+let Notifi_sendSqlite3 = "Notifi_sendSqlite3"
+let appCfg_pasteboard_content = "appCfg_pasteboard_content"
+let UMeng_Event_pwd_add = "UMeng_Event_pwd_add"
+
+// MARK: - Colors
+let FSAPPCOLOR = UIColor(red: 18/255.0, green: 152/255.0, blue: 233/255.0, alpha: 1)
+let APPCOLOR = FSAPPCOLOR
+let FS_TextColor_Dark = UIColor.darkGray
+let FS_GreenColor = UIColor(red: 61/255.0, green: 186/255.0, blue: 67/255.0, alpha: 1)
+
 // MARK: - Debug Log
 public func FSLog(_ format: String, file: String = #file, function: String = #function, line: Int = #line) {
     #if DEBUG
@@ -18,9 +33,6 @@ public func FSLog(_ format: String, file: String = #file, function: String = #fu
 public func MININ<T: Comparable>(_ a: T, _ b: T) -> T {
     return min(a, b)
 }
-
-public let HEIGHTFC: CGFloat = UIScreen.main.bounds.size.height
-public let WIDTHFC: CGFloat = UIScreen.main.bounds.size.width
 
 public func IOSGE(_ version: Float) -> Bool {
     return (UIDevice.current.systemVersion as NSString).floatValue >= version
