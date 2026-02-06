@@ -45,7 +45,7 @@ public class FSKit: NSObject {
         return try? JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed)
     }
     
-    public static func jsonString(with object: Any) -> String? {
+    public static func jsonString(_ object: Any) -> String? {
         guard JSONSerialization.isValidJSONObject(object) else { return nil }
         guard let data = try? JSONSerialization.data(withJSONObject: object, options: []) else { return nil }
         return String(data: data, encoding: .utf8)
