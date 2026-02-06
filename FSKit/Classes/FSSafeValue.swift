@@ -109,6 +109,15 @@ open class FSSafe {
         }
     }
     
+    public static func string(_ value: Any?) -> String {
+        if let str = value as? String {
+            return str
+        } else if let str = value as? NSString {
+            return str as String
+        }
+        return ""
+    }
+    
     public static func dictionary(_ value: Any?) -> [String: Any] {
         if let nsDict = value as? NSDictionary {
              return nsDict as! [String: Any]
