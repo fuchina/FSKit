@@ -7,9 +7,9 @@
 
 import Foundation
 
-public class FSSafeValue {
+open class FSSafe {
     
-    public static func safeDouble(_ value: Any?) -> Double {
+    public static func double(_ value: Any?) -> Double {
         switch value {
         case let t as TimeInterval:
             return t
