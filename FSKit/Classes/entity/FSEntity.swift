@@ -33,13 +33,19 @@ open class FSEntity: NSObject {
         self.fill(from: dict, before: nil, after: nil)
     }
     
-    public func fill(from dict: [String: Any], before:(()-> Void)?, after:(()->Void)?) {
+    public func fill<T: FSEntity>(from dict: [String: Any], before:((T)-> Void)?, after:((T)->Void)?) {
+        
+        guard let typedSelf = self as? T else {
+            assertionFailure("Type mismatch: self is not \(T.self)")
+            return
+        }
+        
         self.meta = dict
         
         self.beforeSetProperties()
         
         if before != nil {
-            before!()
+            before!(typedSelf)
         }
         
         let mapper = type(of: self).keyMapper()
@@ -50,7 +56,7 @@ open class FSEntity: NSObject {
         self.afterSetProperties()
         
         if after != nil {
-            after!()
+            after!(typedSelf)
         }
     }
     
@@ -74,10 +80,10 @@ open class FSEntity: NSObject {
     }
     
     /// 批量
-    static public func toms<T: FSEntity>(from dictionaries: [[String: Any]], before: (() -> Void)?, after: (() -> Void)?) -> [T] {
+    static public func toms<T: FSEntity>(from dictionaries: [[String: Any]], before: ((T) -> Void)?, after: ((T) -> Void)?) -> [T] {
         dictionaries.map {
             let model = T.init()
-            model.fill(from: $0)
+            model.fill(from: $0, before: before, after: after)
             return model
         }
     }
