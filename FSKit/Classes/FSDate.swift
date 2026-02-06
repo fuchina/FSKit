@@ -78,8 +78,8 @@ public class FSDate: NSObject {
         return dateFormatter.date(from: str)
     }
     
-    public static func string(with date: Date?, formatter: String? = nil) -> String? {
-        guard let date = date else { return nil }
+    public static func string(with date: Date?, formatter: String? = nil) -> String {
+        guard let date = date else { return "" }
         
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = formatter ?? "yyyy-MM-dd HH:mm:ss"
