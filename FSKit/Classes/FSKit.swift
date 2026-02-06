@@ -831,6 +831,16 @@ public class FSKit: NSObject {
     }
     
     // MARK: - Display Formatting
+    public static func showBetterFor2DigitFloat(_ value: Float) -> String {
+        let d = Int(value)
+        return self.showBetterFor2DigitInteger(d)
+    }
+
+    public static func showBetterFor2DigitDouble(_ value: Double) -> String {
+        let d = Int(value)
+        return self.showBetterFor2DigitInteger(d)
+    }
+
     public static func showBetterFor2DigitInteger(_ value: Int) -> String {
         guard value != 0 else { return "0" }
         
