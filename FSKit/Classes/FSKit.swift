@@ -1067,6 +1067,16 @@ public class FSKit: NSObject {
         return data
     }
     
+    public static func showBetterFor5DigitFloat(_ value: Float) -> String {
+        let d = Int(value)
+        return self.showBetterFor5DigitInteger(d)
+    }
+    
+    public static func showBetterFor5DigitDouble(_ value: Double) -> String {
+        let d = Int(value)
+        return self.showBetterFor5DigitInteger(d)
+    }
+    
     public static func showBetterFor5DigitInteger(_ value: Int) -> String {
         if value == 0 {
             return "0"
