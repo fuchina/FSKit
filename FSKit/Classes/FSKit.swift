@@ -958,7 +958,6 @@ public class FSKit: NSObject {
     }
     
     // MARK: - Window Scene
-    @available(iOS 13.0, *)
     public static func currentWindowScene() -> UIWindowScene? {
         let scenes = UIApplication.shared.connectedScenes
         for scene in scenes {
