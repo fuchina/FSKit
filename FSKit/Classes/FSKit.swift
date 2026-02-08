@@ -65,45 +65,21 @@ public class FSKit: NSObject {
         return false
     }
     
-    public static func pushToViewController(withClass className: String, navigationController: UINavigationController?, param: [String: Any]? = nil, configBlock: ((UIViewController) -> Void)? = nil) {
-        guard let controller = controllerWithClass(className, param: param, configBlock: configBlock) else { return }
-        navigationController?.pushViewController(controller, animated: true)
-    }
-    
-    public static func controllerWithClass(_ className: String, param: [String: Any]? = nil, configBlock: ((UIViewController) -> Void)? = nil) -> UIViewController? {
-        guard let controllerClass = NSClassFromString(className) as? UIViewController.Type else { return nil }
-        let viewController = controllerClass.init()
-        
-        if let param = param {
-            for (key, value) in param {
-                viewController.setValue(value, forKey: key)
-            }
-        }
-        
-        configBlock?(viewController)
-        return viewController
-    }
-
-    
-    // MARK: - Pasteboard
     public static func copyToPasteboard(_ string: String?) {
         guard let string = string else { return }
         UIPasteboard.general.string = string
     }
     
-    // MARK: - Screen Lock
     public static func letScreenLock(_ lock: Bool) {
         UIApplication.shared.isIdleTimerDisabled = !lock
     }
     
-    // MARK: - App Store
     public static func gotoAppCenterPage(withAppId appID: String) {
         let urlString = "itms-apps://itunes.apple.com/WebObjects/MZStore.woa/wa/viewContentsUserReviews?type=Purple+Software&id=\(appID)"
         guard let url = URL(string: urlString) else { return }
         UIApplication.shared.open(url, options: [:], completionHandler: nil)
     }
     
-    // MARK: - Validation
     public static func isValidateEmail(_ email: String) -> Bool {
         guard email.contains("@"), email.contains(".") else { return false }
         let emailRegex = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
