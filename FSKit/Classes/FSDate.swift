@@ -225,6 +225,7 @@ public class FSDate: NSObject {
     
     // MARK: - Lunar/Solar Conversion
     public static func solars(forLunar year: Int, month: Int, day: Int) -> [Date] {
+        
         let string = "\(year)-\(twoChar(month))-\(twoChar(day)) 23:59:59"
         guard var date = date(byString: string, formatter: nil) else { return [] }
         
