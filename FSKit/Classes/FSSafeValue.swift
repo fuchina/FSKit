@@ -27,7 +27,11 @@ open class FSSafe {
             return n.boolValue
             
         case let s as String:
-            return Bool(s) ?? false
+            
+            if s == "1" {
+                return true
+            }
+            return false
             
         default:
             return false
