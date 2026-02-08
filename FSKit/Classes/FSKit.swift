@@ -46,10 +46,11 @@ public class FSKit: NSObject {
         return try? JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed)
     }
     
-    public static func jsonString(_ object: Any) -> String? {
-        guard JSONSerialization.isValidJSONObject(object) else { return nil }
-        guard let data = try? JSONSerialization.data(withJSONObject: object, options: []) else { return nil }
-        return String(data: data, encoding: .utf8)
+    public static func jsonString(_ object: Any) -> String {
+        guard JSONSerialization.isValidJSONObject(object) else { return "" }
+        
+        guard let data = try? JSONSerialization.data(withJSONObject: object, options: []) else { return "" }
+        return String(data: data, encoding: .utf8) ?? ""
     }
     
     // MARK: - Navigation
@@ -867,7 +868,7 @@ public class FSKit: NSObject {
         }
     }
     
-    public static func showByTenThousand(_ rest: CGFloat, money: Bool) -> String {
+    public static func showByTenThousand(_ rest: Double, money: Bool) -> String {
         if rest < 100000 {
             return money ? bankStyleDataThree(rest) : "\(Int(rest))"
         } else if rest < 1000000 {
