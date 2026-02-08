@@ -846,7 +846,7 @@ public class FSKit: NSObject {
         guard value != 0 else { return "0" }
         
         if value % 100 == 0 {
-            return "\(value / 100)"
+            return String(format: "%.0f", Double(value) / 100)
         } else if value % 10 == 0 {
             return String(format: "%.1f", Double(value) / 100)
         } else {
@@ -858,7 +858,7 @@ public class FSKit: NSObject {
         guard value != 0 else { return "0" }
         
         if value % 1000 == 0 {
-            return "\(value / 1000)"
+            return String(format: "%.0f", Double(value) / 1000)
         } else if value % 100 == 0 {
             return String(format: "%.1f", Double(value) / 1000)
         } else if value % 10 == 0 {
@@ -870,7 +870,7 @@ public class FSKit: NSObject {
     
     public static func showByTenThousand(_ rest: Double, money: Bool) -> String {
         if rest < 100000 {
-            return money ? bankStyleDataThree(rest) : "\(Int(rest))"
+            return money ? bankStyleDataThree(rest) : "\(Int(ceil(rest)))"
         } else if rest < 1000000 {
             return String(format: "%.2f万", rest / 10000.0)
         } else if rest < 100000000 {
