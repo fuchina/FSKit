@@ -21,7 +21,7 @@ public class FSKit: NSObject {
     
     public static func printArrayFirstJSON(_ list: [[String: Any]]) {
         
-        let js = FSKit.jsonString(list.first)
+        let js = FSKit.jsonString(list.first ?? [])
         print("FSKit js = \(js)")
     
     }
