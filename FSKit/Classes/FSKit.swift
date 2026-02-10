@@ -1095,7 +1095,11 @@ public class FSKit: NSObject {
         return ret
     }
     
-    public static func popToController<T: UIViewController>(_ controllerType: T.Type, navigationController: UINavigationController, animated: Bool) {
+    public static func popToController<T: UIViewController>(_ controllerType: T.Type, navigationController: UINavigationController?, animated: Bool) {
+        
+        guard let navigationController = navigationController else {
+            return
+        }
         
         let vcs = navigationController.viewControllers
 
