@@ -362,60 +362,117 @@ public class FSDate: NSObject {
         return result
     }
     
-    public static func componentForDate(date: Date) -> DateComponents {
-        
-        var calendar = Calendar(identifier: .gregorian)     // UTC
-        
-        /**
-         *  NSTimeZone.localTimeZone，即设备当前时区，可以不写，因为方法会隐含；写上是为了增加可读性。
-         *  比如中国是UTC+8，所以在英国下午15点59分59秒（不考虑冬令时夏令时），中国已经23点59分59秒了，也就是下一秒中国就要跨天了。
-         */
-        calendar.timeZone = TimeZone.current
-        
-        let components = calendar.dateComponents([.year, .month, .day, .hour, .minute, .second, .weekOfMonth, .weekday, .weekOfMonth, .weekOfYear], from: date)
-                
-        return components
+    // MARK: - China Date
+    public static func chinaDateByDate(_ date: Date) -> Date {
+        let zone = TimeZone.current
+        let interval = zone.secondsFromGMT(for: date)
+        return date.addingTimeInterval(TimeInterval(interval))
     }
     
-    public static func theFirstSecondOfDay(date: Date) -> Int {
+    // MARK: - Day of Year
+    public static func daythOfYearForDate(_ date: Date?) -> Int {
+        let date = date ?? Date()
+        let component = component(for: date)
+        guard let year = component.year, let month = component.month, let day = component.day else { return 0 }
         
-        var calendar = Calendar.current
-        calendar.timeZone = TimeZone.current
+        let a = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+        let b = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+        var sum = 0
         
-        let t = calendar.startOfDay(for: date)
-        let time = t.timeIntervalSince1970
-        return Int(time)
-    }
-    
-    public static func theLastSecondOfDay(date: Date) -> Int {
-        
-        var com = FSDate.componentForDate(date: date)
-        com.setValue(23, for: .hour)
-        com.setValue(59, for: .minute)
-        com.setValue(59, for: .second)
-        
-        var calendar = Calendar.current
-        calendar.timeZone = TimeZone.current
-        
-        let endOfDay = calendar.date(from: com)
-        
-        guard let time = endOfDay?.timeIntervalSince1970 else { return 0 }
-        
-        return Int(time)
-    }
-    
-    public static func stringWithDate(date: Date?, formatter: String?) -> String {
-        if date == nil {
-            return ""
+        if isLeapYear(year) {
+            for i in 0..<(month-1) {
+                sum += b[i]
+            }
+        } else {
+            for i in 0..<(month-1) {
+                sum += a[i]
+            }
         }
+        sum += day
+        return sum
+    }
+    
+    // MARK: - Time Interval
+    public static func timeIntervalFromLastTime(_ lastTime: String, lastTimeFormat format1: String, ToCurrentTime currentTime: String, currentTimeFormat format2: String) -> String {
+        // 上次时间
+        let dateFormatter1 = DateFormatter()
+        dateFormatter1.dateFormat = format1
+        guard let lastDate = dateFormatter1.date(from: lastTime) else { return "" }
         
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = formatter ?? "yyyy-MM-dd HH:mm:ss"
+        // 当前时间
+        let dateFormatter2 = DateFormatter()
+        dateFormatter2.dateFormat = format2
+        guard let currentDate = dateFormatter2.date(from: currentTime) else { return "" }
         
-        //  这里应该隐含了   dateFormatter.timeZone = NSTimeZone.localTimeZone;
-        dateFormatter.timeZone = TimeZone.current
-        let v = dateFormatter.string(from: date!)
-        return v
+        return timeIntervalFromLastTime(lastDate, ToCurrentTime: currentDate)
+    }
+    
+    public static func timeIntervalFromLastTime(_ lastTime: Date, ToCurrentTime currentTime: Date) -> String {
+        let timeZone = TimeZone.current
+        // 上次时间
+        let lastDate = lastTime.addingTimeInterval(TimeInterval(timeZone.secondsFromGMT(for: lastTime)))
+        // 当前时间
+        let currentDate = currentTime.addingTimeInterval(TimeInterval(timeZone.secondsFromGMT(for: currentTime)))
+        // 时间间隔
+        let intevalTime = Int(currentDate.timeIntervalSinceReferenceDate - lastDate.timeIntervalSinceReferenceDate)
+        
+        // 秒、分、小时、天、月、年
+        let minutes = intevalTime / 60
+        let hours = intevalTime / 60 / 60
+        let day = intevalTime / 60 / 60 / 24
+        let month = intevalTime / 60 / 60 / 24 / 30
+        let yers = intevalTime / 60 / 60 / 24 / 365
+        
+        if minutes <= 10 {
+            return "刚刚"
+        } else if minutes < 60 {
+            return "\(minutes)分钟前"
+        } else if hours < 24 {
+            return "\(hours)小时前"
+        } else if day < 30 {
+            return "\(day)天前"
+        } else if month < 12 {
+            let df = DateFormatter()
+            df.dateFormat = "M月d日"
+            let time = df.string(from: lastDate)
+            return time
+        } else if yers >= 1 {
+            let df = DateFormatter()
+            df.dateFormat = "yyyy年M月d日"
+            let time = df.string(from: lastDate)
+            return time
+        }
+        return ""
+    }
+    
+    // MARK: - Public Function
+    private static func publicFunction(_ date: Date, str callback: (DateComponents) -> String) -> Int {
+        let c = component(for: date)
+        let str = callback(c)
+        guard let result = date(byString: str) else { return 0 }
+        let t = Int(result.timeIntervalSince1970)
+        return t
+    }
+    
+    // MARK: - Deprecated Methods
+    @available(*, deprecated, message: "Use component(for:) instead")
+    public static func componentForDate(date: Date) -> DateComponents {
+        return component(for: date)
+    }
+    
+    @available(*, deprecated, message: "Use theFirstSecondOfDay(_:) instead")
+    public static func theFirstSecondOfDay(date: Date) -> Int {
+        return theFirstSecondOfDay(date)
+    }
+    
+    @available(*, deprecated, message: "Use theLastSecondOfDay(_:) instead")
+    public static func theLastSecondOfDay(date: Date) -> Int {
+        return theLastSecondOfDay(date)
+    }
+    
+    @available(*, deprecated, message: "Use string(with:formatter:) instead")
+    public static func stringWithDate(date: Date?, formatter: String?) -> String {
+        return string(with: date, formatter: formatter)
     }
     
 }
