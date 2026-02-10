@@ -60,18 +60,6 @@ public class FSKit: NSObject {
         return String(data: data, encoding: .utf8) ?? ""
     }
     
-    // MARK: - Navigation
-    public static func popToController(_ className: String, navigationController: UINavigationController?, animated: Bool) -> Bool {
-        guard let nav = navigationController else { return false }
-        for controller in nav.viewControllers {
-            if NSStringFromClass(type(of: controller)).contains(className) {
-                nav.popToViewController(controller, animated: animated)
-                return true
-            }
-        }
-        return false
-    }
-    
     public static func copyToPasteboard(_ string: String?) {
         guard let string = string else { return }
         UIPasteboard.general.string = string
@@ -1107,17 +1095,15 @@ public class FSKit: NSObject {
         return ret
     }
     
-    public static func popToController<T: UIViewController>(
-        _ controllerType: T.Type,
-        forController: UIViewController
-    ) {
+    public static func popToController<T: UIViewController>(_ controllerType: T.Type, forController: UIViewController, animated: Bool) {
+        
         guard let vcs = forController.navigationController?.viewControllers else {
             return
         }
 
         for vc in vcs {
             if vc is T {
-                forController.navigationController?.popToViewController(vc, animated: true)
+                forController.navigationController?.popToViewController(vc, animated: animated)
                 return
             }
         }
