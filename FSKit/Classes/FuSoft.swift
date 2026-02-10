@@ -11,7 +11,7 @@ public let WIDTHFC: CGFloat = UIScreen.main.bounds.width
 public let HEIGHTFC: CGFloat = UIScreen.main.bounds.height
 
 // MARK: - Colors
-public let FSAPPCOLOR = UIColor(red: 18/255.0, green: 152/255.0, blue: 233/255.0, alpha: 1)
+public let APPCOLOR = UIColor(red: 18/255.0, green: 152/255.0, blue: 233/255.0, alpha: 1)
 
 // MARK: - Debug Log
 public func FSLog(_ format: String, file: String = #file, function: String = #function, line: Int = #line) {
