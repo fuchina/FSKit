@@ -1083,21 +1083,21 @@ public class FSKit: NSObject {
         } else {
             mode = value % 10000
             if mode == 0 {
-                ret = String(format: "%.1f", Double(value) / Double(FSFiveDecimalPlaces))
+                ret = String(format: "%.1f", Double(value) / FSDoubleFiveDecimalPlaces)
             } else {
                 mode = value % 1000
                 if mode == 0 {
-                    ret = String(format: "%.2f", Double(value) / Double(FSFiveDecimalPlaces))
+                    ret = String(format: "%.2f", Double(value) / FSDoubleFiveDecimalPlaces)
                 } else {
                     mode = value % 100
                     if mode == 0 {
-                        ret = String(format: "%.3f", Double(value) / Double(FSFiveDecimalPlaces))
+                        ret = String(format: "%.3f", Double(value) / FSDoubleFiveDecimalPlaces)
                     } else {
                         mode = value % 10
                         if mode == 0 {
-                            ret = String(format: "%.4f", Double(value) / Double(FSFiveDecimalPlaces))
+                            ret = String(format: "%.4f", Double(value) / FSDoubleFiveDecimalPlaces)
                         } else {
-                            ret = String(format: "%.5f", Double(value) / Double(FSFiveDecimalPlaces))
+                            ret = String(format: "%.5f", Double(value) / FSDoubleFiveDecimalPlaces)
                         }
                     }
                 }
