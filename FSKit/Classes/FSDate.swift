@@ -62,7 +62,7 @@ public class FSDate: NSObject {
     }
     
     // MARK: - Date Components
-    public static func component(for date: Date) -> DateComponents {
+    public static func components(_ date: Date) -> DateComponents {
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = .current
         return calendar.dateComponents([.year, .month, .day, .hour, .minute, .second, .weekOfMonth, .weekday, .weekOfYear], from: date)
@@ -457,27 +457,6 @@ public class FSDate: NSObject {
                 
         let t = Int(result!.timeIntervalSince1970)
         return t
-    }
-    
-    // MARK: - Deprecated Methods
-    @available(*, deprecated, message: "Use component(for:) instead")
-    public static func componentForDate(date: Date) -> DateComponents {
-        return component(for: date)
-    }
-    
-    @available(*, deprecated, message: "Use theFirstSecondOfDay(_:) instead")
-    public static func theFirstSecondOfDay(date: Date) -> Int {
-        return theFirstSecondOfDay(date)
-    }
-    
-    @available(*, deprecated, message: "Use theLastSecondOfDay(_:) instead")
-    public static func theLastSecondOfDay(date: Date) -> Int {
-        return theLastSecondOfDay(date)
-    }
-    
-    @available(*, deprecated, message: "Use string(with:formatter:) instead")
-    public static func stringWithDate(date: Date?, formatter: String?) -> String {
-        return string(with: date, formatter: formatter)
     }
     
 }
