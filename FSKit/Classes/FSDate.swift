@@ -449,8 +449,13 @@ public class FSDate: NSObject {
     private static func publicFunction(_ date: Date, str callback: (DateComponents) -> String) -> Int {
         let c = component(for: date)
         let str = callback(c)
-        guard let result = date(byString: str) else { return 0 }
-        let t = Int(result.timeIntervalSince1970)
+        
+        let result = FSDate.date(byString: str)
+        guard result != nil else {
+            return 0
+        }
+                
+        let t = Int(result!.timeIntervalSince1970)
         return t
     }
     
