@@ -1095,18 +1095,16 @@ public class FSKit: NSObject {
         return ret
     }
     
-    public static func popToController<T: UIViewController>(_ controllerType: T.Type, forController: UIViewController, animated: Bool) {
+    public static func popToController<T: UIViewController>(_ controllerType: T.Type, navigationController: UINavigationController, animated: Bool) {
         
-        guard let vcs = forController.navigationController?.viewControllers else {
-            return
-        }
+        let vcs = navigationController.viewControllers
 
-        for vc in vcs {
-            if vc is T {
-                forController.navigationController?.popToViewController(vc, animated: animated)
-                return
-            }
-        }
+         for vc in vcs {
+             if vc is T {
+                 navigationController.popToViewController(vc, animated: animated)
+                 return
+             }
+         }
     }
     
 }
