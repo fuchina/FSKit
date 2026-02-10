@@ -308,7 +308,7 @@ public class FSDate: NSObject {
             return nil
         }
         
-        var lastYear = year - 1
+        let lastYear = year - 1
         
         if month == 2 && day == 29 {
             if !isLeapYear(lastYear) {
@@ -376,9 +376,9 @@ public class FSDate: NSObject {
     }
     
     // MARK: - Day of Year
-    public static func daythOfYearForDate(_ date: Date?) -> Int {
-        let date = date ?? Date()
-        let component = component(for: date)
+    public static func daythOfYearForDate(_ date: Date) -> Int {
+        
+        let component = components(date)
         guard let year = component.year, let month = component.month, let day = component.day else { return 0 }
         
         let a = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
@@ -394,6 +394,7 @@ public class FSDate: NSObject {
                 sum += a[i]
             }
         }
+        
         sum += day
         return sum
     }
