@@ -10,7 +10,7 @@ import CommonCrypto
 
 // MARK: - Constants
 /// 一年的秒数
-public let FSKitYearSeconds: CGFloat = 31556926.08
+public let FSKitYearSeconds: Double = 31556926.08
 
 /// 支持小数点后5位，支持汇率（4位），必须是整数
 public let FSFiveDecimalPlaces: Int = 100000
@@ -184,7 +184,7 @@ public class FSKit: NSObject {
         return !dictionary.isEmpty
     }
     
-    public static func floatEqual(_ aNumber: CGFloat, _ bNumber: CGFloat) -> Bool {
+    public static func floatEqual(_ aNumber: Double, _ bNumber: Double) -> Bool {
         return abs(aNumber - bNumber) < .ulpOfOne
     }
     
@@ -220,16 +220,16 @@ public class FSKit: NSObject {
         return Double(vm_page_size) * Double(vmStats.free_count) / 1024.0 / 1024.0
     }
     
-    public static func diskOfAllSizeBytes() -> CGFloat {
+    public static func diskOfAllSizeBytes() -> Double {
         guard let attrs = try? FileManager.default.attributesOfFileSystem(forPath: NSHomeDirectory()),
               let size = attrs[.systemSize] as? NSNumber else { return 0 }
-        return CGFloat(size.floatValue)
+        return Double(size.floatValue)
     }
     
-    public static func diskOfFreeSizeBytes() -> CGFloat {
+    public static func diskOfFreeSizeBytes() -> Double {
         guard let attrs = try? FileManager.default.attributesOfFileSystem(forPath: NSHomeDirectory()),
               let size = attrs[.systemFreeSize] as? NSNumber else { return 0 }
-        return CGFloat(size.floatValue)
+        return Double(size.floatValue)
     }
     
     public static func folderSize(atPath folderPath: String, extension ext: String? = nil) -> Int {
@@ -278,10 +278,10 @@ public class FSKit: NSObject {
         }
     }
     
-    public static func freeStoragePercentage() -> CGFloat {
-        let total = CGFloat(getTotalDiskSize())
+    public static func freeStoragePercentage() -> Double {
+        let total = Double(getTotalDiskSize())
         guard total > 1 else { return 0 }
-        return CGFloat(getAvailableDiskSize()) / total
+        return Double(getAvailableDiskSize()) / total
     }
     
     public static func getTotalDiskSize() -> Int {
@@ -422,9 +422,9 @@ public class FSKit: NSObject {
     
     // MARK: - Color
     public static func randomColor() -> UIColor {
-        let r = CGFloat(arc4random_uniform(256)) / 255.0
-        let g = CGFloat(arc4random_uniform(256)) / 255.0
-        let b = CGFloat(arc4random_uniform(256)) / 255.0
+        let r = Double(arc4random_uniform(256)) / 255.0
+        let g = Double(arc4random_uniform(256)) / 255.0
+        let b = Double(arc4random_uniform(256)) / 255.0
         return UIColor(red: r, green: g, blue: b, alpha: 1)
     }
     
@@ -444,19 +444,19 @@ public class FSKit: NSObject {
         Scanner(string: cString).scanHexInt64(&rgbValue)
         
         return UIColor(
-            red: CGFloat((rgbValue & 0xFF0000) >> 16) / 255.0,
-            green: CGFloat((rgbValue & 0x00FF00) >> 8) / 255.0,
-            blue: CGFloat(rgbValue & 0x0000FF) / 255.0,
+            red: Double((rgbValue & 0xFF0000) >> 16) / 255.0,
+            green: Double((rgbValue & 0x00FF00) >> 8) / 255.0,
+            blue: Double(rgbValue & 0x0000FF) / 255.0,
             alpha: 1.0
         )
     }
 
     
     // MARK: - Font
-    public static func angleFont(withRate rate: CGFloat, fontSize: Int) -> UIFont {
+    public static func angleFont(withRate rate: Double, fontSize: Int) -> UIFont {
         let matrix = CGAffineTransform(a: 1, b: 0, c: tan(rate * .pi / 180), d: 1, tx: 0, ty: 0)
-        let desc = UIFontDescriptor(name: UIFont.systemFont(ofSize: CGFloat(fontSize)).fontName, matrix: matrix)
-        return UIFont(descriptor: desc, size: CGFloat(fontSize))
+        let desc = UIFontDescriptor(name: UIFont.systemFont(ofSize: Double(fontSize)).fontName, matrix: matrix)
+        return UIFont(descriptor: desc, size: Double(fontSize))
     }
     
     // MARK: - Unit Conversion
@@ -477,13 +477,13 @@ public class FSKit: NSObject {
         return formatter
     }
     
-    public static func bankStyleData(_ data: CGFloat) -> String {
+    public static func bankStyleData(_ data: Double) -> String {
         let formatter = NumberFormatter()
         formatter.positiveFormat = "0.00;"
         return formatter.string(from: NSNumber(value: Double(data))) ?? ""
     }
     
-    public static func bankStyleDataThree(_ data: CGFloat) -> String {
+    public static func bankStyleDataThree(_ data: Double) -> String {
         let formatter = bankStyleFormatter()
         return formatter.string(from: NSNumber(value: Double(data))) ?? ""
     }
@@ -600,7 +600,7 @@ public class FSKit: NSObject {
     }
     
     // MARK: - Growth Rate
-    public static func growthRate(_ number: CGFloat, base: CGFloat) -> CGFloat {
+    public static func growthRate(_ number: Double, base: Double) -> Double {
         if base > 0 {
             return number / base - 1
         } else if base < 0 {
@@ -641,7 +641,7 @@ public class FSKit: NSObject {
         return result
     }
     
-    public static func dayMonthYear(forNumber number: CGFloat) -> String {
+    public static func dayMonthYear(forNumber number: Double) -> String {
         if number > 365 {
             return String(format: "%.2f年", number / 365.0)
         } else if number > 30 {
@@ -1001,7 +1001,7 @@ public class FSKit: NSObject {
         return value.cgRectValue.size
     }
     
-    public static func keyboardNotificationScroll(_ notification: Notification, baseOn: CGFloat) -> CGSize {
+    public static func keyboardNotificationScroll(_ notification: Notification, baseOn: Double) -> CGSize {
         let keyboardSize = self.keyboardSize(from: notification)
         let screenSize = UIScreen.main.bounds.size
         
@@ -1045,16 +1045,16 @@ public class FSKit: NSObject {
     }
     
     // MARK: - Image Compression
-    public static func compressOriginalImage(_ image: UIImage, toMaxDataSizeKBytes size: CGFloat) -> Data? {
-        var maxQuality: CGFloat = 0.9
+    public static func compressOriginalImage(_ image: UIImage, toMaxDataSizeKBytes size: Double) -> Data? {
+        var maxQuality: Double = 0.9
         var data = image.jpegData(compressionQuality: 1.0)
-        var dataKBytes = CGFloat(data?.count ?? 0) / 1000.0
+        var dataKBytes = Double(data?.count ?? 0) / 1000.0
         var lastData = dataKBytes
         
         while dataKBytes > size && maxQuality > 0.01 {
             maxQuality -= 0.01
             data = image.jpegData(compressionQuality: maxQuality)
-            dataKBytes = CGFloat(data?.count ?? 0) / 1000.0
+            dataKBytes = Double(data?.count ?? 0) / 1000.0
             if lastData == dataKBytes { break }
             lastData = dataKBytes
         }
