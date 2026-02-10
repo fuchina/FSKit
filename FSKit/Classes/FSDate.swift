@@ -132,8 +132,8 @@ public class FSDate: NSObject {
     // MARK: - Same Day Check
     public static func isTheSameDay(_ aDate: Date?, _ bDate: Date?) -> Bool {
         guard let aDate = aDate, let bDate = bDate else { return false }
-        let f = component(for: aDate)
-        let s = component(for: bDate)
+        let f = components(aDate)
+        let s = components(bDate)
         return f.year == s.year && f.month == s.month && f.day == s.day
     }
 
@@ -143,7 +143,7 @@ public class FSDate: NSObject {
         var calendar = Calendar.current
         calendar.timeZone = .current
         
-        var com = component(for: date)
+        var com = components(date)
         com.day = 1
         com.hour = 0
         com.minute = 0
@@ -157,7 +157,7 @@ public class FSDate: NSObject {
         var calendar = Calendar.current
         calendar.timeZone = .current
         
-        var com = component(for: date)
+        var com = components(date)
         let days = daysForMonth(com.month!, year: com.year!)
         
         com.day = days
@@ -181,7 +181,7 @@ public class FSDate: NSObject {
         var calendar = Calendar.current
         calendar.timeZone = .current
         
-        var com = component(for: date)
+        var com = components(date)
         com.hour = 23
         com.minute = 59
         com.second = 59
@@ -269,7 +269,7 @@ public class FSDate: NSObject {
     
     public static func lunarDate(forSolar solar: Date) -> FSLunarDate? {
         guard let lunarComponents = chineseDate(solar) else { return nil }
-        let solarComponents = component(for: solar)
+        let solarComponents = components(solar)
         
         var year = solarComponents.year ?? 0
         if (lunarComponents.month ?? 0) > (solarComponents.month ?? 0) {
@@ -300,17 +300,23 @@ public class FSDate: NSObject {
     
     // MARK: - Last Year This Day
     public static func theLastYearThisDay(_ components: DateComponents) -> Date? {
-        var lastYearYear = (components.year ?? 0) - 1
-        var lastYearMonth = components.month ?? 1
-        var lastYearDay = components.day ?? 1
         
-        if components.month == 2 && components.day == 29 {
-            if !isLeapYear(lastYearYear) {
-                lastYearDay = 28
+        guard let year = components.year,
+              let month = components.month,
+              var day = components.day else {
+            
+            return nil
+        }
+        
+        var lastYear = year - 1
+        
+        if month == 2 && day == 29 {
+            if !isLeapYear(lastYear) {
+                day = 28
             }
         }
         
-        let lastYearString = "\(lastYearYear)-\(twoChar(lastYearMonth))-\(twoChar(lastYearDay))"
+        let lastYearString = "\(lastYear)-\(twoChar(month))-\(twoChar(day))"
         return date(byString: lastYearString, formatter: "yyyy-MM-dd 00:00:00")
     }
     
