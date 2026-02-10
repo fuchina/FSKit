@@ -1106,6 +1106,23 @@ public class FSKit: NSObject {
         
         return ret
     }
+    
+    public static func popToController<T: UIViewController>(
+        _ controllerType: T.Type,
+        forController: UIViewController
+    ) {
+        guard let vcs = forController.navigationController?.viewControllers else {
+            return
+        }
+
+        for vc in vcs {
+            if vc is T {
+                forController.navigationController?.popToViewController(vc, animated: true)
+                return
+            }
+        }
+    }
+    
 }
 
 // MARK: - GCD Helpers
