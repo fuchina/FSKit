@@ -454,7 +454,8 @@ public class FSDate: NSObject {
     
     // MARK: - Public Function
     private static func publicFunction(_ date: Date, str callback: (DateComponents) -> String) -> Int {
-        let c = component(for: date)
+        
+        let c = components(date)
         let str = callback(c)
         
         let result = FSDate.date(byString: str)
