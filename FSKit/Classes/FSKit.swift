@@ -1096,14 +1096,18 @@ public class FSKit: NSObject {
     }
     
     public static func pushToController<T: UIViewController>(_ controllerType: T.Type, navigationController: UINavigationController?, animated: Bool) {
+        self .pushToController(controllerType, navigationController: navigationController, animated: animated, configure: nil)
+    }
         
-        guard let navigationController = navigationController else {
-            return
-        }
+    public static func pushToController<T: UIViewController>(_ type: T.Type, navigationController: UINavigationController?, animated: Bool,
+        configure: ((T) -> Void)? = nil) {
         
-        let ins = controllerType.init()
-        
-        navigationController.pushViewController(ins, animated: animated)
+        guard let nav = navigationController else { return }
+
+        let vc = T.init()
+        configure?(vc)
+
+        nav.pushViewController(vc, animated: animated)
     }
     
     public static func popToController<T: UIViewController>(_ controllerType: T.Type, navigationController: UINavigationController?, animated: Bool) {
