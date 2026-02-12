@@ -110,6 +110,7 @@ open class FSEntity: NSObject {
         }
         
         private static func convertValue<V>(_ value: Any, to targetType: V.Type) -> V? {
+
             if let matchedValue = value as? V {
                 return matchedValue
             }
@@ -129,36 +130,36 @@ open class FSEntity: NSObject {
             }
         }
         
-        private static func convertToInt(_ value: Any) -> Int? {
+        private static func convertToInt(_ value: Any) -> Int {
             switch value {
             case let num as NSNumber: return num.intValue
             case let d as Double: return Int(d)
-            case let s as String: return Int(s)
-            default: return nil
+            case let s as String: return Int(s) ?? 0
+            default: return 0
             }
         }
         
-        private static func convertToDouble(_ value: Any) -> Double? {
+        private static func convertToDouble(_ value: Any) -> Double {
             switch value {
             case let num as NSNumber: return num.doubleValue
             case let i as Int: return Double(i)
-            case let s as String: return Double(s)
-            default: return nil
+            case let s as String: return Double(s) ?? 0
+            default: return 0
             }
         }
         
-        private static func convertToString(_ value: Any) -> String? {
+        private static func convertToString(_ value: Any) -> String {
             switch value {
             case let s as String: return s
             case let num as NSNumber: return num.stringValue
             case let i as Int: return "\(i)"
             case let d as Double: return "\(d)"
             case let b as Bool: return b ? "true" : "false"
-            default: return nil
+            default: return ""
             }
         }
         
-        private static func convertToBool(_ value: Any) -> Bool? {
+        private static func convertToBool(_ value: Any) -> Bool {
             switch value {
             case let b as Bool: return b
             case let num as NSNumber: return num.boolValue
@@ -166,7 +167,7 @@ open class FSEntity: NSObject {
             case let s as String:
                 let lowerS = s.lowercased()
                 return lowerS == "true" || lowerS == "1"
-            default: return nil
+            default: return false
             }
         }
 }
