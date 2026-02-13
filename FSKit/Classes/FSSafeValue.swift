@@ -64,6 +64,7 @@ open class FSSafe {
     }
     
     public static func int(_ value: Any?) -> Int {
+            
         switch value {
         case let t as TimeInterval:
             return Int(t)
@@ -81,7 +82,11 @@ open class FSSafe {
             return n.intValue
             
         case let s as String:
-            return Int(s) ?? 0
+            let d = Double(s) ?? 0
+            return Int(d)
+        
+        case let f as Float:
+            return Int(f)
             
         default:
             return 0
