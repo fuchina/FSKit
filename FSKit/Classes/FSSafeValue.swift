@@ -195,7 +195,7 @@ open class FSSafe {
     }
     
     /// 严谨判断是否为合法的HTTPS链接
-    static func isValidHttpsLink(_ urlString: String?) -> Bool {
+    public static func isValidHttpsLink(_ urlString: String?) -> Bool {
         guard let urlString = urlString, !urlString.isEmpty else {
             return false
         }
