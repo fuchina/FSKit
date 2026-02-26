@@ -194,4 +194,28 @@ open class FSSafe {
         return resultArray
     }
     
+    /// 严谨判断是否为合法的HTTPS链接
+    static func isValidHttpsLink(_ urlString: String?) -> Bool {
+        guard let urlString = urlString, !urlString.isEmpty else {
+            return false
+        }
+        
+        // 步骤1：转为URL实例（自动处理首尾空格等小问题）
+        guard let url = URL(string: urlString) else {
+            return false
+        }
+        
+        // 步骤2：校验scheme是https（忽略大小写）
+        guard let scheme = url.scheme, scheme.lowercased() == "https" else {
+            return false
+        }
+        
+        // 步骤3（可选）：校验包含有效主机名（排除 https:// 这种空链接）
+        guard let host = url.host, !host.isEmpty else {
+            return false
+        }
+        
+        return true
+    }
+    
 }
