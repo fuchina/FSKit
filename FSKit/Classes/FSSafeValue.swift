@@ -28,10 +28,11 @@ open class FSSafe {
             
         case let s as String:
             
-            if s == "1" {
-                return true
+            if s == "0" || s == "false" {
+                return false
             }
-            return false
+            
+            return true
             
         default:
             return false
