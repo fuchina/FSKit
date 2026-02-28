@@ -145,16 +145,22 @@ public class FSKit: NSObject {
     
     public static func isPureInt(_ string: String?) -> Bool {
         guard let string = string, !string.isEmpty else { return false }
-        let scanner = Scanner(string: string)
-        var value: Int = 0
-        return scanner.scanInt(&value) && scanner.isAtEnd
+        if #available(iOS 13.0, tvOS 13.0, watchOS 6.0, macOS 10.15, *) {
+            let scanner = Scanner(string: string)
+            return scanner.scanInt() != nil && scanner.isAtEnd
+        }
+        
+        return Int(string.trimmingCharacters(in: .whitespacesAndNewlines)) != nil
     }
     
     public static func isPureFloat(_ string: String?) -> Bool {
         guard let string = string, !string.isEmpty else { return false }
-        let scanner = Scanner(string: string)
-        var value: Float = 0
-        return scanner.scanFloat(&value) && scanner.isAtEnd
+        if #available(iOS 13.0, tvOS 13.0, watchOS 6.0, macOS 10.15, *) {
+            let scanner = Scanner(string: string)
+            return scanner.scanFloat() != nil && scanner.isAtEnd
+        }
+        
+        return Float(string.trimmingCharacters(in: .whitespacesAndNewlines)) != nil
     }
     
     public static func isValidateString(_ string: String?) -> Bool {
