@@ -72,16 +72,16 @@ open class FSEntity: NSObject {
 
     /// 批量
     static public func toms<T: FSEntity>(from dictionaries: [[String: Any]]) -> [T] {
-        dictionaries.map {
-            let model = T.init()
-            model.fill(from: $0)
-            return model
-        }
+        self.toms(from: dictionaries, before: nil, after: nil)
     }
     
     /// 批量
     static public func toms<T: FSEntity>(from dictionaries: [[String: Any]], before: ((T) -> Void)?, after: ((T) -> Void)?) -> [T] {
-        dictionaries.map {
+        if dictionaries.count == 0 {
+            return []
+        }
+
+        return dictionaries.map {
             let model = T.init()
             model.fill(from: $0, before: before, after: after)
             return model
