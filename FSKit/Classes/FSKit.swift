@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import CommonCrypto
+import CryptoKit
 
 // MARK: - Constants
 /// 一年的秒数
@@ -403,16 +403,22 @@ public class FSKit: NSObject {
         guard let scalar = Unicode.Scalar(asciiCode) else { return nil }
         return String(Character(scalar))
     }
-    
-    // MARK: - MD5
+        
     public static func md5(_ str: String?) -> String? {
-        guard let str = str, let data = str.data(using: .utf8) else { return nil }
-        var digest = [UInt8](repeating: 0, count: Int(CC_MD5_DIGEST_LENGTH))
-        _ = data.withUnsafeBytes {
-            CC_MD5($0.baseAddress, CC_LONG(data.count), &digest)
-        }
-        return digest.map { String(format: "%02X", $0) }.joined()
-    }
+          guard let str = str, let data = str.data(using: .utf8) else { return nil }
+          
+          // 使用 CryptoKit 计算 MD5 摘要（iOS 13+ 推荐方式）
+          let digest = Insecure.MD5.hash(data: data)
+          
+          // 转为大写 16 进制字符串（和你原代码输出格式完全一致）
+          return digest.map { String(format: "%02X", $0) }.joined()
+      }
+      
+      /// 可选：小写输出版本（按需使用）
+      public static func md5Lowercase(_ str: String?) -> String? {
+          guard let upperCase = md5(str) else { return nil }
+          return upperCase.lowercased()
+      }
     
     // MARK: - Color
     public static func randomColor() -> UIColor {
