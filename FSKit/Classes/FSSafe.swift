@@ -11,25 +11,37 @@ open class FSSafe {
     
     public static func bool(_ value: Any?) -> Bool {
         switch value {
-        case let t as TimeInterval:
-            return Int(t) != 0
-            
         case let i as Int:
             return i != 0
             
         case let i as Int64:
             return i != 0
+        
+        case let f as Float:
+            return f != 0
             
         case let d as Double:
-            return Int(d) != 0
+            return d != 0
             
         case let n as NSNumber:
-            return n.boolValue
+            return n.doubleValue != 0
             
         case let s as String:
-            
-            if s == "0" || s == "false" {
+            let normalized = s.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+            if normalized.isEmpty {
                 return false
+            }
+            
+            if normalized == "0" || normalized == "false" || normalized == "no" || normalized == "n" || normalized == "off" {
+                return false
+            }
+            
+            if normalized == "1" || normalized == "true" || normalized == "yes" || normalized == "y" || normalized == "on" {
+                return true
+            }
+            
+            if let number = Double(normalized) {
+                return number != 0
             }
             
             return true
@@ -129,10 +141,18 @@ open class FSSafe {
     }
     
     public static func dictionary(_ value: Any?) -> [String: Any] {
-        if let nsDict = value as? NSDictionary {
-            return nsDict as! [String: Any]
-        } else if let swiftDict = value as? [String: Any] {
+        if let swiftDict = value as? [String: Any] {
             return swiftDict
+        } else if let nsDict = value as? NSDictionary {
+            var result: [String: Any] = [:]
+            for (key, val) in nsDict {
+                if let k = key as? String {
+                    result[k] = val
+                } else {
+                    result[String(describing: key)] = val
+                }
+            }
+            return result
         } else {
             return [:]
         }
@@ -152,14 +172,45 @@ open class FSSafe {
     // 快速转为 String 数组
     public static func stringArray(_ value: Any?) -> [String] {
         return Self.convertToArray(from: value) { element in
-            return self.string(element)
+            if let str = element as? String {
+                return str
+            }
+            
+            if let str = element as? NSString {
+                return str as String
+            }
+            
+            return nil
         }
     }
     
     /// 快速转为 Int 数组
     public static func intArray(_ value: Any?) -> [Int] {
         return convertToArray(from: value) { element in
-            return self.int(element)
+            switch element {
+            case let i as Int:
+                return i
+                
+            case let i as Int64:
+                return Int(i)
+                
+            case let n as NSNumber:
+                return n.intValue
+                
+            case let d as Double:
+                return Int(d)
+                
+            case let f as Float:
+                return Int(f)
+                
+            case let s as String:
+                let normalized = s.trimmingCharacters(in: .whitespacesAndNewlines)
+                guard !normalized.isEmpty, let d = Double(normalized) else { return nil }
+                return Int(d)
+                
+            default:
+                return nil
+            }
         }
     }
     
