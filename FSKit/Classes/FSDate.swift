@@ -317,7 +317,7 @@ public class FSDate: NSObject {
         }
         
         let lastYearString = "\(lastYear)-\(twoChar(month))-\(twoChar(day))"
-        return date(byString: lastYearString, formatter: "yyyy-MM-dd 00:00:00")
+        return date(byString: lastYearString, formatter: "yyyy-MM-dd 10:00:00")
     }
     
     // MARK: - Two Char
