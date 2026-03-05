@@ -77,6 +77,10 @@ open class FSSafe {
     }
     
     public static func int(_ value: Any?) -> Int {
+        
+        if value == nil {
+            return 0
+        }
             
         switch value {
         case let t as TimeInterval:
