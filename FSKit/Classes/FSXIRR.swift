@@ -99,13 +99,15 @@ open class FSXIRR: NSObject {
         options: Options = FSXIRR.transactionOptions
     ) -> Double? {
         let flows = cashFlows.map { CashFlow(date: $0.date, amount: $0.amount) }
-        return solve(flows, options: options)
+        let v = solve(flows, options: options)
+        return v
     }
 
     public static func solve(
         _ cashFlows: [CashFlow],
         options: Options = FSXIRR.transactionOptions
     ) -> Double? {
+        
         guard cashFlows.count >= 2 else { return nil }
 
         let sorted = cashFlows.sorted { $0.date < $1.date }
