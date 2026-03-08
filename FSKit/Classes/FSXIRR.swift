@@ -32,6 +32,7 @@ open class FSXIRR: NSObject {
         public var residualTolerance: Double
         public var useBisectionFallback: Bool
         public var useAnnualizeFallback: Bool
+        public var enforceMinOneDaySpanOnStartEnd: Bool
 
         public init(
             initialRate: Double = 0.1,
@@ -45,7 +46,8 @@ open class FSXIRR: NSObject {
             npvTolerance: Double = 1e-8,
             residualTolerance: Double = 0.01,
             useBisectionFallback: Bool = true,
-            useAnnualizeFallback: Bool = true
+            useAnnualizeFallback: Bool = true,
+            enforceMinOneDaySpanOnStartEnd: Bool = false
         ) {
             self.initialRate = initialRate
             self.lowerBound = lowerBound
@@ -59,6 +61,7 @@ open class FSXIRR: NSObject {
             self.residualTolerance = residualTolerance
             self.useBisectionFallback = useBisectionFallback
             self.useAnnualizeFallback = useAnnualizeFallback
+            self.enforceMinOneDaySpanOnStartEnd = enforceMinOneDaySpanOnStartEnd
         }
     }
 
@@ -104,13 +107,24 @@ open class FSXIRR: NSObject {
     }
 
     public static func solve(
+        _ cashFlows: [(date: Double, amount: Double)],
+        enforceMinOneDaySpanOnStartEnd: Bool,
+        options: Options = FSXIRR.transactionOptions
+    ) -> Double? {
+        var opts = options
+        opts.enforceMinOneDaySpanOnStartEnd = enforceMinOneDaySpanOnStartEnd
+        return solve(cashFlows, options: opts)
+    }
+
+    public static func solve(
         _ cashFlows: [CashFlow],
         options: Options = FSXIRR.transactionOptions
     ) -> Double? {
         
         guard cashFlows.count >= 2 else { return nil }
 
-        let sorted = cashFlows.sorted { $0.date < $1.date }
+        let sortedRaw = cashFlows.sorted { $0.date < $1.date }
+        let sorted = normalizedFlows(sortedRaw, options: options)
         guard hasBothSigns(sorted) else { return nil }
 
         let baseDate = sorted[0].date
@@ -211,7 +225,7 @@ open class FSXIRR: NSObject {
         }
 
         if options.useAnnualizeFallback {
-            return annualizeFallback(sorted)
+            return annualizeFallback(sorted, options: options)
         }
 
         return nil
@@ -260,5 +274,36 @@ open class FSXIRR: NSObject {
         let fallback = pow(ratio, 1.0 / years) - 1.0
         return fallback.isFinite ? fallback : nil
     }
-}
 
+    private static func annualizeFallback(_ cashFlows: [CashFlow], options: Options) -> Double? {
+        let normalized = normalizedFlows(cashFlows, options: options)
+        return annualizeFallback(normalized)
+    }
+
+    private static func normalizedFlows(_ cashFlows: [CashFlow], options: Options) -> [CashFlow] {
+        guard options.enforceMinOneDaySpanOnStartEnd else { return cashFlows }
+        guard let first = cashFlows.first, let last = cashFlows.last else { return cashFlows }
+
+        let minSpan: Double = 86400.0
+        let rawSpan = last.date - first.date
+        guard rawSpan >= 0, rawSpan < minSpan else { return cashFlows }
+
+        // If start/end is less than one day, stretch the full timeline to one day.
+        // The decision to stretch is based only on start/end gap.
+        if rawSpan == 0 {
+            return cashFlows.map { cf in
+                if cf.date > first.date {
+                    return CashFlow(date: first.date + minSpan, amount: cf.amount)
+                }
+                return CashFlow(date: first.date, amount: cf.amount)
+            }
+        }
+
+        let scale = minSpan / rawSpan
+        return cashFlows.map { cf in
+            let shifted = (cf.date - first.date) * scale
+            let clampedShift = min(max(shifted, 0), minSpan)
+            return CashFlow(date: first.date + clampedShift, amount: cf.amount)
+        }
+    }
+}
