@@ -171,7 +171,11 @@ open class FSXIRR: NSObject {
 
             let bounded = min(max(next, lower), upper)
             if abs(bounded - rate) < options.rateTolerance {
-                return bounded
+                let residual = abs(npv(bounded))
+                if residual < options.npvTolerance || residual < options.residualTolerance {
+                    return bounded
+                }
+                break
             }
             rate = bounded
         }
@@ -291,12 +295,15 @@ open class FSXIRR: NSObject {
         // If start/end is less than one day, stretch the full timeline to one day.
         // The decision to stretch is based only on start/end gap.
         if rawSpan == 0 {
-            return cashFlows.map { cf in
-                if cf.date > first.date {
-                    return CashFlow(date: first.date + minSpan, amount: cf.amount)
-                }
-                return CashFlow(date: first.date, amount: cf.amount)
+            var normalized = cashFlows
+            if normalized.count >= 2 {
+                let lastIndex = normalized.count - 1
+                normalized[lastIndex] = CashFlow(
+                    date: first.date + minSpan,
+                    amount: normalized[lastIndex].amount
+                )
             }
+            return normalized
         }
 
         let scale = minSpan / rawSpan
