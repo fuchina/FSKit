@@ -71,13 +71,13 @@ open class FSXIRR: NSObject {
         lowerBound: -0.999_999,
         upperBound: 1_000_000,
         maxNewtonIterations: 200,
-        maxBisectionIterations: 200,
-        maxBracketExpansionIterations: 40,
+        maxBisectionIterations: 0,
+        maxBracketExpansionIterations: 0,
         derivativeEpsilon: 1e-15,
         rateTolerance: 1e-10,
         npvTolerance: 1e-8,
         residualTolerance: 0.01,
-        useBisectionFallback: true,
+        useBisectionFallback: false,
         useAnnualizeFallback: true
     )
 
