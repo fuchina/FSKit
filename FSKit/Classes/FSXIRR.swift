@@ -157,6 +157,7 @@ open class FSXIRR: NSObject {
         }
 
         var rate = min(max(options.initialRate, lower), upper)
+        var shouldSkipBisection = false
         for _ in 0..<max(options.maxNewtonIterations, 0) {
             let f = npv(rate)
             let df = npvDeriv(rate)
@@ -175,6 +176,8 @@ open class FSXIRR: NSObject {
                 if residual < options.npvTolerance || residual < options.residualTolerance {
                     return bounded
                 }
+                rate = bounded
+                shouldSkipBisection = true
                 break
             }
             rate = bounded
@@ -184,7 +187,7 @@ open class FSXIRR: NSObject {
             return rate
         }
 
-        if options.useBisectionFallback && options.maxBisectionIterations > 0 {
+        if !shouldSkipBisection && options.useBisectionFallback && options.maxBisectionIterations > 0 {
             var low = lower
             var high = min(1.0, upper)
             if high <= low { high = min(low + 1.0, upper) }
