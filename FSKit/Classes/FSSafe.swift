@@ -274,4 +274,15 @@ open class FSSafe {
         return true
     }
     
+    /**
+     *  epsilon：精确到小数点后几位，如3位是 1e-3，6位是1e-6
+     */
+    public static func equald(a: Double, b: Double, epsilon: Double) -> Bool {
+        
+        // let uplofOne = Double.ulpOfOne * tolerance  // 用 ulpOfOne 作为动态阈值（适配不同数值范围）,乘以 tolerance 扩大一点容错范围 这个值太小了，用不着
+        
+        let v = abs(a - b) < epsilon
+        return v
+    }
+    
 }
