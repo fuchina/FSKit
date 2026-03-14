@@ -561,14 +561,14 @@ public class FSKit: NSObject {
     
     // MARK: - Number Conversion
     public static func numberStringToTwoDecimalPlaces(_ floatString: String) -> Int {
-        let flt = Double(floatString) ?? 0
+        let flt = FSSafe.double(floatString)
         let centFlt = round(flt * 100.0)
         return Int(centFlt)
     }
     
     public static func numberStringToFiveDecimalPlaces(_ floatString: String) -> Int {
-        let flt = Double(floatString) ?? 0
-        let centFlt = round(flt * Double(FSFiveDecimalPlaces))
+        let flt = FSSafe.double(floatString)
+        let centFlt = round(flt * FSDoubleFiveDecimalPlaces)
         return Int(centFlt)
     }
     
