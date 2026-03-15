@@ -467,4 +467,12 @@ public class FSDate: NSObject {
         return t
     }
     
+    public static func yyyyMMdd(_ date: Date) -> String {
+        let dc = FSDate.components(date)
+        guard let year = dc.year, let month = dc.month, let day = dc.day else {
+            return ""
+        }
+        let date = "\(year)\(FSDate.twoChar(month))\(FSDate.twoChar(day))"
+        return date
+    }
 }
