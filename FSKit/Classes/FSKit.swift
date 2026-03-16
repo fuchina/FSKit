@@ -12,9 +12,10 @@ import CryptoKit
 /// 一年的秒数
 public let FSKitYearSeconds: Double = 31556926.08
 
-/// 支持小数点后5位，支持汇率（4位），必须是整数
+/// 支持小数点后5位，支持汇率（4位），必须是整数，不要搞个 FSDoubleFiveDecimalPlaces，这样会存在Double精度损失
 public let FSFiveDecimalPlaces: Int = 100000
-public let FSDoubleFiveDecimalPlaces: Double = 100000.0
+
+//public let FSDoubleFiveDecimalPlaces: Double = 100000.0
 
 // MARK: - FSKit
 public class FSKit: NSObject {
@@ -568,7 +569,7 @@ public class FSKit: NSObject {
     
     public static func numberStringToFiveDecimalPlaces(_ floatString: String) -> Int {
         let flt = FSSafe.double(floatString)
-        let centFlt = round(flt * FSDoubleFiveDecimalPlaces)
+        let centFlt = round(flt * Double(FSFiveDecimalPlaces))
         return Int(centFlt)
     }
     
@@ -1083,21 +1084,21 @@ public class FSKit: NSObject {
         } else {
             mode = value % 10000
             if mode == 0 {
-                ret = String(format: "%.1f", Double(value) / FSDoubleFiveDecimalPlaces)
+                ret = String(format: "%.1f", Double(value) / Double(FSFiveDecimalPlaces))
             } else {
                 mode = value % 1000
                 if mode == 0 {
-                    ret = String(format: "%.2f", Double(value) / FSDoubleFiveDecimalPlaces)
+                    ret = String(format: "%.2f", Double(value) / Double(FSFiveDecimalPlaces))
                 } else {
                     mode = value % 100
                     if mode == 0 {
-                        ret = String(format: "%.3f", Double(value) / FSDoubleFiveDecimalPlaces)
+                        ret = String(format: "%.3f", Double(value) / Double(FSFiveDecimalPlaces))
                     } else {
                         mode = value % 10
                         if mode == 0 {
-                            ret = String(format: "%.4f", Double(value) / FSDoubleFiveDecimalPlaces)
+                            ret = String(format: "%.4f", Double(value) / Double(FSFiveDecimalPlaces))
                         } else {
-                            ret = String(format: "%.5f", Double(value) / FSDoubleFiveDecimalPlaces)
+                            ret = String(format: "%.5f", Double(value) / Double(FSFiveDecimalPlaces))
                         }
                     }
                 }
