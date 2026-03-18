@@ -60,6 +60,7 @@ public enum FSModel {
     }
 
     private static func fsModelLog(_ info: String) {
-        print("FSLog FSModel.ERROR: \(info)")
+        let v = "FSLog FSModel.ERROR: \(info)"
+        NotificationCenter.default.post(name: NSNotification.Name(FS_BE_DEBUG_NOTIFICATION), object: v)
     }
 }
