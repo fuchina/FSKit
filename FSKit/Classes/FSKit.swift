@@ -8,7 +8,8 @@
 import UIKit
 import CryptoKit
 
-// MARK: - Constants
+public let FS_BE_DEBUG_NOTIFICATION  =   "FS_BE_DEBUG_NOTIFICATION"
+
 /// 一年的秒数
 public let FSKitYearSeconds: Double = 31556926.08
 
