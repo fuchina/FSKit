@@ -865,7 +865,10 @@ public class FSKit: NSObject {
             return String(format: "%.0f亿", rest / 100000000.0)
         }
     }
-
+    
+    public class func attr(_ text: String) -> NSAttributedString {
+        return NSAttributedString(string: text)
+    }
     
     // MARK: - Array Utilities
     public static func maxAndMinNumber(in array: [Any]) -> [NSNumber]? {
