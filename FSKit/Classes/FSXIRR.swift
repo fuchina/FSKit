@@ -291,7 +291,7 @@ open class FSXIRR: NSObject {
         guard options.enforceMinOneDaySpanOnStartEnd else { return cashFlows }
         guard let first = cashFlows.first, let last = cashFlows.last else { return cashFlows }
 
-        let minSpan: Double = 86400.0
+        let minSpan: Double = 86400.0 * 140  // 5月20日
         let rawSpan = last.date - first.date
         guard rawSpan >= 0, rawSpan < minSpan else { return cashFlows }
 
