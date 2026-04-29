@@ -58,17 +58,20 @@ public struct FSDeepSeekChatRequest: Codable {
     public let model: String
     public let messages: [FSDeepSeekMessage]
     public let reasoning_effort: String?
+    public let enable_search: Bool
     public let extra_body: FSDeepSeekExtraBody?
 
     public init(
         model: String,
         messages: [FSDeepSeekMessage],
         reasoningEffort: String? = nil,
+        enableSearch: Bool = true,
         extraBody: FSDeepSeekExtraBody? = nil
     ) {
         self.model = model
         self.messages = messages
         self.reasoning_effort = reasoningEffort
+        self.enable_search = enableSearch
         self.extra_body = extraBody
     }
 }
@@ -114,6 +117,7 @@ public final class FSDeepSeek {
         messages: [FSDeepSeekMessage],
         model: String? = nil,
         reasoningEffort: String? = "high",
+        enableSearch: Bool = true,
         enableThinking: Bool = true,
         completion: @escaping Completion
     ) {
@@ -121,6 +125,7 @@ public final class FSDeepSeek {
             model: model ?? defaultModel,
             messages: messages,
             reasoningEffort: reasoningEffort,
+            enableSearch: enableSearch,
             extraBody: enableThinking ? FSDeepSeekExtraBody(thinking: FSDeepSeekThinking()) : nil
         )
         chat(request: body, completion: completion)
