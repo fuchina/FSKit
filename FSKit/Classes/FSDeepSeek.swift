@@ -143,7 +143,8 @@ public final class FSDeepSeek {
         urlRequest.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
 
         do {
-            urlRequest.httpBody = try JSONEncoder().encode(request)
+            let data = try JSONEncoder().encode(request)
+            urlRequest.httpBody = data
         } catch {
             completion(.failure(error))
             return
