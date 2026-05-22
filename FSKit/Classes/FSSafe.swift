@@ -112,6 +112,10 @@ open class FSSafe {
     
     public static func double(_ value: Any?) -> Double {
         switch value {
+
+        case let d as Double:
+            return d
+            
         case let t as TimeInterval:
             return t
             
@@ -120,9 +124,6 @@ open class FSSafe {
             
         case let i as Int64:
             return TimeInterval(i)
-            
-        case let d as Double:
-            return d
             
         case let n as NSNumber:
             return n.doubleValue
@@ -140,7 +141,14 @@ open class FSSafe {
             return str
         } else if let str = value as? NSString {
             return str as String
+        } else if let str = value as? NSNumber {
+            return str.stringValue
+        } else if let str = value as? Int {
+            return "\(str)"
+        } else if let str = value {
+            return "\(str)"
         }
+        
         return ""
     }
     

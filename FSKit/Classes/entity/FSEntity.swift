@@ -118,56 +118,15 @@ open class FSEntity: NSObject {
             switch targetType {
 
             case is Int.Type:
-                return convertToInt(value) as? V
+                return FSSafe.int(value) as? V
             case is Double.Type:
-                return convertToDouble(value) as? V
+                return FSSafe.double(value) as? V
             case is String.Type:
-                return convertToString(value) as? V
+                return FSSafe.string(value) as? V
             case is Bool.Type:
-                return convertToBool(value) as? V
+                return FSSafe.bool(value) as? V
             default:
                 return nil
-            }
-        }
-        
-        private static func convertToInt(_ value: Any) -> Int {
-            switch value {
-            case let num as NSNumber: return num.intValue
-            case let d as Double: return Int(d)
-            case let s as String: return Int(s) ?? 0
-            default: return 0
-            }
-        }
-        
-        private static func convertToDouble(_ value: Any) -> Double {
-            switch value {
-            case let num as NSNumber: return num.doubleValue
-            case let i as Int: return Double(i)
-            case let s as String: return Double(s) ?? 0
-            default: return 0
-            }
-        }
-        
-        private static func convertToString(_ value: Any) -> String {
-            switch value {
-            case let s as String: return s
-            case let num as NSNumber: return num.stringValue
-            case let i as Int: return "\(i)"
-            case let d as Double: return "\(d)"
-            case let b as Bool: return b ? "true" : "false"
-            default: return ""
-            }
-        }
-        
-        private static func convertToBool(_ value: Any) -> Bool {
-            switch value {
-            case let b as Bool: return b
-            case let num as NSNumber: return num.boolValue
-            case let i as Int: return i != 0
-            case let s as String:
-                let lowerS = s.lowercased()
-                return lowerS == "true" || lowerS == "1"
-            default: return false
             }
         }
 }
