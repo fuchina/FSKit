@@ -1071,6 +1071,7 @@ public class FSKit: NSObject {
     }
     
     public static func showBetterFor5DigitDouble(_ value: Double) -> String {
+        guard value.isFinite else { return "0" }
         let d = Int(value)
         return self.showBetterFor5DigitInteger(d)
     }
