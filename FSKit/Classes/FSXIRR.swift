@@ -292,7 +292,8 @@ open class FSXIRR: NSObject {
         guard let first = cashFlows.first, let last = cashFlows.last else { return cashFlows }
 
 //        let minSpan: Double = 86400.0 * 140  // 5月20日
-        let minSpan: Double = 86400 * 30;
+//        let minSpan: Double = 86400 * 30;
+        let minSpan: Double = 86400;  // 不然统计不到1天的通用回购
         let rawSpan = last.date - first.date
         guard rawSpan >= 0, rawSpan < minSpan else { return cashFlows }
 
