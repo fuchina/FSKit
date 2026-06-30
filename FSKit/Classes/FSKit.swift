@@ -853,13 +853,14 @@ public class FSKit: NSObject {
     }
     
     public static func showByTenThousand(_ rest: Double, money: Bool) -> String {
-        if rest < 100000 {
+        let absRest = abs(rest)
+        if absRest < 100000 {
             return money ? bankStyleDataThree(rest) : "\(Int(ceil(rest)))"
-        } else if rest < 1000000 {
+        } else if absRest < 1000000 {
             return String(format: "%.2f万", rest / 10000.0)
-        } else if rest < 100000000 {
+        } else if absRest < 100000000 {
             return String(format: "%.0f万", rest / 10000.0)
-        } else if rest < 10000000000 {
+        } else if absRest < 10000000000 {
             return String(format: "%.2f亿", rest / 100000000.0)
         } else {
             return String(format: "%.0f亿", rest / 100000000.0)
