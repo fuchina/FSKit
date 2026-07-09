@@ -60,10 +60,10 @@ public struct CellHighlightButtonStyle: ButtonStyle {
 public struct HighlightRow<Content: View>: View {
     public let content: Content
     public let onTap: () -> Void
-    /// 灰底淡出前的保持时长（秒），默认 0.1
-    public var holdDuration: Double = 0.1
-    /// 淡出时长（秒），默认 0.15（与 CellHighlightButtonStyle 默认一致）
-    public var fadeDuration: Double = 0.15
+    /// 灰底淡出前的保持时长（秒），默认 0.12（原生约 0.1，略加长更易看见）
+    public var holdDuration: Double = 0.12
+    /// 淡出时长（秒），默认 0.2（原生约 0.15，略加长更易看见）
+    public var fadeDuration: Double = 0.2
     /// 选中灰 / 常态底色
     public var pressedColor: Color = Color(UIColor.systemGray3)
     public var normalColor: Color = Color(UIColor.systemBackground)
