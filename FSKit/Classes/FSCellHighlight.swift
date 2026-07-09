@@ -20,28 +20,32 @@ import SwiftUI
 /// ```
 /// - `highlight`：外部强制点亮（用于点击时也保持高亮，避免快速点击看不到动画）。
 /// - `pressedColor` / `normalColor`：选中灰与常态底色。
-/// - `duration`：淡入/淡出时长（秒），默认 0.15，对齐原生 cell 选中的脆快节奏。
+/// - `fadeInDuration`：变灰淡入时长（秒），默认 0（瞬时，对齐原生 cell 选中的脆快节奏）。
+/// - `fadeOutDuration`：恢复白底淡出时长（秒），默认 0.1。
 public struct CellHighlightButtonStyle: ButtonStyle {
     public var highlight: Bool = false
     public var pressedColor: Color = Color(UIColor.systemGray3)
     public var normalColor: Color = Color(UIColor.systemBackground)
-    public var duration: Double = 0.15
+    public var fadeInDuration: Double = 0
+    public var fadeOutDuration: Double = 0.1
 
     public init(highlight: Bool = false,
                 pressedColor: Color = Color(UIColor.systemGray3),
                 normalColor: Color = Color(UIColor.systemBackground),
-                duration: Double = 0.15) {
+                fadeInDuration: Double = 0,
+                fadeOutDuration: Double = 0.1) {
         self.highlight = highlight
         self.pressedColor = pressedColor
         self.normalColor = normalColor
-        self.duration = duration
+        self.fadeInDuration = fadeInDuration
+        self.fadeOutDuration = fadeOutDuration
     }
 
     public func makeBody(configuration: Configuration) -> some View {
         let on = configuration.isPressed || highlight
         configuration.label
             .background(on ? pressedColor : normalColor)
-            .animation(.easeOut(duration: duration), value: on)
+            .animation(.easeOut(duration: on ? fadeInDuration : fadeOutDuration), value: on)
     }
 }
 
