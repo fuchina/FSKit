@@ -66,8 +66,10 @@ public struct HighlightRow<Content: View>: View {
     public let onTap: () -> Void
     /// 灰底淡出前的保持时长（秒），默认 0.2
     public var holdDuration: Double = 0.2
-    /// 淡出时长（秒），默认 0.25
-    public var fadeDuration: Double = 0.25
+    /// 变灰淡入时长（秒），默认 0（瞬时）
+    public var fadeInDuration: Double = 0
+    /// 淡出时长（秒），默认 0.1
+    public var fadeDuration: Double = 0.1
     /// 选中灰 / 常态底色
     public var pressedColor: Color = Color(UIColor.systemGray3)
     public var normalColor: Color = Color(UIColor.systemBackground)
@@ -76,12 +78,14 @@ public struct HighlightRow<Content: View>: View {
 
     public init(onTap: @escaping () -> Void,
                 holdDuration: Double = 0.2,
-                fadeDuration: Double = 0.25,
+                fadeInDuration: Double = 0,
+                fadeDuration: Double = 0.1,
                 pressedColor: Color = Color(UIColor.systemGray3),
                 normalColor: Color = Color(UIColor.systemBackground),
                 @ViewBuilder content: () -> Content) {
         self.onTap = onTap
         self.holdDuration = holdDuration
+        self.fadeInDuration = fadeInDuration
         self.fadeDuration = fadeDuration
         self.pressedColor = pressedColor
         self.normalColor = normalColor
@@ -102,6 +106,7 @@ public struct HighlightRow<Content: View>: View {
         .buttonStyle(CellHighlightButtonStyle(highlight: flash,
                                               pressedColor: pressedColor,
                                               normalColor: normalColor,
-                                              duration: fadeDuration))
+                                              fadeInDuration: fadeInDuration,
+                                              fadeOutDuration: fadeDuration))
     }
 }
