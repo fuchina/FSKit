@@ -64,8 +64,8 @@ public struct CellHighlightButtonStyle: ButtonStyle {
 public struct HighlightRow<Content: View>: View {
     public let content: Content
     public let onTap: () -> Void
-    /// 灰底淡出前的保持时长（秒），默认 0.2
-    public var holdDuration: Double = 0.2
+    /// 灰底淡出前的保持时长（秒），默认 0.1
+    public var holdDuration: Double = 0.1
     /// 变灰淡入时长（秒），默认 0（瞬时）
     public var fadeInDuration: Double = 0
     /// 淡出时长（秒），默认 0.1
@@ -77,7 +77,7 @@ public struct HighlightRow<Content: View>: View {
     @State private var flash = false
 
     public init(onTap: @escaping () -> Void,
-                holdDuration: Double = 0.2,
+                holdDuration: Double = 0.1,
                 fadeInDuration: Double = 0,
                 fadeDuration: Double = 0.1,
                 pressedColor: Color = Color(UIColor.systemGray3),
