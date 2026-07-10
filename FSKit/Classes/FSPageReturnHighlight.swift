@@ -5,7 +5,8 @@
 //  页面跳转型 cell 高亮（与 FSCellHighlight 解耦，互不影响）：
 //  - 点击 cell 时点亮（变灰），随后 push 进编辑/详情页；
 //    在 push 横向转场动画过程中，原 cell 仍可见，灰底被「保留」下来
-//  - 编辑页 pop 回来时，由 UIKit 控制器在 viewDidAppear 调 reset() 立即淡出
+//  - 编辑页 pop 回来时，由 UIKit 控制器在 viewWillAppear 调 reset() 立即淡出
+//    （放在 viewWillAppear 而非 viewDidAppear，是为了让淡出与 pop 转场并行，消除「停顿」感）
 //  - 动画完全由控制器生命周期驱动，与网络请求 / 列表重建没有任何耦合
 //
 //  用法（UIKit 控制器持有 store，SwiftUI row 消费 store）：
@@ -16,7 +17,7 @@
 //      MyRow(model: model)
 //  }
 //  // 点击时：tap.highlight(model.aid); pushEdit(model)
-//  // viewDidAppear：tap.reset()   // 立刻淡出，不依赖网络
+//  // viewWillAppear：tap.reset()   // pop 转场一开始就淡出，不依赖网络
 //  ```
 //
 
@@ -44,7 +45,7 @@ public struct FSPageReturnRow<Content: View>: View {
 
     public init(store: FSPageReturnHighlight,
                 id: AnyHashable,
-                fadeDuration: Double = 0.25,
+                fadeDuration: Double = 0.9,
                 pressedColor: Color = Color(UIColor.systemGray3),
                 normalColor: Color = Color(UIColor.systemBackground),
                 onTap: @escaping () -> Void,
@@ -65,12 +66,11 @@ public struct FSPageReturnRow<Content: View>: View {
             store.highlight(id)
             onTap()
         } label: {
+            // 自带 spring 淡出：response = fadeDuration（秒级时长），dampingFraction 0.85 轻微回弹，
+            // 比 easeInOut 更柔、更「活」，且完全不改 FSCellHighlight。
             content
+                .background(on ? pressedColor : normalColor)
+                .animation(.spring(response: fadeDuration, dampingFraction: 0.85, blendDuration: 0.15), value: on)
         }
-        .buttonStyle(CellHighlightButtonStyle(highlight: on,
-                                             pressedColor: pressedColor,
-                                             normalColor: normalColor,
-                                             fadeInDuration: 0,
-                                             fadeOutDuration: fadeDuration))
     }
 }
