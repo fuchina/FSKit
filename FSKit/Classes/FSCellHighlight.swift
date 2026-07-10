@@ -64,12 +64,12 @@ public struct CellHighlightButtonStyle: ButtonStyle {
 public struct HighlightRow<Content: View>: View {
     public let content: Content
     public let onTap: () -> Void
-    /// 灰底淡出前的保持时长（秒），默认 0.1
-    public var holdDuration: Double = 0.1
+    /// 灰底淡出前的保持时长（秒），默认 0（松手即淡出，对齐原生 UITableViewCell）
+    public var holdDuration: Double = 0
     /// 变灰淡入时长（秒），默认 0（瞬时）
     public var fadeInDuration: Double = 0
-    /// 淡出时长（秒），默认 0.1
-    public var fadeDuration: Double = 0.1
+    /// 淡出时长（秒），默认 0.25（松手后淡出时长，按需调整）
+    public var fadeDuration: Double = 0.25
     /// 选中灰 / 常态底色
     public var pressedColor: Color = Color(UIColor.systemGray3)
     public var normalColor: Color = Color(UIColor.systemBackground)
@@ -77,9 +77,9 @@ public struct HighlightRow<Content: View>: View {
     @State private var flash = false
 
     public init(onTap: @escaping () -> Void,
-                holdDuration: Double = 0.1,
+                holdDuration: Double = 0,
                 fadeInDuration: Double = 0,
-                fadeDuration: Double = 0.1,
+                fadeDuration: Double = 0.25,
                 pressedColor: Color = Color(UIColor.systemGray3),
                 normalColor: Color = Color(UIColor.systemBackground),
                 @ViewBuilder content: () -> Content) {
