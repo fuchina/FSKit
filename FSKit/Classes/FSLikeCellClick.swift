@@ -80,7 +80,8 @@ public struct FSLikeCellClick<Content: View>: View {
                 store.highlight(id)
                 onTap()
                 if autoDismiss {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    // 先保持灰底 0.15s，再清除触发 0.6s 淡出（和 HighlightRow 一致的节奏）
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
                         store.highlightedId = nil
                     }
                 }
