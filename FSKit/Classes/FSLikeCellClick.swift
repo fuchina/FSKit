@@ -1,5 +1,5 @@
 //
-//  FSLikeCellClick2.swift
+//  FSLikeCellClick.swift
 //  FSKit
 //
 //  cell 点击动画容器 v2：
@@ -13,7 +13,7 @@
 import SwiftUI
 import UIKit
 
-public struct FSLikeCellClick2<Content: View>: View {
+public struct FSLikeCellClick<Content: View>: View {
     @EnvironmentObject private var store: FSPageReturnHighlight
     private let id: AnyHashable
     private let onTap: () -> Void
