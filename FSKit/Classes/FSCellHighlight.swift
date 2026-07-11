@@ -6,7 +6,8 @@
 //  - 按下瞬间（或外部 highlight=true）变灰，松手淡出
 //  - 灰色绘在内容之下，文字始终清晰
 //  - 不拦截 List / ScrollView 滑动手势
-//  - 动画节奏对齐原生 UITableViewCell（淡入/淡出约 0.15s）
+//  - 淡出复用共享的 FSCellFadeAnimation（spring, damping 0.96, blend 0），与 FSPageReturnRow 同一质感；
+//    默认 holdDuration 0.1（先见灰底）、fadeDuration 0.6（与返回页同速、明显柔和）
 //
 
 import SwiftUI
@@ -66,12 +67,12 @@ public struct CellHighlightButtonStyle: ButtonStyle {
 public struct HighlightRow<Content: View>: View {
     public let content: Content
     public let onTap: () -> Void
-    /// 灰底淡出前的保持时长（秒），默认 0（松手即淡出，对齐原生 UITableViewCell）
-    public var holdDuration: Double = 0
+    /// 灰底淡出前的保持时长（秒），默认 0.1（先让灰底被看见，再淡出，效果更明显）
+    public var holdDuration: Double = 0.1
     /// 变灰淡入时长（秒），默认 0（瞬时）
     public var fadeInDuration: Double = 0
-    /// 淡出时长（秒），默认 0.25（松手后淡出时长，按需调整）
-    public var fadeDuration: Double = 0.25
+    /// 淡出时长（秒），默认 0.6（与 FSPageReturnRow 返回页淡出同速，spring 柔顺感明显）
+    public var fadeDuration: Double = 0.6
     /// 选中灰 / 常态底色
     public var pressedColor: Color = Color(UIColor.systemGray3)
     public var normalColor: Color = Color(UIColor.systemBackground)
@@ -79,9 +80,9 @@ public struct HighlightRow<Content: View>: View {
     @State private var flash = false
 
     public init(onTap: @escaping () -> Void,
-                holdDuration: Double = 0,
+                holdDuration: Double = 0.1,
                 fadeInDuration: Double = 0,
-                fadeDuration: Double = 0.25,
+                fadeDuration: Double = 0.6,
                 pressedColor: Color = Color(UIColor.systemGray3),
                 normalColor: Color = Color(UIColor.systemBackground),
                 @ViewBuilder content: () -> Content) {
