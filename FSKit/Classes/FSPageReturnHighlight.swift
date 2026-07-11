@@ -45,7 +45,7 @@ public struct FSPageReturnRow<Content: View>: View {
 
     public init(store: FSPageReturnHighlight,
                 id: AnyHashable,
-                fadeDuration: Double = 1.0,
+                fadeDuration: Double = 0.6,
                 pressedColor: Color = Color(UIColor.systemGray3),
                 normalColor: Color = Color(UIColor.systemBackground),
                 onTap: @escaping () -> Void,
