@@ -39,6 +39,8 @@ public struct FSLikeCellClick<Content: View>: View {
     private let fadeDuration: Double
     private let pressedColor: Color
     private let normalColor: Color
+    /// 点击后自动清除高亮（无需跨页保留），默认 false（跨页保留到返回再淡出）
+    private let autoDismiss: Bool
 
     /// 按压即时状态：onLongPressGesture.pressing 驱动，touch-down true、松手 false
     @State private var isPressing = false
@@ -47,12 +49,14 @@ public struct FSLikeCellClick<Content: View>: View {
                 fadeDuration: Double = 0.6,
                 pressedColor: Color = Color(UIColor.systemGray3),
                 normalColor: Color = Color(UIColor.systemBackground),
+                autoDismiss: Bool = false,
                 onTap: @escaping () -> Void,
                 @ViewBuilder content: () -> Content) {
         self.id = id
         self.fadeDuration = fadeDuration
         self.pressedColor = pressedColor
         self.normalColor = normalColor
+        self.autoDismiss = autoDismiss
         self.onTap = onTap
         self.content = content()
     }
@@ -71,10 +75,15 @@ public struct FSLikeCellClick<Content: View>: View {
                     .animation(FSCellFadeAnimation(response: fadeDuration), value: showGray)
             )
             .contentShape(Rectangle())
-            // 点击：点亮 store + 触发导航（返回时由 store 自动淡出）
+            // 点击：点亮 store + 触发 onTap；autoDismiss 时延时清除（无需跨页保留）
             .onTapGesture {
                 store.highlight(id)
                 onTap()
+                if autoDismiss {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        store.highlightedId = nil
+                    }
+                }
             }
             // 长按：仅驱动 isPressing 变灰（铺满），松手恢复，不导航
             .onLongPressGesture(minimumDuration: 0.5, pressing: { isPressing = $0 }, perform: {})
