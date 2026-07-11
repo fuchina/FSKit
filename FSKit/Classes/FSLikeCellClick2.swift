@@ -52,19 +52,19 @@ public struct FSLikeCellClick2<Content: View>: View {
         let showGray = isPressing || isHighlighted
 
         ZStack {
-            // 灰底层：在 content 下面，不遮文字，圆角跟随
-            RoundedRectangle(cornerRadius: cornerRadius)
-                .fill(showGray ? pressedColor : Color.clear)
-                .padding(padding)
-                .animation(FSCellFadeAnimation(response: fadeDuration), value: showGray)
-
-            // 内容层：自带白色背景+圆角+内边距
+            // 内容 + 内边距 + 圆角裁剪
             content
+                .padding(padding)
                 .background(normalColor)
                 .cornerRadius(cornerRadius)
                 .padding(padding)
         }
-        .listRowBackground(Color.clear)
+        // listRowBackground 铺满整行，灰底正常态切换
+        .listRowBackground(
+            Rectangle()
+                .fill(showGray ? pressedColor : normalColor)
+                .animation(FSCellFadeAnimation(response: fadeDuration), value: showGray)
+        )
         .contentShape(Rectangle())
         .onTapGesture {
             store.highlight(id)
