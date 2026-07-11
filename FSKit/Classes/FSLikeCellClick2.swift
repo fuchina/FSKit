@@ -6,7 +6,8 @@
 //  - 铺满模式（默认）：listRowBackground 统一管理白色/灰底，铺满整行
 //  - 卡片模式（cardStyle=true）：灰底在 content 的 background 上切换，白色卡片+圆角+间距
 //  - 点击变灰 + 长按变灰 + 返回淡出（通过 FSPageReturnHighlight store）
-//  - 变灰瞬时、淡出 0.6s spring：用 animatedGray 状态机 + onChange 监听 store 变化
+//  - 变灰瞬时、淡出显式 withAnimation(spring 0.6)：animatedGray 状态机 + onChange 监听 store 变化
+//  - fill 模式 listRowBackground 不响应 withAnimation，仍靠隐式 .animation(value:) 驱动（已验证）
 //
 
 import SwiftUI
@@ -21,6 +22,7 @@ public struct FSLikeCellClick2<Content: View>: View {
     private let pressedColor: Color
     private let normalColor: Color
     private let autoDismiss: Bool
+    private let autoDismissDelay: Double
     private let cardStyle: Bool
     private let cornerRadius: CGFloat
     private let padding: EdgeInsets
@@ -36,6 +38,7 @@ public struct FSLikeCellClick2<Content: View>: View {
                 pressedColor: Color = Color(UIColor.systemGray3),
                 normalColor: Color = Color(.systemBackground),
                 autoDismiss: Bool = false,
+                autoDismissDelay: Double = 0.1,
                 cardStyle: Bool = false,
                 cornerRadius: CGFloat = 0,
                 padding: EdgeInsets = EdgeInsets(),
@@ -46,6 +49,7 @@ public struct FSLikeCellClick2<Content: View>: View {
         self.pressedColor = pressedColor
         self.normalColor = normalColor
         self.autoDismiss = autoDismiss
+        self.autoDismissDelay = autoDismissDelay
         self.cardStyle = cardStyle
         self.cornerRadius = cornerRadius
         self.padding = padding
@@ -62,7 +66,6 @@ public struct FSLikeCellClick2<Content: View>: View {
                 .background(
                     RoundedRectangle(cornerRadius: cornerRadius)
                         .fill(showGray ? pressedColor : normalColor)
-                        .animation(isFadingOut ? FSCellFadeAnimation(response: fadeDuration) : nil, value: animatedGray)
                 )
                 .padding(padding)
                 .listRowBackground(Color.clear)
@@ -71,7 +74,7 @@ public struct FSLikeCellClick2<Content: View>: View {
                     store.highlight(id)
                     onTap()
                     if autoDismiss {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + autoDismissDelay) {
                             store.highlightedId = nil
                         }
                     }
@@ -81,6 +84,11 @@ public struct FSLikeCellClick2<Content: View>: View {
                     perform: {
                         store.highlight(id)
                         onTap()
+                        if autoDismiss {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + autoDismissDelay) {
+                                store.highlightedId = nil
+                            }
+                        }
                     })
                 .onChange(of: store.highlightedId) { newValue in
                     handleStoreChange(newValue)
@@ -102,7 +110,7 @@ public struct FSLikeCellClick2<Content: View>: View {
                     store.highlight(id)
                     onTap()
                     if autoDismiss {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + autoDismissDelay) {
                             store.highlightedId = nil
                         }
                     }
@@ -112,6 +120,11 @@ public struct FSLikeCellClick2<Content: View>: View {
                     perform: {
                         store.highlight(id)
                         onTap()
+                        if autoDismiss {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + autoDismissDelay) {
+                                store.highlightedId = nil
+                            }
+                        }
                     })
                 .onChange(of: store.highlightedId) { newValue in
                     handleStoreChange(newValue)
@@ -128,11 +141,15 @@ public struct FSLikeCellClick2<Content: View>: View {
             return v == id
         }()
         if match {
+            // 变灰：瞬时（对齐 HighlightRow flash=true，无动画）
             isFadingOut = false
             animatedGray = true
         } else if animatedGray {
-            isFadingOut = true
-            animatedGray = false
+            // 淡出：显式 withAnimation（对齐 HighlightRow withAnimation{flash=false}）
+            withAnimation(FSCellFadeAnimation(response: fadeDuration)) {
+                isFadingOut = true
+                animatedGray = false
+            }
         }
     }
 
@@ -144,8 +161,10 @@ public struct FSLikeCellClick2<Content: View>: View {
             // 松手：若 store 已接管（导航中），保持灰底等返回淡出；否则快速松开 → 淡出恢复
             let isHighlighted = store.highlightedId.map { $0 == id } ?? false
             if !isHighlighted {
-                isFadingOut = true
-                animatedGray = false
+                withAnimation(FSCellFadeAnimation(response: fadeDuration)) {
+                    isFadingOut = true
+                    animatedGray = false
+                }
             }
         }
     }
