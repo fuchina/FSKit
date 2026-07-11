@@ -63,21 +63,20 @@ public struct FSLikeCellClick<Content: View>: View {
         /// 任意按压或高亮均变灰
         let showGray = isPressing || isHighlighted
 
-        ZStack {
-            // ① 铺满底板：frame 强制撑满父容器，灰底 + 返回淡出统一在此
-            Rectangle()
-                .fill(showGray ? pressedColor : normalColor)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .animation(FSCellFadeAnimation(response: fadeDuration), value: showGray)
-            // ② 用户内容，纯展示，不参与交互
-            content
-        }
-        // 点击：点亮 store + 触发导航（返回时由 store 自动淡出）
-        .onTapGesture {
-            store.highlight(id)
-            onTap()
-        }
-        // 长按：仅驱动 isPressing 变灰（铺满），松手恢复，不导航
-        .onLongPressGesture(minimumDuration: 0.5, pressing: { isPressing = $0 }, perform: {})
+        return content
+            // 行级背景：listRowBackground 强制铺满整个 row，不依赖 content 尺寸
+            .listRowBackground(
+                Rectangle()
+                    .fill(showGray ? pressedColor : normalColor)
+                    .animation(FSCellFadeAnimation(response: fadeDuration), value: showGray)
+            )
+            .contentShape(Rectangle())
+            // 点击：点亮 store + 触发导航（返回时由 store 自动淡出）
+            .onTapGesture {
+                store.highlight(id)
+                onTap()
+            }
+            // 长按：仅驱动 isPressing 变灰（铺满），松手恢复，不导航
+            .onLongPressGesture(minimumDuration: 0.5, pressing: { isPressing = $0 }, perform: {})
     }
 }
