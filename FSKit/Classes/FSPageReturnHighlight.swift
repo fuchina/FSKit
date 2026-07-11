@@ -59,8 +59,13 @@ public final class FSPageReturnHighlight: ObservableObject {
     private func tryReset() {
         // 点击后 0.6s 内发生的通知视为「push 转场」→ 忽略；
         // 超过阈值（用户在编辑页停留后返回）才复位淡出。
+        // ⚠️ 必须延后到下一帧再置空：willShow/didShow 在 pop 转场「开始前」触发，
+        // 若此刻同步置空，灰底会被「吞掉」（视图以 false 态直接出现，看不到淡出）。
+        // 延到下一个 runloop（视图已上屏）再改状态 → 真·淡出动画可见。
         if Date().timeIntervalSince1970 - self.tapTime > 0.6 {
-            self.highlightedId = nil
+            DispatchQueue.main.async { [weak self] in
+                self?.highlightedId = nil
+            }
         }
     }
 
@@ -74,6 +79,13 @@ public final class FSPageReturnHighlight: ObservableObject {
     public func highlight(_ id: AnyHashable) {
         highlightedId = id
         tapTime = Date().timeIntervalSince1970
+    }
+
+    /// 立即熄灭高亮（仅在确有高亮时改变状态，重复调用幂等）。
+    /// 用于调用方在「确定返回」的时机（如 viewWillAppear）主动触发淡出，
+    /// 与导航通知互为备份：即便通知因环境未收到，返回淡出也必定发生。
+    public func clearHighlight() {
+        highlightedId = nil
     }
 }
 
