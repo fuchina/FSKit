@@ -22,8 +22,6 @@ public struct FSLikeCellClick2<Content: View>: View {
     private let pressedColor: Color
     private let normalColor: Color
     private let autoDismiss: Bool
-    private let cornerRadius: CGFloat
-    private let padding: EdgeInsets
 
     @State private var isPressing = false
 
@@ -32,8 +30,6 @@ public struct FSLikeCellClick2<Content: View>: View {
                 pressedColor: Color = Color(UIColor.systemGray3),
                 normalColor: Color = Color(.systemBackground),
                 autoDismiss: Bool = false,
-                cornerRadius: CGFloat = 0,
-                padding: EdgeInsets = EdgeInsets(),
                 onTap: @escaping () -> Void,
                 @ViewBuilder content: () -> Content) {
         self.id = id
@@ -41,8 +37,6 @@ public struct FSLikeCellClick2<Content: View>: View {
         self.pressedColor = pressedColor
         self.normalColor = normalColor
         self.autoDismiss = autoDismiss
-        self.cornerRadius = cornerRadius
-        self.padding = padding
         self.onTap = onTap
         self.content = content()
     }
@@ -52,14 +46,9 @@ public struct FSLikeCellClick2<Content: View>: View {
         let showGray = isPressing || isHighlighted
 
         ZStack {
-            // 内容 + 内边距 + 圆角裁剪
             content
-                .padding(padding)
-                .background(normalColor)
-                .cornerRadius(cornerRadius)
-                .padding(padding)
         }
-        // listRowBackground 铺满整行，灰底正常态切换
+        // listRowBackground 铺满整行，灰底/正常态统一切换
         .listRowBackground(
             Rectangle()
                 .fill(showGray ? pressedColor : normalColor)
