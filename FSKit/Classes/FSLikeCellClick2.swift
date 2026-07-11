@@ -76,7 +76,7 @@ public struct FSLikeCellClick2<Content: View>: View {
                     }
                 }
                 .onLongPressGesture(minimumDuration: 0.5,
-                    pressing: { withAnimation(.easeOut(duration: 0)) { isPressing = $0 } },
+                    pressing: { p in withAnimation(.easeOut(duration: 0)) { isPressing = p } },
                     perform: {})
         } else {
             // 铺满模式：listRowBackground 统一管理白色/灰底
@@ -98,7 +98,7 @@ public struct FSLikeCellClick2<Content: View>: View {
                     }
                 }
                 .onLongPressGesture(minimumDuration: 0.5,
-                    pressing: { withAnimation(.easeOut(duration: 0)) { isPressing = $0 } },
+                    pressing: { p in withAnimation(.easeOut(duration: 0)) { isPressing = p } },
                     perform: {})
         }
     }
