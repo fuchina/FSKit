@@ -5,14 +5,17 @@
 //  页面跳转型 cell 高亮（与 FSCellHighlight 解耦，互不影响）：
 //  - 点击 cell 时点亮（变灰），随后 push 进编辑/详情页；
 //    在 push 转场过程中原 cell 仍可见，灰底被「保留」下来
-//  - 编辑页 pop 回来时，自动监听 UINavigationController.willShowViewControllerNotification：
-//    当被盖住的 VC 即将重新显示（pop 转场一开始）即 reset()，灰底立即淡出，
-//    与 pop 动画并行，消除「停顿」感；且完全与网络请求 / 列表重建解耦
+//  - 编辑页 pop 回来时，自动监听 UINavigationController.willShowViewControllerNotification
+//    （用字符串字面量取通知名，避免 UIKit 在部分 Swift 版本未桥出类型化成员而报错）：
+//    以「点击时刻」做去抖——点击后极短时间内的 willShow 视为 push 转场而忽略，
+//    超过阈值的 willShow 才视为返回，灰底立即淡出，与 pop 动画并行，消除「停顿」感；
+//    完全不依赖 VC 实例比较，也不依赖网络请求 / 列表重建
 //
-//  ★ 无痕插拔：调用方无需创建变量、无需挂生命周期、无需手动 highlight/reset，
-//    直接一行即可，row 内部自持有 store、自检测返回：
+//  ★ 近无痕插拔：调用方只需在「列表层」建一份 store 并传给每个 row（无需类属性、
+//    无需挂生命周期、无需手动 highlight/reset），row 内部自检测返回并淡出：
 //  ```
-//  FSPageReturnRow(id: model.aid, onTap: { pushEdit(model) }) {
+//  let store = FSPageReturnHighlight()          // 列表级建一份，所有 row 共用
+//  FSPageReturnRow(store: store, id: model.aid, onTap: { pushEdit(model) }) {
 //      MyRow(model: model)
 //  }
 //  ```
@@ -21,45 +24,69 @@
 import SwiftUI
 import UIKit
 
-/// 高亮状态容器：由 row 内部自持有（@StateObject）。
-/// 点击点亮某个 id（变灰）；当「被盖住的 VC」即将重新显示（pop 返回）时自动熄灭并触发淡出。
+/// 高亮状态容器（列表级共享一份，所有 row 共用）：
+/// 点击点亮某个 id（变灰）；当页面从下一级（编辑/详情）pop 回来、
+/// 导航重新显示本页时自动熄灭并触发淡出。
+/// 用「点击时刻」做去抖：点击后立即发生的 push 转场对应的 willShow/didShow 被忽略，
+/// 仅处理稍后（用户返回）的通知，从而避免依赖 VC 实例比较、更稳健。
+/// ⚠️ 必须由调用方（列表层）创建并传给各 row，不能在每个 row 内用 @StateObject
+/// （List 行回收重建会导致灰底丢失、无法淡出）。
 public final class FSPageReturnHighlight: ObservableObject {
     @Published public var highlightedId: AnyHashable?
-    /// 点击时记下当前顶层 VC（即「即将被编辑页盖住、pop 回来要复位」的页面）
-    private var coveredVC: UIViewController?
-    private var token: NSObjectProtocol?
+    /// 最近一次点击（点亮）的时间戳，用于区分「push 转场」与「pop 返回」
+    private var tapTime: TimeInterval = 0
+    private var tokens: [NSObjectProtocol] = []
 
     public init() {
-        // 监听 nav 即将显示某 VC：pop 回来时该通知在转场一开始即触发，
-        // 与 pop 动画并行；push 编辑页时也会触发，但显示的不是 coveredVC，不会误复位。
-        token = NotificationCenter.default.addObserver(
-            forName: UINavigationController.willShowViewControllerNotification,
-            object: nil, queue: .main
-        ) { [weak self] note in
-            guard let self = self, let covered = self.coveredVC else { return }
-            let shown = note.userInfo?[UINavigationControllerViewControllerKey] as? UIViewController
-            if shown === covered {
-                self.highlightedId = nil
+        // 同时监听 willShow 与 didShow（双保险）：两者任一触发即可复位，
+        // 任一因环境不触发也不影响。push 编辑页时两者都会触发，但发生在点击后极短时间内，
+        // 由 tapTime 阈值过滤掉，不会误复位。用字符串字面量取通知名（避免桥接成员缺失报错）。
+        let names = [
+            "UINavigationControllerWillShowViewControllerNotification",
+            "UINavigationControllerDidShowViewControllerNotification"
+        ]
+        for name in names {
+            let t = NotificationCenter.default.addObserver(
+                forName: Notification.Name(name),
+                object: nil, queue: .main
+            ) { [weak self] _ in
+                self?.tryReset()
             }
+            tokens.append(t)
+        }
+    }
+
+    private func tryReset() {
+        // 点击后 0.6s 内发生的通知视为「push 转场」→ 忽略；
+        // 超过阈值（用户在编辑页停留后返回）才复位淡出。
+        if Date().timeIntervalSince1970 - self.tapTime > 0.6 {
+            self.highlightedId = nil
         }
     }
 
     deinit {
-        if let token = token {
-            NotificationCenter.default.removeObserver(token)
+        for t in tokens {
+            NotificationCenter.default.removeObserver(t)
         }
     }
 
-    /// 点亮并记下当前顶层 VC（点击时由 row 内部调用）
+    /// 点亮并记录点击时刻（点击时由 row 内部调用）
     public func highlight(_ id: AnyHashable) {
         highlightedId = id
-        coveredVC = fsTopViewController()
+        tapTime = Date().timeIntervalSince1970
     }
 }
 
 /// 点击高亮行：点击瞬间点亮灰底并触发 onTap（通常 push 下一页），
-/// 灰底保持到「被盖住的页面 pop 回来」时由内部自动复位淡出。完全自包含，调用方零依赖。
+/// 灰底保持到「被盖住的页面 pop 回来」时由共享 store 自动复位淡出。
+/// ⚠️ store 必须由调用方（列表层）创建并传入、所有 row 共享同一份：
+/// 不能用每行的 @StateObject —— List/ForEach 在 push-pop 重建时会回收重建 row，
+/// 导致灰底丢失、无法淡出。共享 store 活在 hosting 层，跨 row 回收持久。
 public struct FSPageReturnRow<Content: View>: View {
+    /// ⚠️ 必须是 @ObservedObject：store 由列表层创建并传入（共享一份），
+    /// 去掉包装会让 SwiftUI 不监听 @Published 的 highlightedId 变化，
+    /// 导致点击/返回时灰底不出现、淡出也不触发（两个动画一起消失）。
+    @ObservedObject private var store: FSPageReturnHighlight
     private let id: AnyHashable
     private let onTap: () -> Void
     private let content: Content
@@ -67,15 +94,14 @@ public struct FSPageReturnRow<Content: View>: View {
     private let pressedColor: Color
     private let normalColor: Color
 
-    /// row 内部自持有高亮状态（含返回自动复位），调用方无需创建 / 传递任何变量
-    @StateObject private var store = FSPageReturnHighlight()
-
-    public init(id: AnyHashable,
+    public init(store: FSPageReturnHighlight,
+                id: AnyHashable,
                 fadeDuration: Double = 0.6,
                 pressedColor: Color = Color(UIColor.systemGray3),
                 normalColor: Color = Color(UIColor.systemBackground),
                 onTap: @escaping () -> Void,
                 @ViewBuilder content: () -> Content) {
+        self._store = ObservedObject(wrappedValue: store)
         self.id = id
         self.fadeDuration = fadeDuration
         self.pressedColor = pressedColor
@@ -85,7 +111,7 @@ public struct FSPageReturnRow<Content: View>: View {
     }
 
     public var body: some View {
-        // 单行算出是否高亮（Optional<AnyHashable> 与 AnyHashable 比较）
+        // 单行算出是否高亮（Optional<AnyHashable> 与 AnyHashable 比较；共享 store 跨 row 共用）
         let on = store.highlightedId.map { $0 == id } ?? false
         return Button {
             store.highlight(id)
@@ -100,27 +126,3 @@ public struct FSPageReturnRow<Content: View>: View {
     }
 }
 
-/// 取当前最顶层可见 VC（用于点击时记录「被盖住的页面」）。
-/// 遍历 rootViewController → presented / nav.top / tab.selected，纯层级遍历，无 swizzle。
-private func fsTopViewController() -> UIViewController? {
-    let scenes = UIApplication.shared.connectedScenes.compactMap({ $0 as? UIWindowScene })
-    let window = scenes
-        .first(where: { $0.activationState == .foregroundActive || $0.activationState == .foregroundInactive })?
-        .windows
-        .first(where: { $0.isKeyWindow })
-        ?? scenes.first?.windows.first
-    guard let vc = window?.rootViewController else { return nil }
-    var current = vc
-    while true {
-        if let presented = current.presentedViewController, !(presented is UIAlertController) {
-            current = presented
-        } else if let nav = current as? UINavigationController, let top = nav.topViewController {
-            current = top
-        } else if let tab = current as? UITabBarController, let sel = tab.selectedViewController {
-            current = sel
-        } else {
-            break
-        }
-    }
-    return current
-}
