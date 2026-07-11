@@ -45,7 +45,7 @@ public struct FSPageReturnRow<Content: View>: View {
 
     public init(store: FSPageReturnHighlight,
                 id: AnyHashable,
-                fadeDuration: Double = 0.9,
+                fadeDuration: Double = 1.0,
                 pressedColor: Color = Color(UIColor.systemGray3),
                 normalColor: Color = Color(UIColor.systemBackground),
                 onTap: @escaping () -> Void,
@@ -66,11 +66,11 @@ public struct FSPageReturnRow<Content: View>: View {
             store.highlight(id)
             onTap()
         } label: {
-            // 自带 spring 淡出：response = fadeDuration（秒级时长），dampingFraction 0.85 轻微回弹，
+            // 自带 spring 淡出：response = fadeDuration（秒级时长），dampingFraction 0.9 轻微回弹更绵顺，
             // 比 easeInOut 更柔、更「活」，且完全不改 FSCellHighlight。
             content
                 .background(on ? pressedColor : normalColor)
-                .animation(.spring(response: fadeDuration, dampingFraction: 0.85, blendDuration: 0.15), value: on)
+                .animation(.spring(response: fadeDuration, dampingFraction: 0.96, blendDuration: 0), value: on)
         }
     }
 }
