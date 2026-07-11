@@ -30,8 +30,9 @@
 //     整棵树，容器的 @StateObject 会随树一起新建 → store 被重置 → 灰底丢失、看不到淡出。
 //     UIKit 宿主请务必「hosting 建一次 + 数据驱动」，不要在每次刷新里重建 rootView。
 //
-//  ⚠️ FSPageReturnRow 依赖 @EnvironmentObject 注入的 store，**必须**包在 FSPageReturnList
-//     之内使用；脱离容器单独使用会因环境对象缺失而崩溃。
+//  ⚠️ FSPageReturnRow 依赖共享 store（由 FSPageReturnList 经 @Environment 注入）。
+//     推荐包在容器内使用以获得返回淡出；若脱离容器单独使用也**不会崩溃**（用带默认值的
+//     EnvironmentKey 兜底），只是该 row 退化为「点击变灰、无返回淡出」的无害状态。
 //
 
 import SwiftUI
@@ -92,6 +93,21 @@ public final class FSPageReturnHighlight: ObservableObject {
     }
 }
 
+// MARK: - Environment 注入（带默认值，避免脱离容器使用时崩溃）
+/// 通过自定义 EnvironmentKey 注入共享 store，并提供默认 no-op 实例：
+/// 即使调用方忘记用 FSPageReturnList 包裹，row 也只会「静默退化为无返回淡出」，
+/// 而不会因 @EnvironmentObject 缺省而直接崩溃（@EnvironmentObject 缺失会 fatal error）。
+private struct FSPageReturnHighlightKey: EnvironmentKey {
+    static let defaultValue: FSPageReturnHighlight = FSPageReturnHighlight()
+}
+
+extension EnvironmentValues {
+    private var fsPageReturnHighlight: FSPageReturnHighlight {
+        get { self[FSPageReturnHighlightKey.self] }
+        set { self[FSPageReturnHighlightKey.self] = newValue }
+    }
+}
+
 /// 无痕容器：用 @StateObject 托管一份共享的 FSPageReturnHighlight，
 /// 并通过 environment 自动下发给内部所有 FSPageReturnRow。
 /// 调用方只需用它包住 List/ForEach，无需持有 store、无需传参、无需挂生命周期。
@@ -106,17 +122,18 @@ public struct FSPageReturnList<Content: View>: View {
     }
 
     public var body: some View {
-        content.environmentObject(store)
+        content.environment(\.fsPageReturnHighlight, store)
     }
 }
 
 /// 点击高亮行：点击瞬间点亮灰底并触发 onTap（通常 push 下一页），
 /// 灰底保持到「被盖住的页面 pop 回来」时由共享 store 自动复位淡出。
-/// store 由外层 FSPageReturnList 经 @EnvironmentObject 注入，无需调用方传入。
+/// store 由外层 FSPageReturnList 经 @Environment 注入，无需调用方传入。
 public struct FSPageReturnRow<Content: View>: View {
     /// 由 FSPageReturnList 注入的共享 store。
-    /// ⚠️ 必须包在 FSPageReturnList 之内；脱离容器使用会因环境对象缺失而崩溃。
-    @EnvironmentObject private var store: FSPageReturnHighlight
+    /// 用带默认值的 @Environment 注入：即使脱离容器单独使用也不会崩溃，
+    /// 仅会「静默退化为无返回淡出」（功能失效，但绝不闪退）。
+    @Environment(\.fsPageReturnHighlight) private var store: FSPageReturnHighlight
     private let id: AnyHashable
     private let onTap: () -> Void
     private let content: Content
