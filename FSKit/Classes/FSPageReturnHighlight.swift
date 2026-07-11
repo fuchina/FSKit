@@ -37,6 +37,7 @@
 
 import SwiftUI
 import UIKit
+import Combine
 
 /// 高亮状态容器（由 FSPageReturnList 用 @StateObject 托管，经 environment 共享给所有 row）：
 /// 点击点亮某个 id（变灰）；当页面从下一级（编辑/详情）pop 回来、导航重新显示本页时
@@ -102,7 +103,7 @@ private struct FSPageReturnHighlightKey: EnvironmentKey {
 }
 
 extension EnvironmentValues {
-    private var fsPageReturnHighlight: FSPageReturnHighlight {
+    fileprivate var fsPageReturnHighlight: FSPageReturnHighlight {
         get { self[FSPageReturnHighlightKey.self] }
         set { self[FSPageReturnHighlightKey.self] = newValue }
     }
@@ -134,6 +135,10 @@ public struct FSPageReturnRow<Content: View>: View {
     /// 用带默认值的 @Environment 注入：即使脱离容器单独使用也不会崩溃，
     /// 仅会「静默退化为无返回淡出」（功能失效，但绝不闪退）。
     @Environment(\.fsPageReturnHighlight) private var store: FSPageReturnHighlight
+    /// @Environment 不会自动订阅 ObservableObject 的 @Published 变化（只有 @EnvironmentObject 会），
+    /// 故手动订阅 store.$highlightedId 的 publisher，在其变化时强制本行重渲染，
+    /// 使点击变灰 / 返回淡出等动画照常驱动；同时保留「缺省不崩」的安全兜底。
+    @State private var forceRefresh: Bool = false
     private let id: AnyHashable
     private let onTap: () -> Void
     private let content: Content
@@ -168,5 +173,7 @@ public struct FSPageReturnRow<Content: View>: View {
                 .background(on ? pressedColor : normalColor)
                 .animation(FSCellFadeAnimation(response: fadeDuration), value: on)
         }
+        // 订阅 highlightedId 变化，强制重渲染（@Environment 不自动订阅 ObservableObject @Published）
+        .onReceive(store.$highlightedId) { _ in forceRefresh.toggle() }
     }
 }
