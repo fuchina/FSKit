@@ -5,32 +5,42 @@
 //  页面跳转型 cell 高亮（与 FSCellHighlight 解耦，互不影响）：
 //  - 点击 cell 时点亮（变灰），随后 push 进编辑/详情页；
 //    在 push 转场过程中原 cell 仍可见，灰底被「保留」下来
-//  - 编辑页 pop 回来时，自动监听 UINavigationController.willShowViewControllerNotification
+//  - 编辑页 pop 回来时，自动监听 UINavigationController 的 will/didShow 通知
 //    （用字符串字面量取通知名，避免 UIKit 在部分 Swift 版本未桥出类型化成员而报错）：
 //    以「点击时刻」做去抖——点击后极短时间内的 willShow 视为 push 转场而忽略，
-//    超过阈值的 willShow 才视为返回，灰底立即淡出，与 pop 动画并行，消除「停顿」感；
-//    完全不依赖 VC 实例比较，也不依赖网络请求 / 列表重建
+//    超过阈值的 willShow 才视为返回，灰底延后一帧淡出，与 pop 动画并行；
+//    完全不依赖 VC 实例比较、不依赖网络请求，也无需调用方挂任何生命周期
 //
-//  ★ 近无痕插拔：调用方只需在「列表层」建一份 store 并传给每个 row（无需类属性、
-//    无需挂生命周期、无需手动 highlight/reset），row 内部自检测返回并淡出：
+//  ★★ 真·无痕插拔（推荐用法）：用 FSPageReturnList 容器包住你的 List/ForEach，
+//     容器内部用 @StateObject 托管共享 store 并经 environment 自动下发给每个 row。
+//     调用方 **零属性、零传参、零生命周期 override**，row 内部自检测返回并淡出：
 //  ```
-//  let store = FSPageReturnHighlight()          // 列表级建一份，所有 row 共用
-//  FSPageReturnRow(store: store, id: model.aid, onTap: { pushEdit(model) }) {
-//      MyRow(model: model)
+//  FSPageReturnList {                       // ← 容器托管 store，自动注入
+//      List {
+//          ForEach(items, id: \.id) { model in
+//              FSPageReturnRow(id: model.aid, onTap: { pushEdit(model) }) {
+//                  MyRow(model: model)      // ← row 从 environment 拿 store，无需传
+//              }
+//          }
+//      }
 //  }
 //  ```
+//  ⚠️ 前提：承载这棵 SwiftUI 树的 UIHostingController **只建一次、靠数据驱动刷新**
+//     （数据用 ObservableObject 的 @Published 驱动 List）。若宿主每次 reload 都销毁重建
+//     整棵树，容器的 @StateObject 会随树一起新建 → store 被重置 → 灰底丢失、看不到淡出。
+//     UIKit 宿主请务必「hosting 建一次 + 数据驱动」，不要在每次刷新里重建 rootView。
+//
+//  ⚠️ FSPageReturnRow 依赖 @EnvironmentObject 注入的 store，**必须**包在 FSPageReturnList
+//     之内使用；脱离容器单独使用会因环境对象缺失而崩溃。
 //
 
 import SwiftUI
 import UIKit
 
-/// 高亮状态容器（列表级共享一份，所有 row 共用）：
-/// 点击点亮某个 id（变灰）；当页面从下一级（编辑/详情）pop 回来、
-/// 导航重新显示本页时自动熄灭并触发淡出。
-/// 用「点击时刻」做去抖：点击后立即发生的 push 转场对应的 willShow/didShow 被忽略，
-/// 仅处理稍后（用户返回）的通知，从而避免依赖 VC 实例比较、更稳健。
-/// ⚠️ 必须由调用方（列表层）创建并传给各 row，不能在每个 row 内用 @StateObject
-/// （List 行回收重建会导致灰底丢失、无法淡出）。
+/// 高亮状态容器（由 FSPageReturnList 用 @StateObject 托管，经 environment 共享给所有 row）：
+/// 点击点亮某个 id（变灰）；当页面从下一级（编辑/详情）pop 回来、导航重新显示本页时
+/// 自动熄灭并触发淡出。用「点击时刻」做去抖：点击后立即发生的 push 转场对应的
+/// will/didShow 被忽略，仅处理稍后（用户返回）的通知，避免依赖 VC 实例比较、更稳健。
 public final class FSPageReturnHighlight: ObservableObject {
     @Published public var highlightedId: AnyHashable?
     /// 最近一次点击（点亮）的时间戳，用于区分「push 转场」与「pop 返回」
@@ -80,25 +90,33 @@ public final class FSPageReturnHighlight: ObservableObject {
         highlightedId = id
         tapTime = Date().timeIntervalSince1970
     }
+}
 
-    /// 立即熄灭高亮（仅在确有高亮时改变状态，重复调用幂等）。
-    /// 用于调用方在「确定返回」的时机（如 viewWillAppear）主动触发淡出，
-    /// 与导航通知互为备份：即便通知因环境未收到，返回淡出也必定发生。
-    public func clearHighlight() {
-        highlightedId = nil
+/// 无痕容器：用 @StateObject 托管一份共享的 FSPageReturnHighlight，
+/// 并通过 environment 自动下发给内部所有 FSPageReturnRow。
+/// 调用方只需用它包住 List/ForEach，无需持有 store、无需传参、无需挂生命周期。
+/// ⚠️ 承载它的 UIHostingController 需「只建一次 + 数据驱动刷新」（见文件头说明），
+///    否则容器随树重建会导致 @StateObject 被重置、灰底丢失。
+public struct FSPageReturnList<Content: View>: View {
+    @StateObject private var store = FSPageReturnHighlight()
+    private let content: Content
+
+    public init(@ViewBuilder content: () -> Content) {
+        self.content = content()
+    }
+
+    public var body: some View {
+        content.environmentObject(store)
     }
 }
 
 /// 点击高亮行：点击瞬间点亮灰底并触发 onTap（通常 push 下一页），
 /// 灰底保持到「被盖住的页面 pop 回来」时由共享 store 自动复位淡出。
-/// ⚠️ store 必须由调用方（列表层）创建并传入、所有 row 共享同一份：
-/// 不能用每行的 @StateObject —— List/ForEach 在 push-pop 重建时会回收重建 row，
-/// 导致灰底丢失、无法淡出。共享 store 活在 hosting 层，跨 row 回收持久。
+/// store 由外层 FSPageReturnList 经 @EnvironmentObject 注入，无需调用方传入。
 public struct FSPageReturnRow<Content: View>: View {
-    /// ⚠️ 必须是 @ObservedObject：store 由列表层创建并传入（共享一份），
-    /// 去掉包装会让 SwiftUI 不监听 @Published 的 highlightedId 变化，
-    /// 导致点击/返回时灰底不出现、淡出也不触发（两个动画一起消失）。
-    @ObservedObject private var store: FSPageReturnHighlight
+    /// 由 FSPageReturnList 注入的共享 store。
+    /// ⚠️ 必须包在 FSPageReturnList 之内；脱离容器使用会因环境对象缺失而崩溃。
+    @EnvironmentObject private var store: FSPageReturnHighlight
     private let id: AnyHashable
     private let onTap: () -> Void
     private let content: Content
@@ -106,14 +124,12 @@ public struct FSPageReturnRow<Content: View>: View {
     private let pressedColor: Color
     private let normalColor: Color
 
-    public init(store: FSPageReturnHighlight,
-                id: AnyHashable,
+    public init(id: AnyHashable,
                 fadeDuration: Double = 0.6,
                 pressedColor: Color = Color(UIColor.systemGray3),
                 normalColor: Color = Color(UIColor.systemBackground),
                 onTap: @escaping () -> Void,
                 @ViewBuilder content: () -> Content) {
-        self._store = ObservedObject(wrappedValue: store)
         self.id = id
         self.fadeDuration = fadeDuration
         self.pressedColor = pressedColor
@@ -137,4 +153,3 @@ public struct FSPageReturnRow<Content: View>: View {
         }
     }
 }
-
