@@ -83,10 +83,13 @@ public struct FSLikeCellClick2<Content: View>: View {
                     animatedGray = newValue
                 }
         } else {
+            // 铺满模式：ZStack Rectangle 做背景（和卡片模式一致，withAnimation 可响应）
             ZStack { content }
                 .listRowBackground(
                     Rectangle()
                         .fill(showGray ? pressedColor : normalColor)
+                        // 长按时变灰瞬时，返回淡出走 spring
+                        .animation(isPressing ? nil : FSCellFadeAnimation(response: fadeDuration), value: animatedGray)
                 )
                 .contentShape(Rectangle())
                 .onTapGesture {
@@ -110,12 +113,14 @@ public struct FSLikeCellClick2<Content: View>: View {
         }
     }
 
-    private func handleStoreChange(_ newValue: AnyHashable??) {
-        let match = newValue.map { $0 == id } ?? false
+    private func handleStoreChange(_ newValue: AnyHashable?) {
+        let match: Bool = {
+            guard let v = newValue else { return false }
+            return v == id
+        }()
         if match {
-            animatedGray = true   // 点击立刻变灰
+            animatedGray = true
         } else if animatedGray {
-            // 返回或 autoDismiss 清除 → 淡出
             withAnimation(FSCellFadeAnimation(response: fadeDuration)) {
                 animatedGray = false
             }
