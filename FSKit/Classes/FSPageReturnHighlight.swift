@@ -34,6 +34,12 @@
 //     之内使用；脱离容器单独使用会因环境对象缺失而崩溃（@EnvironmentObject 无默认值）。
 //     （如需「误用也不崩」的兜底版本，需改用自定义 DynamicProperty 包装，见工作记录备注。）
 //
+//  ★ 长按变灰的实现：用 ButtonStyle 的 isPressed（Button 内部按压状态），**不挂任何独立
+//    长按手势**。原因：反复验证发现 SwiftUI 里「独立长按手势（.gesture/.onLongPressGesture）」
+//    会在导航转场时抑制 row 的动画重渲 → 返回淡出被杀；而 Button + .onLongPressGesture 又
+//    会吞掉点击。ButtonStyle.isPressed 是 Button 自带按压状态、非额外手势，不吞点击、不杀淡出，
+//    是「点击导航 + 长按变灰 + 返回淡出」三者共存的唯一可靠写法。
+//
 
 import SwiftUI
 import UIKit
@@ -113,6 +119,8 @@ public struct FSPageReturnList<Content: View>: View {
 
 /// 点击高亮行：点击瞬间点亮灰底并触发 onTap（通常 push 下一页），
 /// 灰底保持到「被盖住的页面 pop 回来」时由共享 store 自动复位淡出。
+/// 长按（按住）期间也会变灰（ButtonStyle.isPressed 驱动），松手恢复，不导航——
+/// 作为按压反馈，与点击共用同一灰底 / 同一条 FSCellFadeAnimation 曲线。
 /// store 由外层 FSPageReturnList 经 @EnvironmentObject 注入，无需调用方传入。
 public struct FSPageReturnRow<Content: View>: View {
     /// 由 FSPageReturnList 经 @EnvironmentObject 注入的共享 store。
@@ -143,14 +151,53 @@ public struct FSPageReturnRow<Content: View>: View {
         // 单行算出是否高亮（Optional<AnyHashable> 与 AnyHashable 比较；共享 store 跨 row 共用）
         let on = store.highlightedId.map { $0 == id } ?? false
         return Button {
+            // 点击（短按松手）：点亮灰底（由 store 接管，跨页保留到返回）+ 触发 onTap（导航，返回时由 store 自动淡出）。
+            // 长按不会触发 Button 的 action（超过 tap 判定时长），故长按只靠 isPressed 变灰、不导航。
             store.highlight(id)
             onTap()
         } label: {
-            // 淡出复用共享的 FSCellFadeAnimation（与 HighlightRow 点击淡出同一 spring 曲线 / 阻尼），
-            // 仅 response = fadeDuration 由本 row 自带时长决定；曲线调一处全局生效。
             content
-                .background(on ? pressedColor : normalColor)
-                .animation(FSCellFadeAnimation(response: fadeDuration), value: on)
         }
+        .buttonStyle(FSPageReturnPressStyle(
+            pressedColor: pressedColor,
+            normalColor: normalColor,
+            isHighlighted: on,
+            fadeDuration: fadeDuration
+        ))
+    }
+}
+
+/// FSPageReturnRow 专用按钮样式：合并「按压即时变灰（isPressed）」与「跨页保留灰底（isHighlighted）」。
+///
+/// 行为：
+/// - **长按**：手指在 Button 上时 `isPressed=true` → 变灰；保持按住 → 灰持续；松手 `isPressed=false` → 恢复；
+///   长按不触发 Button action → 不导航。即「长按变灰」的瞬时按压反馈。
+/// - **点击**：按下 `isPressed=true` 变灰；松手触发 action → `store.highlight(id)` 置 `on=true`（灰底由 store 接管保留）
+///   + `onTap()` 导航；松手 `isPressed=false` 但 `on=true` → 灰底保持；返回时 store 置空 `on=false` → 淡出。
+///
+/// 为什么用 ButtonStyle 而非 `.gesture` / `.onLongPressGesture`（吃了一上午亏的铁律）：
+/// - ✗ `LongPressGesture.simultaneously(with: TapGesture)` 或 `.exclusively(before:)`：
+///   任何 `.gesture(...)` 组合挂在 row 上，都会在导航转场时抑制 SwiftUI 对该 row 的动画重渲 → **返回淡出被杀**。
+/// - ✗ `Button` + `.onLongPressGesture`：长按识别器在 touch-down 优先注册、吞掉 Button 的 tap → **点击没反应**。
+/// - ✅ `ButtonStyle.isPressed`：Button 内部按压状态，非额外手势，不吞点击、不杀淡出，三者共存唯一可靠写法。
+private struct FSPageReturnPressStyle: ButtonStyle {
+    private let pressedColor: Color
+    private let normalColor: Color
+    private let isHighlighted: Bool
+    private let fadeDuration: Double
+
+    init(pressedColor: Color, normalColor: Color, isHighlighted: Bool, fadeDuration: Double) {
+        self.pressedColor = pressedColor
+        self.normalColor = normalColor
+        self.isHighlighted = isHighlighted
+        self.fadeDuration = fadeDuration
+    }
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            // 按压中（isPressed）或被 store 标记高亮（isHighlighted）都显示灰底
+            .background((configuration.isPressed || isHighlighted) ? pressedColor : normalColor)
+            // 按压变化与高亮变化共用同一条 spring 曲线（柔和、与 HighlightRow 一致）
+            .animation(FSCellFadeAnimation(response: fadeDuration), value: configuration.isPressed || isHighlighted)
     }
 }
