@@ -12,14 +12,14 @@
 //    完全不依赖 VC 实例比较、不依赖网络请求，也无需调用方挂任何生命周期
 //
 //  ★★ 真·无痕插拔（推荐用法）：用 FSPageReturnList 容器包住你的 List/ForEach，
-//     容器内部用 @StateObject 托管共享 store 并经 environment 自动下发给每个 row。
+//     容器内部用 @StateObject 托管共享 store 并经 environmentObject 自动下发给每个 row。
 //     调用方 **零属性、零传参、零生命周期 override**，row 内部自检测返回并淡出：
 //  ```
 //  FSPageReturnList {                       // ← 容器托管 store，自动注入
 //      List {
 //          ForEach(items, id: \.id) { model in
 //              FSPageReturnRow(id: model.aid, onTap: { pushEdit(model) }) {
-//                  MyRow(model: model)      // ← row 从 environment 拿 store，无需传
+//                  MyRow(model: model)      // ← row 从 @EnvironmentObject 拿 store，无需传
 //              }
 //          }
 //      }
@@ -30,14 +30,13 @@
 //     整棵树，容器的 @StateObject 会随树一起新建 → store 被重置 → 灰底丢失、看不到淡出。
 //     UIKit 宿主请务必「hosting 建一次 + 数据驱动」，不要在每次刷新里重建 rootView。
 //
-//  ⚠️ FSPageReturnRow 依赖共享 store（由 FSPageReturnList 经 @Environment 注入）。
-//     推荐包在容器内使用以获得返回淡出；若脱离容器单独使用也**不会崩溃**（用带默认值的
-//     EnvironmentKey 兜底），只是该 row 退化为「点击变灰、无返回淡出」的无害状态。
+//  ⚠️ FSPageReturnRow 用 @EnvironmentObject 取共享 store，**必须**包在 FSPageReturnList
+//     之内使用；脱离容器单独使用会因环境对象缺失而崩溃（@EnvironmentObject 无默认值）。
+//     （如需「误用也不崩」的兜底版本，需改用自定义 DynamicProperty 包装，见工作记录备注。）
 //
 
 import SwiftUI
 import UIKit
-import Combine
 
 /// 高亮状态容器（由 FSPageReturnList 用 @StateObject 托管，经 environment 共享给所有 row）：
 /// 点击点亮某个 id（变灰）；当页面从下一级（编辑/详情）pop 回来、导航重新显示本页时
@@ -94,23 +93,8 @@ public final class FSPageReturnHighlight: ObservableObject {
     }
 }
 
-// MARK: - Environment 注入（带默认值，避免脱离容器使用时崩溃）
-/// 通过自定义 EnvironmentKey 注入共享 store，并提供默认 no-op 实例：
-/// 即使调用方忘记用 FSPageReturnList 包裹，row 也只会「静默退化为无返回淡出」，
-/// 而不会因 @EnvironmentObject 缺省而直接崩溃（@EnvironmentObject 缺失会 fatal error）。
-private struct FSPageReturnHighlightKey: EnvironmentKey {
-    static let defaultValue: FSPageReturnHighlight = FSPageReturnHighlight()
-}
-
-extension EnvironmentValues {
-    fileprivate var fsPageReturnHighlight: FSPageReturnHighlight {
-        get { self[FSPageReturnHighlightKey.self] }
-        set { self[FSPageReturnHighlightKey.self] = newValue }
-    }
-}
-
 /// 无痕容器：用 @StateObject 托管一份共享的 FSPageReturnHighlight，
-/// 并通过 environment 自动下发给内部所有 FSPageReturnRow。
+/// 并通过 environmentObject 自动下发给内部所有 FSPageReturnRow。
 /// 调用方只需用它包住 List/ForEach，无需持有 store、无需传参、无需挂生命周期。
 /// ⚠️ 承载它的 UIHostingController 需「只建一次 + 数据驱动刷新」（见文件头说明），
 ///    否则容器随树重建会导致 @StateObject 被重置、灰底丢失。
@@ -123,22 +107,17 @@ public struct FSPageReturnList<Content: View>: View {
     }
 
     public var body: some View {
-        content.environment(\.fsPageReturnHighlight, store)
+        content.environmentObject(store)
     }
 }
 
 /// 点击高亮行：点击瞬间点亮灰底并触发 onTap（通常 push 下一页），
 /// 灰底保持到「被盖住的页面 pop 回来」时由共享 store 自动复位淡出。
-/// store 由外层 FSPageReturnList 经 @Environment 注入，无需调用方传入。
+/// store 由外层 FSPageReturnList 经 @EnvironmentObject 注入，无需调用方传入。
 public struct FSPageReturnRow<Content: View>: View {
-    /// 由 FSPageReturnList 注入的共享 store。
-    /// 用带默认值的 @Environment 注入：即使脱离容器单独使用也不会崩溃，
-    /// 仅会「静默退化为无返回淡出」（功能失效，但绝不闪退）。
-    @Environment(\.fsPageReturnHighlight) private var store: FSPageReturnHighlight
-    /// @Environment 不会自动订阅 ObservableObject 的 @Published 变化（只有 @EnvironmentObject 会），
-    /// 故手动订阅 store.$highlightedId 的 publisher，在其变化时强制本行重渲染，
-    /// 使点击变灰 / 返回淡出等动画照常驱动；同时保留「缺省不崩」的安全兜底。
-    @State private var forceRefresh: Bool = false
+    /// 由 FSPageReturnList 经 @EnvironmentObject 注入的共享 store。
+    /// ⚠️ 必须包在 FSPageReturnList 之内；脱离容器使用会因环境对象缺失而崩溃。
+    @EnvironmentObject private var store: FSPageReturnHighlight
     private let id: AnyHashable
     private let onTap: () -> Void
     private let content: Content
@@ -173,7 +152,5 @@ public struct FSPageReturnRow<Content: View>: View {
                 .background(on ? pressedColor : normalColor)
                 .animation(FSCellFadeAnimation(response: fadeDuration), value: on)
         }
-        // 订阅 highlightedId 变化，强制重渲染（@Environment 不自动订阅 ObservableObject @Published）
-        .onReceive(store.$highlightedId) { _ in forceRefresh.toggle() }
     }
 }
