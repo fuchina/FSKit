@@ -59,13 +59,13 @@ public struct FSLikeCellClick2<Content: View>: View {
                 .background(
                     RoundedRectangle(cornerRadius: cornerRadius)
                         .fill(showGray ? pressedColor : normalColor)
-                        .animation(FSCellFadeAnimation(response: fadeDuration), value: showGray)
                 )
                 .padding(padding)
                 .listRowBackground(Color.clear)
                 .contentShape(Rectangle())
                 .onTapGesture {
-                    store.highlight(id)
+                    // 灰色立刻出现（瞬时），淡出由 autoDismiss/store 控制 0.6s
+                    withAnimation(.easeOut(duration: 0)) { store.highlight(id) }
                     onTap()
                     if autoDismiss {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
@@ -75,18 +75,19 @@ public struct FSLikeCellClick2<Content: View>: View {
                         }
                     }
                 }
-                .onLongPressGesture(minimumDuration: 0.5, pressing: { isPressing = $0 }, perform: {})
+                .onLongPressGesture(minimumDuration: 0.5,
+                    pressing: { withAnimation(.easeOut(duration: 0)) { isPressing = $0 } },
+                    perform: {})
         } else {
             // 铺满模式：listRowBackground 统一管理白色/灰底
             ZStack { content }
                 .listRowBackground(
                     Rectangle()
                         .fill(showGray ? pressedColor : normalColor)
-                        .animation(FSCellFadeAnimation(response: fadeDuration), value: showGray)
                 )
                 .contentShape(Rectangle())
                 .onTapGesture {
-                    store.highlight(id)
+                    withAnimation(.easeOut(duration: 0)) { store.highlight(id) }
                     onTap()
                     if autoDismiss {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
@@ -96,7 +97,9 @@ public struct FSLikeCellClick2<Content: View>: View {
                         }
                     }
                 }
-                .onLongPressGesture(minimumDuration: 0.5, pressing: { isPressing = $0 }, perform: {})
+                .onLongPressGesture(minimumDuration: 0.5,
+                    pressing: { withAnimation(.easeOut(duration: 0)) { isPressing = $0 } },
+                    perform: {})
         }
     }
 }
