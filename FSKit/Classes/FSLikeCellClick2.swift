@@ -6,6 +6,7 @@
 //  - 铺满模式（默认）：listRowBackground 统一管理白色/灰底，铺满整行
 //  - 卡片模式（cardStyle=true）：灰底在 content 的 background 上切换，白色卡片+圆角+间距
 //  - 点击变灰 + 长按变灰 + 返回淡出（通过 FSPageReturnHighlight store）
+//  - 变灰瞬时、淡出 0.6s spring：用 animatedGray 状态机 + onChange 监听 store 变化
 //
 
 import SwiftUI
@@ -25,6 +26,8 @@ public struct FSLikeCellClick2<Content: View>: View {
     private let padding: EdgeInsets
 
     @State private var isPressing = false
+    /// 动画状态机：变灰时立刻 true，淡出时 withAnimation(false)
+    @State private var animatedGray = false
 
     public init(id: AnyHashable,
                 fadeDuration: Double = 0.6,
@@ -50,11 +53,9 @@ public struct FSLikeCellClick2<Content: View>: View {
 
     @ViewBuilder
     public var body: some View {
-        let isHighlighted = store.highlightedId.map { $0 == id } ?? false
-        let showGray = isPressing || isHighlighted
+        let showGray = animatedGray
 
         if cardStyle {
-            // 卡片模式：灰底在 content 的 background 上切换，listRowBackground 透明，padding 做间距
             content
                 .background(
                     RoundedRectangle(cornerRadius: cornerRadius)
@@ -64,22 +65,24 @@ public struct FSLikeCellClick2<Content: View>: View {
                 .listRowBackground(Color.clear)
                 .contentShape(Rectangle())
                 .onTapGesture {
-                    // 灰色立刻出现（瞬时），淡出由 autoDismiss/store 控制 0.6s
-                    withAnimation(.easeOut(duration: 0)) { store.highlight(id) }
+                    store.highlight(id)
                     onTap()
                     if autoDismiss {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-                            withAnimation(FSCellFadeAnimation(response: fadeDuration)) {
-                                store.highlightedId = nil
-                            }
+                            store.highlightedId = nil
                         }
                     }
                 }
                 .onLongPressGesture(minimumDuration: 0.5,
-                    pressing: { p in withAnimation(.easeOut(duration: 0)) { isPressing = p } },
+                    pressing: { isPressing = $0 },
                     perform: {})
+                .onChange(of: store.highlightedId) { newValue in
+                    handleStoreChange(newValue)
+                }
+                .onChange(of: isPressing) { newValue in
+                    animatedGray = newValue
+                }
         } else {
-            // 铺满模式：listRowBackground 统一管理白色/灰底
             ZStack { content }
                 .listRowBackground(
                     Rectangle()
@@ -87,19 +90,35 @@ public struct FSLikeCellClick2<Content: View>: View {
                 )
                 .contentShape(Rectangle())
                 .onTapGesture {
-                    withAnimation(.easeOut(duration: 0)) { store.highlight(id) }
+                    store.highlight(id)
                     onTap()
                     if autoDismiss {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-                            withAnimation(FSCellFadeAnimation(response: fadeDuration)) {
-                                store.highlightedId = nil
-                            }
+                            store.highlightedId = nil
                         }
                     }
                 }
                 .onLongPressGesture(minimumDuration: 0.5,
-                    pressing: { p in withAnimation(.easeOut(duration: 0)) { isPressing = p } },
+                    pressing: { isPressing = $0 },
                     perform: {})
+                .onChange(of: store.highlightedId) { newValue in
+                    handleStoreChange(newValue)
+                }
+                .onChange(of: isPressing) { newValue in
+                    animatedGray = newValue
+                }
+        }
+    }
+
+    private func handleStoreChange(_ newValue: AnyHashable??) {
+        let match = newValue.map { $0 == id } ?? false
+        if match {
+            animatedGray = true   // 点击立刻变灰
+        } else if animatedGray {
+            // 返回或 autoDismiss 清除 → 淡出
+            withAnimation(FSCellFadeAnimation(response: fadeDuration)) {
+                animatedGray = false
+            }
         }
     }
 }
