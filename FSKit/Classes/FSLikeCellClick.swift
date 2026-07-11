@@ -80,9 +80,11 @@ public struct FSLikeCellClick<Content: View>: View {
                 store.highlight(id)
                 onTap()
                 if autoDismiss {
-                    // 先保持灰底 0.15s，再清除触发 0.6s 淡出（和 HighlightRow 一致的节奏）
+                    // 保持 0.15s → withAnimation 显式触发 0.6s spring 淡出
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-                        store.highlightedId = nil
+                        withAnimation(FSCellFadeAnimation(response: fadeDuration)) {
+                            store.highlightedId = nil
+                        }
                     }
                 }
             }
