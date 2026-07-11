@@ -66,11 +66,11 @@ public struct FSPageReturnRow<Content: View>: View {
             store.highlight(id)
             onTap()
         } label: {
-            // 自带 spring 淡出：response = fadeDuration（秒级时长），dampingFraction 0.9 轻微回弹更绵顺，
-            // 比 easeInOut 更柔、更「活」，且完全不改 FSCellHighlight。
+            // 淡出复用共享的 FSCellFadeAnimation（与 HighlightRow 点击淡出同一 spring 曲线 / 阻尼），
+            // 仅 response = fadeDuration 由本 row 自带时长决定；曲线调一处全局生效。
             content
                 .background(on ? pressedColor : normalColor)
-                .animation(.spring(response: fadeDuration, dampingFraction: 0.96, blendDuration: 0), value: on)
+                .animation(FSCellFadeAnimation(response: fadeDuration), value: on)
         }
     }
 }

@@ -45,7 +45,9 @@ public struct CellHighlightButtonStyle: ButtonStyle {
         let on = configuration.isPressed || highlight
         configuration.label
             .background(on ? pressedColor : normalColor)
-            .animation(.easeOut(duration: on ? fadeInDuration : fadeOutDuration), value: on)
+            // 淡出复用共享的 FSCellFadeAnimation（与 FSPageReturnRow 同一 spring），
+            // 淡入仍用 easeOut 瞬时（对齐原生 cell 选中脆快）；fadeOutDuration 作 spring response。
+            .animation(on ? .easeOut(duration: fadeInDuration) : FSCellFadeAnimation(response: fadeOutDuration), value: on)
     }
 }
 
@@ -96,9 +98,9 @@ public struct HighlightRow<Content: View>: View {
         Button {
             flash = true
             onTap()
-            // 灰底保持 holdDuration 后开始淡出；淡出 fadeDuration 完全消失
+            // 灰底保持 holdDuration 后开始淡出；淡出复用共享的 FSCellFadeAnimation（spring）
             DispatchQueue.main.asyncAfter(deadline: .now() + holdDuration) {
-                withAnimation(.easeOut(duration: fadeDuration)) { flash = false }
+                withAnimation(FSCellFadeAnimation(response: fadeDuration)) { flash = false }
             }
         } label: {
             content
