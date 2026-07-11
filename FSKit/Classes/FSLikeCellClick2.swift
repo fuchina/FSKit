@@ -28,6 +28,8 @@ public struct FSLikeCellClick2<Content: View>: View {
     @State private var isPressing = false
     /// 动画状态机：变灰时立刻 true，淡出时 withAnimation(false)
     @State private var animatedGray = false
+    /// 淡出标志：区分变灰（瞬时）和淡出（spring）
+    @State private var isFadingOut = false
 
     public init(id: AnyHashable,
                 fadeDuration: Double = 0.6,
@@ -60,6 +62,7 @@ public struct FSLikeCellClick2<Content: View>: View {
                 .background(
                     RoundedRectangle(cornerRadius: cornerRadius)
                         .fill(showGray ? pressedColor : normalColor)
+                        .animation(isFadingOut ? FSCellFadeAnimation(response: fadeDuration) : nil, value: animatedGray)
                 )
                 .padding(padding)
                 .listRowBackground(Color.clear)
@@ -75,12 +78,15 @@ public struct FSLikeCellClick2<Content: View>: View {
                 }
                 .onLongPressGesture(minimumDuration: 0.5,
                     pressing: { isPressing = $0 },
-                    perform: {})
+                    perform: {
+                        store.highlight(id)
+                        onTap()
+                    })
                 .onChange(of: store.highlightedId) { newValue in
                     handleStoreChange(newValue)
                 }
                 .onChange(of: isPressing) { newValue in
-                    animatedGray = newValue
+                    handlePressingChange(newValue)
                 }
         } else {
             // 铺满模式：ZStack Rectangle 做背景（和卡片模式一致，withAnimation 可响应）
@@ -89,7 +95,7 @@ public struct FSLikeCellClick2<Content: View>: View {
                     Rectangle()
                         .fill(showGray ? pressedColor : normalColor)
                         // 长按时变灰瞬时，返回淡出走 spring
-                        .animation(isPressing ? nil : FSCellFadeAnimation(response: fadeDuration), value: animatedGray)
+                        .animation(isFadingOut ? FSCellFadeAnimation(response: fadeDuration) : nil, value: animatedGray)
                 )
                 .contentShape(Rectangle())
                 .onTapGesture {
@@ -103,12 +109,15 @@ public struct FSLikeCellClick2<Content: View>: View {
                 }
                 .onLongPressGesture(minimumDuration: 0.5,
                     pressing: { isPressing = $0 },
-                    perform: {})
+                    perform: {
+                        store.highlight(id)
+                        onTap()
+                    })
                 .onChange(of: store.highlightedId) { newValue in
                     handleStoreChange(newValue)
                 }
                 .onChange(of: isPressing) { newValue in
-                    animatedGray = newValue
+                    handlePressingChange(newValue)
                 }
         }
     }
@@ -119,9 +128,23 @@ public struct FSLikeCellClick2<Content: View>: View {
             return v == id
         }()
         if match {
+            isFadingOut = false
             animatedGray = true
         } else if animatedGray {
-            withAnimation(FSCellFadeAnimation(response: fadeDuration)) {
+            isFadingOut = true
+            animatedGray = false
+        }
+    }
+
+    private func handlePressingChange(_ newValue: Bool) {
+        if newValue {
+            isFadingOut = false
+            animatedGray = true
+        } else {
+            // 松手：若 store 已接管（导航中），保持灰底等返回淡出；否则快速松开 → 淡出恢复
+            let isHighlighted = store.highlightedId.map { $0 == id } ?? false
+            if !isHighlighted {
+                isFadingOut = true
                 animatedGray = false
             }
         }
