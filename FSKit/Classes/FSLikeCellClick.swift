@@ -14,6 +14,7 @@ import SwiftUI
 import UIKit
 
 public struct FSLikeCellClick<Content: View>: View {
+    
     @EnvironmentObject private var store: FSPageReturnHighlight
     private let id: AnyHashable
     private let onTap: () -> Void
@@ -26,12 +27,17 @@ public struct FSLikeCellClick<Content: View>: View {
     private let cardStyle: Bool
     private let cornerRadius: CGFloat
     private let padding: EdgeInsets
+    /// 长按阈值，与 onLongPressGesture(minimumDuration:) 保持一致
+    private let longPressDuration: Double = 0.5
 
     @State private var isPressing = false
     /// 动画状态机：变灰时立刻 true，淡出时 withAnimation(false)
     @State private var animatedGray = false
     /// 淡出标志：区分变灰（瞬时）和淡出（spring）
     @State private var isFadingOut = false
+    /// 长按计时任务：达到阈值后置 true，松开时据此决定是否触发回调
+    @State private var longPressWorkItem: DispatchWorkItem?
+    @State private var longPressFired = false
 
     public init(id: AnyHashable,
                 fadeDuration: Double = 0.6,
@@ -79,17 +85,9 @@ public struct FSLikeCellClick<Content: View>: View {
                         }
                     }
                 }
-                .onLongPressGesture(minimumDuration: 0.5,
+                .onLongPressGesture(minimumDuration: longPressDuration,
                     pressing: { isPressing = $0 },
-                    perform: {
-                        store.highlight(id)
-                        onTap()
-                        if autoDismiss {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + autoDismissDelay) {
-                                store.highlightedId = nil
-                            }
-                        }
-                    })
+                    perform: {})
                 .onChange(of: store.highlightedId) { newValue in
                     handleStoreChange(newValue)
                 }
@@ -115,17 +113,9 @@ public struct FSLikeCellClick<Content: View>: View {
                         }
                     }
                 }
-                .onLongPressGesture(minimumDuration: 0.5,
+                .onLongPressGesture(minimumDuration: longPressDuration,
                     pressing: { isPressing = $0 },
-                    perform: {
-                        store.highlight(id)
-                        onTap()
-                        if autoDismiss {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + autoDismissDelay) {
-                                store.highlightedId = nil
-                            }
-                        }
-                    })
+                    perform: {})
                 .onChange(of: store.highlightedId) { newValue in
                     handleStoreChange(newValue)
                 }
@@ -155,10 +145,28 @@ public struct FSLikeCellClick<Content: View>: View {
 
     private func handlePressingChange(_ newValue: Bool) {
         if newValue {
+            // 手指按下：立即变灰，并启动长按计时（达到阈值才视为长按）
             isFadingOut = false
             animatedGray = true
+            longPressFired = false
+            longPressWorkItem?.cancel()
+            let item = DispatchWorkItem { longPressFired = true }
+            longPressWorkItem = item
+            DispatchQueue.main.asyncAfter(deadline: .now() + longPressDuration, execute: item)
         } else {
-            // 松手：若 store 已接管（导航中），保持灰底等返回淡出；否则快速松开 → 淡出恢复
+            // 手指松开：取消计时；若已达长按阈值，则此刻才触发回调
+            longPressWorkItem?.cancel()
+            longPressWorkItem = nil
+            if longPressFired {
+                store.highlight(id)
+                onTap()
+                if autoDismiss {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + autoDismissDelay) {
+                        store.highlightedId = nil
+                    }
+                }
+            }
+            // 若 store 已接管（导航中）保持灰底等返回淡出；否则淡出恢复
             let isHighlighted = store.highlightedId.map { $0 == id } ?? false
             if !isHighlighted {
                 withAnimation(FSCellFadeAnimation(response: fadeDuration)) {
