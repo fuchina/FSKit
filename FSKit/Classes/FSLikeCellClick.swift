@@ -10,8 +10,8 @@
 //  - fill 模式 listRowBackground 不响应 withAnimation，仍靠隐式 .animation(value:) 驱动（已验证）
 //  - 长按仅做视觉（按下立即变灰、松手淡出），不触发回调；规避了 SwiftUI pressing 区分不了
 //    「松手 vs 滚动取消」导致滚动误触发回调的问题。变灰由 pressing=true 立即触发。
-//  - 点击改用 UIKit UITapGestureRecognizer（iOS 18+ UIGestureRecognizerRepresentable）：
-//    allowableMovement 收紧到 5pt —— 手指移动超过该值即判为滑动、tap .failed，不触发回调，
+//  - 点击改用 UIKit UITapGestureRecognizer 子类（iOS 18+ UIGestureRecognizerRepresentable）：
+//    在 touchesMoved 中累计位移，超过 5pt 即判为滑动、置 .failed，不触发回调，
 //    解决「上下滑动列表时误触发 cell 点击、悄悄改了数据」的问题。
 //    tap 是 discrete 手势（抬手才判定、不持续追踪 touch），不会像 minDuration=0 的长按那样抢走滚动。
 //    cancelsTouchesInView=false，保证列表滚动不受影响。
@@ -65,7 +65,7 @@ public struct FSLikeCellClick<Content: View>: View {
     @ViewBuilder
     public var body: some View {
         let showGray = animatedGray
-        // UIKit 严格 tap：allowableMovement=5，滑动超阈值即 .failed，避免滚动误触发点击
+        // UIKit 严格 tap：touchesMoved 位移超 5pt 即 .failed，避免滑动误触发点击
         let tap = FSTapRepresentable { triggerTap() }
 
         if cardStyle {
@@ -158,19 +158,40 @@ public struct FSLikeCellClick<Content: View>: View {
 /// 从而「滑动/滚动列表」时不触发点击，只有「几乎不动的按下→抬起」才算轻点。
 /// tap 是 discrete 手势（抬手才判定、不持续追踪 touch），cancelsTouchesInView=false，
 /// 不会抢走列表的滚动手势。
+/// 严格 tap 识别器：在 touchesMoved 中累计手指位移，超过 movementLimit 即判为滑动、置 .failed，
+/// 从而「滑动/滚动列表」时不触发点击。比 allowableMovement 更精确（移动即判，不必等抬手）。
+private final class FSStrictTapGestureRecognizer: UITapGestureRecognizer {
+    /// 位移超过该值（pt）即判为滑动、手势失败
+    var movementLimit: CGFloat = 5
+    private var startLocation: CGPoint = .zero
+
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent) {
+        super.touchesBegan(touches, with: event)
+        if let loc = touches.first?.location(in: view) {
+            startLocation = loc
+        }
+    }
+
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent) {
+        super.touchesMoved(touches, with: event)
+        guard state == .possible, let loc = touches.first?.location(in: view) else { return }
+        if hypot(loc.x - startLocation.x, loc.y - startLocation.y) > movementLimit {
+            state = .failed
+        }
+    }
+}
+
 private struct FSTapRepresentable: UIGestureRecognizerRepresentable {
     var onTap: () -> Void
-    /// 位移容差（pt）：按下到抬起的总位移超过该值即判为滑动、tap 失败
-    private let allowableMovement: CGFloat = 5
 
-    func makeUIGestureRecognizer(context: Context) -> UITapGestureRecognizer {
-        let gr = UITapGestureRecognizer(target: nil, action: nil)
-        gr.allowableMovement = allowableMovement
+    func makeUIGestureRecognizer(context: Context) -> FSStrictTapGestureRecognizer {
+        let gr = FSStrictTapGestureRecognizer(target: nil, action: nil)
+        gr.movementLimit = 5
         gr.cancelsTouchesInView = false
         return gr
     }
 
-    func handleUIGestureRecognizerAction(_ recognizer: UITapGestureRecognizer, context: Context) {
+    func handleUIGestureRecognizerAction(_ recognizer: FSStrictTapGestureRecognizer, context: Context) {
         if recognizer.state == .recognized {
             onTap()
         }
