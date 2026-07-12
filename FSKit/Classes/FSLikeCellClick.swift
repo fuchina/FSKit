@@ -81,7 +81,7 @@ public struct FSLikeCellClick<Content: View>: View {
                 .onLongPressGesture(minimumDuration: 0.5,
                     pressing: { handlePressingChange($0) },
                     perform: {})
-                .onChange(of: store.highlightedId) { newValue in
+                .onChange(of: store.highlightedId) { _, newValue in
                     handleStoreChange(newValue)
                 }
         } else {
@@ -98,7 +98,7 @@ public struct FSLikeCellClick<Content: View>: View {
                 .onLongPressGesture(minimumDuration: 0.5,
                     pressing: { handlePressingChange($0) },
                     perform: {})
-                .onChange(of: store.highlightedId) { newValue in
+                .onChange(of: store.highlightedId) { _, newValue in
                     handleStoreChange(newValue)
                 }
         }
