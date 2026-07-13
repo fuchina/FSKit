@@ -10,6 +10,10 @@ import CryptoKit
 
 public let FS_BE_DEBUG_NOTIFICATION  =   "FS_BE_DEBUG_NOTIFICATION"
 
+/// 疑似内存泄漏通知：基类检测到页面 pop/dismiss 后仍未释放时投递，object 为提示文案（String）。
+/// 由 App 层监听并按需（如 FSJZAPP.Fudon()）弹 toast，避免基类反向依赖上层。
+public let FS_BE_LEAK_NOTIFICATION   =   "FS_BE_LEAK_NOTIFICATION"
+
 /// 一年的秒数
 public let FSKitYearSeconds: Double = 31556926.08
 
