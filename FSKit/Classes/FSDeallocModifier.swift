@@ -35,7 +35,7 @@ private final class _FSDeallocTracker {
             )
         }
         leakCheckItem = item
-        DispatchQueue.main.asyncAfter(deadline: .now() + 5.0, execute: item)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0, execute: item)
     }
 
     /// onAppear 再次触发时调用：视图重新可见，取消泄漏检测
