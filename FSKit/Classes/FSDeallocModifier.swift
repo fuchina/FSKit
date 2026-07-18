@@ -24,10 +24,12 @@ public final class FSLeakDetector {
     public static func startCheck(for viewName: String) {
         timers[viewName]?.cancel()
         let item = DispatchWorkItem {
+            let msg = "疑似内存泄漏：\(viewName) 未释放"
             NotificationCenter.default.post(
                 name: NSNotification.Name(FS_BE_LEAK_NOTIFICATION),
-                object: "疑似内存泄漏：\(viewName) 未释放"
+                object: msg
             )
+            print("\(msg)")
             Task { @MainActor in timers.removeValue(forKey: viewName) }
         }
         timers[viewName] = item
