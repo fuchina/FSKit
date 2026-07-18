@@ -4,25 +4,29 @@
 //
 //  对齐 FSBaseController 行为：
 //  - deinit 时发送 FS_BE_DEBUG_NOTIFICATION（释放通知）
-//  - onDisappear 后 5 秒未释放则发送 FS_BE_LEAK_NOTIFICATION（疑似泄漏）
+//  - onDisappear 后 5 秒未释放则发送 FS_BE_LEAK_NOTIFICATION（疑似泄漏，可关闭）
 //  用法：SomeView().debugDealloc("SomeView")
+//        SomeRootView().debugDealloc("RootView", leakDetection: false)
 //
 
 import SwiftUI
 
 /// 释放探针：SwiftUI View 被移出视图树且 @State 释放时，deinit 发送通知。
-/// 同时内置泄漏检测：onDisappear 后 5 秒若仍存活，发送 FS_BE_LEAK_NOTIFICATION。
+/// 可选泄漏检测：onDisappear 后 5 秒若仍存活，发送 FS_BE_LEAK_NOTIFICATION。
 /// 若期间 onAppear 再次触发（被遮盖后重新可见），自动取消泄漏检测。
 private final class _FSDeallocTracker {
     let viewName: String
+    let leakDetection: Bool
     private var leakCheckItem: DispatchWorkItem?
 
-    init(viewName: String) {
+    init(viewName: String, leakDetection: Bool) {
         self.viewName = viewName
+        self.leakDetection = leakDetection
     }
 
-    /// onDisappear 时调用：5 秒后若 self 仍存活 → 疑似泄漏
+    /// onDisappear 时调用：5 秒后若 self 仍存活 → 疑似泄漏（仅 leakDetection=true 时生效）
     func scheduleLeakCheck() {
+        guard leakDetection else { return }
         let item = DispatchWorkItem { [weak self] in
             guard let self else { return }
             NotificationCenter.default.post(
@@ -54,20 +58,21 @@ private final class _FSDeallocTracker {
 /// 视图释放时探针随之释放，触发 deinit 通知；若未按时释放则触发泄漏通知。
 private struct _FSDeallocViewModifier: ViewModifier {
     let viewName: String
+    let leakDetection: Bool
     @State private var tracker: _FSDeallocTracker?
 
     func body(content: Content) -> some View {
         content
             .onAppear {
                 if tracker == nil {
-                    tracker = _FSDeallocTracker(viewName: viewName)
+                    tracker = _FSDeallocTracker(viewName: viewName, leakDetection: leakDetection)
                 } else {
                     // 视图重新可见（如被 push 的页面 pop 回来、sheet dismiss），取消之前的泄漏检测
                     tracker?.cancelLeakCheck()
                 }
             }
             .onDisappear {
-                // 视图不可见，启动泄漏检测定时器
+                // 视图不可见，启动泄漏检测定时器（若 leakDetection=false 则跳过）
                 tracker?.scheduleLeakCheck()
             }
     }
@@ -75,8 +80,11 @@ private struct _FSDeallocViewModifier: ViewModifier {
 
 extension View {
     /// 视图释放时发送 FS_BE_DEBUG_NOTIFICATION，对齐 FSBaseController.deinit 行为。
-    /// 若 onDisappear 后 5 秒仍未释放，发送 FS_BE_LEAK_NOTIFICATION（对齐 checkForLeakIfLeaving）。
-    public func debugDealloc(_ viewName: String) -> some View {
-        modifier(_FSDeallocViewModifier(viewName: viewName))
+    /// - Parameters:
+    ///   - viewName: 视图名，常见用法：`.debugDealloc("\(type(of: self))")`
+    ///   - leakDetection: 是否启用 onDisappear 后 5 秒泄漏检测。
+    ///     NavigationStack 根视图等持久页面应设为 false，避免被 push 遮盖时误报。
+    public func debugDealloc(_ viewName: String, leakDetection: Bool = true) -> some View {
+        modifier(_FSDeallocViewModifier(viewName: viewName, leakDetection: leakDetection))
     }
 }
