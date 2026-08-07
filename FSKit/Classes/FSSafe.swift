@@ -142,7 +142,9 @@ open class FSSafe {
         } else if let str = value as? NSString {
             return str as String
         } else if let str = value as? NSNumber {
-            return str.stringValue
+            
+//            return str.stringValue
+            return "\(str.doubleValue)"
         } else if let str = value as? Int {
             return "\(str)"
         } else if let str = value {
