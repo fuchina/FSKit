@@ -20,6 +20,7 @@ public let FSKitYearSeconds: Double = 31556926.08
 /// 支持小数点后5位，支持汇率（4位），必须是整数，目的是解决Double运算精度损失的问题，目前这是一个好的方案
 public let FSFiveDecimalPlaces: Int = 100000
 public let FSDoubleFiveDecimalPlaces: Double = 100000.0
+public let FSThreeDecimalPlaces: Int = 1000
 
 // MARK: - FSKit
 public class FSKit: NSObject {
