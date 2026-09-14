@@ -587,9 +587,12 @@ public class FSKit: NSObject {
         }
     }
 
-    /// 允许的格式：可选正负号 + 整数部分 + 可选小数部分。
+    /// 允许的格式：可选正负号 + 数字，兼容 ".5" 和 "3." 两种简写。
     /// 刻意拒绝：科学计数法("1e5")、inf、nan、千分位逗号("1,234.56")、全角数字、首尾以外的空格。
-    private static let fsNumberPattern = try! NSRegularExpression(pattern: "^[+-]?\\d+(\\.\\d+)?$")
+    ///
+    /// 数字用显式 `[0-9]` 而不是 `\d`：`\d` 在 NSRegularExpression 里会匹配全角数字（"１２３"），
+    /// 而 `Decimal(string:)` 解析不了全角数字，会导致校验放行、解析却失败的行为不一致。
+    private static let fsNumberPattern = try! NSRegularExpression(pattern: "^[+-]?([0-9]+(\\.[0-9]*)?|\\.[0-9]+)$")
 
     /// 严格解析字符串 → 整数最小单位。
     ///
@@ -659,10 +662,17 @@ public class FSKit: NSObject {
 
     
     // MARK: - Account Number Validation
+    /// 校验金额输入格式：只允许数字和一个小数点，小数点后最多 2 位。
+    ///
+    /// 注意：**空串返回 true**。空串表示"用户没有填写金额"，由调用方回退到默认金额
+    /// （FSAccountManager / FSTracksController 依赖 `je > 0 ? je : 默认值` 这个行为），不要改成 false。
     public static func isFSAccountNumber(_ text: String) -> Bool {
+        if text.isEmpty { return true }
+        
         var pointNumber = 0
         var findPoint = false
         var afterPointNumber = 0
+        var digitNumber = 0
         let validChars = Set("0123456789.")
         
         for char in text {
@@ -671,12 +681,15 @@ public class FSKit: NSObject {
             if char == "." {
                 pointNumber += 1
                 findPoint = true
-            } else if findPoint {
-                afterPointNumber += 1
+            } else {
+                digitNumber += 1
+                if findPoint {
+                    afterPointNumber += 1
+                }
             }
         }
         
-        return pointNumber <= 1 && afterPointNumber <= 2
+        return digitNumber > 0 && pointNumber <= 1 && afterPointNumber <= 2
     }
     
     // MARK: - Growth Rate
