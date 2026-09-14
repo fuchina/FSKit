@@ -569,16 +569,87 @@ public class FSKit: NSObject {
     }
     
     // MARK: - Number Conversion
+    /// 数值解析错误
+    public enum FSNumberParseError: Error, CustomStringConvertible {
+        case empty
+        case invalidFormat
+        case overflow
+
+        public var description: String {
+            switch self {
+            case .empty:
+                return "输入不能为空"
+            case .invalidFormat:
+                return "金额格式不正确"
+            case .overflow:
+                return "金额超出可表示范围"
+            }
+        }
+    }
+
+    /// 允许的格式：可选正负号 + 整数部分 + 可选小数部分。
+    /// 刻意拒绝：科学计数法("1e5")、inf、nan、千分位逗号("1,234.56")、全角数字、首尾以外的空格。
+    private static let fsNumberPattern = try! NSRegularExpression(pattern: "^[+-]?\\d+(\\.\\d+)?$")
+
+    /// 严格解析字符串 → 整数最小单位。
+    ///
+    /// 用 Decimal（十进制精确运算）解析，先乘 scale 再显式舍入，避免二进制浮点漂移。
+    /// 例如 `try FSKit.numberStringToMinorUnits("8.165", scale: 100)` → 817；
+    /// 同样输入走 Double 路线 `Int(round(8.165 * 100))` 只会得到 816，少 1 分。
+    ///
+    /// - Parameters:
+    ///   - text: 待解析字符串，如 "3.4"
+    ///   - scale: 最小单位倍数，按 ISO 4217 取。人民币 100（分）、日元 1、科威特第纳尔 1000
+    /// - Throws: FSNumberParseError
+    /// - Returns: 以最小单位为单位的整数
+    public static func numberStringToMinorUnits(_ text: String?, scale: Int) throws -> Int {
+        guard scale > 0 else { throw FSNumberParseError.invalidFormat }
+
+        // 1. 规范化：trim 首尾空白
+        let trimmed = (text ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { throw FSNumberParseError.empty }
+
+        // 2. 严格校验。必须做 —— Decimal(string:) 对 "1,234.56" 会「部分解析」成 1，而不是返回 nil
+        let range = NSRange(trimmed.startIndex..., in: trimmed)
+        guard fsNumberPattern.firstMatch(in: trimmed, range: range) != nil else {
+            throw FSNumberParseError.invalidFormat
+        }
+
+        // 3. 用 Decimal 解析，不用 Double
+        guard var decimal = Decimal(string: trimmed, locale: Locale(identifier: "en_US_POSIX")),
+              decimal.isFinite else {
+            throw FSNumberParseError.invalidFormat
+        }
+
+        // 4. 乘 scale：十进制精确运算，不漂移
+        decimal *= Decimal(scale)
+
+        // 5. 显式舍入到整数最小单位（.plain 四舍五入；.bankers 银行家舍入）
+        var rounded = Decimal()
+        NSDecimalRound(&rounded, &decimal, 0, .plain)
+
+        // 6. 范围检查，避免超出 Int 表示范围
+        guard rounded <= Decimal(Int.max), rounded >= Decimal(Int.min) else {
+            throw FSNumberParseError.overflow
+        }
+
+        return NSDecimalNumber(decimal: rounded).intValue
+    }
+
+    /// 严格解析金额字符串 → 分。等价于 `numberStringToMinorUnits(text, scale: 100)`。
+    public static func numberStringToCents(_ text: String?) throws -> Int {
+        try numberStringToMinorUnits(text, scale: 100)
+    }
+
+    /// 字符串 → 分。解析失败返回 0（保持历史契约，调用方需自行判断结果是否为 0）。
+    /// 内部已升级为 Decimal 精确运算，不会再出现 8.165 → 816 这类少 1 分的问题。
     public static func numberStringToTwoDecimalPlaces(_ floatString: String) -> Int {
-        let flt = FSSafe.double(floatString)
-        let centFlt = round(flt * 100.0)
-        return Int(centFlt)
+        (try? numberStringToMinorUnits(floatString, scale: 100)) ?? 0
     }
     
+    /// 字符串 → 小数点后 5 位整数（汇率场景）。解析失败返回 0。
     public static func numberStringToFiveDecimalPlaces(_ floatString: String) -> Int {
-        let flt = FSSafe.double(floatString)
-        let centFlt = round(flt * Double(FSFiveDecimalPlaces))
-        return Int(centFlt)
+        (try? numberStringToMinorUnits(floatString, scale: FSFiveDecimalPlaces)) ?? 0
     }
     
     public static func floatToInt(_ floatString: String) -> Int {
