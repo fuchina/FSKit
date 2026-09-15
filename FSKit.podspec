@@ -39,7 +39,7 @@ Pod::Spec.new do |s|
   # }
 
   # s.public_header_files = 'Pod/Classes/**/*.h'
-  s.frameworks = 'UIKit', 'SwiftUI', 'MapKit','CoreLocation','CoreTelephony','AVFoundation'
+  s.frameworks = 'UIKit', 'SwiftUI', 'MapKit','CoreLocation','CoreTelephony','AVFoundation','Security'
   s.libraries  = 'sqlite3'
   
   # s.dependency 'AFNetworking', '~> 2.3'
