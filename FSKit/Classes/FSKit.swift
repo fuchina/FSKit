@@ -1060,6 +1060,15 @@ public class FSKit: NSObject {
         return scenes.first as? UIWindowScene
     }
     
+    public static func screenOf(view: UIView) -> UIScreen {
+        let screen = view.window?.windowScene?.screen
+        if let screen {
+            return screen
+        }
+        
+        return UIScreen()
+    }
+    
     // MARK: - Digital Only String
     public static func digitalOnlyString(_ inputString: String?) -> String {
         guard let inputString = inputString, !inputString.isEmpty else { return "" }
