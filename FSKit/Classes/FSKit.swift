@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import FSKit
 import CryptoKit
 
 public let FS_BE_DEBUG_NOTIFICATION  =   "FS_BE_DEBUG_NOTIFICATION"

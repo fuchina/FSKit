@@ -259,7 +259,8 @@ public class FSUIAdapter: NSObject {
         isIPad = UIDevice.current.userInterfaceIdiom == .pad
         isIPhone = UIDevice.current.userInterfaceIdiom == .phone
         
-        let screenBounds = UIScreen.main.bounds
+        let s = FSKit.currentWindowScene()?.screen ?? UIScreen()
+        let screenBounds = s.bounds
         if screenBounds.width > screenBounds.height {
             screenSmallerValue = screenBounds.height
             screenBiggerValue = screenBounds.width
