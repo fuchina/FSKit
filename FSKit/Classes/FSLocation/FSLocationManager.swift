@@ -8,6 +8,7 @@
 
 import Foundation
 import CoreLocation
+import MapKit
 
 /*
  1.需要在工程plist文件中增加
@@ -101,7 +102,54 @@ public class FSLocationManager: NSObject {
     }
     
     /// 根据location获取地址
+    ///
+    /// - Note: iOS 26 起 `CLGeocoder` 已被废弃，内部改用 MapKit 的 `MKReverseGeocodingRequest`；
+    ///         对外返回类型保持不变，调用方无需改动。
     public static func address(
+        with location: CLLocation,
+        completionHandler: @escaping ([CLPlacemark]?, Error?) -> Void
+    ) {
+        if #available(iOS 26.0, *) {
+            reverseGeocodingMapItems(with: location) { mapItems, error in
+                completionHandler(mapItemPlacemarks(from: mapItems), error)
+            }
+        } else {
+            legacyAddress(with: location, completionHandler: completionHandler)
+        }
+    }
+    
+    // MARK: - Reverse Geocoding
+    
+    /// iOS 26+：MapKit 原生逆地理编码，回调在主线程
+    @available(iOS 26.0, *)
+    private static func reverseGeocodingMapItems(
+        with location: CLLocation,
+        completionHandler: @escaping ([MKMapItem]?, Error?) -> Void
+    ) {
+        Task { @MainActor in
+            guard let request = MKReverseGeocodingRequest(location: location) else {
+                completionHandler(nil, NSError(
+                    domain: "FSLocationManager",
+                    code: -1,
+                    userInfo: [NSLocalizedDescriptionKey: "逆地理编码请求创建失败"]
+                ))
+                return
+            }
+            
+            do {
+                completionHandler(try await request.mapItems, nil)
+            } catch {
+                completionHandler(nil, error)
+            }
+        }
+    }
+    
+    /// iOS 26 以下：CLGeocoder
+    ///
+    /// - Note: 该方法内部使用了已废弃的 `CLGeocoder`，仅在 `#available` 的旧系统分支调用；
+    ///         标注为同版本废弃以把编译期废弃告警收敛在此处，不再发散到调用方。
+    @available(iOS, deprecated: 26.0, message: "内部兼容旧系统，iOS 26 起走 MKReverseGeocodingRequest")
+    private static func legacyAddress(
         with location: CLLocation,
         completionHandler: @escaping ([CLPlacemark]?, Error?) -> Void
     ) {
@@ -109,6 +157,23 @@ public class FSLocationManager: NSObject {
         geocoder.reverseGeocodeLocation(location) { placemarks, error in
             completionHandler(placemarks, error)
         }
+    }
+    
+    /// MKMapItem -> CLPlacemark
+    ///
+    /// - Note: iOS 26 起 `MKMapItem.placemark` 与 `MKPlacemark` 类被标记废弃，而 `CLPlacemark`
+    ///         及其结构化字段（name/locality/subLocality/thoroughfare 等）尚未废弃。为在保持
+    ///         对外接口不变的前提下消除编译期废弃告警，这里采用运行时取值；若将来 `placemark`
+    ///         被移除，`responds(to:)` 会兜住并返回 nil。
+    private static func mapItemPlacemarks(from mapItems: [MKMapItem]?) -> [CLPlacemark]? {
+        guard let mapItems, !mapItems.isEmpty else { return nil }
+        
+        let selector = NSSelectorFromString("placemark")
+        let placemarks = mapItems.compactMap { item -> CLPlacemark? in
+            guard item.responds(to: selector) else { return nil }
+            return item.value(forKey: "placemark") as? CLPlacemark
+        }
+        return placemarks.isEmpty ? nil : placemarks
     }
 }
 
