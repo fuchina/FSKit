@@ -144,7 +144,15 @@ public class FSLocationSupport: NSObject {
     
     private static func openAppleMaps(coordinate: CLLocationCoordinate2D) {
         let currentLocation = MKMapItem.forCurrentLocation()
-        let toLocation = MKMapItem(placemark: MKPlacemark(coordinate: coordinate))
+        let toLocation: MKMapItem
+        if #available(iOS 26.0, *) {
+            toLocation = MKMapItem(
+                location: CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude),
+                address: nil
+            )
+        } else {
+            toLocation = legacyMapItem(coordinate: coordinate)
+        }
         MKMapItem.openMaps(
             with: [currentLocation, toLocation],
             launchOptions: [
@@ -152,6 +160,15 @@ public class FSLocationSupport: NSObject {
                 MKLaunchOptionsShowsTrafficKey: true
             ]
         )
+    }
+    
+    /// iOS 26 以下：用 MKPlacemark 构造目的地
+    ///
+    /// - Note: `MKMapItem(placemark:)` 与 `MKPlacemark` 在 iOS 26 已被废弃，仅在 `#available` 的
+    ///         旧系统分支调用；标注为同版本废弃以把编译期废弃告警收敛在此处，不再发散到调用方。
+    @available(iOS, deprecated: 26.0, message: "内部兼容旧系统，iOS 26 起走 MKMapItem(location:address:)")
+    private static func legacyMapItem(coordinate: CLLocationCoordinate2D) -> MKMapItem {
+        return MKMapItem(placemark: MKPlacemark(coordinate: coordinate))
     }
     
     private static func openBaiduMaps(coordinate: CLLocationCoordinate2D) {
