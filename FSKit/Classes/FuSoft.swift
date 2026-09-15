@@ -7,8 +7,15 @@
 
 import UIKit
 
-public let WIDTHFC: CGFloat = UIScreen.main.bounds.width
-public let HEIGHTFC: CGFloat = UIScreen.main.bounds.height
+public var WIDTHFC: CGFloat {
+    let s = FSKit.currentWindowScene()?.screen ?? UIScreen()
+    return s.bounds.width
+}
+
+public var HEIGHTFC: CGFloat {
+    let s = FSKit.currentWindowScene()?.screen ?? UIScreen()
+    return s.bounds.height
+}
 
 // MARK: - Colors
 public let APPCOLOR = UIColor(red: 18/255.0, green: 152/255.0, blue: 233/255.0, alpha: 1)

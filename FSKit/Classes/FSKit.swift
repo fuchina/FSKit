@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import FSKit
 import CryptoKit
 
 public let FS_BE_DEBUG_NOTIFICATION  =   "FS_BE_DEBUG_NOTIFICATION"
@@ -1109,7 +1110,9 @@ public class FSKit: NSObject {
     
     public static func keyboardNotificationScroll(_ notification: Notification, baseOn: Double) -> CGSize {
         let keyboardSize = self.keyboardSize(from: notification)
-        let screenSize = UIScreen.main.bounds.size
+        
+        let s = FSKit.currentWindowScene()?.screen ?? UIScreen()
+        let screenSize = s.bounds.size
         
         if notification.name == UIResponder.keyboardWillShowNotification {
             return CGSize(width: screenSize.width, height: max(keyboardSize.height + baseOn, screenSize.height))
@@ -1122,7 +1125,7 @@ public class FSKit: NSObject {
     // MARK: - Device Info
     public static func deviceInfos() -> [[String: String]] {
         let device = UIDevice.current
-        let screen = UIScreen.main
+        let screen = FSKit.currentWindowScene()?.screen ?? UIScreen()
         let scale = screen.scale
         let width = screen.bounds.width * scale
         let height = screen.bounds.height * scale

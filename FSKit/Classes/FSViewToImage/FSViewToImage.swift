@@ -25,14 +25,16 @@ public class FSViewToImage {
         if #available(iOS 13.0, *) {
             guard let windowScene = currentWindowScene else { return nil }
             
-            let screenSize = UIScreen.main.bounds.size
+            let s = FSKit.currentWindowScene()?.screen ?? UIScreen()
+
+            let screenSize = s.bounds.size
             UIGraphicsBeginImageContextWithOptions(screenSize, false, 0)
             defer { UIGraphicsEndImageContext() }
             
             guard let context = UIGraphicsGetCurrentContext() else { return nil }
             
             for window in windowScene.windows {
-                if window.screen == UIScreen.main {
+                if window.screen == s {
                     context.saveGState()
                     context.translateBy(x: window.center.x, y: window.center.y)
                     context.concatenate(window.transform)

@@ -10,8 +10,14 @@ import UIKit
 // MARK: - Convenience Accessors
 public var UIScreenLong: CGFloat { FSUIAdapter.shared.screenBiggerValue }
 public var UIScreenShort: CGFloat { FSUIAdapter.shared.screenSmallerValue }
-public var UIScreenHeight: CGFloat { UIScreen.main.bounds.height }
-public var UIScreenWidth: CGFloat { UIScreen.main.bounds.width }
+public var UIScreenHeight: CGFloat {
+    let s = FSKit.currentWindowScene()?.screen ?? UIScreen()
+    return s.bounds.height
+}
+public var UIScreenWidth: CGFloat {
+    let s = FSKit.currentWindowScene()?.screen ?? UIScreen()
+    return s.bounds.width
+}
 
 // MARK: - FSUIAdapterModel
 public class FSUIAdapterModel: NSObject {

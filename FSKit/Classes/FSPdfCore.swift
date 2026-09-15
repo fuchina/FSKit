@@ -38,7 +38,8 @@ public class FSPdf: NSObject {
         var currentPage = 0
         var done = false
         
-        let screenBounds = UIScreen.main.bounds
+        let s = FSKit.currentWindowScene()?.screen ?? UIScreen()
+        let screenBounds = s.bounds
         
         while !done {
             UIGraphicsBeginPDFPageWithInfo(CGRect(x: 0, y: 0, width: screenBounds.width, height: screenBounds.height), nil)
@@ -60,7 +61,8 @@ public class FSPdf: NSObject {
         
         context.textMatrix = .identity
         
-        let screenBounds = UIScreen.main.bounds
+        let s = FSKit.currentWindowScene()?.screen ?? UIScreen()
+        let screenBounds = s.bounds
         let frameRect = CGRect(x: 20, y: 20, width: screenBounds.width - 40, height: screenBounds.height - 50)
         
         let framePath = CGMutablePath()
@@ -95,7 +97,8 @@ public class FSPdf: NSObject {
             context: nil
         )
         
-        let screenBounds = UIScreen.main.bounds
+        let s = FSKit.currentWindowScene()?.screen ?? UIScreen()
+        let screenBounds = s.bounds
         let stringRect = CGRect(
             x: screenBounds.width / 2 - size.width / 2,
             y: screenBounds.height - 20,
