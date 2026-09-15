@@ -1060,7 +1060,7 @@ public class FSKit: NSObject {
         return scenes.first as? UIWindowScene
     }
     
-    public static func screenOf(view: UIView) -> UIScreen {
+    public static func screenOf(_ view: UIView) -> UIScreen {
         let screen = view.window?.windowScene?.screen
         if let screen {
             return screen
