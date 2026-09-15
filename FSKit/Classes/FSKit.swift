@@ -1050,7 +1050,7 @@ public class FSKit: NSObject {
     }
     
     // MARK: - Window Scene
-    public static func currentWindowScene() -> UIWindowScene? {
+    public static func currentScene() -> UIWindowScene? {
         let scenes = UIApplication.shared.connectedScenes
         for scene in scenes {
             if scene.activationState == .foregroundActive, let windowScene = scene as? UIWindowScene {
@@ -1059,7 +1059,7 @@ public class FSKit: NSObject {
         }
         return scenes.first as? UIWindowScene
     }
-    
+        
     public static func screenOf(_ view: UIView) -> UIScreen {
         let screen = view.window?.windowScene?.screen
         if let screen {
@@ -1110,13 +1110,10 @@ public class FSKit: NSObject {
     public static func keyboardNotificationScroll(_ notification: Notification, baseOn: Double) -> CGSize {
         let keyboardSize = self.keyboardSize(from: notification)
         
-        let s = FSKit.currentWindowScene()?.screen ?? UIScreen()
-        let screenSize = s.bounds.size
-        
         if notification.name == UIResponder.keyboardWillShowNotification {
-            return CGSize(width: screenSize.width, height: max(keyboardSize.height + baseOn, screenSize.height))
+            return CGSize(width: WIDTHFC, height: max(keyboardSize.height + baseOn, HEIGHTFC))
         } else if notification.name == UIResponder.keyboardWillHideNotification {
-            return CGSize(width: screenSize.width, height: max(baseOn, screenSize.height))
+            return CGSize(width: WIDTHFC, height: max(baseOn, HEIGHTFC))
         }
         return .zero
     }
@@ -1124,7 +1121,7 @@ public class FSKit: NSObject {
     // MARK: - Device Info
     public static func deviceInfos() -> [[String: String]] {
         let device = UIDevice.current
-        let screen = FSKit.currentWindowScene()?.screen ?? UIScreen()
+        let screen = FSKit.currentScene()?.screen ?? UIScreen()
         let scale = screen.scale
         let width = screen.bounds.width * scale
         let height = screen.bounds.height * scale

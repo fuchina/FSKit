@@ -11,12 +11,10 @@ import UIKit
 public var UIScreenLong: CGFloat { FSUIAdapter.shared.screenBiggerValue }
 public var UIScreenShort: CGFloat { FSUIAdapter.shared.screenSmallerValue }
 public var UIScreenHeight: CGFloat {
-    let s = FSKit.currentWindowScene()?.screen ?? UIScreen()
-    return s.bounds.height
+    return HEIGHTFC
 }
 public var UIScreenWidth: CGFloat {
-    let s = FSKit.currentWindowScene()?.screen ?? UIScreen()
-    return s.bounds.width
+    return WIDTHFC
 }
 
 // MARK: - FSUIAdapterModel
@@ -259,14 +257,12 @@ public class FSUIAdapter: NSObject {
         isIPad = UIDevice.current.userInterfaceIdiom == .pad
         isIPhone = UIDevice.current.userInterfaceIdiom == .phone
         
-        let s = FSKit.currentWindowScene()?.screen ?? UIScreen()
-        let screenBounds = s.bounds
-        if screenBounds.width > screenBounds.height {
-            screenSmallerValue = screenBounds.height
-            screenBiggerValue = screenBounds.width
+        if WIDTHFC > HEIGHTFC {
+            screenSmallerValue = HEIGHTFC
+            screenBiggerValue = WIDTHFC
         } else {
-            screenSmallerValue = screenBounds.width
-            screenBiggerValue = screenBounds.height
+            screenSmallerValue = WIDTHFC
+            screenBiggerValue = HEIGHTFC
         }
         
         originRatioForIPhone = screenSmallerValue / 375.0

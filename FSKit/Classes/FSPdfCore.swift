@@ -37,12 +37,9 @@ public class FSPdf: NSObject {
         var currentRange = CFRange(location: 0, length: 0)
         var currentPage = 0
         var done = false
-        
-        let s = FSKit.currentWindowScene()?.screen ?? UIScreen()
-        let screenBounds = s.bounds
-        
+                
         while !done {
-            UIGraphicsBeginPDFPageWithInfo(CGRect(x: 0, y: 0, width: screenBounds.width, height: screenBounds.height), nil)
+            UIGraphicsBeginPDFPageWithInfo(CGRect(x: 0, y: 0, width: WIDTHFC, height: HEIGHTFC), nil)
             currentPage += 1
             drawPageNumber(currentPage)
             currentRange = renderPage(currentPage, textRange: currentRange, framesetter: framesetter)
@@ -61,16 +58,14 @@ public class FSPdf: NSObject {
         
         context.textMatrix = .identity
         
-        let s = FSKit.currentWindowScene()?.screen ?? UIScreen()
-        let screenBounds = s.bounds
-        let frameRect = CGRect(x: 20, y: 20, width: screenBounds.width - 40, height: screenBounds.height - 50)
+        let frameRect = CGRect(x: 20, y: 20, width: WIDTHFC - 40, height: HEIGHTFC - 50)
         
         let framePath = CGMutablePath()
         framePath.addRect(frameRect)
         
         let frameRef = CTFramesetterCreateFrame(framesetter, currentRange, framePath, nil)
         
-        context.translateBy(x: 0, y: screenBounds.height)
+        context.translateBy(x: 0, y: HEIGHTFC)
         context.scaleBy(x: 1.0, y: -1.0)
         
         CTFrameDraw(frameRef, context)
@@ -97,11 +92,9 @@ public class FSPdf: NSObject {
             context: nil
         )
         
-        let s = FSKit.currentWindowScene()?.screen ?? UIScreen()
-        let screenBounds = s.bounds
         let stringRect = CGRect(
-            x: screenBounds.width / 2 - size.width / 2,
-            y: screenBounds.height - 20,
+            x: WIDTHFC / 2 - size.width / 2,
+            y: HEIGHTFC - 20,
             width: size.width,
             height: 20
         )

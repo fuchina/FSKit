@@ -25,7 +25,7 @@ public class FSViewToImage {
         if #available(iOS 13.0, *) {
             guard let windowScene = currentWindowScene else { return nil }
             
-            let s = FSKit.currentWindowScene()?.screen ?? UIScreen()
+            let s = FSKit.currentScene()?.screen ?? UIScreen()
 
             let screenSize = s.bounds.size
             UIGraphicsBeginImageContextWithOptions(screenSize, false, 0)
