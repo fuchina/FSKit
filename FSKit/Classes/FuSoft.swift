@@ -8,13 +8,11 @@
 import UIKit
 
 public var WIDTHFC: CGFloat {
-    let s = FSKit.currentWindowScene()?.screen ?? UIScreen()
-    return s.bounds.width
+    FSApp.shared.width
 }
 
 public var HEIGHTFC: CGFloat {
-    let s = FSKit.currentWindowScene()?.screen ?? UIScreen()
-    return s.bounds.height
+    FSApp.shared.height
 }
 
 // MARK: - Colors
