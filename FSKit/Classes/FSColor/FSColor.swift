@@ -42,6 +42,9 @@ public struct FSColor {
     /// 红色
     public static let red = UIColor(red: 250 / 255.0, green: 49 / 255.0, blue: 105 / 255.0, alpha: 1)
     
+    /// 紫色（iOS 系统紫 #AF52DE）
+    public static let purple = UIColor(red: 0xaf / 255.0, green: 0x52 / 255.0, blue: 0xde / 255.0, alpha: 1)
+    
     /// 黄色
     public static let yellow = UIColor(red: 253 / 255.0, green: 111 / 255.0, blue: 55 / 255.0, alpha: 1)
     
