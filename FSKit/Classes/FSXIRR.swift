@@ -33,6 +33,9 @@ open class FSXIRR: NSObject {
         public var useBisectionFallback: Bool
         public var useAnnualizeFallback: Bool
         public var enforceMinOneDaySpanOnStartEnd: Bool
+        /// 时间轴最小跨度（秒）。仅在 enforceMinOneDaySpanOnStartEnd 为 true 时生效。
+        /// 默认 1 天；传 FSXIRR.oneYearSpan 即「不足 1 年按 1 年算」（XIRR 年）。
+        public var minimumSpanSeconds: Double
 
         public init(
             initialRate: Double = 0.1,
@@ -47,7 +50,8 @@ open class FSXIRR: NSObject {
             residualTolerance: Double = 0.01,
             useBisectionFallback: Bool = true,
             useAnnualizeFallback: Bool = true,
-            enforceMinOneDaySpanOnStartEnd: Bool = false
+            enforceMinOneDaySpanOnStartEnd: Bool = false,
+            minimumSpanSeconds: Double = 86400.0
         ) {
             self.initialRate = initialRate
             self.lowerBound = lowerBound
@@ -62,8 +66,15 @@ open class FSXIRR: NSObject {
             self.useBisectionFallback = useBisectionFallback
             self.useAnnualizeFallback = useAnnualizeFallback
             self.enforceMinOneDaySpanOnStartEnd = enforceMinOneDaySpanOnStartEnd
+            self.minimumSpanSeconds = minimumSpanSeconds
         }
     }
+
+    public static let oneDaySpan: Double = 86400.0
+
+    /// 1 年（365.25 天）。配 Options.minimumSpanSeconds 用，即「XIRR 年」：
+    /// 不足 1 年的现金流按线性拉伸到 1 年，1 个月的 10% 收益仍显示 10%，不会被放大成年化 100%+。
+    public static let oneYearSpan: Double = 365.25 * oneDaySpan
 
     // Mirrors FSTransactionManager behavior.
     public static let transactionOptions = Options(
@@ -291,13 +302,11 @@ open class FSXIRR: NSObject {
         guard options.enforceMinOneDaySpanOnStartEnd else { return cashFlows }
         guard let first = cashFlows.first, let last = cashFlows.last else { return cashFlows }
 
-//        let minSpan: Double = 86400.0 * 140  // 5月20日
-//        let minSpan: Double = 86400 * 30;
-        let minSpan: Double = 86400;  // 不然统计不到1天的通用回购
+        let minSpan: Double = options.minimumSpanSeconds > 0 ? options.minimumSpanSeconds : oneDaySpan  // 默认 1 天：不然统计不到1天的通用回购
         let rawSpan = last.date - first.date
         guard rawSpan >= 0, rawSpan < minSpan else { return cashFlows }
 
-        // If start/end is less than one day, stretch the full timeline to one day.
+        // If start/end gap is shorter than the minimum span, stretch the full timeline to that span.
         // The decision to stretch is based only on start/end gap.
         if rawSpan == 0 {
             var normalized = cashFlows
