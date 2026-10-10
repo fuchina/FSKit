@@ -5,7 +5,7 @@
 
 import UIKit
 
-public final class FSTapGestureRecognizer: UITapGestureRecognizer {
+public class FSTapGestureRecognizer: UITapGestureRecognizer {
 
     public var onTap: ((FSTapGestureRecognizer) -> Void)?
 
