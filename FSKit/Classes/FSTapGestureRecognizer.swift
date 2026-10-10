@@ -7,7 +7,7 @@ import UIKit
 
 public final class FSTapGestureRecognizer: UITapGestureRecognizer {
 
-    public var onTap: ((FSClosureTapGestureRecognizer) -> Void)?
+    public var onTap: ((FSTapGestureRecognizer) -> Void)?
 
     public override init(target: Any?, action: Selector?) {
         super.init(target: target, action: action)
@@ -15,7 +15,7 @@ public final class FSTapGestureRecognizer: UITapGestureRecognizer {
     }
 
     /// 便捷构造：直接给闭包
-    public init(onTap: ((FSClosureTapGestureRecognizer) -> Void)?) {
+    public init(onTap: ((FSTapGestureRecognizer) -> Void)?) {
         super.init(target: nil, action: nil)
         self.onTap = onTap
         addTarget(self, action: #selector(fsHandleTap))
