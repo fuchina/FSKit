@@ -27,7 +27,6 @@ public class FSLocationSupport: NSObject {
     // MARK: - Coordinate Conversion
     
     /// GPS坐标转火星坐标 (从CLLocation)
-    @objc(marsCoordinateFromLocation:)
     public static func marsCoordinate(from location: CLLocation) -> CLLocationCoordinate2D {
         return marsCoordinate(from: location.coordinate)
     }
