@@ -1,5 +1,5 @@
 //
-//  FSClosureTapGestureRecognizer.swift
+//  FSTapGestureRecognizer.swift
 //  FSKit
 //
 
