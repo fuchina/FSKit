@@ -62,13 +62,16 @@ public final class FSPageReturnHighlight: ObservableObject {
                 forName: Notification.Name(name),
                 object: nil, queue: .main
             ) { [weak self] _ in
-                self?.tryReset()
+                self?.resetIfReturning()
             }
             tokens.append(t)
         }
     }
 
-    private func tryReset() {
+    /// 幂等复位：距最近一次点击超过 0.6s（即「不是 push 转场，而是用户返回」）则清空高亮。
+    /// 可被任意多个来源并发调用（UIKit 导航通知 / SwiftUI onAppear / 生命周期探针）；
+    /// 重复调用、以及本就为 nil 时的调用都是**无副作用 no-op** ⇒ 多源冗余是安全的。
+    public func resetIfReturning() {
         if Date().timeIntervalSince1970 - self.tapTime > 0.6 {
             DispatchQueue.main.async { [weak self] in
                 self?.highlightedId = nil
@@ -99,7 +102,44 @@ public struct FSPageReturnList<Content: View>: View {
     }
 
     public var body: some View {
-        content.environmentObject(store)
+        content
+            .environmentObject(store)
+            // 全 SwiftUI 化后 UINavigationController 通知不再可靠：
+            // 三路冗余触发同一个**幂等**复位（谁先到都行，重复调用无副作用）
+            .onAppear { store.resetIfReturning() }
+            .background(FSPageReturnLifecycleProbe { store.resetIfReturning() })
+    }
+}
+
+/// 零尺寸生命周期探针：把「所在页面被重新显示（pop 回来）」翻译成一次复位调用。
+/// 依赖 `UIViewController.viewWillAppear` —— 与旧版 UINavigationController 通知同源，
+/// 但**范围限定在本页**，不会像全局通知那样误伤其它页。
+private struct FSPageReturnLifecycleProbe: UIViewControllerRepresentable {
+
+    let onReturn: () -> Void
+
+    func makeUIViewController(context: Context) -> Probe {
+        Probe(onReturn: onReturn)
+    }
+
+    func updateUIViewController(_ uiViewController: Probe, context: Context) {
+        uiViewController.onReturn = onReturn
+    }
+
+    final class Probe: UIViewController {
+        var onReturn: () -> Void
+
+        init(onReturn: @escaping () -> Void) {
+            self.onReturn = onReturn
+            super.init(nibName: nil, bundle: nil)
+        }
+
+        required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+
+        override func viewWillAppear(_ animated: Bool) {
+            super.viewWillAppear(animated)
+            onReturn()
+        }
     }
 }
 
@@ -178,3 +218,149 @@ private struct FSPageReturnPressStyle: ButtonStyle {
             .animation(FSCellFadeAnimation(response: fadeDuration), value: configuration.isPressed || isHighlighted)
     }
 }
+
+// MARK: - 全 SwiftUI 导航栈（替代 UINavigationController）
+
+/// 一次 push 的目标页：用闭包持有页面视图（及其 store）。
+/// 该闭包被 `FSNavRouter.path` 持有 ⇒ 被 push 期间 store 不会释放；pop 后随之释放。
+public struct FSPageRoute: Hashable, Identifiable {
+
+    public let uid: UUID
+    /// 页面名（用于 popTo(_:) 定位、泄漏检测打点）
+    public let name: String
+    private let content: () -> AnyView
+
+    public var id: UUID { uid }
+
+    public init<V: View>(_ name: String, @ViewBuilder content: @escaping () -> V) {
+        self.uid = UUID()
+        self.name = name
+        self.content = { AnyView(content()) }
+    }
+
+    public func makeView() -> AnyView { content() }
+
+    public static func == (lhs: FSPageRoute, rhs: FSPageRoute) -> Bool { lhs.uid == rhs.uid }
+    public func hash(into hasher: inout Hasher) { hasher.combine(uid) }
+}
+
+/// 导航路由器：**每个 NavigationStack 一个实例**（每个 tab 一个；模态里另开栈则另建）。
+/// 对齐原 UINavigationController 的 push / pop / popTo / popToRoot 语义。
+public final class FSNavRouter: ObservableObject {
+
+    @Published public var path: [FSPageRoute] = []
+
+    public init() {}
+
+    public var depth: Int { path.count }
+    public var topName: String? { path.last?.name }
+    public var isAtRoot: Bool { path.isEmpty }
+
+    /// 等价 `pushViewController(_:animated:)`
+    public func push<V: View>(_ name: String, @ViewBuilder _ content: @escaping () -> V) {
+        path.append(FSPageRoute(name, content: content))
+    }
+
+    /// 等价 `popViewController(animated:)`
+    public func pop() {
+        guard !path.isEmpty else { return }
+        path.removeLast()
+    }
+
+    /// 等价 `popToViewController(_:animated:)`（回退到名为 name 的页，该页保留）
+    public func popTo(_ name: String) {
+        guard let idx = path.lastIndex(where: { $0.name == name }) else { return }
+        path.removeLast(path.count - idx - 1)
+    }
+
+    /// 等价 `popToRootViewController(animated:)`
+    public func popToRoot() { path.removeAll() }
+
+    /// 连续弹掉 n 层
+    public func pop(_ count: Int) {
+        guard count > 0, !path.isEmpty else { return }
+        path.removeLast(min(count, path.count))
+    }
+}
+
+// MARK: - 环境注入
+
+private struct FSNavRouterKey: EnvironmentKey {
+    static let defaultValue = FSNavRouter()
+}
+
+public extension EnvironmentValues {
+    /// 当前 NavigationStack 的路由器。未在 `FSPushStack` 内时为兜底空栈（push 无效但不崩）。
+    var fsNavRouter: FSNavRouter {
+        get { self[FSNavRouterKey.self] }
+        set { self[FSNavRouterKey.self] = newValue }
+    }
+}
+
+// MARK: - 栈容器
+
+/// 一个 tab / 一个模态的根：NavigationStack + 路由器注入 + 目标页解析。
+/// ```
+/// FSPushStack {
+///     MyRootScreen()          // 内部用 @Environment(\.fsNavRouter) 拿 router
+/// }
+/// ```
+public struct FSPushStack<Content: View>: View {
+
+    @StateObject private var router = FSNavRouter()
+    private let content: Content
+
+    public init(@ViewBuilder content: () -> Content) {
+        self.content = content()
+    }
+
+    public var body: some View {
+        NavigationStack(path: $router.path) {
+            content
+                .navigationDestination(for: FSPageRoute.self) { route in
+                    route.makeView()
+                }
+        }
+        .environment(\.fsNavRouter, router)
+    }
+}
+
+// MARK: - 页面基座
+
+/// 页面统一底色（对齐原 FSBaseController 的 0.95 灰底）
+public struct FSPageBackground: ViewModifier {
+    public init() {}
+    public func body(content: Content) -> some View {
+        content.background(Color(red: 0.95, green: 0.95, blue: 0.95).ignoresSafeArea())
+    }
+}
+
+public extension View {
+    func fsPageBackground() -> some View { modifier(FSPageBackground()) }
+}
+
+// MARK: - 顶层视图 / 控制器（替代 tabBarController / navigationController 取宿主）
+
+public extension UIApplication {
+    /// 当前 key window 的最上层控制器（UIKit 弹窗 / toast 宿主；不再依赖 nav 栈）
+    static var fs_topVC: UIViewController {
+        guard let scene = shared.connectedScenes.first as? UIWindowScene,
+              let window = scene.windows.first(where: { $0.isKeyWindow }) ?? scene.windows.first,
+              let root = window.rootViewController else {
+            return UIViewController()
+        }
+        return fs_topMost(from: root)
+    }
+
+    static var fs_topView: UIView { fs_topVC.view }
+
+    private static func fs_topMost(from vc: UIViewController) -> UIViewController {
+        if let presented = vc.presentedViewController { return fs_topMost(from: presented) }
+        if let nav = vc as? UINavigationController, let top = nav.visibleViewController, top != vc {
+            return fs_topMost(from: top)
+        }
+        if let tab = vc as? UITabBarController, let sel = tab.selectedViewController { return fs_topMost(from: sel) }
+        return vc
+    }
+}
+
