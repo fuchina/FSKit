@@ -308,9 +308,12 @@ public extension EnvironmentValues {
 public struct FSPushStack<Content: View>: View {
 
     @StateObject private var router = FSNavRouter()
+    private let tabIndex: Int
     private let content: Content
 
-    public init(@ViewBuilder content: () -> Content) {
+    /// - Parameter tabIndex: 本栈在根 TabView 中的下标；用于向 `FSStackRegistry` 登记（跨 tab 的屏幕锁需要）
+    public init(tabIndex: Int = 0, @ViewBuilder content: () -> Content) {
+        self.tabIndex = tabIndex
         self.content = content()
     }
 
@@ -325,7 +328,40 @@ public struct FSPushStack<Content: View>: View {
                 }
         }
         .environment(\.fsNavRouter, router)
+        .onAppear { FSStackRegistry.shared.register(router, at: tabIndex) }
     }
+}
+
+// MARK: - 跨 tab 栈注册表
+
+/// 全 SwiftUI 后每个 tab 各有一个 `FSNavRouter`。
+/// 屏幕锁（任一栈非根就要验手势；用户左滑时把所有栈弹回根）与剪切板角标这类**跨 tab** 逻辑，
+/// 原来靠遍历 `UITabBarController` 下的 `UINavigationController` 实现；
+/// 现在改为由 `FSPushStack` 向本注册表登记自己的 router。
+@MainActor
+public final class FSStackRegistry: ObservableObject {
+
+    public static let shared = FSStackRegistry()
+
+    /// 各 tab 的栈 router（下标 = tab 下标）。视图不读它，故不参与观察。
+    public private(set) var routers: [FSNavRouter] = []
+
+    /// 剪切板是否有内容（原 `tabBarItem.badgeValue = "1"`，清空时置 nil）——由根 TabView 的 `.badge` 呈现
+    @Published public var pasteboardHasContent = false
+
+    public init() {}
+
+    /// `FSPushStack` 在 `.onAppear` 时登记自己（tab 重建时覆盖同一下标）
+    public func register(_ router: FSNavRouter, at index: Int) {
+        while routers.count <= index { routers.append(FSNavRouter()) }
+        routers[index] = router
+    }
+
+    /// 原 `v.viewControllers.count > 1`
+    public var anyPushed: Bool { routers.contains { $0.path.isEmpty == false } }
+
+    /// 原 `for v in viewControllers { v.popToRootViewController(animated: true) }`
+    public func popAllToRoot() { routers.forEach { $0.popToRoot() } }
 }
 
 // MARK: - 页面基座
