@@ -308,8 +308,12 @@ public class FSKit: NSObject {
         return Bundle.main.infoDictionary?["CFBundleVersion"] as? String
     }
     
-    public static func appName() -> String? {
-        return Bundle.main.infoDictionary?["CFBundleDisplayName"] as? String
+    public static func appName() -> String {
+        let name = Bundle.main.infoDictionary?["CFBundleDisplayName"] as? String
+        if let name {
+            return name
+        }
+        return ""
     }
     
     public static func appBundleName() -> String? {
