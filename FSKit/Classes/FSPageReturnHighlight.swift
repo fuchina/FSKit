@@ -326,6 +326,7 @@ public struct FSPushStack<Content: View>: View {
                     // 迁移期这里用 `.toolbar(.hidden, for: .tabBar)` 对齐了该行为；现按需求整个去掉 ——
                     // 被 push 的页面同样保留 tab bar（不再随层级隐藏）。
                     route.makeView()
+                    .toolbar(.hidden, for: .tabBar)
                 }
         }
         .environment(\.fsNavRouter, router)
