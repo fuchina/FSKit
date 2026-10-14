@@ -321,10 +321,11 @@ public struct FSPushStack<Content: View>: View {
         NavigationStack(path: $router.path) {
             content
                 .navigationDestination(for: FSPageRoute.self) { route in
-                    // 替代原 FSNavigationController.pushViewController 自动置的
-                    // `hidesBottomBarWhenPushed = true`：所有被 push 的页都隐藏 tab bar。
+                    // 2026-10-15：**tab bar 一直显示**。
+                    // 原 FSNavigationController.pushViewController 会自动置 `hidesBottomBarWhenPushed = true`，
+                    // 迁移期这里用 `.toolbar(.hidden, for: .tabBar)` 对齐了该行为；现按需求整个去掉 ——
+                    // 被 push 的页面同样保留 tab bar（不再随层级隐藏）。
                     route.makeView()
-                        .toolbar(.hidden, for: .tabBar)
                 }
         }
         .environment(\.fsNavRouter, router)
