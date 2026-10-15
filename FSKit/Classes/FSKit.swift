@@ -1176,37 +1176,50 @@ public class FSKit: NSObject {
 }
 
 // MARK: - GCD Helpers
+//
+// Swift 6 语言模式：以下 helper 承接外部传入的 `@escaping () -> Void` 闭包，
+// 而 GCD 队列闭包要求 `@Sendable` —— 直接捕获会报
+// `sending 'block' risks causing data races`（主队列，error）或 `#SendableClosureCaptures`
+// 警告（全局队列）。统一用 `FSUncheckedSendable` 包一层：公共签名与全部调用点保持不变，
+// 线程安全仍由调用方保证，与 Swift 5 模式下行为完全一致。
+
 public func fs_dispatch_global_main_queue_async(globalBlock: @escaping () -> Void, mainBlock: @escaping () -> Void) {
+    let global = FSUncheckedSendable(globalBlock)
+    let main = FSUncheckedSendable(mainBlock)
     DispatchQueue.global().async {
-        globalBlock()
+        global.value()
         DispatchQueue.main.async {
-            mainBlock()
+            main.value()
         }
     }
 }
 
 public func fs_dispatch_main_queue_async(_ block: @escaping () -> Void) {
+    let box = FSUncheckedSendable(block)
     if Thread.isMainThread {
         block()
     } else {
-        DispatchQueue.main.async { block() }
+        DispatchQueue.main.async { box.value() }
     }
 }
 
 public func fs_dispatch_main_queue_sync(_ block: @escaping () -> Void) {
+    let box = FSUncheckedSendable(block)
     if Thread.isMainThread {
         block()
     } else {
-        DispatchQueue.main.sync { block() }
+        DispatchQueue.main.sync { box.value() }
     }
 }
 
 public func fs_dispatch_global_queue_async(_ block: @escaping () -> Void) {
-    DispatchQueue.global().async { block() }
+    let box = FSUncheckedSendable(block)
+    DispatchQueue.global().async { box.value() }
 }
 
 public func fs_dispatch_global_queue_sync(_ block: @escaping () -> Void) {
-    DispatchQueue.global().sync { block() }
+    let box = FSUncheckedSendable(block)
+    DispatchQueue.global().sync { box.value() }
 }
 
 // MARK: - Time Helpers
