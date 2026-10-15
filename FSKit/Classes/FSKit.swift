@@ -220,7 +220,10 @@ public class FSKit: NSObject {
             }
         }
         guard result == KERN_SUCCESS else { return Double(NSNotFound) }
-        return Double(vm_page_size) * Double(vmStats.free_count) / 1024.0 / 1024.0
+        // Swift 6：`vm_page_size` 是 C 全局变量，被判为并发不安全的共享可变状态；
+        // `sysconf(_SC_PAGESIZE)` 是等价的 POSIX 调用，不受此限制。
+        let pageSize = Double(sysconf(_SC_PAGESIZE))
+        return pageSize * Double(vmStats.free_count) / 1024.0 / 1024.0
     }
     
     public static func diskOfAllSizeBytes() -> Double {

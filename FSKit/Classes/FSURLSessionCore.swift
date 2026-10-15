@@ -4,6 +4,10 @@
 //
 //  Translated from Objective-C to Swift
 //
+//  2026-10-15 Swift 6：两个方法的回调闭包都不是 Sendable，直接捕获会被区域隔离分析
+//  拒绝送进 `DispatchQueue.main.async`。统一用 `FSUncheckedSendable` 包一层 ——
+//  对外签名与全部调用点保持不变，行为同 Swift 5 模式。
+//
 
 import Foundation
 
@@ -16,6 +20,9 @@ public class FSURLSessionManager: NSObject {
             return
         }
         
+        let successBox = FSUncheckedSendable(success)
+        let failBox = FSUncheckedSendable(fail)
+        
         let session = URLSession.shared
         let task = session.dataTask(with: url) { data, response, error in
             DispatchQueue.main.async {
@@ -23,10 +30,10 @@ public class FSURLSessionManager: NSObject {
                     #if DEBUG
                     print(error.localizedDescription)
                     #endif
-                    fail?()
+                    failBox.value?()
                     return
                 }
-                success?(data)
+                successBox.value?(data)
             }
         }
         task.resume()
@@ -47,6 +54,9 @@ public class FSURLSessionManager: NSObject {
             request.httpBody = bodyString.data(using: .utf8)
         }
         
+        let successBox = FSUncheckedSendable(success)
+        let failBox = FSUncheckedSendable(fail)
+        
         let session = URLSession.shared
         let task = session.dataTask(with: request) { data, response, error in
             DispatchQueue.main.async {
@@ -54,10 +64,10 @@ public class FSURLSessionManager: NSObject {
                     #if DEBUG
                     print(error.localizedDescription)
                     #endif
-                    fail?()
+                    failBox.value?()
                     return
                 }
-                success?(data)
+                successBox.value?(data)
             }
         }
         task.resume()

@@ -30,9 +30,13 @@ public struct FSToastMessage: Equatable {
 ///
 /// 不标 `@MainActor`：因为 `FSToast.toast(...)` 是非隔离的 `static` 方法，
 /// 348 处调用点未必都在主隔离域；若把本类标成 `@MainActor`，那些调用点会编译报错。
-public final class FSToastCenter: ObservableObject {
+///
+/// Swift 6 语言模式：`show` 会把 `self` 送进 `@MainActor` 闭包，需显式声明可跨隔离域传递，
+/// 故补 `@unchecked Sendable`（可变状态已由 `MainActor.assumeIsolated` 保证只在主线程访问）。
+public final class FSToastCenter: ObservableObject, @unchecked Sendable {
 
-    public static let shared = FSToastCenter()
+    // Swift 6 语言模式：同上，任意线程可调用（348 处调用点）。
+    public nonisolated(unsafe) static let shared = FSToastCenter()
 
     /// 当前要显示的 toast（nil = 不显示）
     @Published public private(set) var current: FSToastMessage?

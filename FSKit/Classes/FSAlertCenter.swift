@@ -45,7 +45,10 @@ public struct FSAlertInputSpec: Identifiable {
 }
 
 /// 一条弹窗（nil = 不显示）
-public struct FSAlertSpec: Identifiable {
+///
+/// Swift 6 语言模式：`spec` 会被送进 `@MainActor` 闭包，故声明 `@unchecked Sendable`
+/// （纯数据载体；内含的 handler / commit 闭包由调用方在主线程执行）。
+public struct FSAlertSpec: Identifiable, @unchecked Sendable {
 
     public let id = UUID()
     /// true = alert；false = actionSheet（iPad 上由上游强制转 alert）
@@ -73,9 +76,16 @@ public struct FSAlertSpec: Identifiable {
 ///
 /// 不标 `@MainActor`（同 `FSToastCenter`）：`FSUIKit.alert` 是非隔离的 `static` 方法，
 /// 343 处调用点未必都在主隔离域；标成 `@MainActor` 会让那些调用点编译报错。
-public final class FSAlertCenter: ObservableObject {
+///
+/// Swift 6 语言模式：`show` / `dismiss` 会把 `self` 送进 `@MainActor` 闭包，
+/// 需要显式声明可跨隔离域传递，故补 `@unchecked Sendable`
+/// （可变状态已由 `MainActor.assumeIsolated` 保证只在主线程访问）。
+public final class FSAlertCenter: ObservableObject, @unchecked Sendable {
 
-    public static let shared = FSAlertCenter()
+    // Swift 6 语言模式：本类设计为「任意线程可调用、内部自行切主线程」，
+    // 与 FSToastCenter / FSLoadingCenter 同款。故不能标 @MainActor
+    // （会让 343 处调用点报错），改用 nonisolated(unsafe) 保持原语义。
+    public nonisolated(unsafe) static let shared = FSAlertCenter()
 
     /// 当前要显示的弹窗（nil = 不显示）
     @Published public private(set) var current: FSAlertSpec?

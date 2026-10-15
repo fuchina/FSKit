@@ -99,7 +99,9 @@ public final class FSDeepSeek {
 
     public typealias Completion = (Result<FSDeepSeekChatResponse, Error>) -> Void
 
-    public static let shared = FSDeepSeek()
+    // Swift 6 语言模式：网络客户端，apiKey / baseURL 等可变配置在启动时写入，
+    // 调用点分布在任意线程，故用 nonisolated(unsafe) 保持原语义。
+    public nonisolated(unsafe) static let shared = FSDeepSeek()
 
     public var apiKey: String = ""
     public var baseURL: String = "https://api.deepseek.com"
@@ -132,6 +134,9 @@ public final class FSDeepSeek {
     }
 
     public func chat(request: FSDeepSeekChatRequest, completion: @escaping Completion) {
+        // Swift 6 区域隔离：completion 闭包非 Sendable，直接捕获会被拒绝送进
+        // `DispatchQueue.main.async`。包一层后签名与全部调用点保持不变。
+        let completionBox = FSUncheckedSendable(completion)
         guard let url = URL(string: "\(baseURL)/v1/chat/completions") else {
             completion(.failure(FSDeepSeekError.invalidURL))
             return
@@ -153,14 +158,14 @@ public final class FSDeepSeek {
         URLSession.shared.dataTask(with: urlRequest) { data, response, error in
             if let error = error {
                 DispatchQueue.main.async {
-                    completion(.failure(error))
+                    completionBox.value(.failure(error))
                 }
                 return
             }
 
             guard let httpResponse = response as? HTTPURLResponse else {
                 DispatchQueue.main.async {
-                    completion(.failure(FSDeepSeekError.emptyResponse))
+                    completionBox.value(.failure(FSDeepSeekError.emptyResponse))
                 }
                 return
             }
@@ -168,7 +173,7 @@ public final class FSDeepSeek {
             let responseData = data ?? Data()
             if httpResponse.statusCode == 401 {
                 DispatchQueue.main.async {
-                    completion(.failure(FSDeepSeekError.unauthorized))
+                    completionBox.value(.failure(FSDeepSeekError.unauthorized))
                 }
                 return
             }
@@ -176,7 +181,7 @@ public final class FSDeepSeek {
             guard (200...299).contains(httpResponse.statusCode) else {
                 let message = String(data: responseData, encoding: .utf8) ?? "unknown"
                 DispatchQueue.main.async {
-                    completion(.failure(FSDeepSeekError.httpError(httpResponse.statusCode, message)))
+                    completionBox.value(.failure(FSDeepSeekError.httpError(httpResponse.statusCode, message)))
                 }
                 return
             }
@@ -184,11 +189,11 @@ public final class FSDeepSeek {
             do {
                 let model = try JSONDecoder().decode(FSDeepSeekChatResponse.self, from: responseData)
                 DispatchQueue.main.async {
-                    completion(.success(model))
+                    completionBox.value(.success(model))
                 }
             } catch {
                 DispatchQueue.main.async {
-                    completion(.failure(FSDeepSeekError.decodeFailed))
+                    completionBox.value(.failure(FSDeepSeekError.decodeFailed))
                 }
             }
         }.resume()

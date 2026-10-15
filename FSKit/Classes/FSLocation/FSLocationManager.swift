@@ -19,7 +19,9 @@ import MapKit
  2.TARGETS - Capabilities - Background Modes - Location updates 勾上
  */
 
-public class FSLocationManager: NSObject {
+/// Swift 6 语言模式：回调结果经 `DispatchQueue.main.async` 回主线程时会携带 `self`，
+/// 需显式声明可跨隔离域传递（可变状态由内部串行 `queue` 保护），故补 `@unchecked Sendable`。
+public class FSLocationManager: NSObject, @unchecked Sendable {
     
     public var serialManager: CLLocationManager
     
@@ -125,9 +127,12 @@ public class FSLocationManager: NSObject {
         with location: CLLocation,
         completionHandler: @escaping ([MKMapItem]?, Error?) -> Void
     ) {
+        // Swift 6 区域隔离：completionHandler 非 Sendable，直接捕获会被拒绝送进
+        // @MainActor 的 Task。包一层后对外签名与调用点保持不变。
+        let completion = FSUncheckedSendable(completionHandler)
         Task { @MainActor in
             guard let request = MKReverseGeocodingRequest(location: location) else {
-                completionHandler(nil, NSError(
+                completion.value(nil, NSError(
                     domain: "FSLocationManager",
                     code: -1,
                     userInfo: [NSLocalizedDescriptionKey: "逆地理编码请求创建失败"]
@@ -136,9 +141,9 @@ public class FSLocationManager: NSObject {
             }
             
             do {
-                completionHandler(try await request.mapItems, nil)
+                completion.value(try await request.mapItems, nil)
             } catch {
-                completionHandler(nil, error)
+                completion.value(nil, error)
             }
         }
     }

@@ -22,8 +22,10 @@ public class FSDBMaster {
     // MARK: - 静态属性
     private static let dbExtension = ".db"
     private static let dbFirstName = "sql_ling"
-    private static var defaultMaster: FSDBMaster?
-    private static var currentMaster: FSDBMaster?
+    // Swift 6 语言模式：两个静态缓存的读写都经由 initQueue（成员方法均在 queue.sync 内执行），
+    // 已有外部同步机制，故用 nonisolated(unsafe) 声明。
+    nonisolated(unsafe) private static var defaultMaster: FSDBMaster?
+    nonisolated(unsafe) private static var currentMaster: FSDBMaster?
     private static let initQueue = DispatchQueue(label: "swiftdbmaster.sync")
     
     // MARK: - 初始化

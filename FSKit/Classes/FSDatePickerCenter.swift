@@ -14,7 +14,10 @@
 import SwiftUI
 
 /// 一条日期选择请求
-public struct FSDatePickerSpec: Identifiable {
+///
+/// Swift 6 语言模式：spec 会被送进 `@MainActor` 闭包，故声明 `@unchecked Sendable`
+/// （纯数据载体；内含的 onConfirm / onCancel 闭包由调用方在主线程执行）。
+public struct FSDatePickerSpec: Identifiable, @unchecked Sendable {
 
     public let id = UUID()
     /// 初始选中日期（nil = 今天）
@@ -30,9 +33,13 @@ public struct FSDatePickerSpec: Identifiable {
 }
 
 /// 全局日期选择中心。**可从任意线程调用**。
-public final class FSDatePickerCenter: ObservableObject {
+///
+/// Swift 6 语言模式：`show` 会把 `self` 送进 `@MainActor` 闭包，故补 `@unchecked Sendable`
+/// （可变状态已由 `MainActor.assumeIsolated` 保证只在主线程访问）。
+public final class FSDatePickerCenter: ObservableObject, @unchecked Sendable {
 
-    public static let shared = FSDatePickerCenter()
+    // Swift 6 语言模式：同上，任意线程可调用。
+    public nonisolated(unsafe) static let shared = FSDatePickerCenter()
 
     @Published public private(set) var current: FSDatePickerSpec?
 

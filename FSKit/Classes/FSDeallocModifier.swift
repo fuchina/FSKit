@@ -29,7 +29,10 @@ public final class FSLeakDetector {
                 object: msg
             )
             print("\(msg)")
-            Task { @MainActor in timers.removeValue(forKey: viewName) }
+            // Swift 6：本 block 由 `main.asyncAfter` 派发，必然在主线程执行。
+            // 原来的 `Task { @MainActor in … }` 会让编译器把整个 DispatchWorkItem
+            //（非 Sendable）判为跨域发送。改为同步断言主线程，语义等价。
+            MainActor.assumeIsolated { _ = timers.removeValue(forKey: viewName) }
         }
         timers[viewName] = item
         DispatchQueue.main.asyncAfter(deadline: .now() + 5.0, execute: item)

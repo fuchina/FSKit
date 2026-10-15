@@ -10,9 +10,13 @@
 import SwiftUI
 
 /// 全局等待浮层状态。**可从任意线程调用**。
-public final class FSLoadingCenter: ObservableObject {
+///
+/// Swift 6 语言模式：`show` 会把 `self` 送进 `@MainActor` 闭包，故补 `@unchecked Sendable`
+/// （可变状态已由 `MainActor.assumeIsolated` 保证只在主线程访问）。
+public final class FSLoadingCenter: ObservableObject, @unchecked Sendable {
 
-    public static let shared = FSLoadingCenter()
+    // Swift 6 语言模式：同上，任意线程可调用。
+    public nonisolated(unsafe) static let shared = FSLoadingCenter()
 
     @Published public private(set) var isLoading = false
 

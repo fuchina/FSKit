@@ -19,7 +19,9 @@ open class FSXIRR: NSObject {
         }
     }
 
-    public struct Options {
+    /// Swift 6 语言模式：纯值类型（全部成员为 Double/Int/Bool），
+    /// 显式声明 Sendable 后其 static let 常量即可跨隔离域安全共享。
+    public struct Options: Sendable {
         public var initialRate: Double
         public var lowerBound: Double
         public var upperBound: Double

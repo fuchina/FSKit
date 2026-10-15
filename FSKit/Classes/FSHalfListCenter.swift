@@ -28,7 +28,10 @@ public struct FSHalfListRow: Identifiable {
 }
 
 /// 一条半屏列表请求
-public struct FSHalfListSpec: Identifiable {
+///
+/// Swift 6 语言模式：spec 会被送进 `@MainActor` 闭包，故声明 `@unchecked Sendable`
+/// （纯数据载体；内含的 onSelect 闭包由调用方在主线程执行）。
+public struct FSHalfListSpec: Identifiable, @unchecked Sendable {
 
     public let id = UUID()
     public var leftWidth: CGFloat
@@ -43,9 +46,13 @@ public struct FSHalfListSpec: Identifiable {
 }
 
 /// 全局半屏列表中心。**可从任意线程调用**。
-public final class FSHalfListCenter: ObservableObject {
+///
+/// Swift 6 语言模式：`show` / `dismiss` 会把 `self` 送进 `@MainActor` 闭包，
+/// 故补 `@unchecked Sendable`（可变状态已由 `MainActor.assumeIsolated` 保证只在主线程访问）。
+public final class FSHalfListCenter: ObservableObject, @unchecked Sendable {
 
-    public static let shared = FSHalfListCenter()
+    // Swift 6 语言模式：同上，任意线程可调用。
+    public nonisolated(unsafe) static let shared = FSHalfListCenter()
 
     @Published public private(set) var current: FSHalfListSpec?
 

@@ -286,7 +286,11 @@ public final class FSNavRouter: ObservableObject {
 // MARK: - 环境注入
 
 private struct FSNavRouterKey: EnvironmentKey {
-    static let defaultValue = FSNavRouter()
+    // Swift 6 语言模式（2026-10-15）：EnvironmentKey 的默认值会被任意隔离域读取，
+    // 而 FSNavRouter 的定义即在本文件内 —— 外部扩展补 `@unchecked Sendable`
+    // 不足以通过该检查，故只能就地声明。
+    // 仅此一行，不涉及分页返回高亮的任何逻辑。
+    nonisolated(unsafe) static let defaultValue = FSNavRouter()
 }
 
 public extension EnvironmentValues {
