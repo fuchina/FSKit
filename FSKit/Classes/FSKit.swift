@@ -1034,16 +1034,6 @@ public class FSKit: NSObject {
         }
     }
     
-    // MARK: - ScrollView Gesture
-    public static func fitScrollViewOperate(_ scrollView: UIScrollView, navigationController: UINavigationController?) {
-        guard let nav = navigationController else { return }
-        for gesture in nav.view.gestureRecognizers ?? [] {
-            if gesture is UIScreenEdgePanGestureRecognizer {
-                scrollView.panGestureRecognizer.require(toFail: gesture)
-            }
-        }
-    }
-    
     // MARK: - String Part Display
     public static func showStringPart(_ string: String, front: Int, tail: Int, placeholder: String = "***") -> String {
         guard string.count > front, string.count > tail else { return string }
@@ -1215,37 +1205,6 @@ public class FSKit: NSObject {
         }
         
         return ret
-    }
-    
-    public static func pushToController<T: UIViewController>(_ controllerType: T.Type, navigationController: UINavigationController?, animated: Bool) {
-        self .pushToController(controllerType, navigationController: navigationController, animated: animated, configure: nil)
-    }
-        
-    public static func pushToController<T: UIViewController>(_ type: T.Type, navigationController: UINavigationController?, animated: Bool,
-        configure: ((T) -> Void)? = nil) {
-        
-        guard let nav = navigationController else { return }
-
-        let vc = T.init()
-        configure?(vc)
-
-        nav.pushViewController(vc, animated: animated)
-    }
-    
-    public static func popToController<T: UIViewController>(_ controllerType: T.Type, navigationController: UINavigationController?, animated: Bool) {
-        
-        guard let navigationController = navigationController else {
-            return
-        }
-        
-        let vcs = navigationController.viewControllers
-
-         for vc in vcs {
-             if vc is T {
-                 navigationController.popToViewController(vc, animated: animated)
-                 return
-             }
-         }
     }
     
 }

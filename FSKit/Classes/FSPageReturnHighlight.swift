@@ -321,14 +321,16 @@ public struct FSPushStack<Content: View>: View {
         NavigationStack(path: $router.path) {
             content
                 .navigationDestination(for: FSPageRoute.self) { route in
-                    // 2026-10-15：**tab bar 一直显示**。
-                    // 原 FSNavigationController.pushViewController 会自动置 `hidesBottomBarWhenPushed = true`，
-                    // 迁移期这里用 `.toolbar(.hidden, for: .tabBar)` 对齐了该行为；现按需求整个去掉 ——
-                    // 被 push 的页面同样保留 tab bar（不再随层级隐藏）。
                     route.makeView()
-                    .toolbar(.hidden, for: .tabBar)
                 }
         }
+        // 二级页隐藏 tab bar（对齐原 FSNavigationController 的 `hidesBottomBarWhenPushed` 行为）。
+        //
+        // 2026-10-15 修复：显隐原来写在 `navigationDestination` 的内容上，pop 回一级页要等目标页
+        // 视图被移除后才恢复 tab bar ⇒ tab bar 在转场动画结束后才「跳」出来，很生硬。
+        // 现改为**绑在 `router.path` 上、挂在 NavigationStack 外层**，push / pop 的同一帧内
+        // tab bar 就随转场一起滑入滑出。
+        .toolbar(router.path.isEmpty ? .visible : .hidden, for: .tabBar)
         .environment(\.fsNavRouter, router)
         .onAppear { FSStackRegistry.shared.register(router, at: tabIndex) }
     }
