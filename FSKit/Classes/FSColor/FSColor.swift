@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import SwiftUI
 
 /// 用于处理颜色
 public struct FSColor {
@@ -58,4 +59,10 @@ public struct FSColor {
     
     /// 浅色文字
     public static let textLight = UIColor(red: 169 / 255.0, green: 169 / 255.0, blue: 169 / 255.0, alpha: 1)
+    
+    // MARK: - 其他
+    
+    /// 页面背景颜色
+    public static let backColor = Color(red: 0.95, green: 0.95, blue: 0.95)
+
 }

@@ -369,7 +369,7 @@ public final class FSStackRegistry: ObservableObject {
 public struct FSPageBackground: ViewModifier {
     public init() {}
     public func body(content: Content) -> some View {
-        content.background(Color(red: 0.95, green: 0.95, blue: 0.95).ignoresSafeArea())
+        content.background(FSColor.backColor.ignoresSafeArea())
     }
 }
 
