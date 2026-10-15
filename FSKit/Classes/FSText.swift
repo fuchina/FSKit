@@ -125,6 +125,20 @@ public extension FSKit {
         NSAttributedString(richString(text, font: font, color: color, rules: rules))
     }
 
+    /// 由「关键词列表」构造高亮规则：`colorStrings` 中的词着色、`fontStrings` 中的词换字体。
+    /// 规则构造与旧接口 `attributedString(for:colorStrings:color:fontStrings:font:)` 逐行一致。
+    static func keywordRules(colorStrings: [String],
+                             color: Color,
+                             fontStrings: [String]? = nil,
+                             font: UIFont? = nil) -> [FSTextRule] {
+        var rules = colorStrings.map { FSTextRule($0, color: color, allMatches: false) }
+        if let fontStrings = fontStrings {
+            let resolvedFont = font ?? UIFont.systemFont(ofSize: 14)
+            rules += fontStrings.map { FSTextRule($0, font: resolvedFont, allMatches: false) }
+        }
+        return rules
+    }
+
     /// 关键词高亮的 SwiftUI 版本。
     static func richString(_ text: String,
                            font: UIFont? = nil,
