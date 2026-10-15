@@ -81,7 +81,7 @@ public struct FSDatePickerOverlay: View {
             }
         }
         .animation(.easeInOut(duration: 0.3), value: center.current?.id)
-        .onChange(of: center.current?.id) { _ in
+        .onChange(of: center.current?.id) { _, _ in
             draft = center.current?.initialDate ?? Date()
         }
     }
