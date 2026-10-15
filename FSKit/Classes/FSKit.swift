@@ -812,45 +812,8 @@ public class FSKit: NSObject {
 
     
     // MARK: - Attributed String
-    public static func attributedString(for sourceString: String, colorRanges: [NSRange], color: UIColor, textRanges: [NSRange], font: UIFont) -> NSAttributedString {
-        let attributedStr = NSMutableAttributedString(string: sourceString)
-        for range in colorRanges {
-            attributedStr.addAttribute(.foregroundColor, value: color, range: range)
-        }
-        for range in textRanges {
-            attributedStr.addAttribute(.font, value: font, range: range)
-        }
-        return attributedStr
-    }
-    
-    public static func attributedString(for sourceString: String, colorStrings: [String], color: UIColor, fontStrings: [String]?, font: UIFont?) -> NSAttributedString {
-        var colorRanges: [NSRange] = []
-        var textRanges: [NSRange] = []
-        
-        for colorStr in colorStrings {
-            if let range = sourceString.range(of: colorStr) {
-                colorRanges.append(NSRange(range, in: sourceString))
-            }
-        }
-        
-        if let fontStrings = fontStrings {
-            for fontStr in fontStrings {
-                if let range = sourceString.range(of: fontStr) {
-                    textRanges.append(NSRange(range, in: sourceString))
-                }
-            }
-        }
-        
-        return attributedString(for: sourceString, colorRanges: colorRanges, color: color, textRanges: textRanges, font: font ?? UIFont.systemFont(ofSize: 14))
-    }
-    
-    public func middleLine(forLabel text: String) -> NSAttributedString {
-        return NSAttributedString(string: text, attributes: [.strikethroughStyle: NSUnderlineStyle.single.rawValue])
-    }
-    
-    public func underLine(forLabel text: String) -> NSAttributedString {
-        return NSAttributedString(string: text, attributes: [.underlineStyle: NSUnderlineStyle.single.rawValue])
-    }
+    // 富文本拼装已迁至 FSText.swift（FSTextSegment / FSTextRule / FSKit.attributed(_:)），
+    // 旧的 attributedString / middleLine / underLine 作为兼容层同步保留在那边。
     
     // MARK: - First Character
     public static func firstCharacter(with string: String) -> String {
