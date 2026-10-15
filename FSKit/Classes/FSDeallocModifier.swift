@@ -2,7 +2,6 @@
 //  FSDeallocModifier.swift
 //  FSKit
 //
-//  对齐 FSBaseController 行为：
 //  - deinit 时发送 FS_BE_DEBUG_NOTIFICATION（释放通知）
 //  - 泄漏检测由外部触发：FSLeakDetector.startCheck(for:)（如 NavigationStack path 变短时）
 //  - tracker deinit 自动取消对应的泄漏检测定时器
@@ -83,7 +82,6 @@ private struct _FSDeallocViewModifier: ViewModifier {
 }
 
 extension View {
-    /// 视图释放时发送 FS_BE_DEBUG_NOTIFICATION，对齐 FSBaseController.deinit 行为。
     /// 泄漏检测由外部触发：在视图被 pop/dismiss 时调用 `FSLeakDetector.startCheck(for:)`，
     /// tracker deinit 会自动取消检测。5 秒未释放则发送 FS_BE_LEAK_NOTIFICATION。
     public func debugDealloc(_ viewName: String) -> some View {

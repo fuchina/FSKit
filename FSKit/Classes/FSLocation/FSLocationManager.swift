@@ -1,6 +1,5 @@
 //
 //  FSLocationManager.swift
-//  FSBaseController
 //
 //  Created by FudonFuchina on 2019/4/27.
 //  Translated to Swift

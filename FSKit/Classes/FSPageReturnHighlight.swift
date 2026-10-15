@@ -366,9 +366,6 @@ public final class FSStackRegistry: ObservableObject {
     public func popAllToRoot() { routers.forEach { $0.popToRoot() } }
 }
 
-// MARK: - 页面基座
-
-/// 页面统一底色（对齐原 FSBaseController 的 0.95 灰底）
 public struct FSPageBackground: ViewModifier {
     public init() {}
     public func body(content: Content) -> some View {
