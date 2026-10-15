@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SwiftUI
 
 // MARK: - Convenience Accessors
 public var UIScreenLong: CGFloat { FSUIAdapter.shared.screenBiggerValue }
@@ -446,5 +447,112 @@ public extension UIView {
         gradientLayer.locations = locations
         view.layer.insertSublayer(gradientLayer, at: 0)
         return gradientLayer
+    }
+}
+
+
+// MARK: - 零尺寸生命周期探针（SwiftUI 拿不到 UIKit 导航通知的兜底，全项目共用）
+//
+// 背景：全 SwiftUI 化后导航由 `FSPushStack`(NavigationStack) 承担，
+// 原 `UINavigationController` 的 willAppear/didAppear 通知不再可用；
+// 而 SwiftUI 的 `.onAppear` 在 NavigationStack 的 push/pop 场景下并不保证成对触发。
+// 这两个 modifier 用零尺寸 `UIViewControllerRepresentable` 把 UIKit 生命周期事件
+// 翻译成 SwiftUI 回调：它们只做事件源，不承担任何导航/视图承载。
+
+/// 回归探针承载：`viewWillAppear` → 回调
+private struct FSReturnProbe: UIViewControllerRepresentable {
+
+    let includeFirst: Bool
+    let onReturn: () -> Void
+
+    func makeUIViewController(context: Context) -> Probe {
+        Probe(includeFirst: includeFirst, onReturn: onReturn)
+    }
+
+    func updateUIViewController(_ uiViewController: Probe, context: Context) {
+        uiViewController.includeFirst = includeFirst
+        uiViewController.onReturn = onReturn
+    }
+
+    final class Probe: UIViewController {
+
+        var includeFirst: Bool
+        var onReturn: () -> Void
+        private var hasAppeared = false
+
+        init(includeFirst: Bool, onReturn: @escaping () -> Void) {
+            self.includeFirst = includeFirst
+            self.onReturn = onReturn
+            super.init(nibName: nil, bundle: nil)
+        }
+
+        required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+
+        override func viewWillAppear(_ animated: Bool) {
+            super.viewWillAppear(animated)
+            if hasAppeared || includeFirst {
+                onReturn()
+            } else {
+                hasAppeared = true
+            }
+        }
+    }
+}
+
+/// 摇一摇探针承载：`becomeFirstResponder` + `motionEnded`
+private struct FSShakeProbe: UIViewControllerRepresentable {
+
+    let onShake: () -> Void
+
+    func makeUIViewController(context: Context) -> Probe { Probe(onShake: onShake) }
+
+    func updateUIViewController(_ uiViewController: Probe, context: Context) {
+        uiViewController.onShake = onShake
+    }
+
+    final class Probe: UIViewController {
+
+        var onShake: () -> Void
+
+        init(onShake: @escaping () -> Void) {
+            self.onShake = onShake
+            super.init(nibName: nil, bundle: nil)
+        }
+
+        required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+
+        override var canBecomeFirstResponder: Bool { true }
+
+        override func viewDidLoad() {
+            super.viewDidLoad()
+            UIApplication.shared.applicationSupportsShakeToEdit = true
+        }
+
+        // ⚠️ 必须在 viewDidAppear 而非 viewDidLoad 里 becomeFirstResponder：
+        // viewDidLoad 时本 view 未必已进入 responder chain，摇一摇会收不到。
+        override func viewDidAppear(_ animated: Bool) {
+            super.viewDidAppear(animated)
+            becomeFirstResponder()
+        }
+
+        override func motionEnded(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
+            if event?.subtype == .motionShake {
+                onShake()
+            }
+        }
+    }
+}
+
+public extension View {
+
+    /// 本页被重新显示时回调（子页 pop 回来 / 从覆盖页切回）。
+    /// - Parameter includeFirstAppear: 是否连「首次出现」也回调（默认否，常见用法是首次已在 onAppear 取过数）
+    func fsOnReturn(includeFirstAppear: Bool = false, _ action: @escaping () -> Void) -> some View {
+        background(FSReturnProbe(includeFirst: includeFirstAppear, onReturn: action))
+    }
+
+    /// 摇一摇回调（原 FSShakeBaseController 的 SwiftUI 等价物）
+    func fsOnShake(_ action: @escaping () -> Void) -> some View {
+        background(FSShakeProbe(onShake: action).frame(width: 0, height: 0))
     }
 }
