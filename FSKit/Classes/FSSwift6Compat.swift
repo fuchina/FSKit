@@ -36,10 +36,10 @@ import Foundation
 /// `DispatchQueue.main.async` / `Task { @MainActor in }`。
 ///
 /// 用本类型包一层后，**公共 API 签名与所有调用点都不变**，行为与 Swift 5 模式完全一致。
-struct FSUncheckedSendable<T>: @unchecked Sendable {
-    let value: T
+public struct FSUncheckedSendable<T>: @unchecked Sendable {
+    public let value: T
 
-    init(_ value: T) { self.value = value }
+    public init(_ value: T) { self.value = value }
 }
 
 // MARK: - 补充一致性声明
