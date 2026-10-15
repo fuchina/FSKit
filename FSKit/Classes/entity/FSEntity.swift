@@ -7,6 +7,19 @@
 
 import Foundation
 
+/// 数据库行模型基类。
+///
+/// 【Swift 6 语言模式】
+/// 本基类**不**声明 `@unchecked Sendable`：在非 final 基类上声明会让每个子类都被要求
+/// 「restate inherited conformance」，反而在每个子类处多出一条警告，也会把
+/// 「可跨隔离域传递」的承诺无差别扩大到全部派生类。
+///
+/// 这些模型实例的用法是「后台线程查库并构造 → 交给主线程消费」的单向交接，
+/// 送进 `DispatchQueue.main.async`（Swift 6 里该闭包被视为主隔离闭包）时会被区域
+/// 隔离分析判为 `sending ... risks causing data races`。相应的一致性声明按需逐类写在
+/// **各组件自己的 `FSSwift6Compat.swift`** 里（见 FSJZKit / FSAccount / FSJZBus / …），
+/// 集中一处便于审阅与回退。`@unchecked Sendable` 只是编译期声明、不生成任何代码，
+/// 因此行为与 Swift 5 语言模式完全一致。
 open class FSEntity: NSObject {
     public var     aid      :   Int = 0
     public var     meta     :   Dictionary<String, Any>? = nil
