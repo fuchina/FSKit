@@ -3,7 +3,6 @@
 //  FSKit
 //
 //  2026-10-15 全 SwiftUI 化：
-//  `FSUIKit.alert / alertInput / showAlertWithMessage` 原来是「构造 UIAlertController +
 //  `controller.present(...)`」，必须有 UIViewController 宿主。现改为「状态 + 根视图渲染」：
 //  调用方把内容塞进这里，由根视图（主 App 的 AppRootScreen）统一渲染。
 //
@@ -150,9 +149,6 @@ public struct FSAlertSpec: Identifiable, @unchecked Sendable {
 }
 
 /// 全局弹窗中心。**可从任意线程调用**（内部自行切主线程）。
-///
-/// 不标 `@MainActor`（同 `FSToastCenter`）：`FSUIKit.alert` 是非隔离的 `static` 方法，
-/// 343 处调用点未必都在主隔离域；标成 `@MainActor` 会让那些调用点编译报错。
 ///
 /// Swift 6 语言模式：`show` / `dismiss` 会把 `self` 送进 `@MainActor` 闭包，
 /// 需要显式声明可跨隔离域传递，故补 `@unchecked Sendable`
