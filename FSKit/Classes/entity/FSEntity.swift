@@ -105,17 +105,22 @@ open class FSEntity: NSObject {
     ///
     /// 后台只能把 `[[String: String]]`（Sendable）传回来；走这里可以直接喂给 setter，
     /// 不必再装箱回 `[String: Any]`。各 `keyMapper` 的 setter 本来就走 `FSSafe.*` 解析字符串。
+    ///
+    /// ★ `keyMapper()` 提到循环外：原 `fill` 是**每行**重建一次映射字典
+    /// （`Dictionary(uniqueKeysWithValues:)` + `parentMapper.merging` + 每字段一个闭包分配），
+    /// 6458 行就重建 6458 次 — 实测占明细建模时间的一半。
     /// ⚠️ 与 `fill` 的差异：**不保留 `meta`**（`fill` 会把整行塞进 `meta`，列表页用不到）。
     static public func toms<T: FSEntity>(from dictionaries: [[String: String]]) -> [T] {
         if dictionaries.isEmpty {
             return []
         }
         
+        let mapper = T.keyMapper()      // ← 整批只建一次
+        
         return dictionaries.map {
             let model = T.init()
             model.beforeSetProperties()
             
-            let mapper = type(of: model).keyMapper()
             for (key, value) in $0 {
                 mapper[key]?(model, value)
             }
