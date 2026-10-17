@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 
 // MARK: - FSLunarDate
-public class FSLunarDate: NSObject {
+public class FSLunarDate {
     public var year: Int = 0
     public var month: Int = 0
     public var day: Int = 0
@@ -34,7 +34,7 @@ public class FSLunarDate: NSObject {
 }
 
 // MARK: - FSDate
-public class FSDate: NSObject {
+public enum FSDate {
     
     // MARK: - Leap Year
     public static func isLeapYear(_ year: Int) -> Bool {

@@ -7,7 +7,7 @@
 
 import Foundation
 
-open class FSXIRR: NSObject {
+open class FSXIRR {
 
     public struct CashFlow {
         public let date: Double

@@ -19,7 +19,7 @@ public var UIScreenWidth: CGFloat {
 }
 
 // MARK: - FSUIAdapterModel
-public class FSUIAdapterModel: NSObject {
+public class FSUIAdapterModel {
     
     public let value0p5: CGFloat
     public let value1: CGFloat
@@ -173,13 +173,12 @@ public class FSUIAdapterModel: NSObject {
         value400 = ceil(400 * ratio)
         value500 = ceil(500 * ratio)
         value650 = ceil(650 * ratio)
-        super.init()
     }
 }
 
 
 // MARK: - FSUIAdapterManager
-public class FSUIAdapter: NSObject {
+public class FSUIAdapter {
     
     // 2026-10-17：Pod 与主 App 统一为默认主隔离后，nonisolated(unsafe) 反而报错，故移除。
     public static let shared = FSUIAdapter()
@@ -255,7 +254,7 @@ public class FSUIAdapter: NSObject {
     public private(set) var safeWidth: CGFloat = 0
     public private(set) var safeHeight: CGFloat = 0
     
-    private override init() {
+    private init() {
         isIPad = UIDevice.current.userInterfaceIdiom == .pad
         isIPhone = UIDevice.current.userInterfaceIdiom == .phone
         
@@ -270,7 +269,6 @@ public class FSUIAdapter: NSObject {
         originRatioForIPhone = screenSmallerValue / 375.0
         originRatioForIPad = screenSmallerValue / 810.0
         
-        super.init()
         calculateScreenHeightRatios()
     }
     

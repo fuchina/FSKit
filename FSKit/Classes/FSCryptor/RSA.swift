@@ -8,7 +8,7 @@
 import Foundation
 import Security
 
-open class RSA: NSObject {
+public enum RSA {
 
     public static func encryptString(_ str: String, publicKey pubKey: String) -> String {
         guard let data = str.data(using: .utf8),

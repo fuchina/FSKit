@@ -8,7 +8,7 @@
 import UIKit
 import CoreText
 
-public class FSPdf: NSObject {
+public enum FSPdf {
     
     // MARK: - PDF from String
     public static func pdf(forString text: String, pdfName: String? = nil, password: String? = nil) -> String? {

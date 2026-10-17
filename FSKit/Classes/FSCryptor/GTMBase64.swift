@@ -7,7 +7,7 @@
 
 import Foundation
 
-open class GTMBase64: NSObject {
+public enum GTMBase64 {
 
     public static func encode(_ data: Data) -> Data? {
         encodeData(data)

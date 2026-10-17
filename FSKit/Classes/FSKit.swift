@@ -26,7 +26,7 @@ public nonisolated let FSThreeDecimalPlaces: Int = 1000
 public nonisolated let FSDoubleThreeDecimalPlaces: Double = 1000.0
 
 // MARK: - FSKit
-public class FSKit: NSObject {
+public enum FSKit {
     
     public static func printArrayFirstJSON(_ list: [[String: Any]]) {
         
@@ -931,7 +931,7 @@ public class FSKit: NSObject {
         }
     }
     
-    public class func attr(_ text: String) -> NSAttributedString {
+    public static func attr(_ text: String) -> NSAttributedString {
         return NSAttributedString(string: text)
     }
     
@@ -1045,7 +1045,8 @@ public class FSKit: NSObject {
     
     private static func bundle(withName bundleName: String?) -> Bundle? {
         let name = bundleName ?? "main"
-        guard let bundlePath = Bundle(for: FSKit.self).path(forResource: name, ofType: "bundle") else { return nil }
+        // `Bundle(for:)` 要一个 ObjC 类；`FSKit` 已是 enum，故用一个空类当锚点
+        guard let bundlePath = Bundle(for: FSKitBundleToken.self).path(forResource: name, ofType: "bundle") else { return nil }
         return Bundle(path: bundlePath)
     }
     
@@ -1262,3 +1263,9 @@ public func fs_userDefaultsOnce(key: String, event: () -> Void) {
         ud.set(1, forKey: key)
     }
 }
+
+/// `Bundle(for:)` 的锚点类
+///
+/// 2026-10-17：`FSKit` 从 `class : NSObject` 改成 `enum` 后不再满足 `AnyClass`，
+/// 而 `bundle(withName:)` 要用 `Bundle(for:)` 定位资源包，故用这个空类当锚点。
+private final class FSKitBundleToken {}

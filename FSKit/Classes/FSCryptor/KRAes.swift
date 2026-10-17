@@ -8,7 +8,7 @@
 import Foundation
 import CommonCrypto
 
-open class KRAes: NSObject {
+public enum KRAes {
 
     public static func encryptAES256(with data: Data, password key: String) -> Data? {
         aes256(with: data, key: key, isEncrypt: true)

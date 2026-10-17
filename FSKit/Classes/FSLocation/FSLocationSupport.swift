@@ -15,7 +15,7 @@ import UIKit
  * 但腾讯不是使用这种算法，所以到底是哪边有问题还待确认
  */
 
-public class FSLocationSupport: NSObject {
+public enum FSLocationSupport {
     
     private static let earthRadius: Double = 6378245.0
     private static let ee: Double = 0.00669342162296594323

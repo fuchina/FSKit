@@ -26,7 +26,7 @@ public enum FSLocationSourceType: Int {
     case single = 2     // 单点定位结果
 }
 
-public class FSLocation: NSObject {
+public class FSLocation {
     
     // 2026-10-17：由 nonisolated 的 FSLocationManager.init 调用，故 nonisolated。
     public nonisolated static func makeLocationManager(distanceFilter: CLLocationDistance) -> CLLocationManager {
@@ -78,7 +78,7 @@ public class FSLocation: NSObject {
 }
 
 // 2026-10-17：纯数据模型，其工厂方法 result(...) 由定位回调在后台队列调用，故 nonisolated。
-public nonisolated class FSLocationResult: NSObject {
+public nonisolated class FSLocationResult {
     
     public var locations: [CLLocation]?
     public var lastLocation: CLLocation?

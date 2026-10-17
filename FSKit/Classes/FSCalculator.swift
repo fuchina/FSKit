@@ -9,7 +9,7 @@
 import UIKit
 import CoreLocation
 
-open class FSCalculator: NSObject {
+public enum FSCalculator {
     
     // MARK: - 等额本金计算
     /// 等额本金计算公式

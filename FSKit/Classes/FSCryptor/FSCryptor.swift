@@ -9,7 +9,7 @@
 import Foundation
 import CommonCrypto
 
-open class FSCryptor: NSObject {
+public enum FSCryptor {
     
     // MARK: - AES256 加解密
     

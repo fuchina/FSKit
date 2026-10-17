@@ -11,7 +11,7 @@
 
 import Foundation
 
-public class FSURLSessionManager: NSObject {
+public enum FSURLSessionManager {
     
     // MARK: - GET Request
     public static func sessionGet(_ urlString: String, success: ((Data?) -> Void)?, fail: (() -> Void)?) {

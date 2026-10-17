@@ -7,7 +7,7 @@
 
 import UIKit
 
-public class FSApp: NSObject {
+public class FSApp {
     
     // 2026-10-17：Pod 与主 App 统一为默认主隔离后，nonisolated(unsafe) 反而报错，故移除。
     public static let shared = FSApp()
@@ -18,7 +18,5 @@ public class FSApp: NSObject {
     /// 屏幕方向，如：.portrait
     public var orientation: UIInterfaceOrientationMask = .portrait
     
-    private override init() {
-        super.init()
-    }
+    private init() {}
 }
