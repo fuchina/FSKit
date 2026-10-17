@@ -50,7 +50,9 @@ public final class FSPageReturnHighlight: ObservableObject {
     @Published public var highlightedId: AnyHashable?
     /// 最近一次点击（点亮）的时间戳，用于区分「push 转场」与「pop 返回」
     private var tapTime: TimeInterval = 0
-    private var tokens: [NSObjectProtocol] = []
+    // 2026-10-17：deinit 是 nonisolated，读被主隔离化的属性会报错；本属性仅在
+    // init 里写入、deinit 里遍历移除，改 nonisolated(unsafe) 不改变任何逻辑。
+    nonisolated(unsafe) private var tokens: [NSObjectProtocol] = []
 
     public init() {
         let names = [
@@ -62,7 +64,8 @@ public final class FSPageReturnHighlight: ObservableObject {
                 forName: Notification.Name(name),
                 object: nil, queue: .main
             ) { [weak self] _ in
-                self?.resetIfReturning()
+                // 2026-10-17：观察者挂在 queue: .main 上，必定在主隔离域执行。
+                MainActor.assumeIsolated { self?.resetIfReturning() }
             }
             tokens.append(t)
         }
@@ -290,7 +293,7 @@ private struct FSNavRouterKey: EnvironmentKey {
     // 而 FSNavRouter 的定义即在本文件内 —— 外部扩展补 `@unchecked Sendable`
     // 不足以通过该检查，故只能就地声明。
     // 仅此一行，不涉及分页返回高亮的任何逻辑。
-    nonisolated(unsafe) static let defaultValue = FSNavRouter()
+    static let defaultValue = FSNavRouter()
 }
 
 public extension EnvironmentValues {

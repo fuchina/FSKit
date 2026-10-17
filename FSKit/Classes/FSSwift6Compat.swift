@@ -36,7 +36,9 @@ import Foundation
 /// `DispatchQueue.main.async` / `Task { @MainActor in }`。
 ///
 /// 用本类型包一层后，**公共 API 签名与所有调用点都不变**，行为与 Swift 5 模式完全一致。
-public struct FSUncheckedSendable<T>: @unchecked Sendable {
+// 2026-10-17：默认主隔离下 struct 的成员会被主隔离化，导致 `box.value` 在
+// DispatchQueue 闭包里不可用。装箱本身必须与隔离域无关，故标 nonisolated。
+public nonisolated struct FSUncheckedSendable<T>: @unchecked Sendable {
     public let value: T
 
     public init(_ value: T) { self.value = value }

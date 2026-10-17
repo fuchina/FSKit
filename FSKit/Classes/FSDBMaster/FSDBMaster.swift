@@ -13,9 +13,17 @@ import SQLite3
 //typealias FSDBMaster = SwiftDBMaster
 
 // MARK: - 主类
-public class FSDBMaster {
+
+/// ★ 2026-10-17：本类必须整体 `nonisolated`，否则**启动即崩**。
+/// 它是「真并发类」—— 内部有专用串行队列 `queue`（= `initQueue`）保护 sqlite3 句柄，
+/// 所有成员方法都在 `queue.sync {}` 内执行。若让它默认继承主隔离，`queue.sync` 的闭包会
+/// 继承主隔离、却在自定义队列上执行 ⇒ 入口隔离断言失败：
+///   `_dispatch_assert_queue_fail` → `_swift_task_checkIsolatedSwift`
+///   （崩溃栈：`checkTableExist` ← `querySQL` ← `FSAlertAPI`）
+public nonisolated class FSDBMaster {
     
     // MARK: - 属性
+    // 类已整体 nonisolated，实例属性无需 nonisolated(unsafe)（deinit 可直接访问）。
     private var sqlite3: OpaquePointer?
     private let queue: DispatchQueue
     

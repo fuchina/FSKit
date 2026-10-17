@@ -38,7 +38,9 @@ open class FSCADisplayLink {
     public var onTick: Handler?
 
     /// 底层 display link。本类没转发的属性 / 方法直接从这里取（如 frameInterval）。
-    public let link: CADisplayLink
+    // 2026-10-17：deinit（nonisolated）要 invalidate 它，且 CADisplayLink 非 Sendable，
+    // 需 nonisolated(unsafe) 才能从 deinit 访问。
+    public nonisolated(unsafe) let link: CADisplayLink
 
     public init(handler: Handler? = nil) {
         let proxy = _FSDisplayLinkProxy()

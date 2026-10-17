@@ -76,7 +76,7 @@ public struct FSDeepSeekChatRequest: Codable {
     }
 }
 
-public struct FSDeepSeekChatResponse: Codable {
+public nonisolated struct FSDeepSeekChatResponse: Codable {
     public struct Choice: Codable {
         public struct Message: Codable {
             public let role: String?
@@ -99,9 +99,8 @@ public final class FSDeepSeek {
 
     public typealias Completion = (Result<FSDeepSeekChatResponse, Error>) -> Void
 
-    // Swift 6 语言模式：网络客户端，apiKey / baseURL 等可变配置在启动时写入，
-    // 调用点分布在任意线程，故用 nonisolated(unsafe) 保持原语义。
-    public nonisolated(unsafe) static let shared = FSDeepSeek()
+    // 2026-10-17：Pod 与主 App 统一为默认主隔离后，nonisolated(unsafe) 反而报错，故移除。
+    public static let shared = FSDeepSeek()
 
     public var apiKey: String = ""
     public var baseURL: String = "https://api.deepseek.com"

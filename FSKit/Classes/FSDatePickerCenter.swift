@@ -38,8 +38,8 @@ public struct FSDatePickerSpec: Identifiable, @unchecked Sendable {
 /// （可变状态已由 `MainActor.assumeIsolated` 保证只在主线程访问）。
 public final class FSDatePickerCenter: ObservableObject, @unchecked Sendable {
 
-    // Swift 6 语言模式：同上，任意线程可调用。
-    public nonisolated(unsafe) static let shared = FSDatePickerCenter()
+    // 2026-10-17：Pod 与主 App 统一为默认主隔离后，nonisolated(unsafe) 反而报错，故移除。
+    public static let shared = FSDatePickerCenter()
 
     @Published public private(set) var current: FSDatePickerSpec?
 

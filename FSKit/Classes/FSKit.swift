@@ -8,22 +8,22 @@
 import UIKit
 import CryptoKit
 
-public let FS_BE_DEBUG_NOTIFICATION  =   "FS_BE_DEBUG_NOTIFICATION"
+public nonisolated let FS_BE_DEBUG_NOTIFICATION  =   "FS_BE_DEBUG_NOTIFICATION"
 
 /// 疑似内存泄漏通知：基类检测到页面 pop/dismiss 后仍未释放时投递，object 为提示文案（String）。
 /// 由 App 层监听并按需（如 FSJZAPP.Fudon()）弹 toast，避免基类反向依赖上层。
-public let FS_BE_LEAK_NOTIFICATION   =   "FS_BE_LEAK_NOTIFICATION"
+public nonisolated let FS_BE_LEAK_NOTIFICATION   =   "FS_BE_LEAK_NOTIFICATION"
 
 /// 一年的秒数
-public let FSKitYearSeconds: Double = 31556926.08
+public nonisolated let FSKitYearSeconds: Double = 31556926.08
 
 /// 支持小数点后5位，支持汇率（4位），必须是整数，目的是解决Double运算精度损失的问题，目前这是一个好的方案
-public let FSFiveDecimalPlaces: Int = 100000
-public let FSDoubleFiveDecimalPlaces: Double = 100000.0
+public nonisolated let FSFiveDecimalPlaces: Int = 100000
+public nonisolated let FSDoubleFiveDecimalPlaces: Double = 100000.0
 
 /// 支持小数点后3位，支持价格，必须是整数，目的是解决Double运算精度损失的问题，目前这是一个好的方案
-public let FSThreeDecimalPlaces: Int = 1000
-public let FSDoubleThreeDecimalPlaces: Double = 1000.0
+public nonisolated let FSThreeDecimalPlaces: Int = 1000
+public nonisolated let FSDoubleThreeDecimalPlaces: Double = 1000.0
 
 // MARK: - FSKit
 public class FSKit: NSObject {
@@ -56,7 +56,8 @@ public class FSKit: NSObject {
     }
     
     // MARK: - JSON
-    public static func object(fromJsonString jsonString: String?) -> Any? {
+    /// nonisolated：无状态纯函数，需供网络回调等非隔离上下文调用
+    public nonisolated static func object(fromJsonString jsonString: String?) -> Any? {
         guard let jsonString = jsonString, !jsonString.isEmpty else { return nil }
         guard let data = jsonString.data(using: .utf8) else { return nil }
         return try? JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed)
@@ -340,7 +341,8 @@ public class FSKit: NSObject {
                     var hostname = [CChar](repeating: 0, count: Int(NI_MAXHOST))
                     getnameinfo(interface.ifa_addr, socklen_t(interface.ifa_addr.pointee.sa_len),
                                &hostname, socklen_t(hostname.count), nil, socklen_t(0), NI_NUMERICHOST)
-                    address = String(cString: hostname)
+                    // 2026-10-17：String(cString:) 在 iOS 26 SDK 已弃用，按其提示改为显式解码。
+                address = String(decoding: hostname.prefix { $0 != 0 }.map { UInt8(bitPattern: $0) }, as: UTF8.self)
                 }
             }
             guard let next = interface.ifa_next else { break }
@@ -1177,13 +1179,26 @@ public class FSKit: NSObject {
 
 // MARK: - GCD Helpers
 //
-// Swift 6 语言模式：以下 helper 承接外部传入的 `@escaping () -> Void` 闭包，
-// 而 GCD 队列闭包要求 `@Sendable` —— 直接捕获会报
-// `sending 'block' risks causing data races`（主队列，error）或 `#SendableClosureCaptures`
-// 警告（全局队列）。统一用 `FSUncheckedSendable` 包一层：公共签名与全部调用点保持不变，
-// 线程安全仍由调用方保证，与 Swift 5 模式下行为完全一致。
+// ★★ 2026-10-17：**凡在后台队列上执行的闭包参数，必须显式标 `@Sendable`。**
+//
+// 默认主隔离（`SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor`）下，非 Sendable 的
+// `@escaping () -> Void` 参数会**继承调用方的隔离**（= 主隔离）。于是调用方在闭包体里
+// 调用主隔离 API 是「编译期完全合法」的 —— 但该闭包实际被丢到 `DispatchQueue.global()`
+// 上执行，运行期触发隔离断言：
+//     `_dispatch_assert_queue_fail` ← `_swift_task_checkIsolatedSwift`
+// **这类错误不产生任何编译警告**，只在运行期炸。
+// 2026-10-17 启动崩溃即此：`FSAlertAPI.todoAlertsCount` → `todoDictionaries` → `FSDBMaster.querySQL`。
+//
+// 标 `@Sendable` 后编译器会强制这些闭包只碰 nonisolated API，把隐患一次性暴露为编译错误。
+// 对照：`fs_dispatch_main_queue_async/sync` 的闭包都在主队列执行，保持非 Sendable 即可。
+//
+// 另：`FSUncheckedSendable` 包装保留 —— 让公共签名对外仍是 `@Sendable` 闭包，
+// GCD 闭包直接捕获即可（`sending` 检查通过）。
 
-public func fs_dispatch_global_main_queue_async(globalBlock: @escaping () -> Void, mainBlock: @escaping () -> Void) {
+/// 后台执行 `globalBlock`，随后回主队列执行 `mainBlock`。
+/// `globalBlock` 只能使用 nonisolated API；需要触碰主隔离 API 的代码请挪进 `mainBlock`。
+public func fs_dispatch_global_main_queue_async(globalBlock: @escaping @Sendable () -> Void,
+                                                mainBlock: @escaping () -> Void) {
     let global = FSUncheckedSendable(globalBlock)
     let main = FSUncheckedSendable(mainBlock)
     DispatchQueue.global().async {
@@ -1212,12 +1227,14 @@ public func fs_dispatch_main_queue_sync(_ block: @escaping () -> Void) {
     }
 }
 
-public func fs_dispatch_global_queue_async(_ block: @escaping () -> Void) {
+/// 后台异步执行。闭包只能使用 nonisolated API（见本节顶部说明）。
+public func fs_dispatch_global_queue_async(_ block: @escaping @Sendable () -> Void) {
     let box = FSUncheckedSendable(block)
     DispatchQueue.global().async { box.value() }
 }
 
-public func fs_dispatch_global_queue_sync(_ block: @escaping () -> Void) {
+/// 后台同步执行。闭包只能使用 nonisolated API（见本节顶部说明）。
+public func fs_dispatch_global_queue_sync(_ block: @escaping @Sendable () -> Void) {
     let box = FSUncheckedSendable(block)
     DispatchQueue.global().sync { box.value() }
 }

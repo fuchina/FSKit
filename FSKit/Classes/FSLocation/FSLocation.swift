@@ -28,7 +28,8 @@ public enum FSLocationSourceType: Int {
 
 public class FSLocation: NSObject {
     
-    public static func makeLocationManager(distanceFilter: CLLocationDistance) -> CLLocationManager {
+    // 2026-10-17：由 nonisolated 的 FSLocationManager.init 调用，故 nonisolated。
+    public nonisolated static func makeLocationManager(distanceFilter: CLLocationDistance) -> CLLocationManager {
         let manager = CLLocationManager()
         manager.allowsBackgroundLocationUpdates = true
         manager.desiredAccuracy = kCLLocationAccuracyBest
@@ -36,7 +37,8 @@ public class FSLocation: NSObject {
         return manager
     }
     
-    public static func locationAccuracy(for accuracy: FSLocationAccuracy) -> CLLocationAccuracy {
+    // 2026-10-17：纯数值映射，被 FSLocationManager 的后台队列调用，故 nonisolated。
+    public nonisolated static func locationAccuracy(for accuracy: FSLocationAccuracy) -> CLLocationAccuracy {
         switch accuracy {
         case .default, .best:
             return kCLLocationAccuracyBest
@@ -75,7 +77,8 @@ public class FSLocation: NSObject {
     }
 }
 
-public class FSLocationResult: NSObject {
+// 2026-10-17：纯数据模型，其工厂方法 result(...) 由定位回调在后台队列调用，故 nonisolated。
+public nonisolated class FSLocationResult: NSObject {
     
     public var locations: [CLLocation]?
     public var lastLocation: CLLocation?

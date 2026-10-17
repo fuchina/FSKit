@@ -181,9 +181,8 @@ public class FSUIAdapterModel: NSObject {
 // MARK: - FSUIAdapterManager
 public class FSUIAdapter: NSObject {
     
-    // Swift 6 语言模式：屏幕尺寸适配器，被全项目高频读取（懒加载 model* 在任意线程首次触碰）。
-    // 标 @MainActor 会让大量调用点报错，故用 nonisolated(unsafe) 保持原语义。
-    public nonisolated(unsafe) static let shared = FSUIAdapter()
+    // 2026-10-17：Pod 与主 App 统一为默认主隔离后，nonisolated(unsafe) 反而报错，故移除。
+    public static let shared = FSUIAdapter()
     
     public let isIPad: Bool
     public let isIPhone: Bool

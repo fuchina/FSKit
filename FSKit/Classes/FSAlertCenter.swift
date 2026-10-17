@@ -82,10 +82,9 @@ public struct FSAlertSpec: Identifiable, @unchecked Sendable {
 /// （可变状态已由 `MainActor.assumeIsolated` 保证只在主线程访问）。
 public final class FSAlertCenter: ObservableObject, @unchecked Sendable {
 
-    // Swift 6 语言模式：本类设计为「任意线程可调用、内部自行切主线程」，
-    // 与 FSToastCenter / FSLoadingCenter 同款。故不能标 @MainActor
-    // （会让 343 处调用点报错），改用 nonisolated(unsafe) 保持原语义。
-    public nonisolated(unsafe) static let shared = FSAlertCenter()
+    // 2026-10-17：Pod 与主 App 统一为 SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor 后，
+    // 本类及 shared 都是主隔离的，nonisolated(unsafe) 反而报错，故移除。
+    public static let shared = FSAlertCenter()
 
     /// 当前要显示的弹窗（nil = 不显示）
     @Published public private(set) var current: FSAlertSpec?

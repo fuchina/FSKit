@@ -21,7 +21,9 @@ import MapKit
 
 /// Swift 6 语言模式：回调结果经 `DispatchQueue.main.async` 回主线程时会携带 `self`，
 /// 需显式声明可跨隔离域传递（可变状态由内部串行 `queue` 保护），故补 `@unchecked Sendable`。
-public class FSLocationManager: NSObject, @unchecked Sendable {
+// 2026-10-17：本类真跑在自己的串行 DispatchQueue 上（非主线程），故显式 nonisolated，
+// 保持「任意线程可调用、内部自行切主线程回调」的原设计。
+public nonisolated class FSLocationManager: NSObject, @unchecked Sendable {
     
     public var serialManager: CLLocationManager
     
@@ -158,8 +160,9 @@ public class FSLocationManager: NSObject, @unchecked Sendable {
         completionHandler: @escaping ([CLPlacemark]?, Error?) -> Void
     ) {
         let geocoder = CLGeocoder()
+        let completion = FSUncheckedSendable(completionHandler)
         geocoder.reverseGeocodeLocation(location) { placemarks, error in
-            completionHandler(placemarks, error)
+            completion.value(placemarks, error)
         }
     }
     
