@@ -197,6 +197,9 @@ public struct FSAlertHost: View {
         ZStack {
             if let spec = center.current, spec.isAlert {
                 FSAlertDialog(spec: spec, center: center)
+                    // 换一条弹窗就重建（如「每日一温」的下一篇）：滚动位置归零、入场动画重播；
+                    // 不重建则 ScrollView 沿用上一条的偏移，下一篇会直接停在底部。
+                    .id(spec.id)
                     .transition(.opacity)
                     .zIndex(1)
             }
