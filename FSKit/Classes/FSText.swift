@@ -68,6 +68,8 @@ public struct FSTextSegment {
     public var text: String
     /// 文字颜色；nil 表示继承外层（UILabel / Text 自身）的颜色。
     public var color: UIColor?
+    /// 底色；nil 表示不设底色。
+    public var background: UIColor?
     /// 字体；nil 表示继承外层字体。
     public var font: UIFont?
     /// 删除线
@@ -82,12 +84,14 @@ public struct FSTextSegment {
     ///   注意：写颜色字面量（如 `.red`）时会因重载而无法推断，请写成 `UIColor.red` / `Color.red`。
     public init(_ text: String,
                 color: (any FSTextColorConvertible)? = nil,
+                background: (any FSTextColorConvertible)? = nil,
                 font: UIFont? = nil,
                 strikethrough: Bool = false,
                 underline: Bool = false,
                 extra: AttributeContainer? = nil) {
         self.text = text
         self.color = color?.fs_color
+        self.background = background?.fs_color
         self.font = font
         self.strikethrough = strikethrough
         self.underline = underline
@@ -104,6 +108,8 @@ public struct FSTextRule {
     public var keyword: String
     /// 命中部分的颜色；nil 表示沿用基样式。
     public var color: UIColor?
+    /// 命中部分的底色；nil 表示不设底色。
+    public var background: UIColor?
     /// 命中部分的字体；nil 表示沿用基样式。
     public var font: UIFont?
     /// 是否命中全部出现位置。`false` 时只改第一处（与旧接口行为一致）。
@@ -112,9 +118,11 @@ public struct FSTextRule {
     public init(_ keyword: String,
                 color: (any FSTextColorConvertible)? = nil,
                 font: UIFont? = nil,
+                background: (any FSTextColorConvertible)? = nil,
                 allMatches: Bool = true) {
         self.keyword = keyword
         self.color = color?.fs_color
+        self.background = background?.fs_color
         self.font = font
         self.allMatches = allMatches
     }
@@ -128,9 +136,9 @@ public extension FSKit {
 
     /// 单段富文本。这是绝大多数场景该用的入口 —— 给一段字上色 / 换字体 / 加删除线。
     ///
-    /// 若只想要「不加任何属性」的富文本，用 `FSKit.attr(_:)`（见 FSKit.swift）或 `AttributedString(text)`。
+    /// `color` 传 `nil` 表示不加颜色（继承外层）；完全没有任何属性时等价 `AttributedString(text)`。
     static func attr(_ text: String,
-                     color: (any FSTextColorConvertible)?,
+                     color: (any FSTextColorConvertible)? = nil,
                      font: UIFont? = nil,
                      strikethrough: Bool = false,
                      underline: Bool = false) -> AttributedString {
@@ -208,6 +216,9 @@ private extension FSKit {
         if let color = segment.color {
             piece[AttributeScopes.UIKitAttributes.ForegroundColorAttribute.self] = color
         }
+        if let background = segment.background {
+            piece[AttributeScopes.UIKitAttributes.BackgroundColorAttribute.self] = background
+        }
         if let font = segment.font {
             piece[AttributeScopes.UIKitAttributes.FontAttribute.self] = font
         }
@@ -233,7 +244,7 @@ private extension FSKit {
         let length = full.length
         guard length > 0 else { return [] }
 
-        var hits: [(range: NSRange, color: UIColor?, font: UIFont?)] = []
+        var hits: [(range: NSRange, color: UIColor?, background: UIColor?, font: UIFont?)] = []
         for rule in rules where !rule.keyword.isEmpty {
             var searchFrom = 0
             while searchFrom < length {
@@ -241,7 +252,7 @@ private extension FSKit {
                                        options: [],
                                        range: NSRange(location: searchFrom, length: length - searchFrom))
                 guard found.location != NSNotFound, found.length > 0 else { break }
-                hits.append((found, rule.color, rule.font))
+                hits.append((found, rule.color, rule.background, rule.font))
                 guard rule.allMatches else { break }
                 searchFrom = found.location + found.length
             }
@@ -254,7 +265,7 @@ private extension FSKit {
     static func segments(in full: NSString,
                          baseFont: UIFont?,
                          baseColor: UIColor?,
-                         hits: [(range: NSRange, color: UIColor?, font: UIFont?)]) -> [FSTextSegment] {
+                         hits: [(range: NSRange, color: UIColor?, background: UIColor?, font: UIFont?)]) -> [FSTextSegment] {
         let length = full.length
 
         func clamp(_ range: NSRange) -> NSRange {
@@ -263,7 +274,7 @@ private extension FSKit {
             return NSRange(location: start, length: end - start)
         }
 
-        let validHits = hits.map { (clamp($0.range), $0.color, $0.font) }.filter { $0.0.length > 0 }
+        let validHits = hits.map { (clamp($0.range), $0.color, $0.background, $0.font) }.filter { $0.0.length > 0 }
 
         var boundaries: Set<Int> = [0, length]
         for hit in validHits {
@@ -279,14 +290,16 @@ private extension FSKit {
             guard end > start else { continue }
 
             var color = baseColor
+            var background: UIColor? = nil
             var font = baseFont
             for hit in validHits where hit.0.location <= start && end <= hit.0.location + hit.0.length {
                 if let hitColor = hit.1 { color = hitColor }
-                if let hitFont = hit.2 { font = hitFont }
+                if let hitBackground = hit.2 { background = hitBackground }
+                if let hitFont = hit.3 { font = hitFont }
             }
 
             let piece = full.substring(with: NSRange(location: start, length: end - start))
-            segments.append(FSTextSegment(piece, color: color, font: font))
+            segments.append(FSTextSegment(piece, color: color, background: background, font: font))
         }
         return segments
     }

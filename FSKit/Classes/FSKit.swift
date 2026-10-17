@@ -931,10 +931,6 @@ public enum FSKit {
         }
     }
     
-    public static func attr(_ text: String) -> NSAttributedString {
-        return NSAttributedString(string: text)
-    }
-    
     // MARK: - Array Utilities
     public static func maxAndMinNumber(in array: [Any]) -> [NSNumber]? {
         guard !array.isEmpty else { return nil }
