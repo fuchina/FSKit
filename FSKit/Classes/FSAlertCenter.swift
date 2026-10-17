@@ -244,8 +244,10 @@ public struct FSAlertHost: View {
 
 /// 自绘 alert：遮罩 + 居中面板 + 输入框 + 按钮。
 ///
-/// 刻意对齐 `UIAlertController`：面板宽 320、圆角 14、按钮高 44、分隔线 0.5pt、
-/// 默认蓝字 / destructive 红字 / cancel 加粗，两个按钮横排、三个及以上竖排。
+/// 2026-10-17 按 F 给的 iOS 26 截图复刻：
+/// 面板宽 320、圆角 28、`.regularMaterial` 玻璃底；标题/说明**左对齐**、17pt；
+/// 多个输入框合成**一个**圆角块（行高 45、中间 0.5pt 分隔线、有内容时右侧清除按钮）；
+/// 按钮是**独立圆角填充块**（高 48、圆角 14、间距 8、黑字，destructive 红字）。
 /// 与系统唯一的行为差异是「点遮罩可以关闭」—— 但只在调用方显式登记过 `addTapEvent` 时生效，
 /// 其余弹窗点遮罩依旧什么都不发生（与原系统 alert 一致）。
 private struct FSAlertDialog: View {
