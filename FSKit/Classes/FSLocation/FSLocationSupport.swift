@@ -95,6 +95,10 @@ public class FSLocationSupport: NSObject {
     // MARK: - Navigation
     
     /// 导航,coordinate为目的地
+    ///
+    /// 2026-10-17 收编：原来自己造 `UIAlertController` 再 `present`，与本模块的
+    /// `FSAlertCenter`（SwiftUI 全局弹窗）是两套系统。现统一交给 FSAlertCenter。
+    /// - Parameter controller: 已无作用（弹窗由根视图渲染），保留只为不破坏调用点。
     public static func navigationToMaps(
         destination coordinate: CLLocationCoordinate2D,
         controller: UIViewController
@@ -109,23 +113,17 @@ public class FSLocationSupport: NSObject {
         }
         mapOptions.append(mapApple)
         
-        let alertController = UIAlertController(
-            title: "选择导航方式",
-            message: nil,
-            preferredStyle: .actionSheet
-        )
-        
-        for option in mapOptions {
-            let action = UIAlertAction(title: option, style: .default) { _ in
+        var specs: [FSAlertActionSpec] = mapOptions.map { option in
+            FSAlertActionSpec(title: option, style: .default) {
                 handleMapSelection(option, coordinate: coordinate)
             }
-            alertController.addAction(action)
         }
-        
-        let cancelAction = UIAlertAction(title: "取消", style: .cancel)
-        alertController.addAction(cancelAction)
-        
-        controller.present(alertController, animated: true)
+        specs.append(FSAlertActionSpec(title: "取消", style: .cancel, handler: nil))
+
+        FSAlertCenter.shared.show(FSAlertSpec(style: .actionSheet,
+                                              title: "选择导航方式",
+                                              message: "",
+                                              actions: specs))
     }
     
     private static func handleMapSelection(_ mapName: String, coordinate: CLLocationCoordinate2D) {

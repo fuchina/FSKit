@@ -42,6 +42,31 @@ public enum FSAlertActionStyle {
     case destructive
 }
 
+/// 输入框键盘类型
+///
+/// 2026-10-17：SwiftUI **没有**自己的键盘枚举 —— `View.keyboardType(_:)` 参数直接就是
+/// `UIKeyboardType`。为了让 `FSAlertInputConfig` 不对外暴露 UIKit 类型，这里定义自有枚举，
+/// 由 `FSAlertDialog` 渲染时映射回 `UIKeyboardType`。**内核仍是 UIKit，只是不再外泄**。
+public enum FSAlertKeyboard {
+    case `default`
+    case asciiCapable
+    case alphabet
+    case numbersAndPunctuation
+    case numberPad
+    case decimalPad
+
+    var uiKeyboardType: UIKeyboardType {
+        switch self {
+        case .default: return .default
+        case .asciiCapable: return .asciiCapable
+        case .alphabet: return .alphabet
+        case .numbersAndPunctuation: return .numbersAndPunctuation
+        case .numberPad: return .numberPad
+        case .decimalPad: return .decimalPad
+        }
+    }
+}
+
 /// 一个弹窗按钮
 public struct FSAlertActionSpec: Identifiable {
 
@@ -62,21 +87,22 @@ public struct FSAlertInputSpec: Identifiable {
 
     public let id = UUID()
     public var placeholder: String
-    public var keyboardType: UIKeyboardType
+    /// 键盘类型（自有枚举，见 `FSAlertKeyboard` 的说明）
+    public var keyboardType: FSAlertKeyboard
     /// 初始文本（原 `UITextField.text`，改造时漏掉的预填，如记账弹窗的备注）
     public var text: String
-    /// 有内容时右侧显示清除按钮（原 `UITextField.clearButtonMode`）
+    /// 有内容时右侧显示清除按钮
     public var showsClearButton: Bool
-    /// 自动首字母大写（原 `UITextField.autocapitalizationType`）
-    public var autocapitalization: UITextAutocapitalizationType
+    /// 自动大写（SwiftUI 原生类型，直接透传给 `.textInputAutocapitalization`)
+    public var autocapitalization: TextInputAutocapitalization?
     /// 点按钮时把当前文本回写（原 `UITextField` 语义，供调用方从 `textFields` 取值）
     public var commit: (String) -> Void
 
     public init(placeholder: String,
-                keyboardType: UIKeyboardType = .default,
+                keyboardType: FSAlertKeyboard = .default,
                 text: String = "",
                 showsClearButton: Bool = false,
-                autocapitalization: UITextAutocapitalizationType = .sentences,
+                autocapitalization: TextInputAutocapitalization? = nil,
                 commit: @escaping (String) -> Void) {
         self.placeholder = placeholder
         self.keyboardType = keyboardType
@@ -356,8 +382,8 @@ private struct FSAlertDialog: View {
                         HStack(spacing: 8) {
                             TextField(input.placeholder, text: binding(index))
                                 .textFieldStyle(.plain)
-                                .keyboardType(input.keyboardType)
-                                .textInputAutocapitalization(Self.swiftUI(autocap: input.autocapitalization))
+                                .keyboardType(input.keyboardType.uiKeyboardType)
+                                .textInputAutocapitalization(input.autocapitalization)
                                 .font(.system(size: 17))
                                 .focused($focusedIndex, equals: index)
 
@@ -385,7 +411,13 @@ private struct FSAlertDialog: View {
                 .padding(.horizontal, 16)
             }
 
-            buttons
+            // 无按钮的纯提示弹窗（如 FSAccount 的「欠债提示」2 秒自动关）不画按钮区，
+            // 否则会留 34pt 空白
+            if spec.actions.isEmpty == false {
+                buttons
+            } else {
+                Color.clear.frame(height: 16)
+            }
         }
         .frame(width: 320)
         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 28, style: .continuous))
@@ -446,17 +478,6 @@ private struct FSAlertDialog: View {
                 set: { newValue in
                     if index < center.inputTexts.count { center.inputTexts[index] = newValue }
                 })
-    }
-
-    /// `UITextField.autocapitalizationType` → SwiftUI 的 `TextInputAutocapitalization`
-    private static func swiftUI(autocap: UITextAutocapitalizationType) -> TextInputAutocapitalization? {
-        switch autocap {
-        case .none: return .never
-        case .words: return .words
-        case .sentences: return .sentences
-        case .allCharacters: return .characters
-        @unknown default: return .sentences
-        }
     }
 
     private func run(_ action: FSAlertActionSpec) {
