@@ -339,14 +339,15 @@ private struct FSAlertDialog: View {
                 }
 
                 if spec.message.isEmpty == false {
-                    // 长内容（如「每日一温」）超长时内部滚动，不再被裁掉
-                    ViewThatFits(in: .vertical) {
+                    // 短内容由 fixedSize 贴合自然高度，超长才滚动（如「每日一温」）。
+                    // ⚠️ 别用 ViewThatFits：未入选的 ScrollView 照样参与尺寸计算，
+                    // 会把容器顶到上限、入选的 Text 被垂直居中 —— 就是「上面大片空白」。
+                    ScrollView(.vertical) {
                         messageText
-                        ScrollView(.vertical) {
-                            messageText
-                        }
                     }
                     .frame(maxHeight: maxTextHeight)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .scrollBounceBehavior(.basedOnSize)
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
