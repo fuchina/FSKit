@@ -340,6 +340,8 @@ public struct FSPushStack<Content: View>: View {
         .toolbar(router.path.isEmpty ? .visible : .hidden, for: .tabBar)
         .environment(\.fsNavRouter, router)
         .onAppear { FSStackRegistry.shared.register(router, at: tabIndex) }
+        // pop 时自动对「挂过 debugDealloc 的页面」启动泄漏检测（见 FSDeallocModifier.swift）
+        .fsLeakCheckOnPop(router.path)
     }
 }
 

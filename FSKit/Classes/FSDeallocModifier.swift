@@ -18,9 +18,19 @@ import SwiftUI
 public final class FSLeakDetector {
     @MainActor private static var timers: [String: DispatchWorkItem] = [:]
 
+    /// 挂过 `debugDealloc` 的页面名（进程内累计）；未登记的页面不检测，避免误报
+    @MainActor private static var registered: Set<String> = []
+
+    /// 由 `debugDealloc` 在 onAppear 时调用
+    @MainActor
+    public static func register(_ viewName: String) {
+        registered.insert(viewName)
+    }
+
     /// 启动泄漏检测：5 秒后若对应 tracker 仍未 deinit → 发送 FS_BE_LEAK_NOTIFICATION
     @MainActor
     public static func startCheck(for viewName: String) {
+        guard registered.contains(viewName) else { return }
         timers[viewName]?.cancel()
         let item = DispatchWorkItem {
             let msg = "疑似内存泄漏：\(viewName) 未释放"
@@ -77,10 +87,40 @@ private struct _FSDeallocViewModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         content.onAppear {
+            FSLeakDetector.register(viewName)
             if tracker == nil {
                 tracker = _FSDeallocTracker(viewName: viewName)
             }
         }
+    }
+}
+
+// MARK: - pop 时自动启动检测
+
+/// 挂在导航栈上：路径变短时，对刚被弹出的页面启动 5 秒泄漏检测。
+/// 只对登记过的（即挂过 `debugDealloc` 的）页面生效，其余静默跳过。
+struct FSLeakCheckOnPopModifier: ViewModifier {
+    let routes: [FSPageRoute]
+
+    func body(content: Content) -> some View {
+        content.onChange(of: routes) { old, new in
+            let kept = Set(new.map(\.uid))
+            let names = old.filter { !kept.contains($0.uid) }.map(\.name)
+            guard names.isEmpty == false else { return }
+            // onChange 在主线程回调；assumeIsolated 让编译器认可 MainActor 隔离
+            MainActor.assumeIsolated {
+                for name in names {
+                    FSLeakDetector.startCheck(for: name)
+                }
+            }
+        }
+    }
+}
+
+extension View {
+    /// 导航栈专用：栈路径变化时自动为被弹出的页面打点
+    func fsLeakCheckOnPop(_ routes: [FSPageRoute]) -> some View {
+        modifier(FSLeakCheckOnPopModifier(routes: routes))
     }
 }
 
