@@ -94,6 +94,8 @@ public struct FSAlertInputSpec: Identifiable {
     public var showsClearButton: Bool
     /// 自动大写（SwiftUI 原生类型，直接透传给 `.textInputAutocapitalization`)
     public var autocapitalization: TextInputAutocapitalization?
+    /// 关闭自动更正（拼音简写 / 代码类输入）
+    public var autocorrectionDisabled: Bool
     /// 点按钮时把当前文本回写（原 `UITextField` 语义，供调用方从 `textFields` 取值）
     public var commit: (String) -> Void
 
@@ -102,12 +104,14 @@ public struct FSAlertInputSpec: Identifiable {
                 text: String = "",
                 showsClearButton: Bool = false,
                 autocapitalization: TextInputAutocapitalization? = nil,
+                autocorrectionDisabled: Bool = false,
                 commit: @escaping (String) -> Void) {
         self.placeholder = placeholder
         self.keyboardType = keyboardType
         self.text = text
         self.showsClearButton = showsClearButton
         self.autocapitalization = autocapitalization
+        self.autocorrectionDisabled = autocorrectionDisabled
         self.commit = commit
     }
 }
@@ -380,6 +384,7 @@ private struct FSAlertDialog: View {
                                 .textFieldStyle(.plain)
                                 .keyboardType(input.keyboardType.uiKeyboardType)
                                 .textInputAutocapitalization(input.autocapitalization)
+                                .autocorrectionDisabled(input.autocorrectionDisabled)
                                 .font(.system(size: 17))
                                 .focused($focusedIndex, equals: index)
 
