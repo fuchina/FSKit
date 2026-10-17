@@ -47,16 +47,20 @@ public struct FSAlertInputSpec: Identifiable {
     public var keyboardType: UIKeyboardType
     /// 初始文本（原 `UITextField.text`，改造时漏掉的预填，如记账弹窗的备注）
     public var text: String
+    /// 有内容时右侧显示清除按钮（原 `UITextField.clearButtonMode`）
+    public var showsClearButton: Bool
     /// 点按钮时把当前文本回写（原 `UITextField` 语义，供调用方从 `textFields` 取值）
     public var commit: (String) -> Void
 
     public init(placeholder: String,
                 keyboardType: UIKeyboardType = .default,
                 text: String = "",
+                showsClearButton: Bool = false,
                 commit: @escaping (String) -> Void) {
         self.placeholder = placeholder
         self.keyboardType = keyboardType
         self.text = text
+        self.showsClearButton = showsClearButton
         self.commit = commit
     }
 }
@@ -252,8 +256,9 @@ private struct FSAlertDialog: View {
     /// 当前聚焦的输入框（有输入框时弹出来就聚焦第 0 个 ⇒ 键盘直接弹起、面板上移）
     @FocusState private var focusedIndex: Int?
 
-    /// 系统弹窗蓝（不受 App 全局 `.tint(.black)` 影响）
-    private let tintColor = Color(uiColor: .systemBlue)
+    /// 键盘上移量（只算第一次，之后不再变）
+    @State private var keyboardShift: CGFloat = 0
+    @State private var keyboardHandled = false
 
     var body: some View {
         ZStack {
@@ -268,14 +273,25 @@ private struct FSAlertDialog: View {
 
             panel
         }
-        // 2026-10-17：弹出即聚焦第一个输入框。
-        // 等 0.22s（淡入动画 0.18s）再聚焦，让「面板淡入」和「键盘顶起面板」两段动画分开走，
-        // 否则键盘会在面板还没落位时就开始位移，看起来是两个人一起抖。
-        // 键盘弹起时的上移由 SwiftUI 的键盘安全区避让完成，本身带系统动画。
+        // 键盘自己顶：忽略键盘安全区，面板不会随键盘高度变化反复位移（数字键盘 → 全键盘会再顶一次）
+        .ignoresSafeArea(.keyboard, edges: .bottom)
+        // 2026-10-17：弹出即聚焦第一个输入框（不再延迟，键盘立刻起）。
         .task(id: spec.id) {
             guard spec.inputs.isEmpty == false else { return }
-            try? await Task.sleep(nanoseconds: 220_000_000)
             focusedIndex = 0
+        }
+        // 只在**第一次**键盘出现时上移一次：位移量 = 键盘高一半（等于居中于键盘上方），
+        // 之后键盘换成更高的全键盘也不再动 —— 这是「聚焦第二个输入框别往上跑」的关键。
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillChangeFrameNotification)) { note in
+            guard keyboardHandled == false,
+                  let end = note.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect,
+                  end.height > 1 else { return }
+
+            keyboardHandled = true
+            let duration = (note.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double) ?? 0.25
+            withAnimation(.easeOut(duration: max(duration, 0.2))) {
+                keyboardShift = -end.height / 2
+            }
         }
     }
 
@@ -283,63 +299,79 @@ private struct FSAlertDialog: View {
 
     private var panel: some View {
         VStack(spacing: 0) {
-            VStack(spacing: 6) {
+            // 标题 / 说明：iOS 26 弹窗是左对齐、同字号（图里两行分别是两个科目）
+            VStack(alignment: .leading, spacing: 3) {
                 if spec.title.isEmpty == false {
                     Text(spec.title)
                         .font(.system(size: 17, weight: .semibold))
-                        .multilineTextAlignment(.center)
                 }
 
                 if spec.message.isEmpty == false {
                     Text(spec.message)
-                        .font(.system(size: 13))
-                        .multilineTextAlignment(.center)
-                }
-
-                ForEach(Array(spec.inputs.enumerated()), id: \.offset) { index, input in
-                    TextField(input.placeholder, text: binding(index))
-                        .textFieldStyle(.plain)
-                        .multilineTextAlignment(.center)
-                        .keyboardType(input.keyboardType)
-                        .font(.system(size: 14))
-                        .focused($focusedIndex, equals: index)
-                        .padding(.horizontal, 8)
-                        .frame(height: 45)
-                        .background(Color(uiColor: .tertiarySystemFill),
-                                    in: RoundedRectangle(cornerRadius: 6, style: .continuous))
+                        .font(.system(size: 17))
                 }
             }
-            .padding(.horizontal, 16)
-            .padding(.top, 20)
-            .padding(.bottom, 18)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .foregroundColor(.primary)
+            .padding(.horizontal, 20)
+            .padding(.top, 22)
+            .padding(.bottom, spec.inputs.isEmpty ? 0 : 18)
+
+            // 输入框：多个输入框合成一个圆角块，中间一条分隔线（图里的样式）
+            if spec.inputs.isEmpty == false {
+                VStack(spacing: 0) {
+                    ForEach(Array(spec.inputs.enumerated()), id: \.offset) { index, input in
+                        HStack(spacing: 8) {
+                            TextField(input.placeholder, text: binding(index))
+                                .textFieldStyle(.plain)
+                                .keyboardType(input.keyboardType)
+                                .font(.system(size: 17))
+                                .focused($focusedIndex, equals: index)
+
+                            if input.showsClearButton, binding(index).wrappedValue.isEmpty == false {
+                                Button {
+                                    binding(index).wrappedValue = ""
+                                } label: {
+                                    Image(systemName: "xmark.circle.fill")
+                                        .font(.system(size: 16))
+                                        .foregroundColor(Color(uiColor: .tertiaryLabel))
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+                        .padding(.horizontal, 16)
+                        .frame(height: 45)
+
+                        if index < spec.inputs.count - 1 {
+                            dividerH
+                        }
+                    }
+                }
+                .background(Color(uiColor: .secondarySystemFill).opacity(0.75),
+                            in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+                .padding(.horizontal, 16)
+            }
 
             buttons
         }
         .frame(width: 320)
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 28, style: .continuous))
+        .offset(y: keyboardShift)
     }
 
     // MARK: 按钮
 
+    /// 图里的样式：每个按钮是一个独立的圆角填充块（不是居中分隔线那一套）
     @ViewBuilder
     private var buttons: some View {
-        if spec.actions.count == 2 {
-            HStack(spacing: 0) {
-                actionButton(spec.actions[0])
-                dividerV
-                actionButton(spec.actions[1])
-            }
-            .overlay(alignment: .top) { dividerH }
-        } else {
-            VStack(spacing: 0) {
-                ForEach(Array(spec.actions.enumerated()), id: \.element.id) { index, action in
-                    if index > 0 {
-                        dividerH
-                    }
-                    actionButton(action)
-                }
+        VStack(spacing: 8) {
+            ForEach(spec.actions) { action in
+                actionButton(action)
             }
         }
+        .padding(.horizontal, 16)
+        .padding(.top, spec.inputs.isEmpty ? 18 : 14)
+        .padding(.bottom, 16)
     }
 
     private func actionButton(_ action: FSAlertActionSpec) -> some View {
@@ -347,11 +379,13 @@ private struct FSAlertDialog: View {
             run(action)
         } label: {
             Text(action.title)
-                .font(.system(size: 17, weight: action.style == .cancel ? .semibold : .regular))
+                .font(.system(size: 17, weight: .medium))
                 .foregroundColor(color(for: action.style))
                 .frame(maxWidth: .infinity)
-                .frame(height: 44)
-                .contentShape(Rectangle())
+                .frame(height: 48)
+                .background(Color(uiColor: .tertiarySystemFill).opacity(0.9),
+                            in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+                .contentShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
         }
         .buttonStyle(FSAlertButtonStyle())
     }
@@ -360,13 +394,6 @@ private struct FSAlertDialog: View {
         Rectangle()
             .fill(Color(uiColor: .separator))
             .frame(height: 0.5)
-    }
-
-    private var dividerV: some View {
-        Rectangle()
-            .fill(Color(uiColor: .separator))
-            .frame(width: 0.5)
-            .frame(height: 44)
     }
 
     // MARK: 行为
@@ -388,8 +415,9 @@ private struct FSAlertDialog: View {
         action.handler?()
     }
 
+    /// 图里默认按钮是黑字（iOS 26 的样式），只有 destructive 才是红字
     private func color(for style: UIAlertAction.Style) -> Color {
-        style == .destructive ? Color(uiColor: .systemRed) : tintColor
+        style == .destructive ? Color(uiColor: .systemRed) : Color.primary
     }
 }
 
