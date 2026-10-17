@@ -100,6 +100,30 @@ open class FSEntity: NSObject {
             return model
         }
     }
+    
+    /// 批量（**字符串字典**版）：给「后台线程取行、主线程建模」的场景用。
+    ///
+    /// 后台只能把 `[[String: String]]`（Sendable）传回来；走这里可以直接喂给 setter，
+    /// 不必再装箱回 `[String: Any]`。各 `keyMapper` 的 setter 本来就走 `FSSafe.*` 解析字符串。
+    /// ⚠️ 与 `fill` 的差异：**不保留 `meta`**（`fill` 会把整行塞进 `meta`，列表页用不到）。
+    static public func toms<T: FSEntity>(from dictionaries: [[String: String]]) -> [T] {
+        if dictionaries.isEmpty {
+            return []
+        }
+        
+        return dictionaries.map {
+            let model = T.init()
+            model.beforeSetProperties()
+            
+            let mapper = type(of: model).keyMapper()
+            for (key, value) in $0 {
+                mapper[key]?(model, value)
+            }
+            
+            model.afterSetProperties()
+            return model
+        }
+    }
         
     // 原泛型map方法 + 兼容类型转换扩展（核心修改：新增value转换逻辑）
         public static func map<T: FSEntity, V>(
