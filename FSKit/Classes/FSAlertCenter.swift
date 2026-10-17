@@ -258,9 +258,10 @@ private struct FSAlertDialog: View {
     /// 当前聚焦的输入框（有输入框时弹出来就聚焦第 0 个 ⇒ 键盘直接弹起、面板上移）
     @FocusState private var focusedIndex: Int?
 
-    /// 键盘上移量（只算第一次，之后不再变）
+    /// 第一段键盘的高度（用来判断后面键盘变高了多少）
+    @State private var baseKeyboardHeight: CGFloat = 0
+    /// 补偿量：抵消「键盘变高时系统又顶了一次」，正数 = 往下
     @State private var keyboardShift: CGFloat = 0
-    @State private var keyboardHandled = false
 
     var body: some View {
         ZStack {
@@ -275,24 +276,37 @@ private struct FSAlertDialog: View {
 
             panel
         }
-        // 键盘自己顶：忽略键盘安全区，面板不会随键盘高度变化反复位移（数字键盘 → 全键盘会再顶一次）
-        .ignoresSafeArea(.keyboard, edges: .bottom)
         // 2026-10-17：弹出即聚焦第一个输入框（不再延迟，键盘立刻起）。
         .task(id: spec.id) {
             guard spec.inputs.isEmpty == false else { return }
             focusedIndex = 0
         }
-        // 只在**第一次**键盘出现时上移一次：位移量 = 键盘高一半（等于居中于键盘上方），
-        // 之后键盘换成更高的全键盘也不再动 —— 这是「聚焦第二个输入框别往上跑」的关键。
+        // 上移**只交给系统**（SwiftUI 键盘避让，一次性、带系统动画）——
+        // 自己再算一次位移就会「先动一下、再动一下」。
+        // 这里只做补偿：第一个框是数字键盘、第二个框是全键盘，键高不同 ⇒ 切换焦点时系统会再顶一次，
+        // 用等量反向 offset（Δ/2）抵消掉，面板就钉在第一次的位置上。
         .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillChangeFrameNotification)) { note in
-            guard keyboardHandled == false,
-                  let end = note.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect,
-                  end.height > 1 else { return }
+            guard let end = note.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
 
-            keyboardHandled = true
+            // 键盘收起：补偿归零
+            guard end.height > 1 else {
+                baseKeyboardHeight = 0
+                withAnimation(nil) { keyboardShift = 0 }
+                return
+            }
+
+            // 第一次：系统自己把面板顶上去，不补偿
+            guard baseKeyboardHeight > 1 else {
+                baseKeyboardHeight = end.height
+                return
+            }
+
+            let delta = end.height - baseKeyboardHeight
+            guard abs(delta) > 0.5 else { return }
+
             let duration = (note.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double) ?? 0.25
             withAnimation(.easeOut(duration: max(duration, 0.2))) {
-                keyboardShift = -end.height / 2
+                keyboardShift += delta / 2
             }
         }
     }
