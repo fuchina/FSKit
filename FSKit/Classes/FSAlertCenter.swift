@@ -24,15 +24,33 @@
 import SwiftUI
 import UIKit
 
+/// 弹窗形态（原 `UIAlertController.Style`）
+///
+/// 2026-10-17：弹窗全程由 SwiftUI 自绘，UIKit 的这两个枚举只是被当值用，
+/// 换成自有枚举后调用点的 `.alert` / `.actionSheet` 字面量写法完全不变。
+public enum FSAlertStyle {
+    case alert
+    case actionSheet
+}
+
+/// 按钮样式（原 `UIAlertAction.Style`）
+///
+/// `.cancel` 在 actionSheet 里走系统的取消位；`.destructive` 显示红字。
+public enum FSAlertActionStyle {
+    case `default`
+    case cancel
+    case destructive
+}
+
 /// 一个弹窗按钮
 public struct FSAlertActionSpec: Identifiable {
 
     public let id = UUID()
     public var title: String
-    public var style: UIAlertAction.Style
+    public var style: FSAlertActionStyle
     public var handler: (() -> Void)?
 
-    public init(title: String, style: UIAlertAction.Style, handler: (() -> Void)?) {
+    public init(title: String, style: FSAlertActionStyle, handler: (() -> Void)?) {
         self.title = title
         self.style = style
         self.handler = handler
@@ -76,8 +94,8 @@ public struct FSAlertInputSpec: Identifiable {
 public struct FSAlertSpec: Identifiable, @unchecked Sendable {
 
     public let id = UUID()
-    /// true = alert；false = actionSheet（iPad 上由上游强制转 alert）
-    public var isAlert: Bool
+    /// alert 还是 actionSheet（iPad 上由上游强制转 alert）
+    public var style: FSAlertStyle
     public var title: String
     public var message: String
     public var actions: [FSAlertActionSpec]
@@ -88,14 +106,14 @@ public struct FSAlertSpec: Identifiable, @unchecked Sendable {
     /// 点遮罩时的附加条件：返回 false = 这次不关（有内容就不关，原 `handleAlertClick` 的语义）
     public var tapOutsideCanDismiss: (([String]) -> Bool)?
 
-    public init(isAlert: Bool,
+    public init(style: FSAlertStyle,
                 title: String,
                 message: String,
                 actions: [FSAlertActionSpec],
                 inputs: [FSAlertInputSpec] = [],
                 tapOutsideToDismiss: Bool = false,
                 tapOutsideCanDismiss: (([String]) -> Bool)? = nil) {
-        self.isAlert = isAlert
+        self.style = style
         self.title = title
         self.message = message
         self.actions = actions
@@ -125,22 +143,12 @@ public final class FSAlertCenter: ObservableObject, @unchecked Sendable {
     /// 输入框文本（与 `current?.inputs` 一一对应）
     @Published public var inputTexts: [String] = []
 
-    /// 当前弹窗的宿主容器（`UIAlertController` 数据容器）标识，供 `addTapEvent` 认领
-    private var containerID: ObjectIdentifier?
-
-    /// 点遮罩时调用方额外要做的动作（原 `addTapEvent` 的 clickDismiss 闭包）
-    private var tapOutsideHandler: ((CGPoint) -> Void)?
-
     private init() {}
 
-    /// - Parameter container: 本次弹窗的 `UIAlertController` 数据容器；
-    ///   调用方随后在 `completion` 里对它调 `addTapEvent` 时，靠它认领「这是哪条弹窗」。
-    public func show(_ spec: FSAlertSpec, container: AnyObject? = nil) {
+    public func show(_ spec: FSAlertSpec) {
         let apply: @MainActor () -> Void = { [weak self] in
             guard let self else { return }
             self.inputTexts = spec.inputs.map { $0.text }
-            self.containerID = container.map { ObjectIdentifier($0) }
-            self.tapOutsideHandler = nil
             self.current = spec
         }
         if Thread.isMainThread {
@@ -153,8 +161,6 @@ public final class FSAlertCenter: ObservableObject, @unchecked Sendable {
     public func dismiss() {
         let apply: @MainActor () -> Void = { [weak self] in
             guard let self else { return }
-            self.tapOutsideHandler = nil
-            self.containerID = nil
             self.current = nil
         }
         if Thread.isMainThread {
@@ -162,31 +168,6 @@ public final class FSAlertCenter: ObservableObject, @unchecked Sendable {
         } else {
             DispatchQueue.main.async { MainActor.assumeIsolated { apply() } }
         }
-    }
-
-    /// `UIAlertController.addTapEvent` 的新落点：只对「当前正在显示的那条弹窗」生效。
-    public func enableTapOutsideDismiss(for container: AnyObject,
-                                       handler: ((CGPoint) -> Void)?) {
-        let apply: @MainActor () -> Void = { [weak self] in
-            guard let self,
-                  let id = self.containerID,
-                  id == ObjectIdentifier(container) else { return }
-            self.tapOutsideHandler = handler
-            self.current?.tapOutsideToDismiss = true
-        }
-        if Thread.isMainThread {
-            MainActor.assumeIsolated { apply() }
-        } else {
-            DispatchQueue.main.async { MainActor.assumeIsolated { apply() } }
-        }
-    }
-
-    /// 点遮罩：先关弹窗，再跑调用方回调（老代码里回调本身就是 dismiss，此时已是空操作）。
-    /// 先关再回调，避免回调里又 show 一条新弹窗时被这里的 dismiss 顶掉。
-    public func dismissByOutsideTap(at point: CGPoint) {
-        let handler = tapOutsideHandler
-        dismiss()
-        handler?(point)
     }
 }
 
@@ -203,7 +184,7 @@ public struct FSAlertHost: View {
 
     public var body: some View {
         ZStack {
-            if let spec = center.current, spec.isAlert {
+            if let spec = center.current, spec.style == .alert {
                 FSAlertDialog(spec: spec, center: center)
                     // 换一条弹窗就重建（如「每日一温」的下一篇）：滚动位置归零、入场动画重播；
                     // 不重建则 ScrollView 沿用上一条的偏移，下一篇会直接停在底部。
@@ -216,7 +197,7 @@ public struct FSAlertHost: View {
             Color.clear
                 .frame(width: 0, height: 0)
                 .confirmationDialog(center.current?.title ?? "",
-                                    isPresented: Binding(get: { center.current?.isAlert == false },
+                                    isPresented: Binding(get: { center.current?.style == .actionSheet },
                                                          set: { if !$0 { center.dismiss() } }),
                                     presenting: center.current) { spec in
                     actionButtons(for: spec)
@@ -243,7 +224,7 @@ public struct FSAlertHost: View {
         }
     }
 
-    private func role(for style: UIAlertAction.Style) -> ButtonRole? {
+    private func role(for style: FSAlertActionStyle) -> ButtonRole? {
         switch style {
         case .destructive: return .destructive
         case .cancel: return .cancel
@@ -287,11 +268,11 @@ private struct FSAlertDialog: View {
             Color.black.opacity(0.2)
                 .ignoresSafeArea()
                 .contentShape(Rectangle())
-                .gesture(SpatialTapGesture().onEnded { value in
+                .gesture(SpatialTapGesture().onEnded { _ in
                     guard spec.tapOutsideToDismiss else { return }
                     // 有内容就不关（原 `UIAlertController.handleAlertClick` 的语义）
                     if let can = spec.tapOutsideCanDismiss, !can(center.inputTexts) { return }
-                    center.dismissByOutsideTap(at: value.location)
+                    center.dismiss()
                 })
 
             panel(maxTextHeight: max(150, hostHeight * 0.42))
@@ -489,7 +470,7 @@ private struct FSAlertDialog: View {
     }
 
     /// 图里默认按钮是黑字（iOS 26 的样式），只有 destructive 才是红字
-    private func color(for style: UIAlertAction.Style) -> Color {
+    private func color(for style: FSAlertActionStyle) -> Color {
         style == .destructive ? Color(uiColor: .systemRed) : Color.primary
     }
 }
