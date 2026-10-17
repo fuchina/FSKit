@@ -49,6 +49,8 @@ public struct FSAlertInputSpec: Identifiable {
     public var text: String
     /// 有内容时右侧显示清除按钮（原 `UITextField.clearButtonMode`）
     public var showsClearButton: Bool
+    /// 自动首字母大写（原 `UITextField.autocapitalizationType`）
+    public var autocapitalization: UITextAutocapitalizationType
     /// 点按钮时把当前文本回写（原 `UITextField` 语义，供调用方从 `textFields` 取值）
     public var commit: (String) -> Void
 
@@ -56,11 +58,13 @@ public struct FSAlertInputSpec: Identifiable {
                 keyboardType: UIKeyboardType = .default,
                 text: String = "",
                 showsClearButton: Bool = false,
+                autocapitalization: UITextAutocapitalizationType = .sentences,
                 commit: @escaping (String) -> Void) {
         self.placeholder = placeholder
         self.keyboardType = keyboardType
         self.text = text
         self.showsClearButton = showsClearButton
+        self.autocapitalization = autocapitalization
         self.commit = commit
     }
 }
@@ -81,19 +85,23 @@ public struct FSAlertSpec: Identifiable, @unchecked Sendable {
     public var inputs: [FSAlertInputSpec]
     /// 点遮罩是否关闭（原 `UIAlertController.addTapEvent` 的语义，默认不关）
     public var tapOutsideToDismiss: Bool
+    /// 点遮罩时的附加条件：返回 false = 这次不关（有内容就不关，原 `handleAlertClick` 的语义）
+    public var tapOutsideCanDismiss: (([String]) -> Bool)?
 
     public init(isAlert: Bool,
                 title: String,
                 message: String,
                 actions: [FSAlertActionSpec],
                 inputs: [FSAlertInputSpec] = [],
-                tapOutsideToDismiss: Bool = false) {
+                tapOutsideToDismiss: Bool = false,
+                tapOutsideCanDismiss: (([String]) -> Bool)? = nil) {
         self.isAlert = isAlert
         self.title = title
         self.message = message
         self.actions = actions
         self.inputs = inputs
         self.tapOutsideToDismiss = tapOutsideToDismiss
+        self.tapOutsideCanDismiss = tapOutsideCanDismiss
     }
 }
 
@@ -281,6 +289,8 @@ private struct FSAlertDialog: View {
                 .contentShape(Rectangle())
                 .gesture(SpatialTapGesture().onEnded { value in
                     guard spec.tapOutsideToDismiss else { return }
+                    // 有内容就不关（原 `UIAlertController.handleAlertClick` 的语义）
+                    if let can = spec.tapOutsideCanDismiss, !can(center.inputTexts) { return }
                     center.dismissByOutsideTap(at: value.location)
                 })
 
@@ -366,6 +376,7 @@ private struct FSAlertDialog: View {
                             TextField(input.placeholder, text: binding(index))
                                 .textFieldStyle(.plain)
                                 .keyboardType(input.keyboardType)
+                                .textInputAutocapitalization(Self.swiftUI(autocap: input.autocapitalization))
                                 .font(.system(size: 17))
                                 .focused($focusedIndex, equals: index)
 
@@ -454,6 +465,17 @@ private struct FSAlertDialog: View {
                 set: { newValue in
                     if index < center.inputTexts.count { center.inputTexts[index] = newValue }
                 })
+    }
+
+    /// `UITextField.autocapitalizationType` → SwiftUI 的 `TextInputAutocapitalization`
+    private static func swiftUI(autocap: UITextAutocapitalizationType) -> TextInputAutocapitalization? {
+        switch autocap {
+        case .none: return .never
+        case .words: return .words
+        case .sentences: return .sentences
+        case .allCharacters: return .characters
+        @unknown default: return .sentences
+        }
     }
 
     private func run(_ action: FSAlertActionSpec) {
