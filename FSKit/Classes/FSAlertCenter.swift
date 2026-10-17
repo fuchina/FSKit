@@ -265,25 +265,27 @@ private struct FSAlertDialog: View {
     @State private var keyboardShift: CGFloat = 0
     /// 入场缩放：首帧 0.94，随即弹到 1（原先只有 0.18s 纯淡入，太快且生硬）
     @State private var appeared = false
+    /// 覆盖层高度：只用来算「内容滚动上限」，**不参与布局**
+    @State private var hostHeight: CGFloat = 800
 
     var body: some View {
-        GeometryReader { geo in
-            ZStack {
-                // 遮罩：系统 alert 的压暗程度
-                Color.black.opacity(0.2)
-                    .ignoresSafeArea()
-                    .contentShape(Rectangle())
-                    .gesture(SpatialTapGesture().onEnded { value in
-                        guard spec.tapOutsideToDismiss else { return }
-                        center.dismissByOutsideTap(at: value.location)
-                    })
+        // 注意：这里**不能**套 GeometryReader —— 它会换掉布局上下文，
+        // 键盘弹出时面板不再跟着系统避让上移，输入类弹窗会被键盘盖住。
+        ZStack {
+            // 遮罩：系统 alert 的压暗程度
+            Color.black.opacity(0.2)
+                .ignoresSafeArea()
+                .contentShape(Rectangle())
+                .gesture(SpatialTapGesture().onEnded { value in
+                    guard spec.tapOutsideToDismiss else { return }
+                    center.dismissByOutsideTap(at: value.location)
+                })
 
-                // 内容可滚动的高度上限按屏幕算，小屏也不会顶出屏幕
-                panel(maxTextHeight: max(150, geo.size.height * 0.42))
-                    .scaleEffect(appeared ? 1 : 0.94)
-            }
-            .frame(width: geo.size.width, height: geo.size.height)
+            panel(maxTextHeight: max(150, hostHeight * 0.42))
+                .scaleEffect(appeared ? 1 : 0.94)
         }
+        // 只测量、不改布局（等价于背景里塞一个 GeometryReader，但不影响尺寸提议）
+        .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { hostHeight = $0 }
         // 入场：停一帧再开（否则首帧就被布局压成 1，缩放看不出来）；随后聚焦第一个输入框
         .task(id: spec.id) {
             try? await Task.sleep(for: .milliseconds(12))
