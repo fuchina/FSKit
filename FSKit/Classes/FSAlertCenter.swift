@@ -240,7 +240,7 @@ public struct FSAlertHost: View {
 
 /// 自绘 alert：遮罩 + 居中面板 + 输入框 + 按钮。
 ///
-/// 刻意对齐 `UIAlertController`：面板宽 270、圆角 14、按钮高 44、分隔线 0.5pt、
+/// 刻意对齐 `UIAlertController`：面板宽 320、圆角 14、按钮高 44、分隔线 0.5pt、
 /// 默认蓝字 / destructive 红字 / cancel 加粗，两个按钮横排、三个及以上竖排。
 /// 与系统唯一的行为差异是「点遮罩可以关闭」—— 但只在调用方显式登记过 `addTapEvent` 时生效，
 /// 其余弹窗点遮罩依旧什么都不发生（与原系统 alert 一致）。
@@ -248,6 +248,9 @@ private struct FSAlertDialog: View {
 
     let spec: FSAlertSpec
     @ObservedObject var center: FSAlertCenter
+
+    /// 当前聚焦的输入框（有输入框时弹出来就聚焦第 0 个 ⇒ 键盘直接弹起、面板上移）
+    @FocusState private var focusedIndex: Int?
 
     /// 系统弹窗蓝（不受 App 全局 `.tint(.black)` 影响）
     private let tintColor = Color(uiColor: .systemBlue)
@@ -264,6 +267,15 @@ private struct FSAlertDialog: View {
                 })
 
             panel
+        }
+        // 2026-10-17：弹出即聚焦第一个输入框。
+        // 等 0.22s（淡入动画 0.18s）再聚焦，让「面板淡入」和「键盘顶起面板」两段动画分开走，
+        // 否则键盘会在面板还没落位时就开始位移，看起来是两个人一起抖。
+        // 键盘弹起时的上移由 SwiftUI 的键盘安全区避让完成，本身带系统动画。
+        .task(id: spec.id) {
+            guard spec.inputs.isEmpty == false else { return }
+            try? await Task.sleep(nanoseconds: 220_000_000)
+            focusedIndex = 0
         }
     }
 
@@ -290,8 +302,9 @@ private struct FSAlertDialog: View {
                         .multilineTextAlignment(.center)
                         .keyboardType(input.keyboardType)
                         .font(.system(size: 14))
+                        .focused($focusedIndex, equals: index)
                         .padding(.horizontal, 8)
-                        .frame(height: 30)
+                        .frame(height: 45)
                         .background(Color(uiColor: .tertiarySystemFill),
                                     in: RoundedRectangle(cornerRadius: 6, style: .continuous))
                 }
@@ -302,7 +315,7 @@ private struct FSAlertDialog: View {
 
             buttons
         }
-        .frame(width: 270)
+        .frame(width: 320)
         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
     }
 
