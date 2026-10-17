@@ -817,7 +817,7 @@ public enum FSKit {
 
     
     // MARK: - Attributed String
-    // 富文本拼装已迁至 FSText.swift（FSTextSegment / FSTextRule / FSKit.attributed(_:)），
+    // 富文本拼装已迁至 FSText.swift（FSTextSegment / FSTextRule / FSKit.attr(...)），
     // 旧的 attributedString / middleLine / underLine 作为兼容层同步保留在那边。
     
     // MARK: - First Character

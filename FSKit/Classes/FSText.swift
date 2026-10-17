@@ -304,21 +304,3 @@ private extension FSKit {
         return segments
     }
 }
-
-// MARK: - 兼容层（P0 迁移完成后整段删除）
-
-/// 旧的 NSAttributedString 出口。保留只为让存量调用点先编过；
-/// 每迁完一个文件就把该文件的 `attributed(` 换成 `attr(`，全库清零后删掉本节。
-public extension FSKit {
-
-    static func attributed(_ segments: [FSTextSegment]) -> NSAttributedString {
-        attr(segments).fs_ns
-    }
-
-    static func attributed(_ text: String,
-                           font: UIFont? = nil,
-                           color: (any FSTextColorConvertible)? = nil,
-                           rules: [FSTextRule]) -> NSAttributedString {
-        attr(text, font: font, color: color, rules: rules).fs_ns
-    }
-}
