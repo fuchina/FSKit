@@ -215,7 +215,8 @@ public struct FSAlertHost: View {
                     }
                 }
         }
-        .animation(.easeOut(duration: 0.18), value: center.current?.id)
+        // 0.18s 太短 ⇒ 观感生硬；放长到 0.3s，面板内部再叠一层 0.94 → 1 的 spring 缩放
+        .animation(.easeOut(duration: 0.3), value: center.current?.id)
     }
 
     /// actionSheet 的按钮（系统渲染，TextField 不支持，与改造前一致）
@@ -262,22 +263,34 @@ private struct FSAlertDialog: View {
     @State private var baseKeyboardHeight: CGFloat = 0
     /// 补偿量：抵消「键盘变高时系统又顶了一次」，正数 = 往下
     @State private var keyboardShift: CGFloat = 0
+    /// 入场缩放：首帧 0.94，随即弹到 1（原先只有 0.18s 纯淡入，太快且生硬）
+    @State private var appeared = false
 
     var body: some View {
-        ZStack {
-            // 遮罩：系统 alert 的压暗程度
-            Color.black.opacity(0.2)
-                .ignoresSafeArea()
-                .contentShape(Rectangle())
-                .gesture(SpatialTapGesture().onEnded { value in
-                    guard spec.tapOutsideToDismiss else { return }
-                    center.dismissByOutsideTap(at: value.location)
-                })
+        GeometryReader { geo in
+            ZStack {
+                // 遮罩：系统 alert 的压暗程度
+                Color.black.opacity(0.2)
+                    .ignoresSafeArea()
+                    .contentShape(Rectangle())
+                    .gesture(SpatialTapGesture().onEnded { value in
+                        guard spec.tapOutsideToDismiss else { return }
+                        center.dismissByOutsideTap(at: value.location)
+                    })
 
-            panel
+                // 内容可滚动的高度上限按屏幕算，小屏也不会顶出屏幕
+                panel(maxTextHeight: max(150, geo.size.height * 0.42))
+                    .scaleEffect(appeared ? 1 : 0.94)
+            }
+            .frame(width: geo.size.width, height: geo.size.height)
         }
-        // 2026-10-17：弹出即聚焦第一个输入框（不再延迟，键盘立刻起）。
+        // 入场：停一帧再开（否则首帧就被布局压成 1，缩放看不出来）；随后聚焦第一个输入框
         .task(id: spec.id) {
+            try? await Task.sleep(for: .milliseconds(12))
+            withAnimation(.spring(response: 0.42, dampingFraction: 0.86)) {
+                appeared = true
+            }
+
             guard spec.inputs.isEmpty == false else { return }
             focusedIndex = 0
         }
@@ -313,22 +326,28 @@ private struct FSAlertDialog: View {
 
     // MARK: 面板
 
-    private var panel: some View {
+    private func panel(maxTextHeight: CGFloat) -> some View {
         VStack(spacing: 0) {
-            // 标题 / 说明：iOS 26 弹窗是左对齐、同字号（图里两行分别是两个科目）
-            VStack(alignment: .leading, spacing: 3) {
+            // 标题 / 说明：iOS 26 弹窗是左对齐；标题 17 半粗，说明降一档（15）+ 次要灰
+            VStack(alignment: .leading, spacing: 6) {
                 if spec.title.isEmpty == false {
                     Text(spec.title)
                         .font(.system(size: 17, weight: .semibold))
+                        .foregroundColor(.primary)
                 }
 
                 if spec.message.isEmpty == false {
-                    Text(spec.message)
-                        .font(.system(size: 17))
+                    // 长内容（如「每日一温」）超长时内部滚动，不再被裁掉
+                    ViewThatFits(in: .vertical) {
+                        messageText
+                        ScrollView(.vertical) {
+                            messageText
+                        }
+                    }
+                    .frame(maxHeight: maxTextHeight)
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .foregroundColor(.primary)
             .padding(.horizontal, 20)
             .padding(.top, 22)
             .padding(.bottom, spec.inputs.isEmpty ? 0 : 18)
@@ -373,6 +392,16 @@ private struct FSAlertDialog: View {
         .frame(width: 320)
         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 28, style: .continuous))
         .offset(y: keyboardShift)
+    }
+
+    /// 说明文字：有标题时比标题小一号 + 次要灰；没有标题时它就是主体，保持 17 号主色
+    private var messageText: some View {
+        Text(spec.message)
+            .font(.system(size: spec.title.isEmpty ? 17 : 15))
+            .foregroundColor(spec.title.isEmpty ? Color.primary : Color(uiColor: .secondaryLabel))
+            .lineSpacing(2)
+            .fixedSize(horizontal: false, vertical: true)
+            .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     // MARK: 按钮
