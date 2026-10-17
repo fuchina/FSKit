@@ -5,10 +5,12 @@
 //  富文本拼装：以「段」为单位，Swift 原生 AttributedString 实现
 //
 //  设计要点：
-//  1. 主入口是段数组 —— 调用方把文本切成若干段，每段自带 color / font，按顺序拼接；
-//  2. 实现走 Foundation 的 AttributedString（Swift 值类型）逐段 append，
-//     最后一次性桥接成 NSAttributedString，不再用 NSMutableAttributedString 逐条 addAttribute；
-//  3. 颜色参数既能收 UIColor，也能收 SwiftUI 的 Color（见 FSTextColorConvertible）。
+//  1. 对外一律产出 Foundation 的 `AttributedString`（值类型 / Sendable / 写时复制），
+//     需要喂 UIKit 时在**边界**显式写 `.fs_ns`，业务代码不再直接造 NSAttributedString；
+//  2. 属性 scope 只在本文件里选（UIKit scope 显式下标）。业务代码不得直接读写 AttributedString 属性，
+//     将来若要整体切 SwiftUI scope，只改本文件；
+//  3. 禁止自定义 `NSAttributedString.Key` —— 过桥时静默丢失；要自定义语义请新建 AttributedStringKey 类型；
+//  4. 颜色参数既能收 UIColor，也能收 SwiftUI 的 Color（见 FSTextColorConvertible）。
 //
 
 import UIKit
@@ -32,12 +34,31 @@ extension Color: FSTextColorConvertible {
     public var fs_color: UIColor { UIColor(self) }
 }
 
+// MARK: - UIKit 边界桥接
+
+public extension AttributedString {
+
+    /// 仅在 UIKit 边界使用（`UILabel.attributedText` / `UITextView` / `NSTextStorage`）。
+    /// 出现它的地方就是「还没 SwiftUI 化」的待办点。
+    var fs_ns: NSAttributedString { NSAttributedString(self) }
+}
+
+public extension Optional where Wrapped == AttributedString {
+
+    var fs_ns: NSAttributedString {
+        switch self {
+        case .some(let value): return NSAttributedString(value)
+        case .none: return NSAttributedString(string: "")
+        }
+    }
+}
+
 // MARK: - 段
 
 /// 一段文本及其样式，多个段按数组顺序拼接成最终富文本。
 ///
 /// ```swift
-/// FSKit.attributed([
+/// FSKit.attr([
 ///     FSTextSegment("原价 ", color: FSColor.textLight),
 ///     FSTextSegment("¥88", color: FSColor.red, font: .boldSystemFont(ofSize: 16), strikethrough: true),
 /// ])
@@ -53,6 +74,9 @@ public struct FSTextSegment {
     public var strikethrough: Bool
     /// 下划线
     public var underline: Bool
+    /// 逃生口：段结构装不下的属性（kern / paragraphStyle / baselineOffset / attachment 等）
+    /// 直接塞进 AttributeContainer，注意必须是 UIKit scope 的 key。
+    public var extra: AttributeContainer?
 
     /// - Parameter color: 可传 `UIColor`，也可直接传 SwiftUI 的 `Color`。
     ///   注意：写颜色字面量（如 `.red`）时会因重载而无法推断，请写成 `UIColor.red` / `Color.red`。
@@ -60,12 +84,14 @@ public struct FSTextSegment {
                 color: (any FSTextColorConvertible)? = nil,
                 font: UIFont? = nil,
                 strikethrough: Bool = false,
-                underline: Bool = false) {
+                underline: Bool = false,
+                extra: AttributeContainer? = nil) {
         self.text = text
         self.color = color?.fs_color
         self.font = font
         self.strikethrough = strikethrough
         self.underline = underline
+        self.extra = extra
     }
 }
 
@@ -94,22 +120,39 @@ public struct FSTextRule {
     }
 }
 
-// MARK: - 对外接口
+// MARK: - 对外接口（AttributedString 版）
 
 public extension FSKit {
+
+    // MARK: 单段
+
+    /// 单段富文本。这是绝大多数场景该用的入口 —— 给一段字上色 / 换字体 / 加删除线。
+    ///
+    /// 若只想要「不加任何属性」的富文本，用 `FSKit.attr(_:)`（见 FSKit.swift）或 `AttributedString(text)`。
+    static func attr(_ text: String,
+                     color: (any FSTextColorConvertible)?,
+                     font: UIFont? = nil,
+                     strikethrough: Bool = false,
+                     underline: Bool = false) -> AttributedString {
+        build(FSTextSegment(text,
+                            color: color,
+                            font: font,
+                            strikethrough: strikethrough,
+                            underline: underline))
+    }
+
+    /// 涨跌着色：`up == true` 红、否则绿（A 股 / 港股口径，唯一出处，别在业务里各写一份三目）。
+    static func attr(_ text: String, up: Bool, font: UIFont? = nil) -> AttributedString {
+        attr(text, color: up ? FSColor.red : FSColor.wechatGreen, font: font)
+    }
 
     // MARK: 段数组
 
     /// 按数组顺序拼接各段文本，逐段套用各自的 color / font / 删除线 / 下划线。
-    static func attributed(_ segments: [FSTextSegment]) -> NSAttributedString {
-        NSAttributedString(richString(segments))
-    }
-
-    /// 与 `attributed(_:)` 同源，直接产出 SwiftUI 的 `AttributedString`，可写作 `Text(FSKit.richString(...))`。
-    static func richString(_ segments: [FSTextSegment]) -> AttributedString {
+    static func attr(_ segments: [FSTextSegment]) -> AttributedString {
         var result = AttributedString()
         for segment in segments {
-            result.append(richString(segment))
+            result.append(build(segment))
         }
         return result
     }
@@ -118,15 +161,14 @@ public extension FSKit {
 
     /// 在整段文本中高亮命中的关键词；未命中的部分使用 `font` / `color`。
     /// - Parameter rules: 多个规则命中同一区间时，**数组中靠后的规则覆盖靠前的**。
-    static func attributed(_ text: String,
-                           font: UIFont? = nil,
-                           color: (any FSTextColorConvertible)? = nil,
-                           rules: [FSTextRule]) -> NSAttributedString {
-        NSAttributedString(richString(text, font: font, color: color, rules: rules))
+    static func attr(_ text: String,
+                     font: UIFont? = nil,
+                     color: (any FSTextColorConvertible)? = nil,
+                     rules: [FSTextRule]) -> AttributedString {
+        attr(runs(in: text, baseFont: font, baseColor: color?.fs_color, rules: rules))
     }
 
     /// 由「关键词列表」构造高亮规则：`colorStrings` 中的词着色、`fontStrings` 中的词换字体。
-    /// 规则构造与旧接口 `attributedString(for:colorStrings:color:fontStrings:font:)` 逐行一致。
     static func keywordRules(colorStrings: [String],
                              color: Color,
                              fontStrings: [String]? = nil,
@@ -134,17 +176,9 @@ public extension FSKit {
         var rules = colorStrings.map { FSTextRule($0, color: color, allMatches: false) }
         if let fontStrings = fontStrings {
             let resolvedFont = font ?? UIFont.systemFont(ofSize: 14)
-            rules += fontStrings.map { FSTextRule($0, font: resolvedFont, allMatches: false) }
+            rules += fontStrings.map { FSTextRule($0, font: resolvedFont) }
         }
         return rules
-    }
-
-    /// 关键词高亮的 SwiftUI 版本。
-    static func richString(_ text: String,
-                           font: UIFont? = nil,
-                           color: (any FSTextColorConvertible)? = nil,
-                           rules: [FSTextRule]) -> AttributedString {
-        richString(runs(in: text, baseFont: font, baseColor: color?.fs_color, rules: rules))
     }
 
     // MARK: 便捷
@@ -152,15 +186,15 @@ public extension FSKit {
     /// 删除线文本
     static func strikethrough(_ text: String,
                               font: UIFont? = nil,
-                              color: (any FSTextColorConvertible)? = nil) -> NSAttributedString {
-        attributed([FSTextSegment(text, color: color, font: font, strikethrough: true)])
+                              color: (any FSTextColorConvertible)? = nil) -> AttributedString {
+        attr([FSTextSegment(text, color: color, font: font, strikethrough: true)])
     }
 
     /// 下划线文本
     static func underline(_ text: String,
                           font: UIFont? = nil,
-                          color: (any FSTextColorConvertible)? = nil) -> NSAttributedString {
-        attributed([FSTextSegment(text, color: color, font: font, underline: true)])
+                          color: (any FSTextColorConvertible)? = nil) -> AttributedString {
+        attr([FSTextSegment(text, color: color, font: font, underline: true)])
     }
 }
 
@@ -169,7 +203,7 @@ public extension FSKit {
 private extension FSKit {
 
     /// 单段 → AttributedString。用显式的 attribute scope 下标，避免 UIKit / SwiftUI 两个 scope 的同名属性歧义。
-    static func richString(_ segment: FSTextSegment) -> AttributedString {
+    static func build(_ segment: FSTextSegment) -> AttributedString {
         var piece = AttributedString(segment.text)
         if let color = segment.color {
             piece[AttributeScopes.UIKitAttributes.ForegroundColorAttribute.self] = color
@@ -182,6 +216,9 @@ private extension FSKit {
         }
         if segment.underline {
             piece[AttributeScopes.UIKitAttributes.UnderlineStyleAttribute.self] = .single
+        }
+        if let extra = segment.extra {
+            piece.mergeAttributes(extra)
         }
         return piece
     }
@@ -255,46 +292,20 @@ private extension FSKit {
     }
 }
 
-// MARK: - 兼容层（下游迁移完成后可整段删除）
+// MARK: - 兼容层（P0 迁移完成后整段删除）
 
+/// 旧的 NSAttributedString 出口。保留只为让存量调用点先编过；
+/// 每迁完一个文件就把该文件的 `attributed(` 换成 `attr(`，全库清零后删掉本节。
 public extension FSKit {
 
-    @available(*, deprecated, message: "改用 attributed(_ segments:)，颜色与字体由 FSTextSegment 描述")
-    static func attributedString(for sourceString: String,
-                                 colorRanges: [NSRange],
-                                 color: UIColor,
-                                 textRanges: [NSRange],
-                                 font: UIFont) -> NSAttributedString {
-        let hits = colorRanges.map { (range: $0, color: Optional(color), font: Optional<UIFont>.none) }
-            + textRanges.map { (range: $0, color: Optional<UIColor>.none, font: Optional(font)) }
-        let segments = Self.segments(in: sourceString as NSString,
-                                     baseFont: nil,
-                                     baseColor: nil,
-                                     hits: hits)
-        return NSAttributedString(Self.richString(segments))
+    static func attributed(_ segments: [FSTextSegment]) -> NSAttributedString {
+        attr(segments).fs_ns
     }
 
-    @available(*, deprecated, message: "改用 attributed(_:font:color:rules:)，关键词由 FSTextRule 描述")
-    static func attributedString(for sourceString: String,
-                                 colorStrings: [String],
-                                 color: Color,
-                                 fontStrings: [String]?,
-                                 font: UIFont?) -> NSAttributedString {
-        var rules = colorStrings.map { FSTextRule($0, color: color, allMatches: false) }
-        if let fontStrings = fontStrings {
-            let resolvedFont = font ?? UIFont.systemFont(ofSize: 14)
-            rules += fontStrings.map { FSTextRule($0, font: resolvedFont, allMatches: false) }
-        }
-        return attributed(sourceString, font: nil, color: nil, rules: rules)
-    }
-
-    @available(*, deprecated, message: "已改为静态方法，请用 strikethrough(_:font:color:)")
-    func middleLine(forLabel text: String) -> NSAttributedString {
-        FSKit.strikethrough(text)
-    }
-
-    @available(*, deprecated, message: "已改为静态方法，请用 underline(_:font:color:)")
-    func underLine(forLabel text: String) -> NSAttributedString {
-        FSKit.underline(text)
+    static func attributed(_ text: String,
+                           font: UIFont? = nil,
+                           color: (any FSTextColorConvertible)? = nil,
+                           rules: [FSTextRule]) -> NSAttributedString {
+        attr(text, font: font, color: color, rules: rules).fs_ns
     }
 }
