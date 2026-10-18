@@ -103,6 +103,14 @@ public struct FSDatePickerOverlay: View {
     /// 面板高：40(蓝条) + 200(滚轮) + 34(底部安全区补偿)
     private static let panelHeight: CGFloat = 274
 
+    /// 收起时向下的偏移量。
+    ///
+    /// **不能只偏移 `panelHeight`**：面板底部对齐的是「安全区底线」而不是屏幕底，
+    /// 偏移一个面板高之后，面板上边缘正好压在这条线上 —— 底部安全区那段
+    /// （iPhone 约 34pt）会把面板顶部露出来，App 一启动就能看到（2026-10-19 踩坑）。
+    /// 多给 60 覆盖所有机型的底部安全区（手机 34 / iPad 20 / 横屏 21），保证完全滑出屏幕。
+    private static let hiddenOffset: CGFloat = panelHeight + 60
+
     private var isPresented: Bool { center.current != nil }
 
     public var body: some View {
@@ -115,7 +123,7 @@ public struct FSDatePickerOverlay: View {
                 .onTapGesture { cancel() }
 
             DatePickerPanel(date: draftBinding, onCancel: cancel, onConfirm: confirm)
-                .offset(y: isPresented ? 0 : Self.panelHeight)
+                .offset(y: isPresented ? 0 : Self.hiddenOffset)
                 .allowsHitTesting(isPresented)
                 .accessibilityHidden(!isPresented)
         }
