@@ -81,9 +81,18 @@ public final class FSToastCenter: ObservableObject, @unchecked Sendable {
 /// 外观逐值对齐原 `FSToast.toast(_:duration:to:)`：
 /// 底色 rgba(73,80,86,0.9)、圆角 3、白字 14、最小高 40、水平内边距 10、
 /// 最大宽 `WIDTHFC - 30 - 20`、居中、0.1s 淡入 / 0.25s 淡出。
+///
+/// 2026-10-18 宽度自适应：宽度上限 `frame(maxWidth:)` 从 `Text` 内侧挪到 `background` 外侧。
+/// 之前挂在 `Text` 上，`Text` 收到的提议被夹到上限值后，`frame` 自身就撑满上限，
+/// 背景跟着变成固定宽度——短文案也是一条大长块。挪到最外层后，`Text` 只被「提议」宽度，
+/// 实际尺寸仍是内容宽（`Text` 长度不足时 tight-fit），背景也只有内容那么宽；
+/// 只有超长文案才会吃到上限宽度并自动换行（`multilineTextAlignment(.center)` + 垂直 `fixedSize`）。
 public struct FSToastOverlay: View {
 
     @ObservedObject private var center = FSToastCenter.shared
+
+    /// 宽度上限（沿用原来的 `WIDTHFC - 50`）
+    private var maxWidth: CGFloat { WIDTHFC - 50 }
 
     public init() {}
 
@@ -95,10 +104,10 @@ public struct FSToastOverlay: View {
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 10)
                 .frame(minHeight: 40)
-                .frame(maxWidth: WIDTHFC - 50)
                 .fixedSize(horizontal: false, vertical: true)
                 .background(Color(red: 73.0 / 255, green: 80.0 / 255, blue: 86.0 / 255).opacity(0.9))
                 .clipShape(RoundedRectangle(cornerRadius: 3, style: .continuous))
+                .frame(maxWidth: maxWidth)
                 .allowsHitTesting(false)
         }
     }
