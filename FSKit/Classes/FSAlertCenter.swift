@@ -232,8 +232,10 @@ public struct FSAlertHost: View {
                     }
                 }
         }
-        // 0.18s 太短 ⇒ 观感生硬；放长到 0.3s，面板内部再叠一层 0.94 → 1 的 spring 缩放
-        .animation(.easeOut(duration: 0.3), value: center.current?.id)
+        // 2026-10-18：曲线对齐系统 —— 系统 alert 的入场/退场是同一个 CASpringAnimation
+        // （damping 45.71 / stiffness 522.35 / mass 1 / v0 0，等效 ζ=1.0，不过冲），
+        // 面板本身**没有缩放**，只有 opacity。原来的 .easeOut(0.3) + 0.94 放大是手调的，观感偏生硬。
+        .animation(.interpolatingSpring(stiffness: 522.35, damping: 45.71), value: center.current?.id)
     }
 
     /// actionSheet 的按钮（系统渲染，TextField 不支持，与改造前一致）
@@ -262,10 +264,16 @@ public struct FSAlertHost: View {
 
 /// 自绘 alert：遮罩 + 居中面板 + 输入框 + 按钮。
 ///
-/// 2026-10-17 按 F 给的 iOS 26 截图复刻：
-/// 面板宽 320、圆角 28、`.regularMaterial` 玻璃底；标题/说明**左对齐**、17pt；
-/// 多个输入框合成**一个**圆角块（行高 45、中间 0.5pt 分隔线、有内容时右侧清除按钮）；
-/// 按钮是**独立圆角填充块**（高 48、圆角 14、间距 8、黑字，destructive 红字）。
+/// 2026-10-18 按**实测数据**重排（探针 App 在 iPhone 17 Pro / iOS 26.5 上逐帧采样系统 alert）：
+/// - 面板 320 宽、**圆角 34**；背景 `thinMaterial` + 5% 黑（实测亮度 208，系统 201）；
+///   内侧一圈 12pt 柔和高光模拟 Liquid Glass 的边缘折射（系统有，材质 API 给不了）。
+/// - 标题左对齐 17pt / 说明 15pt，左右边距 **16**；说明到输入块 16。
+/// - 输入块行高 **48**、圆角 16、白 60% 底（实测 236）。
+/// - 按钮 **两个时横排**（各 140×48、间距 8、圆角 24 胶囊，实测坐标 57/205），
+///   三个及以上竖排；高 48、黑字、destructive 红字。
+/// - 垂直位置不用管：`ZStack` 本身就在**安全区内**居中，实测系统 y=319、自绘 320。
+/// - 入场/退场交给外层 `.transition(.opacity)` + 同一条 spring，**不做缩放**（系统 transform 恒 1.0）。
+///
 /// 与系统唯一的行为差异是「点遮罩可以关闭」—— 但只在调用方显式登记过 `addTapEvent` 时生效，
 /// 其余弹窗点遮罩依旧什么都不发生（与原系统 alert 一致）。
 private struct FSAlertDialog: View {
@@ -273,17 +281,22 @@ private struct FSAlertDialog: View {
     let spec: FSAlertSpec
     @ObservedObject var center: FSAlertCenter
 
+    /// 深浅色要分开取值：实测的 rgb(236) 是**浅色**下的输入块，深色下同样用白 60% 会变成刺眼的白块
+    @Environment(\.colorScheme) private var colorScheme
+
     /// 当前聚焦的输入框（有输入框时弹出来就聚焦第 0 个 ⇒ 键盘直接弹起、面板上移）
     @FocusState private var focusedIndex: Int?
 
-    /// 第一段键盘的高度（用来判断后面键盘变高了多少）
-    @State private var baseKeyboardHeight: CGFloat = 0
-    /// 补偿量：抵消「键盘变高时系统又顶了一次」，正数 = 往下
-    @State private var keyboardShift: CGFloat = 0
-    /// 入场缩放：首帧 0.94，随即弹到 1（原先只有 0.18s 纯淡入，太快且生硬）
-    @State private var appeared = false
+    /// 键盘弹出后的一次性上移量（负数 = 往上）。**算出一次就锁死**，之后键盘再怎么变都不动。
+    @State private var keyboardLift: CGFloat = 0
+    /// 是否已经算过位置
+    @State private var liftDone = false
     /// 覆盖层高度：只用来算「内容滚动上限」，**不参与布局**
     @State private var hostHeight: CGFloat = 800
+
+    /// 实测值：系统 iPhone 竖屏 alert 面板 320 宽、圆角 34
+    private let panelWidth: CGFloat = 320
+    private let panelShape = RoundedRectangle(cornerRadius: 34, style: .continuous)
 
     var body: some View {
         // 注意：这里**不能**套 GeometryReader —— 它会换掉布局上下文，
@@ -301,46 +314,38 @@ private struct FSAlertDialog: View {
                 })
 
             panel(maxTextHeight: max(150, hostHeight * 0.42))
-                .scaleEffect(appeared ? 1 : 0.94)
+                .offset(y: keyboardLift)
         }
+        // 2026-10-18：**关掉系统的键盘避让**。原来的做法是让系统避让、再用 `+= delta/2`
+        // 去补偿，但切换输入框时键盘高度一变（数字键盘 ↔ 全键盘），系统会重新居中，
+        // 补偿量又是累加的 ⇒ 面板跟着上下跳。
+        // 现在位置由我们自己定：键盘第一次弹出时上移一次 `(键盘高 - 底部安全区) / 2`
+        // （实测系统避让量正是这个值：308 / 34 → 137），之后**再也不动**。
+        .ignoresSafeArea(.keyboard)
         // 只测量、不改布局（等价于背景里塞一个 GeometryReader，但不影响尺寸提议）
         .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { hostHeight = $0 }
-        // 入场：停一帧再开（否则首帧就被布局压成 1，缩放看不出来）；随后聚焦第一个输入框
+        // 入场动画由外层的 `.transition(.opacity)` + spring 统一驱动（系统面板不做缩放），
+        // 这里只负责在出现后把焦点交给第一个输入框，让键盘自己弹起来。
         .task(id: spec.id) {
             try? await Task.sleep(for: .milliseconds(12))
-            withAnimation(.spring(response: 0.42, dampingFraction: 0.86)) {
-                appeared = true
-            }
-
             guard spec.inputs.isEmpty == false else { return }
             focusedIndex = 0
         }
-        // 上移**只交给系统**（SwiftUI 键盘避让，一次性、带系统动画）——
-        // 自己再算一次位移就会「先动一下、再动一下」。
-        // 这里只做补偿：第一个框是数字键盘、第二个框是全键盘，键高不同 ⇒ 切换焦点时系统会再顶一次，
-        // 用等量反向 offset（Δ/2）抵消掉，面板就钉在第一次的位置上。
+        // 键盘第一次弹出时算一次位置，然后**锁死**：
+        // 之后切到哪个输入框、键盘变高变矮（数字键盘 ↔ 全键盘）面板都纹丝不动。
         .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillChangeFrameNotification)) { note in
             guard let end = note.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
+            guard end.height > 1 else { return }        // 收起：保持当前位置，不回弹
+            guard liftDone == false else { return }     // 只认第一次
+            liftDone = true
 
-            // 键盘收起：补偿归零
-            guard end.height > 1 else {
-                baseKeyboardHeight = 0
-                withAnimation(nil) { keyboardShift = 0 }
-                return
-            }
-
-            // 第一次：系统自己把面板顶上去，不补偿
-            guard baseKeyboardHeight > 1 else {
-                baseKeyboardHeight = end.height
-                return
-            }
-
-            let delta = end.height - baseKeyboardHeight
-            guard abs(delta) > 0.5 else { return }
+            let safeBottom = (UIApplication.shared.connectedScenes
+                .compactMap { ($0 as? UIWindowScene)?.keyWindow }
+                .first?.safeAreaInsets.bottom) ?? 0
 
             let duration = (note.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double) ?? 0.25
             withAnimation(.easeOut(duration: max(duration, 0.2))) {
-                keyboardShift += delta / 2
+                keyboardLift = -(end.height - safeBottom) / 2
             }
         }
     }
@@ -370,11 +375,11 @@ private struct FSAlertDialog: View {
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, 20)
+            .padding(.horizontal, 16)
             .padding(.top, 22)
-            .padding(.bottom, spec.inputs.isEmpty ? 0 : 18)
+            .padding(.bottom, spec.inputs.isEmpty ? 0 : 16)
 
-            // 输入框：多个输入框合成一个圆角块，中间一条分隔线（图里的样式）
+            // 输入框：多个输入框合成一个圆角块，中间一条分隔线（实测行高 48、圆角 16）
             if spec.inputs.isEmpty == false {
                 VStack(spacing: 0) {
                     ForEach(Array(spec.inputs.enumerated()), id: \.offset) { index, input in
@@ -399,15 +404,16 @@ private struct FSAlertDialog: View {
                             }
                         }
                         .padding(.horizontal, 16)
-                        .frame(height: 45)
+                        .frame(height: 48)
 
                         if index < spec.inputs.count - 1 {
                             dividerH
                         }
                     }
                 }
-                .background(Color(uiColor: .secondarySystemFill).opacity(0.75),
-                            in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+                // 实测系统输入块底色 rgb(236)：白 60% ≈ 236（原来的 secondarySystemFill 只有 ~191，偏暗）
+                .background(Color.white.opacity(colorScheme == .dark ? 0.10 : 0.60),
+                            in: RoundedRectangle(cornerRadius: 16, style: .continuous))
                 .padding(.horizontal, 16)
             }
 
@@ -419,9 +425,30 @@ private struct FSAlertDialog: View {
                 Color.clear.frame(height: 16)
             }
         }
-        .frame(width: 320)
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 28, style: .continuous))
-        .offset(y: keyboardShift)
+        .frame(width: panelWidth)
+        // 实测亮度：系统 201，thinMaterial 213 + 5% 黑 ≈ 203，是目前最快能对上的组合。
+        // 深色模式不再压黑（系统深色面板本身就暗，再压会糊成一片）。
+        .background {
+            panelShape
+                .fill(.thinMaterial)
+                .overlay(panelShape.fill(Color.black.opacity(colorScheme == .dark ? 0 : 0.05)))
+        }
+        .overlay(edgeHighlight)
+    }
+
+    /// Liquid Glass 的边缘折射：系统面板内侧有一圈约 19pt 的高光带（rgb 228 对面板 201）。
+    /// 材质 API 给不了真正的折射，用「宽而淡的内发光 + 细亮描边」近似。
+    private var edgeHighlight: some View {
+        ZStack {
+            panelShape
+                .strokeBorder(Color.white.opacity(0.20), lineWidth: 12)
+                .blur(radius: 8)
+            panelShape
+                .strokeBorder(Color.white.opacity(0.40), lineWidth: 1.2)
+                .blur(radius: 1.5)
+        }
+        .clipShape(panelShape)
+        .allowsHitTesting(false)
     }
 
     /// 说明文字：有标题时比标题小一号 + 次要灰；没有标题时它就是主体，保持 17 号主色
@@ -436,16 +463,37 @@ private struct FSAlertDialog: View {
 
     // MARK: 按钮
 
-    /// 图里的样式：每个按钮是一个独立的圆角填充块（不是居中分隔线那一套）
+    /// 系统的排布规则：**两个按钮并排**（各 140 × 48、间距 8、左右边距 16），
+    /// 三个及以上才转竖排。`.cancel` 在并排时固定占左位（系统把它当「次要动作」放左边）。
+    private var orderedActions: [FSAlertActionSpec] {
+        var items = spec.actions
+        if items.count == 2,
+           items[0].style != .cancel,
+           items[1].style == .cancel {
+            items.swapAt(0, 1)
+        }
+        return items
+    }
+
     @ViewBuilder
     private var buttons: some View {
-        VStack(spacing: 8) {
-            ForEach(spec.actions) { action in
-                actionButton(action)
+        Group {
+            if spec.actions.count == 2 {
+                HStack(spacing: 8) {
+                    ForEach(orderedActions) { action in
+                        actionButton(action)
+                    }
+                }
+            } else {
+                VStack(spacing: 8) {
+                    ForEach(orderedActions) { action in
+                        actionButton(action)
+                    }
+                }
             }
         }
         .padding(.horizontal, 16)
-        .padding(.top, spec.inputs.isEmpty ? 18 : 14)
+        .padding(.top, spec.inputs.isEmpty ? 18 : 20)
         .padding(.bottom, 16)
     }
 
@@ -454,13 +502,21 @@ private struct FSAlertDialog: View {
             run(action)
         } label: {
             Text(action.title)
-                .font(.system(size: 17, weight: .medium))
+                .font(.system(size: 17))
                 .foregroundColor(color(for: action.style))
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
                 .frame(maxWidth: .infinity)
                 .frame(height: 48)
-                .background(Color(uiColor: .tertiarySystemFill).opacity(0.9),
-                            in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-                .contentShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                // 按钮改成**比面板暗的灰**（用户 2026-10-18 要求：白色块太抢、和面板拉不开）。
+                // 浅色 black 8% ⇒ 实测 rgb(188)，对面板 208；深色仍用白 10%（深色下按钮该略亮）。
+                .background {
+                    RoundedRectangle(cornerRadius: 24, style: .continuous)
+                        .fill(colorScheme == .dark ? Color.white.opacity(0.10) : Color.black.opacity(0.08))
+                        .overlay(RoundedRectangle(cornerRadius: 24, style: .continuous)
+                            .strokeBorder(Color.white.opacity(0.18), lineWidth: 0.5))
+                }
+                .contentShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
         }
         .buttonStyle(FSAlertButtonStyle())
     }
