@@ -36,12 +36,6 @@ public nonisolated class FSDBMaster {
     nonisolated(unsafe) private static var currentMaster: FSDBMaster?
     private static let initQueue = DispatchQueue(label: "swiftdbmaster.sync")
 
-    // MARK: - 临时打点（持仓页卡顿排查，验证完整段删除）
-    /// 累计读出次数 / 写库次数 / 读累计耗时(ms)，只由 FSJZBus 的 FSHP 消费。
-    nonisolated(unsafe) public static var fsSQLReads = 0
-    nonisolated(unsafe) public static var fsSQLWrites = 0
-    nonisolated(unsafe) public static var fsSQLMs = 0.0
-    
     // MARK: - 初始化
     deinit {
         
@@ -262,7 +256,6 @@ public nonisolated class FSDBMaster {
     /// 更新数据（使用字段-值字典和条件）
     @discardableResult
     public func updateTable(_ table: String?, fieldsValues: [String: Any]?, where whereClause: String) -> String {
-        FSDBMaster.fsSQLWrites += 1
         guard let table = table, !table.isEmpty else { return "updateTable table 参数不对" }
         guard let fvs = fieldsValues, !fvs.isEmpty else { return "updateTable fvs 参数不对" }
         
@@ -295,13 +288,7 @@ public nonisolated class FSDBMaster {
      【SELECT * FROM %@ WHERE atype = ? OR btype = ? and time BETWEEN 1483228800 AND 1514764799 order by time DESC limit 0,10;】
      */
     public func querySQL(_ sql: String?, tableName: String?) -> [[String: Any]] {
-       
-        let fsT0 = CFAbsoluteTimeGetCurrent()
-        defer {
-            FSDBMaster.fsSQLReads += 1
-            FSDBMaster.fsSQLMs += (CFAbsoluteTimeGetCurrent() - fsT0) * 1000
-        }
-        
+
         guard let sql = sql, !sql.isEmpty else {
             return []
         }
