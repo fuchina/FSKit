@@ -250,7 +250,11 @@ public struct FSAlertHost: View {
                     // 换一条弹窗就重建（如「每日一温」的下一篇）：滚动位置归零、入场动画重播；
                     // 不重建则 ScrollView 沿用上一条的偏移，下一篇会直接停在底部。
                     .id(spec.id)
-                    .transition(.opacity)
+                    // 2026-10-18 用户：「是有个渐显动画吗？如果有的话，去掉渐显」。
+                    // 入场**不做透明度过渡**（`.identity`）——面板直接以满不透明度出现，
+                    // 只靠自身缩放收口，这样"从稍大缩回正常"才看得清；淡入会把缩放糊掉。
+                    // 退场保留 `.opacity`：那一刻要的是"化开"，不是"闪没"。
+                    .transition(.asymmetric(insertion: .identity, removal: .opacity))
                     .zIndex(1)
             }
 
@@ -307,6 +311,8 @@ public struct FSAlertHost: View {
 /// - 按钮 **两个时横排**（各 140×48、间距 8、圆角 24 胶囊，实测坐标 57/205），
 ///   三个及以上竖排；高 48、黑字、destructive 红字。
 /// - 垂直位置不用管：`ZStack` 本身就在**安全区内**居中，实测系统 y=319、自绘 320。
+/// - 入场**不做透明度过渡**：面板以满不透明度直接出现，只靠缩放收口（淡入会把缩放糊掉）。
+///   遮罩是唯一例外，留 0.15s 压暗，避免整屏硬闪。
 /// - 入场分两种（见 `FSAlertCenter.presentAnimation(for:)` 与 `entranceStart`）：
 ///   **输入框模式** 0.96 → 1.0 + 高刚度快曲线（劲道来自键盘那 137pt 上移）；
 ///   **纯文字模式** 1.05 → 1.0 + 系统原始曲线（从稍大缩回正常，慢一点才看得出动作）。
@@ -336,6 +342,11 @@ private struct FSAlertDialog: View {
     /// 不放在 `transition` 上：那会把全屏遮罩一起缩放，边缘会露出底下一层。
     @State private var entrance: CGFloat = 0
 
+    /// 遮罩压暗进度 0 → 1。
+    /// 面板本身已经不渐显了，但**整屏遮罩必须留一点过渡**：0.2 的黑如果一帧砸下来，
+    /// 整块屏幕会"闪"一下，比淡入更难看。
+    @State private var scrimAlpha: CGFloat = 0
+
     /// 实测值：系统 iPhone 竖屏 alert 面板 320 宽、圆角 34
     private let panelWidth: CGFloat = 320
     private let panelShape = RoundedRectangle(cornerRadius: 34, style: .continuous)
@@ -353,8 +364,10 @@ private struct FSAlertDialog: View {
         // 注意：这里**不能**套 GeometryReader —— 它会换掉布局上下文，
         // 键盘弹出时面板不再跟着系统避让上移，输入类弹窗会被键盘盖住。
         ZStack {
-            // 遮罩：系统 alert 的压暗程度
+            // 遮罩：系统 alert 的压暗程度。
+            // 面板不渐显了，遮罩还留 0.15s 过渡 —— 否则整屏亮度会硬切。
             Color.black.opacity(0.2)
+                .opacity(scrimAlpha)
                 .ignoresSafeArea()
                 .contentShape(Rectangle())
                 .gesture(SpatialTapGesture().onEnded { _ in
@@ -378,10 +391,12 @@ private struct FSAlertDialog: View {
         .ignoresSafeArea(.keyboard)
         // 只测量、不改布局（等价于背景里塞一个 GeometryReader，但不影响尺寸提议）
         .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { hostHeight = $0 }
-        // 入场动画由外层 `.transition(.opacity)` + presentAnimation 统一驱动，
+        // 入场动画由外层 transition + presentAnimation 统一驱动，
         // 这里补一下面板自身的缩放：没有它，弹窗只是"淡出来"，一点劲都没有。
         .onAppear {
             withAnimation(FSAlertCenter.presentAnimation(for: spec)) { entrance = 1 }
+            // 遮罩单独走一条短曲线（不跟面板的 spring，否则 0.29s 才暗到位会显得拖）
+            withAnimation(.easeOut(duration: 0.15)) { scrimAlpha = 1 }
         }
         .task(id: spec.id) {
             try? await Task.sleep(for: .milliseconds(12))
