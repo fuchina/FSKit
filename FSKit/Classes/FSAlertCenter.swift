@@ -164,10 +164,13 @@ public final class FSAlertCenter: ObservableObject, @unchecked Sendable {
 
     /// 入场曲线。
     /// 系统 alert 实测是 `CASpringAnimation(damping 45.71, stiffness 522.35, mass 1, v0 0)`，
-    /// 即 **ζ=1.0 临界阻尼 —— 理论上不反弹**，实测观感确实偏"平"。用户 2026-10-18 反馈
-    /// 「没有那种弹性，只是平移，没有劲道」，所以把阻尼降到 34（ζ≈0.64，约 7% 过冲），
-    /// 刚度提到 700（落定 ≈0.24s，比原来快），入场才有"弹上来一把按住"的劲。
-    public static let presentAnimation: Animation = .interpolatingSpring(stiffness: 700, damping: 34)
+    /// 即 **ζ=1.0 临界阻尼 —— 理论上不反弹**，实测观感确实偏"平"。
+    ///
+    /// 2026-10-18 用户要求「**幅度不用大，但是劲道要大**」，所以这一版刻意把两者拆开：
+    /// - **幅度**：缩放只做 0.96 → 1.0（4%），几乎看不出"放大"动作；
+    /// - **劲道**：刚度拉到 1000（落定 ≈0.17s，比原来快一倍多），阻尼 40 ⇒ ζ≈0.63，约 7% 过冲。
+    ///   "劲"来自到位速度，不是幅度 —— 位移一样，三倍速砸到位就是有力。
+    public static let presentAnimation: Animation = .interpolatingSpring(stiffness: 1000, damping: 40)
 
     /// 退场曲线：比入场快、且**不要弹性**。
     /// 原来退场跟入场共用同一条临界阻尼 spring，尾巴拖得长，键盘收起动画会叠到下一个页面上。
@@ -290,9 +293,9 @@ public struct FSAlertHost: View {
 /// - 按钮 **两个时横排**（各 140×48、间距 8、圆角 24 胶囊，实测坐标 57/205），
 ///   三个及以上竖排；高 48、黑字、destructive 红字。
 /// - 垂直位置不用管：`ZStack` 本身就在**安全区内**居中，实测系统 y=319、自绘 320。
-/// - 入场：外层 `.transition(.opacity)` 走 `presentAnimation`（弹簧），面板自身再 0.92 → 1.0 缩放。
-///   ⚠️ 系统 alert 的 transform 实测恒为 1.0、曲线是 ζ=1 的临界阻尼（不反弹）。加缩放是有意偏离，
-///   按用户 2026-10-18 的反馈「没有弹性、没有劲道」补的。
+/// - 入场：外层 `.transition(.opacity)` 走 `presentAnimation`（弹簧），面板自身再 0.96 → 1.0 缩放。
+///   ⚠️ 系统 alert 的 transform 实测恒为 1.0、曲线是 ζ=1 的临界阻尼（不反弹）。缩放是有意偏离，
+///   按用户 2026-10-18 的反馈「幅度不用大，但是劲道要大」——小幅度 + 高刚度，要的是速度不是动作大小。
 /// - 退场：单独的 `dismissAnimation`（0.18s easeOut），比入场快，键盘收起不会拖到下一个页面。
 ///
 /// 与系统唯一的行为差异是「点遮罩可以关闭」—— 但只在调用方显式登记过 `addTapEvent` 时生效，
@@ -338,9 +341,9 @@ private struct FSAlertDialog: View {
                 })
 
             panel(maxTextHeight: max(150, hostHeight * 0.42))
-                // 缩放只作用于面板：0.92 → 1.0 配 spring，入场才有"弹上来"的劲。
-                // 系统 alert 的 transform 实测恒为 1.0，这一步是**故意**偏离系统、按用户要求加的。
-                .scaleEffect(0.92 + 0.08 * entrance)
+                // 幅度刻意做小（只有 4%）：用户 2026-10-18「幅度不用大，但是劲道要大」。
+                // 缩放负责"收口"，劲道交给曲线本身的速度（stiffness 1000）。
+                .scaleEffect(0.96 + 0.04 * entrance)
                 .offset(y: keyboardLift)
         }
         // 2026-10-18：**关掉系统的键盘避让**。原来的做法是让系统避让、再用 `+= delta/2`
@@ -375,7 +378,13 @@ private struct FSAlertDialog: View {
 
             // 上移也必须带弹性：输入弹窗的「入场」观感几乎全被这 137pt 平移吃掉，
             // 原来用 easeOut（均速收尾）看起来就是"纯平移、没有劲道"。
-            withAnimation(.interpolatingSpring(stiffness: 560, damping: 38)) {
+            //
+            // 2026-10-18 用户二次要求：「弹上去的时间大一点，不要回弹」——
+            // 上一版 ζ≈0.64 会过冲 7%（137pt × 7% ≈ 9.6pt），观感是"弹上去又缩回来一点"。
+            // 现在刚度降到 450、阻尼提到 46 ⇒ **ζ≈1.08，轻微过阻尼，数学上不过冲**：
+            //   90% 到位 0.20s、99% 到位 0.35s（原来 0.09s / 0.11s），慢一倍多，且一路单调到顶。
+            // ⚠️ damping 必须 ≥ 2√stiffness（此处 42.43）才不过冲，改刚度时记得同步。
+            withAnimation(.interpolatingSpring(stiffness: 450, damping: 46)) {
                 keyboardLift = -(end.height - safeBottom) / 2
             }
         }
