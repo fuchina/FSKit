@@ -162,7 +162,7 @@ public final class FSAlertCenter: ObservableObject, @unchecked Sendable {
     // 本类及 shared 都是主隔离的，nonisolated(unsafe) 反而报错，故移除。
     public static let shared = FSAlertCenter()
 
-    /// 入场曲线。
+    /// 入场曲线（**输入框模式**）。
     /// 系统 alert 实测是 `CASpringAnimation(damping 45.71, stiffness 522.35, mass 1, v0 0)`，
     /// 即 **ζ=1.0 临界阻尼 —— 理论上不反弹**，实测观感确实偏"平"。
     ///
@@ -170,7 +170,21 @@ public final class FSAlertCenter: ObservableObject, @unchecked Sendable {
     /// - **幅度**：缩放只做 0.96 → 1.0（4%），几乎看不出"放大"动作；
     /// - **劲道**：刚度拉到 1000（落定 ≈0.17s，比原来快一倍多），阻尼 40 ⇒ ζ≈0.63，约 7% 过冲。
     ///   "劲"来自到位速度，不是幅度 —— 位移一样，三倍速砸到位就是有力。
+    ///
+    /// 之所以敢用这么快的曲线：输入弹窗真正的"入场"是键盘那 137pt 上移，缩放只是收口。
     public static let presentAnimation: Animation = .interpolatingSpring(stiffness: 1000, damping: 40)
+
+    /// 入场曲线（**纯文字模式**：只有 title / message，没有输入框）。
+    /// 这种弹窗**没有键盘位移兜底**，整段入场就只有一次淡入 —— 用输入框那条 0.09s 的快曲线
+    /// 会快到看不出任何动作，观感"太普通"（用户 2026-10-18 反馈）。
+    /// 所以直接回到系统实测的原始参数（ζ=1.0、99% 到位 ≈0.29s），再配「从稍大缩回正常」的缩放，
+    /// 才有用户要的「从一个稍大的变到正常大小」这个过程。
+    public static let textPresentAnimation: Animation = .interpolatingSpring(stiffness: 522.35, damping: 45.71)
+
+    /// 按弹窗类型挑入场曲线
+    static func presentAnimation(for spec: FSAlertSpec) -> Animation {
+        spec.inputs.isEmpty ? textPresentAnimation : presentAnimation
+    }
 
     /// 退场曲线：比入场快、且**不要弹性**。
     /// 原来退场跟入场共用同一条临界阻尼 spring，尾巴拖得长，键盘收起动画会叠到下一个页面上。
@@ -189,7 +203,7 @@ public final class FSAlertCenter: ObservableObject, @unchecked Sendable {
         let apply: @MainActor () -> Void = { [weak self] in
             guard let self else { return }
             self.inputTexts = spec.inputs.map { $0.text }
-            withAnimation(FSAlertCenter.presentAnimation) { self.current = spec }
+            withAnimation(FSAlertCenter.presentAnimation(for: spec)) { self.current = spec }
         }
         if Thread.isMainThread {
             MainActor.assumeIsolated { apply() }
@@ -293,9 +307,10 @@ public struct FSAlertHost: View {
 /// - 按钮 **两个时横排**（各 140×48、间距 8、圆角 24 胶囊，实测坐标 57/205），
 ///   三个及以上竖排；高 48、黑字、destructive 红字。
 /// - 垂直位置不用管：`ZStack` 本身就在**安全区内**居中，实测系统 y=319、自绘 320。
-/// - 入场：外层 `.transition(.opacity)` 走 `presentAnimation`（弹簧），面板自身再 0.96 → 1.0 缩放。
-///   ⚠️ 系统 alert 的 transform 实测恒为 1.0、曲线是 ζ=1 的临界阻尼（不反弹）。缩放是有意偏离，
-///   按用户 2026-10-18 的反馈「幅度不用大，但是劲道要大」——小幅度 + 高刚度，要的是速度不是动作大小。
+/// - 入场分两种（见 `FSAlertCenter.presentAnimation(for:)` 与 `entranceStart`）：
+///   **输入框模式** 0.96 → 1.0 + 高刚度快曲线（劲道来自键盘那 137pt 上移）；
+///   **纯文字模式** 1.05 → 1.0 + 系统原始曲线（从稍大缩回正常，慢一点才看得出动作）。
+///   ⚠️ 系统 alert 的 transform 实测恒为 1.0、曲线是 ζ=1 的临界阻尼。两处缩放都是有意偏离系统。
 /// - 退场：单独的 `dismissAnimation`（0.18s easeOut），比入场快，键盘收起不会拖到下一个页面。
 ///
 /// 与系统唯一的行为差异是「点遮罩可以关闭」—— 但只在调用方显式登记过 `addTapEvent` 时生效，
@@ -325,6 +340,15 @@ private struct FSAlertDialog: View {
     private let panelWidth: CGFloat = 320
     private let panelShape = RoundedRectangle(cornerRadius: 34, style: .continuous)
 
+    /// 入场缩放的**起点**（`entrance` 走到 1 时收口到 1.0）。
+    /// - 有输入框：0.96 → 1.0，**从小到大**。这段缩放只是为了给键盘那 137pt 上移收个口，
+    ///   配合快曲线才有"弹上来一把按住"的劲。
+    /// - 纯文字：1.05 → 1.0，**从稍大缩回正常**。没有键盘位移兜底，纯文字弹窗要的就是这个过程本身
+    ///   （用户 2026-10-18：「系统效果好像是从一个稍大的变到正常大小」）。
+    private var entranceStart: CGFloat {
+        spec.inputs.isEmpty ? 1.05 : 0.96
+    }
+
     var body: some View {
         // 注意：这里**不能**套 GeometryReader —— 它会换掉布局上下文，
         // 键盘弹出时面板不再跟着系统避让上移，输入类弹窗会被键盘盖住。
@@ -341,9 +365,9 @@ private struct FSAlertDialog: View {
                 })
 
             panel(maxTextHeight: max(150, hostHeight * 0.42))
-                // 幅度刻意做小（只有 4%）：用户 2026-10-18「幅度不用大，但是劲道要大」。
+                // 幅度刻意做小（4%）：用户「幅度不用大，但是劲道要大」。
                 // 缩放负责"收口"，劲道交给曲线本身的速度（stiffness 1000）。
-                .scaleEffect(0.96 + 0.04 * entrance)
+                .scaleEffect(entranceStart + (1 - entranceStart) * entrance)
                 .offset(y: keyboardLift)
         }
         // 2026-10-18：**关掉系统的键盘避让**。原来的做法是让系统避让、再用 `+= delta/2`
@@ -354,10 +378,10 @@ private struct FSAlertDialog: View {
         .ignoresSafeArea(.keyboard)
         // 只测量、不改布局（等价于背景里塞一个 GeometryReader，但不影响尺寸提议）
         .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { hostHeight = $0 }
-        // 入场动画由外层 `.transition(.opacity)` + `presentAnimation` 统一驱动，
+        // 入场动画由外层 `.transition(.opacity)` + presentAnimation 统一驱动，
         // 这里补一下面板自身的缩放：没有它，弹窗只是"淡出来"，一点劲都没有。
         .onAppear {
-            withAnimation(FSAlertCenter.presentAnimation) { entrance = 1 }
+            withAnimation(FSAlertCenter.presentAnimation(for: spec)) { entrance = 1 }
         }
         .task(id: spec.id) {
             try? await Task.sleep(for: .milliseconds(12))
