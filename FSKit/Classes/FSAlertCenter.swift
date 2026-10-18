@@ -360,6 +360,16 @@ private struct FSAlertDialog: View {
         spec.inputs.isEmpty ? 1.05 : 0.96
     }
 
+    /// 面板相对「安全区内居中」的**起始**偏移。
+    /// 2026-10-18 用户：「输入模式时，弹窗的初始位置太矮了，往上移 50」——
+    /// 纯文字弹窗居中刚好，输入弹窗看起来偏低，所以只给输入模式抬高 50pt。
+    ///
+    /// ⚠️ 只抬**起点**，**终点不动**：键盘弹出后落点仍等于系统的避让位置（居中再 -(键盘高-安全区)/2）。
+    /// 所以 `keyboardLift` 里要把这 50 减掉（见 `onReceive` 那段），否则终点会跟着一起上移 50。
+    private var baseOffset: CGFloat {
+        spec.inputs.isEmpty ? 0 : -50
+    }
+
     var body: some View {
         // 注意：这里**不能**套 GeometryReader —— 它会换掉布局上下文，
         // 键盘弹出时面板不再跟着系统避让上移，输入类弹窗会被键盘盖住。
@@ -381,7 +391,9 @@ private struct FSAlertDialog: View {
                 // 幅度刻意做小（4%）：用户「幅度不用大，但是劲道要大」。
                 // 缩放负责"收口"，劲道交给曲线本身的速度（stiffness 1000）。
                 .scaleEffect(entranceStart + (1 - entranceStart) * entrance)
-                .offset(y: keyboardLift)
+                // baseOffset 是**静态**位置（输入模式整体上移 50），keyboardLift 是键盘那一下。
+                // 两者相加，所以入场动画是从"已经抬高的位置"开始的，不是先出现在低处再被顶上去。
+                .offset(y: baseOffset + keyboardLift)
         }
         // 2026-10-18：**关掉系统的键盘避让**。原来的做法是让系统避让、再用 `+= delta/2`
         // 去补偿，但切换输入框时键盘高度一变（数字键盘 ↔ 全键盘），系统会重新居中，
@@ -423,8 +435,11 @@ private struct FSAlertDialog: View {
             // 现在刚度降到 450、阻尼提到 46 ⇒ **ζ≈1.08，轻微过阻尼，数学上不过冲**：
             //   90% 到位 0.20s、99% 到位 0.35s（原来 0.09s / 0.11s），慢一倍多，且一路单调到顶。
             // ⚠️ damping 必须 ≥ 2√stiffness（此处 42.43）才不过冲，改刚度时记得同步。
+            // 终点**固定**在系统避让位置（居中再 -(键盘高-安全区)/2 = -137），
+            // 起点已经被 baseOffset 抬高了 50，所以这里要减掉它 —— 否则终点也一起上移 50。
+            // 结果：面板只走 137-50 = 87pt，但落点和原来一模一样。
             withAnimation(.interpolatingSpring(stiffness: 450, damping: 46)) {
-                keyboardLift = -(end.height - safeBottom) / 2
+                keyboardLift = -(end.height - safeBottom) / 2 - baseOffset
             }
         }
     }
@@ -505,11 +520,15 @@ private struct FSAlertDialog: View {
             }
         }
         .frame(width: panelWidth)
-        // 面板底：**只用 thinMaterial，不再压黑**（用户 2026-10-18 要求「再增白一点点」）。
-        // 之前为了贴系统 201 压了 5% 黑；纯材质在浅底上约 226，压 5% 是 215、压 2% 是 222，
-        // 现在全去掉 ⇒ 比原来亮约 11/255。深色模式本来就靠材质本身，无需调整。
+        // 面板底：thinMaterial 打底，再**叠一层 25% 白**（用户 2026-10-18「面板再变白点」）。
+        // 实测量级：纯材质 ≈227，叠白 a 后 = 227 + a×(255−227)，所以 0.25 → ≈234。
+        // ⚠️ 叠白会削弱材质的通透和模糊层次（越白越像实色块），0.25 是"明显变白但还看得出材质"的上限附近；
+        // 再往上（≥0.4）就基本是一张白纸了，那时候不如直接用 Color(.secondarySystemBackground)。
+        // 深色模式不叠白：深色面板本来就该暗，叠白会糊成一片。
         .background {
-            panelShape.fill(.thinMaterial)
+            panelShape
+                .fill(.thinMaterial)
+                .overlay(panelShape.fill(Color.white.opacity(colorScheme == .dark ? 0 : 0.25)))
         }
         .overlay(edgeHighlight)
     }
