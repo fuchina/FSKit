@@ -30,9 +30,7 @@ public struct FSColor {
     /// 微信朋友圈蓝（带透明度）
     public static let wechatFriendsBlueAlpha = Color(red: 0x58 / 255.0, green: 0x6c / 255.0, blue: 0x93 / 255.0)
     
-    /// iOS 系统蓝
-//    public static let iosSystemBlue = UIColor(red: 0, green: 0x7A / 255.0, blue: 0xFF / 255.0, alpha: 1)
-    
+    /// iOS 系统蓝    
     public static let iosSystemBlue = Color(red: 0, green: 0x7A / 255.0, blue: 0xFF / 255.0)
 
     /// App Store 按钮背景色（淡蓝色）
