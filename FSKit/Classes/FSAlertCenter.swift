@@ -162,6 +162,18 @@ public final class FSAlertCenter: ObservableObject, @unchecked Sendable {
     // 本类及 shared 都是主隔离的，nonisolated(unsafe) 反而报错，故移除。
     public static let shared = FSAlertCenter()
 
+    /// 入场曲线。
+    /// 系统 alert 实测是 `CASpringAnimation(damping 45.71, stiffness 522.35, mass 1, v0 0)`，
+    /// 即 **ζ=1.0 临界阻尼 —— 理论上不反弹**，实测观感确实偏"平"。用户 2026-10-18 反馈
+    /// 「没有那种弹性，只是平移，没有劲道」，所以把阻尼降到 34（ζ≈0.64，约 7% 过冲），
+    /// 刚度提到 700（落定 ≈0.24s，比原来快），入场才有"弹上来一把按住"的劲。
+    public static let presentAnimation: Animation = .interpolatingSpring(stiffness: 700, damping: 34)
+
+    /// 退场曲线：比入场快、且**不要弹性**。
+    /// 原来退场跟入场共用同一条临界阻尼 spring，尾巴拖得长，键盘收起动画会叠到下一个页面上。
+    /// 0.18s 的 easeOut 让弹窗先干脆消失，键盘随后收完。
+    public static let dismissAnimation: Animation = .easeOut(duration: 0.18)
+
     /// 当前要显示的弹窗（nil = 不显示）
     @Published public private(set) var current: FSAlertSpec?
 
@@ -174,7 +186,7 @@ public final class FSAlertCenter: ObservableObject, @unchecked Sendable {
         let apply: @MainActor () -> Void = { [weak self] in
             guard let self else { return }
             self.inputTexts = spec.inputs.map { $0.text }
-            self.current = spec
+            withAnimation(FSAlertCenter.presentAnimation) { self.current = spec }
         }
         if Thread.isMainThread {
             MainActor.assumeIsolated { apply() }
@@ -186,7 +198,14 @@ public final class FSAlertCenter: ObservableObject, @unchecked Sendable {
     public func dismiss() {
         let apply: @MainActor () -> Void = { [weak self] in
             guard let self else { return }
-            self.current = nil
+            // 有输入框时**先交还第一响应者**，键盘立刻开始收起。
+            // 不这么做的话：视图被移除后 UIKit 才去 resign，键盘收起动画晚一个节拍启动，
+            // 于是键盘滑下去的画面会叠在下一个页面上（用户 2026-10-18 反馈的问题）。
+            if self.current?.inputs.isEmpty == false {
+                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder),
+                                                to: nil, from: nil, for: nil)
+            }
+            withAnimation(FSAlertCenter.dismissAnimation) { self.current = nil }
         }
         if Thread.isMainThread {
             MainActor.assumeIsolated { apply() }
@@ -232,10 +251,9 @@ public struct FSAlertHost: View {
                     }
                 }
         }
-        // 2026-10-18：曲线对齐系统 —— 系统 alert 的入场/退场是同一个 CASpringAnimation
-        // （damping 45.71 / stiffness 522.35 / mass 1 / v0 0，等效 ζ=1.0，不过冲），
-        // 面板本身**没有缩放**，只有 opacity。原来的 .easeOut(0.3) + 0.94 放大是手调的，观感偏生硬。
-        .animation(.interpolatingSpring(stiffness: 522.35, damping: 45.71), value: center.current?.id)
+        // 2026-10-18：曲线交给 `FSAlertCenter.presentAnimation` / `dismissAnimation`（在 show/dismiss
+        // 里用 withAnimation 驱动），**这里不能再挂 `.animation(_:value:)`** —— 它的优先级高于
+        // 外部事务，会把入场/退场强行拉回同一条曲线，退场也就慢不下来。
     }
 
     /// actionSheet 的按钮（系统渲染，TextField 不支持，与改造前一致）
@@ -265,14 +283,17 @@ public struct FSAlertHost: View {
 /// 自绘 alert：遮罩 + 居中面板 + 输入框 + 按钮。
 ///
 /// 2026-10-18 按**实测数据**重排（探针 App 在 iPhone 17 Pro / iOS 26.5 上逐帧采样系统 alert）：
-/// - 面板 320 宽、**圆角 34**；背景 `thinMaterial` + 5% 黑（实测亮度 208，系统 201）；
+/// - 面板 320 宽、**圆角 34**；背景纯 `thinMaterial`（不压黑，浅底上约 227，比系统 201 亮）；
 ///   内侧一圈 12pt 柔和高光模拟 Liquid Glass 的边缘折射（系统有，材质 API 给不了）。
 /// - 标题左对齐 17pt / 说明 15pt，左右边距 **16**；说明到输入块 16。
-/// - 输入块行高 **48**、圆角 16、白 60% 底（实测 236）。
+/// - 输入块行高 **48**、圆角 16、底与按钮同灰（浅色 black 8% ≈ 208），行间分隔线为**实色**（浅色 150）。
 /// - 按钮 **两个时横排**（各 140×48、间距 8、圆角 24 胶囊，实测坐标 57/205），
 ///   三个及以上竖排；高 48、黑字、destructive 红字。
 /// - 垂直位置不用管：`ZStack` 本身就在**安全区内**居中，实测系统 y=319、自绘 320。
-/// - 入场/退场交给外层 `.transition(.opacity)` + 同一条 spring，**不做缩放**（系统 transform 恒 1.0）。
+/// - 入场：外层 `.transition(.opacity)` 走 `presentAnimation`（弹簧），面板自身再 0.92 → 1.0 缩放。
+///   ⚠️ 系统 alert 的 transform 实测恒为 1.0、曲线是 ζ=1 的临界阻尼（不反弹）。加缩放是有意偏离，
+///   按用户 2026-10-18 的反馈「没有弹性、没有劲道」补的。
+/// - 退场：单独的 `dismissAnimation`（0.18s easeOut），比入场快，键盘收起不会拖到下一个页面。
 ///
 /// 与系统唯一的行为差异是「点遮罩可以关闭」—— 但只在调用方显式登记过 `addTapEvent` 时生效，
 /// 其余弹窗点遮罩依旧什么都不发生（与原系统 alert 一致）。
@@ -293,6 +314,9 @@ private struct FSAlertDialog: View {
     @State private var liftDone = false
     /// 覆盖层高度：只用来算「内容滚动上限」，**不参与布局**
     @State private var hostHeight: CGFloat = 800
+    /// 入场进度 0 → 1，只驱动面板的缩放（0.92 → 1.0）。
+    /// 不放在 `transition` 上：那会把全屏遮罩一起缩放，边缘会露出底下一层。
+    @State private var entrance: CGFloat = 0
 
     /// 实测值：系统 iPhone 竖屏 alert 面板 320 宽、圆角 34
     private let panelWidth: CGFloat = 320
@@ -314,6 +338,9 @@ private struct FSAlertDialog: View {
                 })
 
             panel(maxTextHeight: max(150, hostHeight * 0.42))
+                // 缩放只作用于面板：0.92 → 1.0 配 spring，入场才有"弹上来"的劲。
+                // 系统 alert 的 transform 实测恒为 1.0，这一步是**故意**偏离系统、按用户要求加的。
+                .scaleEffect(0.92 + 0.08 * entrance)
                 .offset(y: keyboardLift)
         }
         // 2026-10-18：**关掉系统的键盘避让**。原来的做法是让系统避让、再用 `+= delta/2`
@@ -324,8 +351,11 @@ private struct FSAlertDialog: View {
         .ignoresSafeArea(.keyboard)
         // 只测量、不改布局（等价于背景里塞一个 GeometryReader，但不影响尺寸提议）
         .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { hostHeight = $0 }
-        // 入场动画由外层的 `.transition(.opacity)` + spring 统一驱动（系统面板不做缩放），
-        // 这里只负责在出现后把焦点交给第一个输入框，让键盘自己弹起来。
+        // 入场动画由外层 `.transition(.opacity)` + `presentAnimation` 统一驱动，
+        // 这里补一下面板自身的缩放：没有它，弹窗只是"淡出来"，一点劲都没有。
+        .onAppear {
+            withAnimation(FSAlertCenter.presentAnimation) { entrance = 1 }
+        }
         .task(id: spec.id) {
             try? await Task.sleep(for: .milliseconds(12))
             guard spec.inputs.isEmpty == false else { return }
@@ -343,8 +373,9 @@ private struct FSAlertDialog: View {
                 .compactMap { ($0 as? UIWindowScene)?.keyWindow }
                 .first?.safeAreaInsets.bottom) ?? 0
 
-            let duration = (note.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double) ?? 0.25
-            withAnimation(.easeOut(duration: max(duration, 0.2))) {
+            // 上移也必须带弹性：输入弹窗的「入场」观感几乎全被这 137pt 平移吃掉，
+            // 原来用 easeOut（均速收尾）看起来就是"纯平移、没有劲道"。
+            withAnimation(.interpolatingSpring(stiffness: 560, damping: 38)) {
                 keyboardLift = -(end.height - safeBottom) / 2
             }
         }
@@ -426,12 +457,11 @@ private struct FSAlertDialog: View {
             }
         }
         .frame(width: panelWidth)
-        // 实测亮度：系统 201，thinMaterial 213 + 5% 黑 ≈ 203，是目前最快能对上的组合。
-        // 深色模式不再压黑（系统深色面板本身就暗，再压会糊成一片）。
+        // 面板底：**只用 thinMaterial，不再压黑**（用户 2026-10-18 要求「再增白一点点」）。
+        // 之前为了贴系统 201 压了 5% 黑；纯材质在浅底上约 226，压 5% 是 215、压 2% 是 222，
+        // 现在全去掉 ⇒ 比原来亮约 11/255。深色模式本来就靠材质本身，无需调整。
         .background {
-            panelShape
-                .fill(.thinMaterial)
-                .overlay(panelShape.fill(Color.black.opacity(colorScheme == .dark ? 0 : 0.05)))
+            panelShape.fill(.thinMaterial)
         }
         .overlay(edgeHighlight)
     }
@@ -521,9 +551,15 @@ private struct FSAlertDialog: View {
         .buttonStyle(FSAlertButtonStyle())
     }
 
+    /// 输入行之间的分隔线。
+    /// 用**实色**而不是 `.separator`：后者自带 alpha（浅色 #3C3C43 @29%），叠在 8% 灰的被
+    /// 输入块上渲染成 ~151，换底色就跟着变，还会透出后面的内容。这里的色值就是按「叠在灰底上
+    /// 的 .separator」反算出来的等效实色（浅色 150/150/155、深色 76/76/80），所见即所得。
     private var dividerH: some View {
         Rectangle()
-            .fill(Color(uiColor: .separator))
+            .fill(colorScheme == .dark
+                  ? Color(red: 76 / 255, green: 76 / 255, blue: 80 / 255)
+                  : Color(red: 150 / 255, green: 150 / 255, blue: 155 / 255))
             .frame(height: 0.5)
     }
 
