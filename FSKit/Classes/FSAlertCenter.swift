@@ -411,8 +411,8 @@ private struct FSAlertDialog: View {
                         }
                     }
                 }
-                // 实测系统输入块底色 rgb(236)：白 60% ≈ 236（原来的 secondarySystemFill 只有 ~191，偏暗）
-                .background(Color.white.opacity(colorScheme == .dark ? 0.10 : 0.60),
+                // 底色跟按钮统一用灰（用户 2026-10-18 要求：原来是白 60%，和按钮一亮一暗太割裂）
+                .background(colorScheme == .dark ? Color.white.opacity(0.10) : Color.black.opacity(0.08),
                             in: RoundedRectangle(cornerRadius: 16, style: .continuous))
                 .padding(.horizontal, 16)
             }
