@@ -3,7 +3,6 @@
 //  FSKit
 //
 //  2026-10-15 全 SwiftUI 化：
-//  `controller.present(...)`」，必须有 UIViewController 宿主。现改为「状态 + 根视图渲染」：
 //  调用方把内容塞进这里，由根视图（主 App 的 AppRootScreen）统一渲染。
 //
 //  ⇒ 全项目 343 处调用点**一行都不用改**（签名保留、`controller` 参数被忽略），

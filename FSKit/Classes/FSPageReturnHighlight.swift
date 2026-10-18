@@ -115,7 +115,6 @@ public struct FSPageReturnList<Content: View>: View {
 }
 
 /// 零尺寸生命周期探针：把「所在页面被重新显示（pop 回来）」翻译成一次复位调用。
-/// 依赖 `UIViewController.viewWillAppear` —— 与旧版 UINavigationController 通知同源，
 /// 但**范围限定在本页**，不会像全局通知那样误伤其它页。
 private struct FSPageReturnLifecycleProbe: UIViewControllerRepresentable {
 

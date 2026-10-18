@@ -8,7 +8,6 @@
 //  统一渲染成 SwiftUI 浮层。
 //
 //  因此全项目 348 处 `FSToast.toast(...)` 调用点**一行都不用改**，
-//  也不再依赖任何 UIView / UIViewController。
 //
 
 import SwiftUI

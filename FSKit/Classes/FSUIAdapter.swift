@@ -455,7 +455,6 @@ public extension UIView {
 // 背景：全 SwiftUI 化后导航由 `FSPushStack`(NavigationStack) 承担，
 // 原 `UINavigationController` 的 willAppear/didAppear 通知不再可用；
 // 而 SwiftUI 的 `.onAppear` 在 NavigationStack 的 push/pop 场景下并不保证成对触发。
-// 这两个 modifier 用零尺寸 `UIViewControllerRepresentable` 把 UIKit 生命周期事件
 // 翻译成 SwiftUI 回调：它们只做事件源，不承担任何导航/视图承载。
 
 /// 回归探针承载：`viewWillAppear` → 回调
