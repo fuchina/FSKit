@@ -69,13 +69,27 @@ public enum FSDate {
     }
     
     // MARK: - Date Formatting
+    /// DateFormatter 缓存：创建一个 `DateFormatter` + 设 locale 约 200µs，
+    /// 而农历反推是按天扫描（一条生日要解析 2~3 次日期串），每次新建会直接拖垮列表。
+    /// iOS 7+ 的 DateFormatter 在配置完成后可并发做 date(from:) / string(from:)。
+    private static let formatterLock = NSLock()
+    // 访问全部在 formatterLock 内，外部同步机制齐备（同 FSDBMaster 的写法）
+    nonisolated(unsafe) private static var formatters: [String: DateFormatter] = [:]
+
+    private static func cachedFormatter(for format: String) -> DateFormatter {
+        formatterLock.lock()
+        defer { formatterLock.unlock() }
+        if let cached = formatters[format] { return cached }
+        let formatter = DateFormatter()
+        formatter.dateFormat = format
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatters[format] = formatter
+        return formatter
+    }
+
     public static func date(byString str: String?, formatter: String? = nil) -> Date? {
         guard let str = str, !str.isEmpty else { return nil }
-        
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = formatter ?? "yyyy-MM-dd HH:mm:ss"
-        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
-        return dateFormatter.date(from: str)
+        return cachedFormatter(for: formatter ?? "yyyy-MM-dd HH:mm:ss").date(from: str)
     }
     
     public static func string(with date: Date?, formatter: String? = nil) -> String {
@@ -88,10 +102,14 @@ public enum FSDate {
     }
     
     // MARK: - Chinese Calendar
+    /// 农历 Calendar 复用：`Calendar(identifier: .chinese)` 每次新建约 20µs（ICU 初始化），
+    /// 而农历反推是「按天扫描」的热点（一条生日要调几十次），复用后省近一半时间。
+    /// Calendar 是不可变值类型、`dateComponents` 为 non-mutating，可安全并发读。
+    private static let chineseCalendar = Calendar(identifier: .chinese)
+
     public static func chineseDate(_ date: Date?) -> DateComponents? {
         guard let date = date else { return nil }
-        let calendar = Calendar(identifier: .chinese)
-        return calendar.dateComponents([.year, .month, .day, .hour, .minute, .second], from: date)
+        return chineseCalendar.dateComponents([.year, .month, .day, .hour, .minute, .second], from: date)
     }
     
     public static func chineseCalendar(for date: Date?) -> [String]? {
@@ -226,14 +244,23 @@ public enum FSDate {
     // MARK: - Lunar/Solar Conversion
     public static func solars(forLunar year: Int, month: Int, day: Int) -> [Date] {
         
+        // 农历只有 1-12 月、1-30 日。越界数据（如历史脏数据存了 day = 31）在下面的
+        // 「按天扫描直到命中」里**永远不可能命中**，原实现没有循环上限 → 死循环卡死 UI。
+        guard (1...12).contains(month), (1...30).contains(day) else { return [] }
+        
         let string = "\(year)-\(twoChar(month))-\(twoChar(day)) 23:59:59"
         guard var date = date(byString: string, formatter: nil) else { return [] }
         
         guard let lunarComponents = chineseDate(date) else { return [] }
         var found = (lunarComponents.month == month) && (lunarComponents.day == day)
         
+        // 扫描上限：腊月三十这类日子要跨好几年才轮到一次（实测最多约 1130 天），
+        // 留 2000 天余量；超限直接放弃返回空，绝不无限循环。
+        var scanned = 0
         var dates: [Date] = []
         while !found {
+            scanned += 1
+            if scanned > 2000 { break }
             date = date.addingTimeInterval(86400)
             guard let newLunarComponents = chineseDate(date) else { break }
             found = (newLunarComponents.month == month) && (newLunarComponents.day == day)
