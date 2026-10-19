@@ -128,7 +128,8 @@ public struct FSAlertSpec: Identifiable, @unchecked Sendable {
     public var actions: [FSAlertActionSpec]
     /// 输入框（0 = 普通弹窗）
     public var inputs: [FSAlertInputSpec]
-    /// 点遮罩是否关闭（原 `UIAlertController.addTapEvent` 的语义，默认不关）
+    /// 点遮罩是否关闭。**默认 true** —— 2026-10-19 用户要求「所有 alert 都支持点空白区关闭」。
+    /// 需要「必须做出选择」的弹窗（危险操作确认）可显式传 false。
     public var tapOutsideToDismiss: Bool
     /// 点遮罩时的附加条件：返回 false = 这次不关（有内容就不关，原 `handleAlertClick` 的语义）
     public var tapOutsideCanDismiss: (([String]) -> Bool)?
@@ -138,7 +139,7 @@ public struct FSAlertSpec: Identifiable, @unchecked Sendable {
                 message: String,
                 actions: [FSAlertActionSpec],
                 inputs: [FSAlertInputSpec] = [],
-                tapOutsideToDismiss: Bool = false,
+                tapOutsideToDismiss: Bool = true,
                 tapOutsideCanDismiss: (([String]) -> Bool)? = nil) {
         self.style = style
         self.title = title
@@ -152,81 +153,268 @@ public struct FSAlertSpec: Identifiable, @unchecked Sendable {
 
 /// 全局弹窗中心。**可从任意线程调用**（内部自行切主线程）。
 ///
-/// Swift 6 语言模式：`show` / `dismiss` 会把 `self` 送进 `@MainActor` 闭包，
-/// 需要显式声明可跨隔离域传递，故补 `@unchecked Sendable`
-/// （可变状态已由 `MainActor.assumeIsolated` 保证只在主线程访问）。
+/// 2026-10-19：`alert` 的后端从 SwiftUI 自绘（`FSAlertDialog`）换成原生 `UIAlertController`。
+/// - 观感 / 材质 / 键盘避让 / 无障碍 / iPad 适配全部交还系统；
+/// - 「点空白区关闭」由挂在 `presentationController.containerView` 上的手势补回
+///   （系统 alert 没有这个能力；判据见 `FSAlertTapOutside`）；
+/// - `actionSheet` 仍走 SwiftUI 的 `confirmationDialog`（它本来就是原生 action sheet）。
+///
+/// 自绘那套代码（`FSAlertDialog`）保留在本文件末尾，不再被引用。
 public final class FSAlertCenter: ObservableObject, @unchecked Sendable {
 
-    // 2026-10-17：Pod 与主 App 统一为 SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor 后，
-    // 本类及 shared 都是主隔离的，nonisolated(unsafe) 反而报错，故移除。
     public static let shared = FSAlertCenter()
 
-    /// 入场曲线（**输入框模式**）。
-    /// 系统 alert 实测是 `CASpringAnimation(damping 45.71, stiffness 522.35, mass 1, v0 0)`，
-    /// 即 **ζ=1.0 临界阻尼 —— 理论上不反弹**，实测观感确实偏"平"。
-    ///
-    /// 2026-10-18 用户要求「**幅度不用大，但是劲道要大**」，所以这一版刻意把两者拆开：
-    /// - **幅度**：缩放只做 0.96 → 1.0（4%），几乎看不出"放大"动作；
-    /// - **劲道**：刚度拉到 1000（落定 ≈0.17s，比原来快一倍多），阻尼 40 ⇒ ζ≈0.63，约 7% 过冲。
-    ///   "劲"来自到位速度，不是幅度 —— 位移一样，三倍速砸到位就是有力。
-    ///
-    /// 之所以敢用这么快的曲线：输入弹窗真正的"入场"是键盘那 137pt 上移，缩放只是收口。
     public static let presentAnimation: Animation = .interpolatingSpring(stiffness: 1000, damping: 40)
-
-    /// 入场曲线（**纯文字模式**：只有 title / message，没有输入框）。
-    /// 这种弹窗**没有键盘位移兜底**，整段入场就只有一次淡入 —— 用输入框那条 0.09s 的快曲线
-    /// 会快到看不出任何动作，观感"太普通"（用户 2026-10-18 反馈）。
-    /// 所以直接回到系统实测的原始参数（ζ=1.0、99% 到位 ≈0.29s），再配「从稍大缩回正常」的缩放，
-    /// 才有用户要的「从一个稍大的变到正常大小」这个过程。
     public static let textPresentAnimation: Animation = .interpolatingSpring(stiffness: 522.35, damping: 45.71)
+    public static let dismissAnimation: Animation = .easeOut(duration: 0.18)
 
-    /// 按弹窗类型挑入场曲线
     static func presentAnimation(for spec: FSAlertSpec) -> Animation {
         spec.inputs.isEmpty ? textPresentAnimation : presentAnimation
     }
 
-    /// 退场曲线：比入场快、且**不要弹性**。
-    /// 原来退场跟入场共用同一条临界阻尼 spring，尾巴拖得长，键盘收起动画会叠到下一个页面上。
-    /// 0.18s 的 easeOut 让弹窗先干脆消失，键盘随后收完。
-    public static let dismissAnimation: Animation = .easeOut(duration: 0.18)
-
-    /// 当前要显示的弹窗（nil = 不显示）
+    /// 当前弹窗。
+    /// - `.actionSheet`：这是**渲染源**，`FSAlertHost` 靠它出界面；
+    /// - `.alert`：**只作状态标记**（SwiftUI 的 `.fsAlert` 靠它的 id 变化同步 `isPresented`），
+    ///   界面由 UIKit 的 `UIAlertController` 呈现，不参与 SwiftUI 渲染。
     @Published public private(set) var current: FSAlertSpec?
 
-    /// 输入框文本（与 `current?.inputs` 一一对应）
+    /// 输入框文本（与当前弹窗的 `inputs` 一一对应）
     @Published public var inputTexts: [String] = []
+
+    // MARK: 内部状态
+
+    /// 排队中的弹窗：`UIAlertController` 一次只能 present 一条，
+    /// 正在显示时再 present 第二条会**静默失败**（无 completion、view.window == nil），必须排队。
+    private var pending: [FSAlertSpec] = []
+    private var activeAlert: UIAlertController?
+    private var activeSpec: FSAlertSpec?
+    private var tapProxy: FSAlertTapOutside?
+    private var retryCount = 0
 
     private init() {}
 
+    // MARK: 对外
+
     public func show(_ spec: FSAlertSpec) {
-        let apply: @MainActor () -> Void = { [weak self] in
+        onMain { [weak self] in
             guard let self else { return }
-            self.inputTexts = spec.inputs.map { $0.text }
-            withAnimation(FSAlertCenter.presentAnimation(for: spec)) { self.current = spec }
-        }
-        if Thread.isMainThread {
-            MainActor.assumeIsolated { apply() }
-        } else {
-            DispatchQueue.main.async { MainActor.assumeIsolated { apply() } }
+
+            if spec.style == .actionSheet {
+                self.inputTexts = spec.inputs.map { $0.text }
+                withAnimation(FSAlertCenter.presentAnimation(for: spec)) { self.current = spec }
+                return
+            }
+
+            self.pending.append(spec)
+            self.pump()
         }
     }
 
     public func dismiss() {
-        let apply: @MainActor () -> Void = { [weak self] in
+        onMain { [weak self] in
             guard let self else { return }
-            // 有输入框时**先交还第一响应者**，键盘立刻开始收起。
-            // 不这么做的话：视图被移除后 UIKit 才去 resign，键盘收起动画晚一个节拍启动，
-            // 于是键盘滑下去的画面会叠在下一个页面上（用户 2026-10-18 反馈的问题）。
-            if self.current?.inputs.isEmpty == false {
+
+            if let cur = self.current, cur.style == .actionSheet {
+                withAnimation(FSAlertCenter.dismissAnimation) { self.current = nil }
+                return
+            }
+
+            guard let alert = self.activeAlert else {
+                self.pending.removeAll()
+                return
+            }
+
+            // 有输入框时先交还第一响应者，键盘立刻开始收起
+            //（与原自绘版一致：否则键盘收起动画会叠到下一个页面）
+            if alert.textFields?.isEmpty == false {
                 UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder),
                                                 to: nil, from: nil, for: nil)
             }
-            withAnimation(FSAlertCenter.dismissAnimation) { self.current = nil }
+            self.inputTexts = alert.textFields?.map { $0.text ?? "" } ?? self.inputTexts
+
+            let spec = self.activeSpec
+            self.activeAlert = nil
+            self.activeSpec = nil
+            self.tapProxy = nil
+            if let spec, self.current?.id == spec.id { self.current = nil }
+
+            alert.dismiss(animated: true) { [weak self] in self?.pump() }
         }
+    }
+
+    // MARK: 呈现
+
+    private func pump() {
+        guard activeAlert == nil else { return }
+        guard pending.isEmpty == false else { retryCount = 0; return }
+
+        // 宿主还没空出来（上一条正在 dismiss、或 SwiftUI 有 sheet）就等一会儿再来
+        guard let host = FSAlertCenter.topViewController(),
+              host.presentedViewController == nil else {
+            scheduleRetry()
+            return
+        }
+
+        retryCount = 0
+        let spec = pending.removeFirst()
+        present(spec, on: host)
+    }
+
+    private func scheduleRetry() {
+        guard retryCount < 100 else { retryCount = 0; return }   // 最多等 5 秒（50ms × 100）
+        retryCount += 1
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { [weak self] in self?.pump() }
+    }
+
+    private func present(_ spec: FSAlertSpec, on host: UIViewController) {
+        let alert = UIAlertController(title: spec.title.isEmpty ? nil : spec.title,
+                                      message: spec.message.isEmpty ? nil : spec.message,
+                                      preferredStyle: .alert)
+
+        for input in spec.inputs {
+            alert.addTextField { field in
+                field.placeholder = input.placeholder
+                field.text = input.text
+                field.keyboardType = input.keyboardType.uiKeyboardType
+                field.autocorrectionType = input.autocorrectionDisabled ? .no : .default
+                field.clearButtonMode = input.showsClearButton ? .whileEditing : .never
+            }
+        }
+
+        for action in spec.actions {
+            alert.addAction(UIAlertAction(title: action.title,
+                                          style: action.style.uiAlertStyle) { [weak self] _ in
+                guard let self else { return }
+                self.finish(spec, alert: alert)
+                action.handler?()
+                // 此刻系统正在 dismiss，`pump` 里会检查宿主是否空出来，必要时自动重试
+                self.pump()
+            })
+        }
+
+        activeAlert = alert
+        activeSpec = spec
+        inputTexts = spec.inputs.map { $0.text }
+        current = spec
+
+        host.present(alert, animated: true) { [weak self] in
+            self?.installTapOutside(spec, alert: alert)
+        }
+    }
+
+    /// 按钮点击后收尾：回写文本、清状态、让 SwiftUI 的 `isPresented` 归 false
+    private func finish(_ spec: FSAlertSpec, alert: UIAlertController) {
+        if let fields = alert.textFields {
+            inputTexts = fields.map { $0.text ?? "" }
+            for (index, input) in spec.inputs.enumerated() where index < inputTexts.count {
+                input.commit(inputTexts[index])
+            }
+        }
+        activeAlert = nil
+        activeSpec = nil
+        tapProxy = nil
+        if current?.id == spec.id { current = nil }
+    }
+
+    /// 点空白区关闭：系统 alert 不提供这个能力，只能往它所在的过渡容器上挂手势。
+    ///
+    /// 2026-10-19 实测（iPhone 17 Pro / iOS 26.5 与 iPhone 16 Pro / iOS 18.5 结论一致）：
+    /// - `alert.view` 的 frame **就是面板矩形**，点面板外的事件根本投递不到它（hitTest 返回 nil）；
+    /// - 面板与黑色 0.2 的遮罩是 `containerView`（全屏 `UITransitionView`）下的兄弟视图；
+    /// - 所以手势挂 containerView，判据用「touch.view 是否在 alert.view 里面」：
+    ///   不比坐标、不受入场动画影响、也不依赖任何私有类名。
+    private func installTapOutside(_ spec: FSAlertSpec, alert: UIAlertController) {
+        // `tapOutsideToDismiss` 是总开关，`tapOutsideCanDismiss` 只是附加条件
+        //（与原自绘版 `FSAlertDialog` 的判定完全一致）
+        guard spec.tapOutsideToDismiss else { return }
+        guard let container = alert.presentationController?.containerView else { return }
+
+        let proxy = FSAlertTapOutside()
+        proxy.alert = alert
+        proxy.onTap = { [weak self, weak alert] in
+            guard let self, let alert else { return }
+            // 输入框内容要先同步回来，`tapOutsideCanDismiss` 才拿得到最新文本
+            let texts = alert.textFields?.map { $0.text ?? "" } ?? []
+            self.inputTexts = texts
+            if let can = spec.tapOutsideCanDismiss, !can(texts) { return }
+            self.dismiss()
+        }
+
+        let tap = UITapGestureRecognizer(target: proxy, action: #selector(FSAlertTapOutside.handle(_:)))
+        tap.cancelsTouchesInView = false
+        tap.delegate = proxy
+        container.addGestureRecognizer(tap)
+        tapProxy = proxy
+    }
+
+    // MARK: 宿主
+
+    /// 当前正在交互的 scene 里最上层的控制器（present 的落点）
+    static func topViewController() -> UIViewController? {
+        let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
+        let scene = scenes.first { $0.activationState == .foregroundActive } ?? scenes.first
+        let window = scene?.windows.first { $0.isKeyWindow } ?? scene?.windows.first
+        guard var top = window?.rootViewController else { return nil }
+
+        // 已经有一层弹窗在屏幕上时，不要在它上面再叠一层（会 present 失败），
+        // 返回它的宿主，让 `pump` 的 `presentedViewController == nil` 判断去排队等。
+        while let presented = top.presentedViewController {
+            if presented is UIAlertController {
+                return presented.presentingViewController ?? top
+            }
+            top = presented
+        }
+        while true {
+            if let nav = top as? UINavigationController, let visible = nav.visibleViewController {
+                top = visible; continue
+            }
+            if let tab = top as? UITabBarController, let selected = tab.selectedViewController {
+                top = selected; continue
+            }
+            break
+        }
+        return top
+    }
+
+    // MARK: 线程
+
+    private func onMain(_ block: @escaping @MainActor () -> Void) {
         if Thread.isMainThread {
-            MainActor.assumeIsolated { apply() }
+            MainActor.assumeIsolated { block() }
         } else {
-            DispatchQueue.main.async { MainActor.assumeIsolated { apply() } }
+            DispatchQueue.main.async { MainActor.assumeIsolated { block() } }
+        }
+    }
+}
+
+/// 点空白区关闭的手势代理。
+///
+/// 只做一件事：认出「落在面板外」的 tap。`shouldReceive` 用视图层级而不是坐标判断，
+/// 入场动画、旋转、动态字体调整都不会误判。
+final class FSAlertTapOutside: NSObject, UIGestureRecognizerDelegate {
+
+    weak var alert: UIAlertController?
+    var onTap: (() -> Void)?
+
+    @objc func handle(_ gesture: UITapGestureRecognizer) {
+        guard gesture.state == .ended else { return }
+        onTap?()
+    }
+
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
+                           shouldReceive touch: UITouch) -> Bool {
+        guard let alert else { return false }
+        return !(touch.view?.isDescendant(of: alert.view) ?? false)
+    }
+}
+
+extension FSAlertActionStyle {
+
+    var uiAlertStyle: UIAlertAction.Style {
+        switch self {
+        case .default: return .default
+        case .cancel: return .cancel
+        case .destructive: return .destructive
         }
     }
 }
@@ -235,7 +423,7 @@ public final class FSAlertCenter: ObservableObject, @unchecked Sendable {
 
 /// 弹窗渲染器（由根视图挂载）。
 ///
-/// alert 走自绘（`FSAlertDialog`），actionSheet 走系统 `confirmationDialog`。
+/// 2026-10-19 起只剩 actionSheet：alert 已交给 `UIAlertController` 直接 present。
 public struct FSAlertHost: View {
 
     @ObservedObject private var center = FSAlertCenter.shared
@@ -243,37 +431,21 @@ public struct FSAlertHost: View {
     public init() {}
 
     public var body: some View {
-        ZStack {
-            if let spec = center.current, spec.style == .alert {
-                FSAlertDialog(spec: spec, center: center)
-                    // 换一条弹窗就重建（如「每日一温」的下一篇）：滚动位置归零、入场动画重播；
-                    // 不重建则 ScrollView 沿用上一条的偏移，下一篇会直接停在底部。
-                    .id(spec.id)
-                    // 2026-10-18 用户：「是有个渐显动画吗？如果有的话，去掉渐显」。
-                    // 入场**不做透明度过渡**（`.identity`）——面板直接以满不透明度出现，
-                    // 只靠自身缩放收口，这样"从稍大缩回正常"才看得清；淡入会把缩放糊掉。
-                    // 退场保留 `.opacity`：那一刻要的是"化开"，不是"闪没"。
-                    .transition(.asymmetric(insertion: .identity, removal: .opacity))
-                    .zIndex(1)
-            }
-
-            // actionSheet 仍交给系统：它原生支持点外关闭，也自带 iPad popover 适配
-            Color.clear
-                .frame(width: 0, height: 0)
-                .confirmationDialog(center.current?.title ?? "",
-                                    isPresented: Binding(get: { center.current?.style == .actionSheet },
-                                                         set: { if !$0 { center.dismiss() } }),
-                                    presenting: center.current) { spec in
-                    actionButtons(for: spec)
-                } message: { spec in
-                    if spec.message.isEmpty == false {
-                        Text(spec.message)
-                    }
+        // alert 已改由 UIKit 的 `UIAlertController` 直接 present（见 `FSAlertCenter`），
+        // 这里只保留 actionSheet 这一条路径 —— 系统 `confirmationDialog` 原生支持点外关闭，
+        // 也自带 iPad popover 适配。
+        Color.clear
+            .frame(width: 0, height: 0)
+            .confirmationDialog(center.current?.title ?? "",
+                                isPresented: Binding(get: { center.current?.style == .actionSheet },
+                                                     set: { if !$0, center.current?.style == .actionSheet { center.dismiss() } }),
+                                presenting: center.current) { spec in
+                actionButtons(for: spec)
+            } message: { spec in
+                if spec.message.isEmpty == false {
+                    Text(spec.message)
                 }
-        }
-        // 2026-10-18：曲线交给 `FSAlertCenter.presentAnimation` / `dismissAnimation`（在 show/dismiss
-        // 里用 withAnimation 驱动），**这里不能再挂 `.animation(_:value:)`** —— 它的优先级高于
-        // 外部事务，会把入场/退场强行拉回同一条曲线，退场也就慢不下来。
+            }
     }
 
     /// actionSheet 的按钮（系统渲染，TextField 不支持，与改造前一致）
