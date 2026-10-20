@@ -145,9 +145,9 @@ public struct FSAlertSpec: Identifiable, @unchecked Sendable {
     /// 见 `FSAlertAnchorCenter`。
     public var anchorRect: CGRect?
 
-    public init(style: FSAlertStyle,
-                title: String,
-                message: String,
+    public init(style: FSAlertStyle = .alert,
+                title: String = "",
+                message: String = "",
                 actions: [FSAlertActionSpec],
                 inputs: [FSAlertInputSpec] = [],
                 tapOutsideToDismiss: Bool = true,

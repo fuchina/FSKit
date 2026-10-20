@@ -120,9 +120,7 @@ public enum FSLocationSupport {
         }
         specs.append(FSAlertActionSpec(title: "取消", style: .cancel, handler: nil))
 
-        FSAlertCenter.shared.show(FSAlertSpec(style: .actionSheet,
-                                              title: "选择导航方式",
-                                              message: "",
+        FSAlertCenter.shared.show(FSAlertSpec(title: "选择导航方式",
                                               actions: specs))
     }
     
