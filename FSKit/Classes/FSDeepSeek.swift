@@ -104,11 +104,11 @@ public final class FSDeepSeek {
 
     public var apiKey: String = ""
     public var baseURL: String = "https://api.deepseek.com"
-    public var defaultModel: String = "deepseek-v4-pro"
+    public var defaultModel: String = "deepseek-flash"
 
     private init() {}
 
-    public func configure(apiKey: String, baseURL: String = "https://api.deepseek.com", defaultModel: String = "deepseek-v4-pro") {
+    public func configure(apiKey: String, baseURL: String = "https://api.deepseek.com", defaultModel: String = "deepseek-flash") {
         self.apiKey = apiKey
         self.baseURL = baseURL
         self.defaultModel = defaultModel
