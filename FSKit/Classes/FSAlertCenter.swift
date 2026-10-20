@@ -423,7 +423,18 @@ public final class FSAlertCenter: ObservableObject, @unchecked Sendable {
         // `tapOutsideToDismiss` 是总开关，`tapOutsideCanDismiss` 只是附加条件
         //（与原自绘版 `FSAlertDialog` 的判定完全一致）
         guard spec.tapOutsideToDismiss else { return }
-        guard let container = alert.presentationController?.containerView else { return }
+        guard let container = alert.presentationController?.containerView else {
+            // 兜底：拿不到遮罩容器就点不了空白。若本条又没有取消按钮（2026-10-20 起是默认值），
+            // 弹窗将无路可退 ⇒ 补一个「取消」。
+            if spec.actions.contains(where: { $0.style == .cancel }) == false {
+                alert.addAction(UIAlertAction(title: "取消", style: .cancel) { [weak self] _ in
+                    guard let self else { return }
+                    self.finish(spec, alert: alert)
+                    self.pump()
+                })
+            }
+            return
+        }
 
         let proxy = FSAlertTapOutside()
         proxy.alert = alert
