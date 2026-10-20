@@ -72,6 +72,16 @@ public final class FSAlertAnchorCenter: ObservableObject {
         let inset = window.safeAreaInsets.bottom
         return CGRect(x: bounds.midX, y: bounds.maxY - inset - 8, width: 1, height: 1)
     }
+
+    /// 锚点矩形换算到 `proxy` 所在视图的局部坐标系。
+    ///
+    /// 落点是窗口坐标，而挂载视图的坐标系原点未必在 (0,0)（根视图落在安全区内、
+    /// 页面内容在导航栏之下），必须减掉该视图自己的全局原点。
+    func localRect(in proxy: GeometryProxy, frozen: CGRect? = nil) -> CGRect {
+        let target = frozen ?? currentAnchorRect()
+        let origin = proxy.frame(in: .global).origin
+        return target.offsetBy(dx: -origin.x, dy: -origin.y)
+    }
 }
 
 // MARK: - 被动触摸观察
@@ -166,5 +176,130 @@ struct FSTapAnchorProbe: UIViewRepresentable {
             recognizer.delaysTouchesEnded = false
             window.addGestureRecognizer(recognizer)
         }
+    }
+}
+
+// MARK: - 修饰器版：锚在落点的 confirmationDialog
+
+// 页内直接写 `.confirmationDialog` 的那批（2026-10-20 统计 14 处）挂在整页 body 上，
+// 于是 popover 锚在「页面正中央」。这里给一个形状完全相同、只是把挂载视图挪到落点的替代品：
+//
+//     .confirmationDialog("选择图片", isPresented: $show, titleVisibility: .visible) { ... }
+//     .fsTapAnchoredDialog("选择图片", isPresented: $show, titleVisibility: .visible) { ... }
+//
+// 参数名、顺序、尾随闭包全部对齐系统 API（`titleVisibility` 默认 `.automatic`），调用点只换名字。
+// 系统 `presenting:` 那一族暂不需要，故未提供。
+
+public extension View {
+
+    /// 同系统的 `.confirmationDialog(_:isPresented:titleVisibility:actions:)`，
+    /// 但弹窗锚定在**最后一次轻点落点**上（见 `FSAlertAnchorCenter`）。
+    func fsTapAnchoredDialog<Actions: View>(_ title: String,
+                                            isPresented: Binding<Bool>,
+                                            titleVisibility: Visibility = .automatic,
+                                            @ViewBuilder actions: @escaping () -> Actions) -> some View {
+        modifier(FSTapAnchoredDialog(title: title,
+                                     isPresented: isPresented,
+                                     titleVisibility: titleVisibility,
+                                     actions: actions))
+    }
+
+    /// 带 `message` 的重载，形状对齐系统的
+    /// `.confirmationDialog(_:isPresented:titleVisibility:actions:message:)`。
+    func fsTapAnchoredDialog<Actions: View, Message: View>(_ title: String,
+                                                           isPresented: Binding<Bool>,
+                                                           titleVisibility: Visibility = .automatic,
+                                                           @ViewBuilder actions: @escaping () -> Actions,
+                                                           @ViewBuilder message: @escaping () -> Message) -> some View {
+        modifier(FSTapAnchoredMessageDialog(title: title,
+                                            isPresented: isPresented,
+                                            titleVisibility: titleVisibility,
+                                            actions: actions,
+                                            message: message))
+    }
+}
+
+/// 锚在落点的挂载点：一个 1×1 的透明矩形，位置跟着最后一次轻点走。
+///
+/// - 用 `.overlay` 而不是改内容本身：overlay 不参与布局，对页面零影响；
+/// - `allowsHitTesting(false)`：它可能正好压在列表某一行上，绝不能吃触摸；
+/// - 弹窗在屏时用 `frozen` 快照：否则「点空白处关闭」那一下会先把挂载视图挪走、
+///   让 popover 抖一帧再消失。
+private struct FSTapAnchorSlot<Dialog: View>: View {
+
+    private let frozen: CGRect?
+    private let dialog: Dialog
+
+    @ObservedObject private var anchor = FSAlertAnchorCenter.shared
+
+    init(frozen: CGRect?, @ViewBuilder dialog: () -> Dialog) {
+        self.frozen = frozen
+        self.dialog = dialog()
+    }
+
+    var body: some View {
+        GeometryReader { proxy in
+            let rect = anchor.localRect(in: proxy, frozen: frozen)
+            dialog
+                .frame(width: 1, height: 1)
+                .position(x: rect.midX, y: rect.midY)
+                .allowsHitTesting(false)
+        }
+    }
+}
+
+/// `.fsTapAnchoredDialog(_:isPresented:titleVisibility:actions:)` 的实现
+private struct FSTapAnchoredDialog<Actions: View>: ViewModifier {
+
+    let title: String
+    @Binding var isPresented: Bool
+    let titleVisibility: Visibility
+    let actions: () -> Actions
+
+    @State private var frozen: CGRect?
+
+    func body(content: Content) -> some View {
+        content
+            .overlay {
+                FSTapAnchorSlot(frozen: frozen) {
+                    Color.clear
+                        .confirmationDialog(title,
+                                            isPresented: $isPresented,
+                                            titleVisibility: titleVisibility,
+                                            actions: actions)
+                }
+            }
+            .onChange(of: isPresented) { _, presented in
+                frozen = presented ? FSAlertAnchorCenter.shared.currentAnchorRect() : nil
+            }
+    }
+}
+
+/// 带 `message` 的那一版
+private struct FSTapAnchoredMessageDialog<Actions: View, Message: View>: ViewModifier {
+
+    let title: String
+    @Binding var isPresented: Bool
+    let titleVisibility: Visibility
+    let actions: () -> Actions
+    let message: () -> Message
+
+    @State private var frozen: CGRect?
+
+    func body(content: Content) -> some View {
+        content
+            .overlay {
+                FSTapAnchorSlot(frozen: frozen) {
+                    Color.clear
+                        .confirmationDialog(title,
+                                            isPresented: $isPresented,
+                                            titleVisibility: titleVisibility,
+                                            actions: actions,
+                                            message: message)
+                }
+            }
+            .onChange(of: isPresented) { _, presented in
+                frozen = presented ? FSAlertAnchorCenter.shared.currentAnchorRect() : nil
+            }
     }
 }
