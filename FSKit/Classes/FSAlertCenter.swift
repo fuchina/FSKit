@@ -138,6 +138,13 @@ public struct FSAlertSpec: Identifiable, @unchecked Sendable {
     /// 点遮罩时的附加条件：返回 false = 这次不关（有内容就不关，原 `handleAlertClick` 的语义）
     public var tapOutsideCanDismiss: (([String]) -> Bool)?
 
+    /// 弹窗锚点（窗口坐标）。
+    ///
+    /// iOS 26 起 action sheet 是「从锚点长出的 popover」，屏幕位置完全由它决定。
+    /// `.actionSheet` 在 `show` 里快照一次后不再变 —— 弹窗期间手指再点别处不会让它跳位置。
+    /// 见 `FSAlertAnchorCenter`。
+    public var anchorRect: CGRect?
+
     public init(style: FSAlertStyle,
                 title: String,
                 message: String,
@@ -208,14 +215,18 @@ public final class FSAlertCenter: ObservableObject, @unchecked Sendable {
             guard let self else { return }
 
             if spec.style == .actionSheet {
-                self.inputTexts = spec.inputs.map { $0.text }
+                // 2026-10-20：锚点快照。iOS 26 的 action sheet 是「从锚点长出的 popover」，
+                // 位置全靠这一行 —— 不设的话会沿用 `FSAlertHost` 里那个 0×0 视图的默认位置（屏幕正中）
+                var sheet = spec
+                sheet.anchorRect = FSAlertAnchorCenter.shared.currentAnchorRect()
+                self.inputTexts = sheet.inputs.map { $0.text }
                 // 原实现直接覆盖 current：上一条还挂在确认框的关闭流程上时，新的一条会被
                 // `isPresented = false` 的回调一起清掉（2026-10-20 武器库「清理」二级确认复现）
                 if self.sheetBusy {
-                    self.pendingSheets.append(spec)
+                    self.pendingSheets.append(sheet)
                     return
                 }
-                withAnimation(FSAlertCenter.presentAnimation(for: spec)) { self.current = spec }
+                withAnimation(FSAlertCenter.presentAnimation(for: sheet)) { self.current = sheet }
                 return
             }
 
@@ -493,9 +504,15 @@ extension FSAlertActionStyle {
 /// 弹窗渲染器（由根视图挂载）。
 ///
 /// 2026-10-19 起只剩 actionSheet：alert 已交给 `UIAlertController` 直接 present。
+///
+/// 2026-10-20 锚点修复：iOS 26 把 action sheet 改成了「从挂载它的 view 旁边长出的 popover」，
+/// 而这里原来挂在根 overlay 里一个 0×0 的 `Color.clear` 上 —— 该视图在 ZStack 里居中，
+/// 于是全 App 的 actionSheet 都从屏幕正中冒出。现在挂载视图**跟着最后一次轻点落点走**
+/// （见 `FSAlertAnchorCenter`），popover 的箭头就指着手指按下的位置。
 public struct FSAlertHost: View {
 
     @ObservedObject private var center = FSAlertCenter.shared
+    @ObservedObject private var anchor = FSAlertAnchorCenter.shared
 
     public init() {}
 
@@ -508,18 +525,47 @@ public struct FSAlertHost: View {
         //（否则 handler 里排进来的下一条会被这次关闭一起清掉）
         let showing = center.current
 
-        Color.clear
-            .frame(width: 0, height: 0)
-            .confirmationDialog(showing?.title ?? "",
-                                isPresented: Binding(get: { center.current?.style == .actionSheet },
-                                                     set: { if !$0 { center.sheetDismissed(id: showing?.id) } }),
-                                presenting: showing) { spec in
-                actionButtons(for: spec)
-            } message: { spec in
-                if spec.message.isEmpty == false {
-                    Text(spec.message)
+        GeometryReader { proxy in
+            let rect = anchorRect(in: proxy)
+
+            Color.clear
+                // 1×1 的透明矩形 ⇒ popover 锚点。**必须 allowsHitTesting(false)**：
+                // 它可能正好压在列表某一行上，不能吃触摸
+                .frame(width: max(rect.width, 1), height: max(rect.height, 1))
+                .position(x: rect.midX, y: rect.midY)
+                .allowsHitTesting(false)
+                .background {
+                    // 零尺寸探针：只要这条路径被挂上（根视图），落点观察者就会装到 window 上
+                    FSTapAnchorProbe()
+                        .frame(width: 0, height: 0)
                 }
-            }
+                .confirmationDialog(showing?.title ?? "",
+                                    isPresented: Binding(get: { center.current?.style == .actionSheet },
+                                                         set: { if !$0 { center.sheetDismissed(id: showing?.id) } }),
+                                    presenting: showing) { spec in
+                    actionButtons(for: spec)
+                } message: { spec in
+                    if spec.message.isEmpty == false {
+                        Text(spec.message)
+                    }
+                }
+        }
+    }
+
+    /// 锚点矩形换算到 overlay 自己的坐标系。
+    ///
+    /// 弹窗已经弹出来时用**快照**（`spec.anchorRect`），否则用实时落点 —— 这样
+    /// 「点空白区关闭」那一下不会先把挂载视图挪走、再让 popover 跳一下。
+    private func anchorRect(in proxy: GeometryProxy) -> CGRect {
+        let target: CGRect
+        if let current = center.current, current.style == .actionSheet, let snapshot = current.anchorRect {
+            target = snapshot
+        } else {
+            target = anchor.currentAnchorRect()
+        }
+        // 落点是窗口坐标，overlay 的坐标系原点未必在 (0,0)（根视图落在安全区内）
+        let origin = proxy.frame(in: .global).origin
+        return target.offsetBy(dx: -origin.x, dy: -origin.y)
     }
 
     /// actionSheet 的按钮（系统渲染，TextField 不支持，与改造前一致）
