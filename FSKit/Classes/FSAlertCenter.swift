@@ -201,6 +201,9 @@ public final class FSAlertCenter: ObservableObject, @unchecked Sendable {
     private var pendingSheets: [FSAlertSpec] = []
     /// 上一条 actionSheet 正在关闭（这期间来的新 sheet 一律进队列）
     private var sheetClosing = false
+    /// 当前 actionSheet 挂上屏的时刻。僵尸判定用：SwiftUI 偶发接不住 present 时，
+    /// `current` 会停在一条永远不显示的 sheet 上（见 `show`）。
+    private var sheetShownAt: Date?
     private var activeAlert: UIAlertController?
     private var activeSpec: FSAlertSpec?
     private var tapProxy: FSAlertTapOutside?
@@ -223,9 +226,19 @@ public final class FSAlertCenter: ObservableObject, @unchecked Sendable {
                 // 原实现直接覆盖 current：上一条还挂在确认框的关闭流程上时，新的一条会被
                 // `isPresented = false` 的回调一起清掉（2026-10-20 武器库「清理」二级确认复现）
                 if self.sheetBusy {
-                    self.pendingSheets.append(sheet)
-                    return
+                    // 僵尸兜底：actionSheet 在屏时用户点不到别处，若当前这条已挂 2s 以上又来新的 show，
+                    // 只能是 SwiftUI 没接住那次 present（iOS 26 popover 偶发丢弃）⇒ 清掉重来，
+                    // 否则 `sheetBusy` 恒真，全 App 的 actionSheet 会永久排在队列里。
+                    if self.sheetClosing == false, self.pendingSheets.isEmpty,
+                       let at = self.sheetShownAt, Date().timeIntervalSince(at) > 2 {
+                        self.current = nil
+                        self.sheetShownAt = nil
+                    } else {
+                        self.pendingSheets.append(sheet)
+                        return
+                    }
                 }
+                self.sheetShownAt = Date()
                 withAnimation(FSAlertCenter.presentAnimation(for: sheet)) { self.current = sheet }
                 return
             }
@@ -247,6 +260,7 @@ public final class FSAlertCenter: ObservableObject, @unchecked Sendable {
             guard let alert = self.activeAlert else {
                 self.pending.removeAll()
                 self.pendingSheets.removeAll()
+                self.sheetShownAt = nil
                 return
             }
 
@@ -280,6 +294,7 @@ public final class FSAlertCenter: ObservableObject, @unchecked Sendable {
     /// 关掉当前 actionSheet，并在它真正关完之后放下一条
     private func closeSheet() {
         sheetClosing = true
+        sheetShownAt = nil
         withAnimation(FSAlertCenter.dismissAnimation) { current = nil }
         promoteSheetSoon()
     }
@@ -318,6 +333,7 @@ public final class FSAlertCenter: ObservableObject, @unchecked Sendable {
             self.sheetClosing = false
             let next = self.pendingSheets.removeFirst()
             self.inputTexts = next.inputs.map { $0.text }
+            self.sheetShownAt = Date()
             withAnimation(FSAlertCenter.presentAnimation(for: next)) { self.current = next }
         }
     }

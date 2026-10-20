@@ -45,7 +45,10 @@ public final class FSAlertAnchorCenter: ObservableObject {
 
     /// 记一次轻点（只由 `FSTapAnchorRecognizer` 在主线程调用）
     func recordTap(_ point: CGPoint) {
-        tapPoint = point
+        // 同一落点不重复发布：避免根视图白重算一次、把锚点视图再"推"一下
+        if tapPoint != point {
+            tapPoint = point
+        }
         tapTime = Date()
     }
 
@@ -108,6 +111,13 @@ private final class FSTapAnchorRecognizer: UIGestureRecognizer {
         tracking = true
         moved = false
         startLocation = touches.first?.location(in: view) ?? .zero
+
+        // 落点在**按下瞬间**就登记。锚点视图必须先就位：
+        // 原实现只在 touchesEnded 记录，和按钮 action（show → present）几乎同帧，
+        // 视图仍在移动时 iOS 26 的 popover 会丢弃这次呈现（2026-10-20 武器库「清理」首点不弹）。
+        if let window = view?.window, let touch = touches.first {
+            FSAlertAnchorCenter.shared.recordTap(touch.location(in: window))
+        }
     }
 
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent) {
