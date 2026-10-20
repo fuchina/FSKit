@@ -17,6 +17,10 @@
 //  `tapOutsideToDismiss` 由 `addTapEvent` 登记。actionSheet 继续用系统 `confirmationDialog`
 //  （它原生支持点外关闭，也原生跟 iPad 的 popover 适配）。
 //
+//  2026-10-20 actionSheet 补排队：原来 `show` 直接覆盖 `current`，在按钮 handler 里再弹一条
+//  会被这次关闭的 `isPresented = false` 一起清掉（嵌套二级确认全哑）。现在 sheet 走
+//  `pendingSheets` 队列，由 `sheetDismissed(id:)` 认准「刚关掉的是哪一条」再放下一条。
+//
 
 import SwiftUI
 import UIKit
@@ -186,6 +190,10 @@ public final class FSAlertCenter: ObservableObject, @unchecked Sendable {
     /// 排队中的弹窗：`UIAlertController` 一次只能 present 一条，
     /// 正在显示时再 present 第二条会**静默失败**（无 completion、view.window == nil），必须排队。
     private var pending: [FSAlertSpec] = []
+    /// 排队中的 actionSheet：`confirmationDialog` 关掉上一条要几百毫秒，期间弹新的会被吃掉，必须排队。
+    private var pendingSheets: [FSAlertSpec] = []
+    /// 上一条 actionSheet 正在关闭（这期间来的新 sheet 一律进队列）
+    private var sheetClosing = false
     private var activeAlert: UIAlertController?
     private var activeSpec: FSAlertSpec?
     private var tapProxy: FSAlertTapOutside?
@@ -201,6 +209,12 @@ public final class FSAlertCenter: ObservableObject, @unchecked Sendable {
 
             if spec.style == .actionSheet {
                 self.inputTexts = spec.inputs.map { $0.text }
+                // 原实现直接覆盖 current：上一条还挂在确认框的关闭流程上时，新的一条会被
+                // `isPresented = false` 的回调一起清掉（2026-10-20 武器库「清理」二级确认复现）
+                if self.sheetBusy {
+                    self.pendingSheets.append(spec)
+                    return
+                }
                 withAnimation(FSAlertCenter.presentAnimation(for: spec)) { self.current = spec }
                 return
             }
@@ -215,12 +229,13 @@ public final class FSAlertCenter: ObservableObject, @unchecked Sendable {
             guard let self else { return }
 
             if let cur = self.current, cur.style == .actionSheet {
-                withAnimation(FSAlertCenter.dismissAnimation) { self.current = nil }
+                self.closeSheet()
                 return
             }
 
             guard let alert = self.activeAlert else {
                 self.pending.removeAll()
+                self.pendingSheets.removeAll()
                 return
             }
 
@@ -236,9 +251,63 @@ public final class FSAlertCenter: ObservableObject, @unchecked Sendable {
             self.activeAlert = nil
             self.activeSpec = nil
             self.tapProxy = nil
+            // 显式 dismiss 语义是「关掉所有弹窗」：排队中的 actionSheet 一并丢掉
+            self.pendingSheets.removeAll()
             if let spec, self.current?.id == spec.id { self.current = nil }
 
             alert.dismiss(animated: true) { [weak self] in self?.pump() }
+        }
+    }
+
+    // MARK: actionSheet 排队
+
+    /// 屏幕上有 actionSheet，或它还没关干净
+    private var sheetBusy: Bool {
+        sheetClosing || current?.style == .actionSheet
+    }
+
+    /// 关掉当前 actionSheet，并在它真正关完之后放下一条
+    private func closeSheet() {
+        sheetClosing = true
+        withAnimation(FSAlertCenter.dismissAnimation) { current = nil }
+        promoteSheetSoon()
+    }
+
+    /// `confirmationDialog` 把 `isPresented` 置 false 时回调（点按钮 / 取消 / 点遮罩都走这里）
+    func sheetDismissed(id: UUID?) {
+        onMain { [weak self] in
+            guard let self else { return }
+            guard let cur = self.current, cur.style == .actionSheet else { return }
+            // 已经被换成另一条（旧实现会这样）⇒ 别把新的清掉
+            if let id, cur.id != id { return }
+            self.closeSheet()
+        }
+    }
+
+    /// 等关闭动画走完再放下一条：弹太早，系统会把新的一条直接吃掉
+    private func promoteSheetSoon() {
+        guard pendingSheets.isEmpty == false else {
+            sheetClosing = false
+            return
+        }
+
+        sheetClosing = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) { [weak self] in
+            guard let self else { return }
+            guard self.pendingSheets.isEmpty == false else {
+                self.sheetClosing = false
+                return
+            }
+            // 屏幕上冒出别的弹窗（如 alert）就再等一轮，否则这条会永久卡在队列里
+            guard self.current == nil else {
+                self.promoteSheetSoon()
+                return
+            }
+
+            self.sheetClosing = false
+            let next = self.pendingSheets.removeFirst()
+            self.inputTexts = next.inputs.map { $0.text }
+            withAnimation(FSAlertCenter.presentAnimation(for: next)) { self.current = next }
         }
     }
 
@@ -434,12 +503,17 @@ public struct FSAlertHost: View {
         // alert 已改由 UIKit 的 `UIAlertController` 直接 present（见 `FSAlertCenter`），
         // 这里只保留 actionSheet 这一条路径 —— 系统 `confirmationDialog` 原生支持点外关闭，
         // 也自带 iPad popover 适配。
+        //
+        // 快照 `showing`：`isPresented` 的 setter 只能靠它判断刚被系统关掉的是哪一条
+        //（否则 handler 里排进来的下一条会被这次关闭一起清掉）
+        let showing = center.current
+
         Color.clear
             .frame(width: 0, height: 0)
-            .confirmationDialog(center.current?.title ?? "",
+            .confirmationDialog(showing?.title ?? "",
                                 isPresented: Binding(get: { center.current?.style == .actionSheet },
-                                                     set: { if !$0, center.current?.style == .actionSheet { center.dismiss() } }),
-                                presenting: center.current) { spec in
+                                                     set: { if !$0 { center.sheetDismissed(id: showing?.id) } }),
+                                presenting: showing) { spec in
                 actionButtons(for: spec)
             } message: { spec in
                 if spec.message.isEmpty == false {
@@ -457,6 +531,9 @@ public struct FSAlertHost: View {
                     input.commit(center.inputTexts[i])
                 }
                 action.handler?()
+                // 先跑 handler（下一条要趁 current 还是本条的时机入队），再认账本条已关闭；
+                // 系统随后写回的 `isPresented = false` 会再调一次，id 对不上直接忽略
+                center.sheetDismissed(id: spec.id)
             }
         }
     }
