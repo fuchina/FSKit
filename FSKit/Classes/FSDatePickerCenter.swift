@@ -124,6 +124,12 @@ public struct FSDatePickerOverlay: View {
 
             DatePickerPanel(date: draftBinding, onCancel: cancel, onConfirm: confirm)
                 .offset(y: isPresented ? 0 : Self.hiddenOffset)
+                // 收起时彻底不可见。
+                // 光靠 offset 滑出不够：键盘一弹起，根视图安全区底部上移到键盘顶，
+                // 面板只偏移 334 就不再够远 —— 面板上的蓝条（40pt）正好落在键盘区域内，
+                // 半透明键盘（搜狗/百度等第三方）会把它透出来（2026-10-20 踩坑：
+                // 新增待办页自动聚焦输入框，一进页面键盘下的蓝色时间选择器）。
+                .opacity(isPresented ? 1 : 0)
                 .allowsHitTesting(isPresented)
                 .accessibilityHidden(!isPresented)
         }
