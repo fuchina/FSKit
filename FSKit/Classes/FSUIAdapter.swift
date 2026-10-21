@@ -486,10 +486,10 @@ private struct FSReturnProbe: UIViewControllerRepresentable {
 
         required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 
-        // [DIAG] `.fsOnReturn` 闭包若强引用 store，本 VC 不释放就会吊住 store。
-        // 诊断用（2026-10-21）：`.fsOnReturn` 的闭包强引用页面 store，
-        // 若本 VC 在 pop 后没释放，就会把 store 一起吊住。这里打一行日志用于确认。
+        #if DEBUG
+        // 诊断用：`.fsOnReturn` 的闭包强引用页面 store 时，本 VC 不释放就会把 store 一起吊住。
         deinit { print("FSReturnProbe deinit") }
+        #endif
 
         override func viewWillAppear(_ animated: Bool) {
             super.viewWillAppear(animated)

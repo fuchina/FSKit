@@ -20,8 +20,9 @@ public let APPCOLOR = UIColor(red: 18/255.0, green: 152/255.0, blue: 233/255.0, 
 
 // MARK: - Debug Log
 public func FSLog(_ format: String, file: String = #file, function: String = #function, line: Int = #line) {
-    // [DIAG] 通用日志，Release 测试期也输出。
+    #if DEBUG
     print("\(function) - \(line)\n\(format)")
+    #endif
 }
 
 // MARK: - System Helpers
