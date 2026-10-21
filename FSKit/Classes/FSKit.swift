@@ -815,45 +815,6 @@ public enum FSKit {
         return data
     }
 
-    
-    // MARK: - Attributed String
-    // 富文本拼装已迁至 FSText.swift（FSTextSegment / FSTextRule / FSKit.attr(...)），
-    // 旧的 attributedString / middleLine / underLine 作为兼容层同步保留在那边。
-    
-    // MARK: - First Character
-    public static func firstCharacter(with string: String) -> String {
-        let mutableString = NSMutableString(string: string)
-        CFStringTransform(mutableString, nil, kCFStringTransformMandarinLatin, false)
-        CFStringTransform(mutableString, nil, kCFStringTransformStripDiacritics, false)
-        let pinyin = mutableString.capitalized
-        return String(pinyin.prefix(1))
-    }
-    
-    // MARK: - Bank Card Number
-    public static func forthCarNumber(_ text: String?) -> String? {
-        guard var text = text else { return nil }
-        text = text.replacingOccurrences(of: " ", with: "")
-        guard isValidateString(text) else { return nil }
-        
-        var result: [String] = []
-        let length = text.count
-        let numbers = length / 4
-        let rest = length % 4
-        
-        for i in 0..<numbers {
-            let start = text.index(text.startIndex, offsetBy: i * 4)
-            let end = text.index(start, offsetBy: 4)
-            result.append(String(text[start..<end]))
-        }
-        
-        if rest > 0 {
-            let start = text.index(text.startIndex, offsetBy: length - rest)
-            result.append(String(text[start...]))
-        }
-        
-        return result.joined(separator: " ")
-    }
-    
     // MARK: - Phone Call
     public static func call(_ phone: String?) {
         guard let phone = phone else { return }
@@ -983,21 +944,7 @@ public enum FSKit {
         }
         return params
     }
-    
-    // MARK: - Method Swizzle
-    public static func methodSwizzle(_ cls: AnyClass, origin oriSel: Selector, swizzle swiSel: Selector) {
-        guard let originMethod = class_getInstanceMethod(cls, oriSel),
-              let swizzledMethod = class_getInstanceMethod(cls, swiSel) else { return }
         
-        let hasMethod = class_addMethod(cls, oriSel, method_getImplementation(swizzledMethod), method_getTypeEncoding(swizzledMethod))
-        
-        if hasMethod {
-            class_replaceMethod(cls, swiSel, method_getImplementation(originMethod), method_getTypeEncoding(originMethod))
-        } else {
-            method_exchangeImplementations(originMethod, swizzledMethod)
-        }
-    }
-    
     // MARK: - String Part Display
     public static func showStringPart(_ string: String, front: Int, tail: Int, placeholder: String = "***") -> String {
         guard string.count > front, string.count > tail else { return string }
@@ -1027,13 +974,11 @@ public enum FSKit {
         return UIScreen()
     }
     
-    // MARK: - Digital Only String
     public static func digitalOnlyString(_ inputString: String?) -> String {
         guard let inputString = inputString, !inputString.isEmpty else { return "" }
         return inputString.replacingOccurrences(of: "\\D", with: "", options: .regularExpression)
     }
     
-    // MARK: - Bundle File
     public static func bundleFile(_ bundle: String?, name: String, ofType type: String) -> String? {
         let bundleObj = self.bundle(withName: bundle)
         return bundleObj?.path(forResource: name, ofType: type)
@@ -1046,38 +991,12 @@ public enum FSKit {
         return Bundle(path: bundlePath)
     }
     
-    // MARK: - Haptic Feedback
     public static func feedback(_ style: UIImpactFeedbackGenerator.FeedbackStyle) {
         let generator = UIImpactFeedbackGenerator(style: style)
         generator.prepare()
         generator.impactOccurred()
     }
-    
-    // MARK: - Keyboard
-    public static func keyboardSize(from notification: Notification) -> CGSize {
-        guard let name = notification.name as NSNotification.Name?,
-              name == UIResponder.keyboardWillShowNotification ||
-              name == UIResponder.keyboardWillChangeFrameNotification ||
-              name == UIResponder.keyboardWillHideNotification else { return .zero }
-        
-        guard let info = notification.userInfo,
-              let value = info[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue else { return .zero }
-        
-        return value.cgRectValue.size
-    }
-    
-    public static func keyboardNotificationScroll(_ notification: Notification, baseOn: Double) -> CGSize {
-        let keyboardSize = self.keyboardSize(from: notification)
-        
-        if notification.name == UIResponder.keyboardWillShowNotification {
-            return CGSize(width: WIDTHFC, height: max(keyboardSize.height + baseOn, HEIGHTFC))
-        } else if notification.name == UIResponder.keyboardWillHideNotification {
-            return CGSize(width: WIDTHFC, height: max(baseOn, HEIGHTFC))
-        }
-        return .zero
-    }
-    
-    // MARK: - Device Info
+            
     public static func deviceInfos() -> [[String: String]] {
         let device = UIDevice.current
         let screen = FSKit.currentScene()?.screen ?? UIScreen()
