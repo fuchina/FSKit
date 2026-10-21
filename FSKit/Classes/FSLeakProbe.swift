@@ -149,7 +149,9 @@ public enum FSLeakProbe {
 
         let types = Set(alive.map(\.typeName)).sorted().joined(separator: "、")
         let delay = Int(firstDelay + secondDelay)
-        report("疑似内存泄漏：\(page) 的 \(alive.count) 个对象在 \(delay) 秒后仍未释放（\(types)）")
+        // 附上当前 footprint：单个页面的泄漏通常只有几百 KB，但若已到几十 MB 量级，
+        // 说明是同一条引用链上吊住了一整片对象（store 之间是父子持有关系，会级联）。
+        report("疑似内存泄漏：\(page) 的 \(alive.count) 个对象在 \(delay) 秒后仍未释放（\(types)），当前占用 \(FSKit.memoryFootprintText())")
     }
 
     private static func report(_ msg: String) {

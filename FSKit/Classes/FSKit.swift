@@ -200,6 +200,45 @@ public enum FSKit {
 
     
     // MARK: - Memory & Disk
+
+    /// 当前进程物理占用（footprint，字节）。
+    ///
+    /// 这与 Xcode Debug Navigator / Instruments 里显示的 Memory 是同一个数，也是系统 jetsam
+    /// （内存不足杀进程）的判定依据。**不要用 `MACH_TASK_BASIC_INFO.resident_size`**：
+    /// 那是 RSS，含可回收的 clean pages，通常比 Xcode 显示值大很多。
+    public static func memoryFootprintBytes() -> UInt64 {
+        var info = task_vm_info_data_t()
+        var count = mach_msg_type_number_t(MemoryLayout<task_vm_info_data_t>.size / MemoryLayout<integer_t>.size)
+        let result = withUnsafeMutablePointer(to: &info) { pointer in
+            pointer.withMemoryRebound(to: integer_t.self, capacity: Int(count)) { rebound in
+                task_info(mach_task_self_, task_flavor_t(TASK_VM_INFO), rebound, &count)
+            }
+        }
+        guard result == KERN_SUCCESS else { return 0 }
+        return info.phys_footprint
+    }
+
+    /// 当前进程占用（MB），与 Xcode 显示一致
+    public static func memoryFootprint() -> Double {
+        Double(memoryFootprintBytes()) / 1024.0 / 1024.0
+    }
+
+    /// 本进程还能申请多少（MB，iOS 13+）。
+    ///
+    /// 这是「离被系统杀掉还有多远」的直接指标，比整机空闲内存更有参考价值。
+    /// 模拟器上可能返回 0。
+    public static func availableMemoryForApp() -> Double {
+        Double(os_proc_available_memory()) / 1024.0 / 1024.0
+    }
+
+    /// 形如 "128.4MB"，便于日志与 toast（内部先造字符串，避免多处重复 format）
+    public static func memoryFootprintText() -> String {
+        String(format: "%.1fMB", memoryFootprint())
+    }
+
+    /// resident_size（RSS，MB）。
+    ///
+    /// 与 Xcode 显示值不一致，仅保留用于和旧日志比对；新代码请用 `memoryFootprint()`。
     public static func usedMemory() -> Double {
         var taskInfo = mach_task_basic_info()
         var count = mach_msg_type_number_t(MemoryLayout<mach_task_basic_info>.size) / 4
@@ -212,6 +251,10 @@ public enum FSKit {
         return Double(taskInfo.resident_size) / 1024.0 / 1024.0
     }
     
+    /// 整机空闲内存（MB）。
+    ///
+    /// 注意：这是**设备全局**的空闲页，不是本 App 的可用额度；线上表现与它关系不大。
+    /// 要看本进程还能吃多少，用 `availableMemoryForApp()`。
     public static func availableMemory() -> Double {
         var vmStats = vm_statistics_data_t()
         var infoCount = mach_msg_type_number_t(MemoryLayout<vm_statistics_data_t>.stride / MemoryLayout<integer_t>.stride)
