@@ -95,11 +95,6 @@ final class _FSDeallocTracker {
     deinit {
         let name = viewName
         let k = key
-        #if DEBUG
-        // 诊断用（2026-10-21）：与 `FSReturnProbe deinit` 日志对照，
-        // 可区分「整棵视图树都没释放」与「只有 store 被外部闭包吊住」两种泄漏。
-        print("\(name) deinit")
-        #endif
         DispatchQueue.main.async {
             FSLeakDetector.cancelCheck(key: k)
         }
