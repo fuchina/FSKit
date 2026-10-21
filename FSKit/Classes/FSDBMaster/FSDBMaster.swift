@@ -39,9 +39,8 @@ public nonisolated class FSDBMaster {
     // MARK: - 初始化
     deinit {
         
-        #if DEBUG
+        // [DIAG] 数据库单例释放日志。
         print("SwiftDBMaster dealloc")
-        #endif
         
         if let db = sqlite3 {
             sqlite3_close(db)

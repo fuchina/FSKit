@@ -27,9 +27,8 @@ public enum FSURLSessionManager {
         let task = session.dataTask(with: url) { data, response, error in
             DispatchQueue.main.async {
                 if let error = error {
-                    #if DEBUG
+                    // [DIAG] 网络错误日志，Release 测试期也输出。
                     print(error.localizedDescription)
-                    #endif
                     failBox.value?()
                     return
                 }
@@ -61,9 +60,8 @@ public enum FSURLSessionManager {
         let task = session.dataTask(with: request) { data, response, error in
             DispatchQueue.main.async {
                 if let error = error {
-                    #if DEBUG
+                    // [DIAG] 网络错误日志，Release 测试期也输出。
                     print(error.localizedDescription)
-                    #endif
                     failBox.value?()
                     return
                 }
