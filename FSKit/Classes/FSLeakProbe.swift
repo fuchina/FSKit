@@ -68,9 +68,17 @@ public enum FSLeakProbe {
     }
 
     /// 页面 `onAppear` 时登记业务对象（store / model / manager）。
+    ///
+    /// 同一页被重新 push、或从子页 pop 回来再次 onAppear 时，会覆盖同一个 key：
+    /// 必须先取消上一轮尚未跑完的检查，否则 13 秒窗口内会被「新实例」的存活状态顶替，
+    /// 产生「明明没漏却报泄漏」的误报（pop 后立刻再进同一页就会踩到）。
     public static func watch<T: AnyObject>(_ objects: [T], page: String, depth: Int) {
         guard objects.isEmpty == false else { return }
-        boxes[key(page: page, depth: depth)] = objects.map { FSWeakBox($0) }
+
+        let k = key(page: page, depth: depth)
+        pending[k]?.cancel()
+        pending.removeValue(forKey: k)
+        boxes[k] = objects.map { FSWeakBox($0) }
     }
 
     /// 页面退出（pop / dismiss）时启动检查。
