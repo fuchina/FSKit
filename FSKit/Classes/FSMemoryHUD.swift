@@ -6,9 +6,10 @@
 //
 //  - 显示当前 footprint（与 Xcode Debug Navigator 同一个数）、会话峰值、相对启动的增量
 //  - 真机上额外显示系统允许本进程继续申请的额度（模拟器返回 0 时自动隐藏该行）
-//  - 可拖动，位置持久化；开关状态也持久化
+//  - 可拖动，位置存 UserDefaults；**开关状态不在这里持久化** —— 落库字段是
+//    `AppConfiger.debugSwitch`（沿用原「Debug日」那一行），由 `FSJZAPP` 读库后推进来
 //
-//  开关入口：设置页「内存浮层」；也可以在代码里 `FSMemoryHUDState.shared.enabled = true`
+//  开关入口：设置页「内存浮层」（改的是落库字段），或代码里 `FSMemoryHUDState.shared.enabled = true`
 //  挂载点：AppRootScreen 的 overlay（`FSMemoryHUD()` 内部自己判断开关，关着时什么都不渲染）
 //
 
@@ -16,26 +17,23 @@ import SwiftUI
 
 // MARK: - 状态
 
-/// 浮层的开关与位置（持久化到 UserDefaults，不依赖 FSJZKit）
+/// 浮层的开关与位置。位置存 UserDefaults；开关的持久化交给上层（`AppConfiger.debugSwitch`），
+/// 因为 FSKit 是零依赖库、不能 import FSJZKit。
 @MainActor
 public final class FSMemoryHUDState: ObservableObject {
 
     public static let shared = FSMemoryHUDState()
 
-    private static let enabledKey = "fs_memory_hud_enabled"
     private static let offsetXKey = "fs_memory_hud_offset_x"
     private static let offsetYKey = "fs_memory_hud_offset_y"
 
-    /// 是否显示浮层
-    @Published public var enabled: Bool {
-        didSet { UserDefaults.standard.set(enabled, forKey: Self.enabledKey) }
-    }
+    /// 是否显示浮层。初值恒为 false，`FSJZAPP` 初始化时会按落库的 `debug_switch` 覆盖。
+    @Published public var enabled: Bool = false
 
     /// 相对默认位置的偏移（拖动累积）。拖动结束时才落盘，避免每帧写 UserDefaults。
     @Published public var offset: CGSize
 
     private init() {
-        enabled = UserDefaults.standard.bool(forKey: Self.enabledKey)
         let x = UserDefaults.standard.double(forKey: Self.offsetXKey)
         let y = UserDefaults.standard.double(forKey: Self.offsetYKey)
         offset = CGSize(width: x, height: y)
