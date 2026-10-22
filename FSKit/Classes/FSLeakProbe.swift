@@ -26,6 +26,58 @@
 //
 
 import Foundation
+import Observation
+
+// MARK: - 页面 store 宿主盒子
+
+/// 页面 store 的宿主盒子：**重对象不要直接放 `@State`**。
+///
+/// 2026-10-23 实证（`FSPMView`）：经 `router.push` 进来的页面，它自己的 `@State` location
+/// 会被某份视图副本长期吊住 —— 一个**只被 State 引用**、没有任何业务代码碰过的空标记类，
+/// 13 秒后仍与页面 store 一起存活；而挂在另一个 modifier 上的 `debugDealloc` location 却按时释放。
+/// 结论：**这个 location 会被吊住，放进 location 的东西一概不释放**，改初始化时机、把闭包改 weak
+/// 都没用（那两轮都试过，`init` 1 次 / `deinit` 0 次照旧）。
+///
+/// 所以 State 里只放这个几十字节的盒子，重对象挂在 `store` 上，页面离场后主动置空：
+/// ```swift
+/// @State private var host = FSStoreHost<FSValueStore>()
+///
+/// if let store = host.store { content(store) }        // body
+/// .onAppear {
+///     host.keepAlive()
+///     guard host.store == nil else { return }
+///     host.store = FSValueStore(...)
+/// }
+/// .onDisappear {
+///     host.store?.saveIfNeeded()
+///     host.closeSoon()                                // 0.6s 后才置 nil
+/// }
+/// ```
+@Observable
+public final class FSStoreHost<Store: AnyObject> {
+
+    public var store: Store?
+
+    /// 清理令牌：`keepAlive()` / `closeSoon()` 都 +1，迟到的清理发现令牌变了就跳过
+    /// （防止「刚 pop 又立刻回来」时把刚建好的页面清成空白）
+    @ObservationIgnored private var closeToken = 0
+
+    public init() {}
+
+    /// 页面离场：等转场走完再放开重对象（默认 0.6s，pop 动画约 0.35s）。
+    /// 只改类实例、不动 SwiftUI state ⇒ 不会触发 pop 期间那次空白重绘。
+    public func closeSoon(after delay: TimeInterval = 0.6) {
+        closeToken += 1
+        let token = closeToken
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
+            guard let self, self.closeToken == token else { return }
+            self.store = nil
+        }
+    }
+
+    /// 页面重新出现（被上层页盖住后又回来）：撤销尚未执行的清理
+    public func keepAlive() { closeToken += 1 }
+}
 
 // MARK: - 弱引用盒子
 
