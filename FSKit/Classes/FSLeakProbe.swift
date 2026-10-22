@@ -58,6 +58,9 @@ public final class FSStoreHost<Store: AnyObject> {
 
     public var store: Store?
 
+    /// 本页在导航栈中的深度（`onAppear` 时由页面写入）。不参与观察，避免无谓重绘。
+    @ObservationIgnored public var depth: Int = 0
+
     /// 清理令牌：`keepAlive()` / `closeSoon()` 都 +1，迟到的清理发现令牌变了就跳过
     /// （防止「刚 pop 又立刻回来」时把刚建好的页面清成空白）
     @ObservationIgnored private var closeToken = 0
@@ -75,8 +78,20 @@ public final class FSStoreHost<Store: AnyObject> {
         }
     }
 
-    /// 页面重新出现（被上层页盖住后又回来）：撤销尚未执行的清理
-    public func keepAlive() { closeToken += 1 }
+    /// 页面出现（含被上层页盖住后又回来）：撤销尚未执行的清理，并记下本页栈深度
+    public func keepAlive(depth: Int? = nil) {
+        closeToken += 1
+        if let depth { self.depth = depth }
+    }
+
+    /// 页面离场：**只有真的被 pop 掉才放开重对象**。
+    ///
+    /// 自己 push 了子页时 `router.path` 反而更深，这时必须保留 store，
+    /// 否则从子页返回后表单输入、筛选条件、展开状态会被重置。
+    public func closeIfPopped(pathCount: Int) {
+        guard pathCount < depth else { return }
+        closeSoon()
+    }
 }
 
 // MARK: - 弱引用盒子
