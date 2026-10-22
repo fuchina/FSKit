@@ -25,6 +25,22 @@ public final class FSLeakDetector {
     /// 挂过 `debugDealloc` 的页面名（进程内累计）；未登记的页面不检测，避免误报
     @MainActor private static var registered: Set<String> = []
 
+    /// 存活表：key → 该层 tracker 的**弱引用**。
+    ///
+    /// 5 秒到点时以它为准，而不是「定时器有没有被 deinit 取消」——后者有两个漏洞：
+    /// 1. `cancelCheck` 是 `deinit` 里 `DispatchQueue.main.async` 派发的，视图可能比
+    ///    `onChange(of: routes)` 更早释放，`startCheck` 反而在取消之后才登记，定时器永远没人取消；
+    /// 2. key 里的深度是 `onAppear` 时读的 `router.path.count`，若与出栈下标算出的深度不一致，
+    ///    取消的是另一个 key ⇒ 必然误报。
+    /// 用弱引用判定则只有一种结论：这一层的 tracker 还在 ⇒ 视图存储确实没释放。
+    @MainActor private static var live: [String: FSWeakBox] = [:]
+
+    /// 由 `debugDealloc` 在 onAppear 建好 tracker 后登记
+    @MainActor
+    static func track(_ tracker: _FSDeallocTracker) {
+        live[tracker.key] = FSWeakBox(tracker)
+    }
+
     /// 由 `debugDealloc` 在 onAppear 时调用
     @MainActor
     public static func register(_ viewName: String) {
@@ -45,16 +61,21 @@ public final class FSLeakDetector {
         timers[key]?.cancel()
 
         let item = DispatchWorkItem {
-            let msg = "疑似内存泄漏：\(viewName) 未释放"
-            NotificationCenter.default.post(
-                name: NSNotification.Name(FS_BE_LEAK_NOTIFICATION),
-                object: msg
-            )
-            print("\(msg)")
-            // Swift 6：本 block 由 `main.asyncAfter` 派发，必然在主线程执行。
-            // 原来的 `Task { @MainActor in … }` 会让编译器把整个 DispatchWorkItem
-            //（非 Sendable）判为跨域发送。改为同步断言主线程，语义等价。
-            MainActor.assumeIsolated { _ = timers.removeValue(forKey: key) }
+            // 先确认「这一层真的还活着」。
+            // 本 block 由 `main.asyncAfter` 派发，必然在主线程执行 ⇒ 同步读静态表是安全的。
+            MainActor.assumeIsolated {
+                let stillAlive = live[key]?.isAlive ?? false
+                live.removeValue(forKey: key)
+                timers.removeValue(forKey: key)
+                guard stillAlive else { return }
+
+                let msg = "疑似内存泄漏：\(viewName) 未释放（深度 \(depth)）"
+                NotificationCenter.default.post(
+                    name: NSNotification.Name(FS_BE_LEAK_NOTIFICATION),
+                    object: msg
+                )
+                print("\(msg)")
+            }
         }
         timers[key] = item
         DispatchQueue.main.asyncAfter(deadline: .now() + 5.0, execute: item)
@@ -121,7 +142,10 @@ private struct _FSDeallocViewModifier: ViewModifier {
             let depth = router.path.count
             FSLeakDetector.register(viewName)
             if tracker == nil {
-                tracker = _FSDeallocTracker(viewName: viewName, depth: depth)
+                let newTracker = _FSDeallocTracker(viewName: viewName, depth: depth)
+                tracker = newTracker
+                // 登记弱引用：5 秒到点时以「它还在不在」为判据（见 FSLeakDetector.live）
+                FSLeakDetector.track(newTracker)
             }
         }
     }
