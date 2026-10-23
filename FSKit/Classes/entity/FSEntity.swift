@@ -138,29 +138,3 @@ public extension FSEntity {
         }
     }
 }
-
-// MARK: - 建模入口（泛型转发命名空间）
-//
-// 协议类型 `FSEntity` 不能调用返回 `[Self]` 的静态方法（`Self` 无法由存在类型推导），
-// 而全库 90 余处调用点/调用签名都是「从一个 `Any` 行数组建出模型」。
-// 保留这个泛型命名空间做转发，调用点形状不变；新代码优先直接写 `Model.toms(from:)`。
-public enum FSEntityMap {
-
-    public static func tom<T: FSEntity>(from row: [String: Any]) -> T {
-        T.tom(from: row)
-    }
-
-    public static func toms<T: FSEntity>(from rows: [[String: Any]]) -> [T] {
-        T.toms(from: rows)
-    }
-
-    public static func toms<T: FSEntity>(from rows: [[String: Any]],
-                                         before: ((T) -> Void)?,
-                                         after: ((T) -> Void)?) -> [T] {
-        T.toms(from: rows, before: before, after: after)
-    }
-
-    public static func toms<T: FSEntity>(from rows: [[String: String]]) -> [T] {
-        T.toms(from: rows)
-    }
-}
