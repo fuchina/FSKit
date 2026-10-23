@@ -63,7 +63,7 @@ public func fsField<Model>(_ keyPath: WritableKeyPath<Model, Bool>) -> (inout Mo
 // 现在 `applyFields(to:)` 传值 + 表里 `inout` ⇒ 类语义正确、结构体不可用。
 // 等模型改 struct 时，这里换成 `applyFields(to: inout Self, from:)`，
 // 字段表**一行都不用改**（表本来就是 `inout` 的）。
-public protocol FSEntity: AnyObject {
+public protocol FSEntity: AnyObject, Equatable {
 
     init()
 
@@ -75,6 +75,12 @@ public protocol FSEntity: AnyObject {
 }
 
 public extension FSEntity {
+
+    /// 身份相等。旧基类经 `NSObject` 白送的就是这个语义，改协议后必须显式补上：
+    /// 全库有 5 处 `[Model].firstIndex(of:)` / `[Model].contains(_:)` 依赖它。
+    nonisolated static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs === rhs
+    }
 
     func beforeSetProperties() {}
     func afterSetProperties() {}
@@ -133,11 +139,11 @@ public extension FSEntity {
     }
 }
 
-// MARK: - 建模入口（保留旧写法）
+// MARK: - 建模入口（泛型转发命名空间）
 //
-// 历史调用点写的是 `FSEntityMap.toms(from: list)`（静态方法挂在旧的基类上）。
-// 协议类型上不能调用返回 `[Self]` 的静态方法，所以保留一个同名命名空间做转发，
-// 全库 90 处调用**无需改动**。
+// 协议类型 `FSEntity` 不能调用返回 `[Self]` 的静态方法（`Self` 无法由存在类型推导），
+// 而全库 90 余处调用点/调用签名都是「从一个 `Any` 行数组建出模型」。
+// 保留这个泛型命名空间做转发，调用点形状不变；新代码优先直接写 `Model.toms(from:)`。
 public enum FSEntityMap {
 
     public static func tom<T: FSEntity>(from row: [String: Any]) -> T {
