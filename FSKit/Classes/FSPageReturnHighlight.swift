@@ -273,6 +273,16 @@ nonisolated public protocol FSPageTarget: Hashable {
     static func fsMakeView(_ page: Self) -> AnyView
 }
 
+nonisolated public extension FSPageTarget {
+
+    /// 路由值的身份由 `FSPageValue.uid` 承担，**不参与视图 diff** ——
+    /// 因此这里只按页名比较，实现者不必让每个字段都 Hashable
+    /// （store 类、回调闭包都能直接放进路由值）。
+    static func == (lhs: Self, rhs: Self) -> Bool { lhs.fsPageName == rhs.fsPageName }
+
+    func hash(into hasher: inout Hasher) { hasher.combine(fsPageName) }
+}
+
 /// 数据通道的栈元素。`uid` 只为「同一参数连续 push 两次」保留独立身份，
 /// 不参与语义 —— 页面语义完全由 `target` 决定。
 public struct FSPageValue: Hashable, Identifiable {
