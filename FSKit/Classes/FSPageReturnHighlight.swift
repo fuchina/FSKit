@@ -224,27 +224,24 @@ private struct FSPageReturnPressStyle: ButtonStyle {
 
 // MARK: - 全 SwiftUI 导航栈（替代 UINavigationController）
 
-/// 一次 push 的目标页：用闭包持有页面视图（及其 store）。
-/// 该闭包被 `FSNavRouter.path` 持有 ⇒ 被 push 期间 store 不会释放；pop 后随之释放。
-public struct FSPageRoute: Hashable, Identifiable {
+/// 历史上按「name + 闭包」写的页面。**兼容形态，新代码不要用**。
+///
+/// 它同样是一个 `FSPageTarget`，所以 `path` 里只有 `FSPageValue` 一种元素 ——
+/// 但页面内容对路由表不透明（不可序列化、不可深链）。
+/// 现存使用点用 `grep -rn "FSPageLegacy"` 可数；迁移一页就少一个。
+public struct FSPageLegacy: FSPageTarget {
 
-    public let uid: UUID
-    /// 页面名（用于 popTo(_:) 定位、泄漏检测打点）
     public let name: String
     private let content: () -> AnyView
 
-    public var id: UUID { uid }
-
     public init<V: View>(_ name: String, @ViewBuilder content: @escaping () -> V) {
-        self.uid = UUID()
         self.name = name
         self.content = { AnyView(content()) }
     }
 
-    public func makeView() -> AnyView { content() }
+    public var fsPageName: String { name }
 
-    public static func == (lhs: FSPageRoute, rhs: FSPageRoute) -> Bool { lhs.uid == rhs.uid }
-    public func hash(into hasher: inout Hasher) { hasher.combine(uid) }
+    public static func fsMakeView(_ page: Self, router: FSNavRouter) -> AnyView { page.content() }
 }
 
 // MARK: - 数据通道（与闭包通道并存）
@@ -260,7 +257,7 @@ public struct FSPageRoute: Hashable, Identifiable {
 /// struct FSConfigCOSPage: FSPageTarget {
 ///     let pwd: String
 ///     var fsPageName: String { "FSConfigCOSScreen" }   // 必须与旧通道的 name 一致
-///     static func fsMakeView(_ page: Self) -> AnyView { AnyView(FSConfigCOSView(pwd: page.pwd)) }
+///     static func fsMakeView(_ page: Self, router: FSNavRouter) -> AnyView { AnyView(FSConfigCOSView(pwd: page.pwd)) }
 /// }
 /// router.push(FSConfigCOSPage(pwd: pwd))               // 新通道
 /// ```
@@ -270,7 +267,7 @@ nonisolated public protocol FSPageTarget: Hashable {
     var fsPageName: String { get }
 
     /// 由值构造页面视图。放在本页文件里，避免 FSKit 反向依赖各业务 pod。
-    static func fsMakeView(_ page: Self) -> AnyView
+    static func fsMakeView(_ page: Self, router: FSNavRouter) -> AnyView
 }
 
 nonisolated public extension FSPageTarget {
@@ -299,37 +296,20 @@ public struct FSPageValue: Hashable, Identifiable {
         self.target = AnyHashable(target)
     }
 
-    public func makeView() -> AnyView {
+    /// `router` 只在构造目标视图那一刻才拿得到（它就是本栈的路由器），
+    /// 因此由 `navigationDestination` 传进来，而不是塞进路由值 ——
+    /// 路由值持有 router 会和 `router.path` 形成引用环。
+    public func makeView(router: FSNavRouter) -> AnyView {
         guard let anyTarget = target.base as? any FSPageTarget else {
             assertionFailure("FSPageValue: \(name) 不是 FSPageTarget")
             return AnyView(EmptyView())
         }
-        return Self.open(anyTarget)
+        return Self.open(anyTarget, router: router)
     }
 
     /// 打开存在类型：Swift 5.7+ 的隐式打开，静态派发到各自的 `fsMakeView`
-    private static func open<T: FSPageTarget>(_ page: T) -> AnyView { T.fsMakeView(page) }
-}
-
-/// 栈里的一项：两条通道的统一表示。
-public enum FSPathItem: Hashable, Identifiable {
-
-    case view(FSPageRoute)
-    case data(FSPageValue)
-
-    public var id: UUID {
-        switch self {
-        case .view(let route): return route.uid
-        case .data(let value): return value.uid
-        }
-    }
-
-    /// 页面名（`popTo(_:)` 跨通道通用）
-    public var name: String {
-        switch self {
-        case .view(let route): return route.name
-        case .data(let value): return value.name
-        }
+    private static func open<T: FSPageTarget>(_ page: T, router: FSNavRouter) -> AnyView {
+        T.fsMakeView(page, router: router)
     }
 }
 
@@ -338,7 +318,7 @@ public enum FSPathItem: Hashable, Identifiable {
 @Observable
 public final class FSNavRouter {
 
-    public var path: [FSPathItem] = []
+    public var path: [FSPageValue] = []
 
     public init() {}
 
@@ -348,12 +328,12 @@ public final class FSNavRouter {
 
     /// 等价 `pushViewController(_:animated:)`
     public func push<V: View>(_ name: String, @ViewBuilder _ content: @escaping () -> V) {
-        path.append(.view(FSPageRoute(name, content: content)))
+        path.append(FSPageValue(FSPageLegacy(name, content: content)))
     }
 
     /// 数据通道：压入一个纯值，视图由该类型自己的 `fsMakeView` 解析。
     public func push<T: FSPageTarget>(_ target: T) {
-        path.append(.data(FSPageValue(target)))
+        path.append(FSPageValue(target))
     }
 
     /// 等价 `popViewController(animated:)`
@@ -422,11 +402,8 @@ public struct FSPushStack<Content: View>: View {
 
         return NavigationStack(path: $router.path) {
             content
-                .navigationDestination(for: FSPathItem.self) { item in
-                    switch item {
-                    case .view(let route): route.makeView()
-                    case .data(let value): value.makeView()
-                    }
+                .navigationDestination(for: FSPageValue.self) { value in
+                    value.makeView(router: router)
                 }
         }
         // 二级页隐藏 tab bar（对齐原 FSNavigationController 的 `hidesBottomBarWhenPushed` 行为）。
