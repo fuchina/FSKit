@@ -171,7 +171,8 @@ public struct FSAlertSpec: Identifiable, @unchecked Sendable {
 /// - `actionSheet` 仍走 SwiftUI 的 `confirmationDialog`（它本来就是原生 action sheet）。
 ///
 /// 自绘那套代码（`FSAlertDialog`）保留在本文件末尾，不再被引用。
-public final class FSAlertCenter: ObservableObject, @unchecked Sendable {
+@Observable
+public final class FSAlertCenter: @unchecked Sendable {
 
     public static let shared = FSAlertCenter()
 
@@ -187,27 +188,27 @@ public final class FSAlertCenter: ObservableObject, @unchecked Sendable {
     /// - `.actionSheet`：这是**渲染源**，`FSAlertHost` 靠它出界面；
     /// - `.alert`：**只作状态标记**（SwiftUI 的 `.fsAlert` 靠它的 id 变化同步 `isPresented`），
     ///   界面由 UIKit 的 `UIAlertController` 呈现，不参与 SwiftUI 渲染。
-    @Published public private(set) var current: FSAlertSpec?
+    public private(set) var current: FSAlertSpec?
 
     /// 输入框文本（与当前弹窗的 `inputs` 一一对应）
-    @Published public var inputTexts: [String] = []
+    public var inputTexts: [String] = []
 
     // MARK: 内部状态
 
     /// 排队中的弹窗：`UIAlertController` 一次只能 present 一条，
     /// 正在显示时再 present 第二条会**静默失败**（无 completion、view.window == nil），必须排队。
-    private var pending: [FSAlertSpec] = []
+    @ObservationIgnored private var pending: [FSAlertSpec] = []
     /// 排队中的 actionSheet：`confirmationDialog` 关掉上一条要几百毫秒，期间弹新的会被吃掉，必须排队。
-    private var pendingSheets: [FSAlertSpec] = []
+    @ObservationIgnored private var pendingSheets: [FSAlertSpec] = []
     /// 上一条 actionSheet 正在关闭（这期间来的新 sheet 一律进队列）
-    private var sheetClosing = false
+    @ObservationIgnored private var sheetClosing = false
     /// 当前 actionSheet 挂上屏的时刻。僵尸判定用：SwiftUI 偶发接不住 present 时，
     /// `current` 会停在一条永远不显示的 sheet 上（见 `show`）。
-    private var sheetShownAt: Date?
-    private var activeAlert: UIAlertController?
-    private var activeSpec: FSAlertSpec?
-    private var tapProxy: FSAlertTapOutside?
-    private var retryCount = 0
+    @ObservationIgnored private var sheetShownAt: Date?
+    @ObservationIgnored private var activeAlert: UIAlertController?
+    @ObservationIgnored private var activeSpec: FSAlertSpec?
+    @ObservationIgnored private var tapProxy: FSAlertTapOutside?
+    @ObservationIgnored private var retryCount = 0
 
     private init() {}
 
@@ -538,8 +539,8 @@ extension FSAlertActionStyle {
 /// （见 `FSAlertAnchorCenter`），popover 的箭头就指着手指按下的位置。
 public struct FSAlertHost: View {
 
-    @ObservedObject private var center = FSAlertCenter.shared
-    @ObservedObject private var anchor = FSAlertAnchorCenter.shared
+    private let center = FSAlertCenter.shared
+    private let anchor = FSAlertAnchorCenter.shared
 
     public init() {}
 
@@ -645,7 +646,7 @@ public struct FSAlertHost: View {
 private struct FSAlertDialog: View {
 
     let spec: FSAlertSpec
-    @ObservedObject var center: FSAlertCenter
+    let center: FSAlertCenter
 
     /// 深浅色要分开取值：实测的 rgb(236) 是**浅色**下的输入块，深色下同样用白 60% 会变成刺眼的白块
     @Environment(\.colorScheme) private var colorScheme

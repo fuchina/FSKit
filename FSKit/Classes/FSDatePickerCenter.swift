@@ -39,12 +39,13 @@ public struct FSDatePickerSpec: Identifiable, @unchecked Sendable {
 ///
 /// Swift 6 语言模式：`show` 会把 `self` 送进 `@MainActor` 闭包，故补 `@unchecked Sendable`
 /// （可变状态已由 `MainActor.assumeIsolated` 保证只在主线程访问）。
-public final class FSDatePickerCenter: ObservableObject, @unchecked Sendable {
+@Observable
+public final class FSDatePickerCenter: @unchecked Sendable {
 
     // 2026-10-17：Pod 与主 App 统一为默认主隔离后，nonisolated(unsafe) 反而报错，故移除。
     public static let shared = FSDatePickerCenter()
 
-    @Published public private(set) var current: FSDatePickerSpec?
+    public private(set) var current: FSDatePickerSpec?
 
     /// 滚轮当前选中值。
     ///
@@ -52,8 +53,9 @@ public final class FSDatePickerCenter: ObservableObject, @unchecked Sendable {
     /// 所以放在这里而不是视图的 `@State`。`show` 里**先写它、再 publish `current`**，
     /// 这样入场动画的第一帧就是正确日期（旧实现靠 `onChange` 补设，会先闪一下上次的日期）。
     ///
-    /// 故意不加 `@Published`：滚轮每滚一格都会写它，publish 会让整个浮层重算。
-    public var draft: Date = Date()
+    /// 故意标 `@ObservationIgnored`：滚轮每滚一格都会写它，可观察的话整个浮层会跟着重算
+    ///（`@Observable` 默认跟踪**所有**存储属性，与旧版只有 `@Published` 才跟踪不同）。
+    @ObservationIgnored public var draft: Date = Date()
 
     private init() {}
 
@@ -90,13 +92,13 @@ public final class FSDatePickerCenter: ObservableObject, @unchecked Sendable {
 ///    现建一个 `UIDatePicker`，这笔开销正好落在 0.3s 入场动画里 → 掉帧。
 /// 2. `zh-CN` locale 提成 `static let`。旧实现写在 `body` 里，滚轮每动一格 body 重算就
 ///    重新造一个 Locale 塞进环境（等于反复重配滚轮）。
-/// 3. 滚轮值改由 `FSDatePickerCenter.draft`（非 `@Published`）持有，拖动滚轮不再触发
+/// 3. 滚轮值改由 `FSDatePickerCenter.draft`（`@ObservationIgnored`）持有，拖动滚轮不再触发
 ///    浮层重算，只更新 UIDatePicker 自己。
 /// 4. 动画从 `body` 上的 `.animation(_:value:)` 挪到 `show` / `dismiss` 内部用 `withAnimation`，
 ///    只动画「显隐这一次事务」，不在滚轮子树里留常驻的隐式动画。
 public struct FSDatePickerOverlay: View {
 
-    @ObservedObject private var center = FSDatePickerCenter.shared
+    private let center = FSDatePickerCenter.shared
 
     public init() {}
 

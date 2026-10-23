@@ -27,7 +27,7 @@ import UIKit
 
 public struct FSLikeCellClick<Content: View>: View {
 
-    @EnvironmentObject private var store: FSPageReturnHighlight
+    @Environment(FSPageReturnHighlight.self) private var store
     private let id: AnyHashable
     private let onTap: () -> Void
     private let content: Content

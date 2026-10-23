@@ -26,20 +26,21 @@ import SwiftUI
 import UIKit
 
 /// 最近一次轻点落点的登记处（窗口坐标）。
+@Observable
 @MainActor
-public final class FSAlertAnchorCenter: ObservableObject {
+public final class FSAlertAnchorCenter {
 
     public static let shared = FSAlertAnchorCenter()
 
     /// 最后一次轻点落点。nil = 本次启动还没点过。
-    @Published public private(set) var tapPoint: CGPoint?
+    public private(set) var tapPoint: CGPoint?
 
     /// 落点有效期。
     /// 弹窗可能是异步回调里弹的（网络回来、定时器、数据库回写），那时手指早就离开了几秒钟，
     /// 拿一个旧落点当锚点还不如退到底部兜底位置，故超时即作废。
     public static let tapPointMaxAge: TimeInterval = 2.0
 
-    private var tapTime: Date = .distantPast
+    @ObservationIgnored private var tapTime: Date = .distantPast
 
     private init() {}
 
@@ -240,7 +241,7 @@ private struct FSTapAnchorSlot<Dialog: View>: View {
     private let frozen: CGRect?
     private let dialog: Dialog
 
-    @ObservedObject private var anchor = FSAlertAnchorCenter.shared
+    private let anchor = FSAlertAnchorCenter.shared
 
     init(frozen: CGRect?, @ViewBuilder dialog: () -> Dialog) {
         self.frozen = frozen

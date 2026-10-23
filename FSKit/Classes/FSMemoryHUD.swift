@@ -19,8 +19,9 @@ import SwiftUI
 
 /// 浮层的开关与位置。位置存 UserDefaults；开关的持久化交给上层（`AppConfiger.debugSwitch`），
 /// 因为 FSKit 是零依赖库、不能 import FSJZKit。
+@Observable
 @MainActor
-public final class FSMemoryHUDState: ObservableObject {
+public final class FSMemoryHUDState {
 
     public static let shared = FSMemoryHUDState()
 
@@ -28,10 +29,10 @@ public final class FSMemoryHUDState: ObservableObject {
     private static let offsetYKey = "fs_memory_hud_offset_y"
 
     /// 是否显示浮层。初值恒为 false，`FSJZAPP` 初始化时会按落库的 `debug_switch` 覆盖。
-    @Published public var enabled: Bool = false
+    public var enabled: Bool = false
 
     /// 相对默认位置的偏移（拖动累积）。拖动结束时才落盘，避免每帧写 UserDefaults。
-    @Published public var offset: CGSize
+    public var offset: CGSize
 
     private init() {
         let x = UserDefaults.standard.double(forKey: Self.offsetXKey)
@@ -56,7 +57,7 @@ public final class FSMemoryHUDState: ObservableObject {
 
 public struct FSMemoryHUD: View {
 
-    @ObservedObject private var state = FSMemoryHUDState.shared
+    private let state = FSMemoryHUDState.shared
 
     /// 当前 footprint（MB）
     @State private var current: Double = 0

@@ -13,12 +13,13 @@ import SwiftUI
 ///
 /// Swift 6 语言模式：`show` 会把 `self` 送进 `@MainActor` 闭包，故补 `@unchecked Sendable`
 /// （可变状态已由 `MainActor.assumeIsolated` 保证只在主线程访问）。
-public final class FSLoadingCenter: ObservableObject, @unchecked Sendable {
+@Observable
+public final class FSLoadingCenter: @unchecked Sendable {
 
     // 2026-10-17：Pod 与主 App 统一为默认主隔离后，nonisolated(unsafe) 反而报错，故移除。
     public static let shared = FSLoadingCenter()
 
-    @Published public private(set) var isLoading = false
+    public private(set) var isLoading = false
 
     private init() {}
 
@@ -37,7 +38,7 @@ public final class FSLoadingCenter: ObservableObject, @unchecked Sendable {
 /// 外观对齐原实现：全屏透明遮罩（挡点击但不压暗）+ 80×80 黑底 0.7、圆角 6、白色转圈。
 public struct FSLoadingOverlay: View {
 
-    @ObservedObject private var center = FSLoadingCenter.shared
+    private let center = FSLoadingCenter.shared
 
     public init() {}
 

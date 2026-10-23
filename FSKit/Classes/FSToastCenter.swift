@@ -28,26 +28,27 @@ public struct FSToastMessage: Identifiable, Equatable {
 
 /// 全局 toast 中心：允许**多条同时存在**，每条独立计时、独立消失。
 /// 旧版只保留一个槽位（`current`），后来的 toast 会顶掉前一条 —— 已废弃该行为。
-public final class FSToastCenter: ObservableObject, @unchecked Sendable {
+@Observable
+public final class FSToastCenter: @unchecked Sendable {
 
     public static let shared = FSToastCenter()
 
     /// 当前存活的全部 toast，按加入顺序排列（最旧的在前）
-    @Published public private(set) var items: [FSToastMessage] = []
+    public private(set) var items: [FSToastMessage] = []
 
     /// 同时最多保留几条；超出时丢弃最旧的。
     /// 之所以要上限：debug 通知里有 `duration: 600` 的长驻 toast，不设上限会无限堆叠。
-    public var maxVisible: Int = 6
+    @ObservationIgnored public var maxVisible: Int = 6
 
-    private var seq: Int = 0
+    @ObservationIgnored private var seq: Int = 0
 
     /// 待插入队列。`show()` 只往这里入队，由 `drainPending()` 逐条落到 `items` 上。
     /// 之所以要排队：SwiftUI 会把「同一帧内的所有状态变更」合并成一次更新，
     /// 一次回调里连打多条日志时直接 append 会让它们同帧出现，既没有淡入也没有「上方让位」动画。
-    private var pending: [FSToastMessage] = []
+    @ObservationIgnored private var pending: [FSToastMessage] = []
 
     /// 是否已有排空任务在跑（避免并发起多个 drain 循环）
-    private var isDraining = false
+    @ObservationIgnored private var isDraining = false
 
     /// 连续多条时的入队间隔（秒）。必须大于一帧，否则又会被合并；0.14s ≈ 8 帧 @60Hz。
     private let insertInterval: Double = 0.14
@@ -178,7 +179,7 @@ public final class FSToastCenter: ObservableObject, @unchecked Sendable {
 /// 浮层：把 `FSToastCenter.items` 竖直排列，多条并存时逐条往上让位
 public struct FSToastOverlay: View {
 
-    @ObservedObject private var center = FSToastCenter.shared
+    private let center = FSToastCenter.shared
 
     private var maxWidth: CGFloat { WIDTHFC - 50 }
 

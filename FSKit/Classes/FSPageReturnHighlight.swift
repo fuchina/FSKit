@@ -12,26 +12,26 @@
 //    完全不依赖 VC 实例比较、不依赖网络请求，也无需调用方挂任何生命周期
 //
 //  ★★ 真·无痕插拔（推荐用法）：用 FSPageReturnList 容器包住你的 List/ForEach，
-//     容器内部用 @StateObject 托管共享 store 并经 environmentObject 自动下发给每个 row。
+//     容器内部用 `@State` 托管共享 store 并经 `.environment(_:)` 自动下发给每个 row。
 //     调用方 **零属性、零传参、零生命周期 override**，row 内部自检测返回并淡出：
 //  ```
 //  FSPageReturnList {                       // ← 容器托管 store，自动注入
 //      List {
 //          ForEach(items, id: \.id) { model in
 //              FSPageReturnRow(id: model.aid, onTap: { pushEdit(model) }) {
-//                  MyRow(model: model)      // ← row 从 @EnvironmentObject 拿 store，无需传
+//                  MyRow(model: model)      // ← row 从环境里拿 store，无需传
 //              }
 //          }
 //      }
 //  }
 //  ```
 //  ⚠️ 前提：承载这棵 SwiftUI 树的 UIHostingController **只建一次、靠数据驱动刷新**
-//     （数据用 ObservableObject 的 @Published 驱动 List）。若宿主每次 reload 都销毁重建
-//     整棵树，容器的 @StateObject 会随树一起新建 → store 被重置 → 灰底丢失、看不到淡出。
+//     （数据用 `@Observable` 驱动 List）。若宿主每次 reload 都销毁重建
+//     整棵树，容器的 `@State` 会随树一起新建 → store 被重置 → 灰底丢失、看不到淡出。
 //     UIKit 宿主请务必「hosting 建一次 + 数据驱动」，不要在每次刷新里重建 rootView。
 //
-//  ⚠️ FSPageReturnRow 用 @EnvironmentObject 取共享 store，**必须**包在 FSPageReturnList
-//     之内使用；脱离容器单独使用会因环境对象缺失而崩溃（@EnvironmentObject 无默认值）。
+//  ⚠️ FSPageReturnRow 用 `@Environment(FSPageReturnHighlight.self)` 取共享 store，
+//     **必须**包在 FSPageReturnList 之内使用；脱离容器单独使用会因环境值缺失而崩溃。
 //
 //  ★ content 铺满整行的注意事项：
 //     FSPageReturnRow 的 content 需使用「主动撑满」的布局（如 HStack{...Spacer()}），
@@ -43,17 +43,18 @@ import Observation
 import SwiftUI
 import UIKit
 
-/// 高亮状态容器（由 FSPageReturnList 用 @StateObject 托管，经 environment 共享给所有 row）：
+/// 高亮状态容器（由 FSPageReturnList 用 `@State` 托管，经 environment 共享给所有 row）：
 /// 点击点亮某个 id（变灰）；当页面从下一级（编辑/详情）pop 回来、导航重新显示本页时
 /// 自动熄灭并触发淡出。用「点击时刻」做去抖：点击后立即发生的 push 转场对应的
 /// will/didShow 被忽略，仅处理稍后（用户返回）的通知，避免依赖 VC 实例比较、更稳健。
-public final class FSPageReturnHighlight: ObservableObject {
-    @Published public var highlightedId: AnyHashable?
+@Observable
+public final class FSPageReturnHighlight {
+    public var highlightedId: AnyHashable?
     /// 最近一次点击（点亮）的时间戳，用于区分「push 转场」与「pop 返回」
-    private var tapTime: TimeInterval = 0
+    @ObservationIgnored private var tapTime: TimeInterval = 0
     // 2026-10-17：deinit 是 nonisolated，读被主隔离化的属性会报错；本属性仅在
     // init 里写入、deinit 里遍历移除，改 nonisolated(unsafe) 不改变任何逻辑。
-    nonisolated(unsafe) private var tokens: [NSObjectProtocol] = []
+    @ObservationIgnored nonisolated(unsafe) private var tokens: [NSObjectProtocol] = []
 
     public init() {
         let names = [
@@ -95,10 +96,10 @@ public final class FSPageReturnHighlight: ObservableObject {
     }
 }
 
-/// 无痕容器：用 @StateObject 托管一份共享的 FSPageReturnHighlight，
-/// 并通过 environmentObject 自动下发给内部所有 FSPageReturnRow。
+/// 无痕容器：用 `@State` 托管一份共享的 FSPageReturnHighlight，
+/// 并通过 `.environment(_:)` 自动下发给内部所有 FSPageReturnRow。
 public struct FSPageReturnList<Content: View>: View {
-    @StateObject private var store = FSPageReturnHighlight()
+    @State private var store = FSPageReturnHighlight()
     private let content: Content
 
     public init(@ViewBuilder content: () -> Content) {
@@ -107,7 +108,7 @@ public struct FSPageReturnList<Content: View>: View {
 
     public var body: some View {
         content
-            .environmentObject(store)
+            .environment(store)
             // 全 SwiftUI 化后 UINavigationController 通知不再可靠：
             // 三路冗余触发同一个**幂等**复位（谁先到都行，重复调用无副作用）
             .onAppear { store.resetIfReturning() }
@@ -149,12 +150,12 @@ private struct FSPageReturnLifecycleProbe: UIViewControllerRepresentable {
 /// 点击高亮行：点击瞬间点亮灰底并触发 onTap（通常 push 下一页），
 /// 灰底保持到「被盖住的页面 pop 回来」时由共享 store 自动复位淡出。
 /// 长按（按住）期间也会变灰（ButtonStyle.isPressed 驱动），松手恢复，不导航。
-/// store 由外层 FSPageReturnList 经 @EnvironmentObject 注入，无需调用方传入。
+/// store 由外层 FSPageReturnList 经 `@Environment(FSPageReturnHighlight.self)` 注入，无需调用方传入。
 ///
 /// ⚠️ content 需用「主动撑满」的布局方式（HStack+Spacer），不要只用 frame(maxWidth: .infinity)——
 /// Button 在 List 里是紧凑布局，被动等约束撑不开。参照 FSBirthRow：HStack{ content; Spacer() }。
 public struct FSPageReturnRow<Content: View>: View {
-    @EnvironmentObject private var store: FSPageReturnHighlight
+    @Environment(FSPageReturnHighlight.self) private var store
     private let id: AnyHashable
     private let onTap: () -> Void
     private let content: Content
@@ -233,12 +234,12 @@ private struct FSPageReturnPressStyle: ButtonStyle {
 /// 可入栈的页面标识。实现者是**值类型**，只带本页需要的参数。
 ///
 /// ```
-/// struct FSConfigCOSPage: FSPageTarget {
+/// struct FSDemoPage: FSPageTarget {
 ///     let pwd: String
-///     var fsPageName: String { "FSConfigCOSScreen" }   // `popTo(_:)` 与泄漏打点靠它定位
-///     static func fsMakeView(_ page: Self, router: FSNavRouter) -> AnyView { AnyView(FSConfigCOSView(pwd: page.pwd)) }
+///     var fsPageName: String { "FSDemoScreen" }        // `popTo(_:)` 与泄漏打点靠它定位
+///     static func fsMakeView(_ page: Self, router: FSNavRouter) -> AnyView { AnyView(FSDemoView(pwd: page.pwd)) }
 /// }
-/// router.push(FSConfigCOSPage(pwd: pwd))
+/// router.push(FSDemoPage(pwd: pwd))
 /// ```
 nonisolated public protocol FSPageTarget: Hashable {
 

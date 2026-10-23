@@ -49,12 +49,13 @@ public struct FSHalfListSpec: Identifiable, @unchecked Sendable {
 ///
 /// Swift 6 语言模式：`show` / `dismiss` 会把 `self` 送进 `@MainActor` 闭包，
 /// 故补 `@unchecked Sendable`（可变状态已由 `MainActor.assumeIsolated` 保证只在主线程访问）。
-public final class FSHalfListCenter: ObservableObject, @unchecked Sendable {
+@Observable
+public final class FSHalfListCenter: @unchecked Sendable {
 
     // 2026-10-17：Pod 与主 App 统一为默认主隔离后，nonisolated(unsafe) 反而报错，故移除。
     public static let shared = FSHalfListCenter()
 
-    @Published public private(set) var current: FSHalfListSpec?
+    public private(set) var current: FSHalfListSpec?
 
     private init() {}
 
@@ -81,7 +82,7 @@ public final class FSHalfListCenter: ObservableObject, @unchecked Sendable {
 /// 半屏列表浮层（由根视图挂载）
 public struct FSHalfListOverlay: View {
 
-    @ObservedObject private var center = FSHalfListCenter.shared
+    private let center = FSHalfListCenter.shared
 
     public init() {}
 
