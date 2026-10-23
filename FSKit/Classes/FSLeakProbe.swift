@@ -53,6 +53,20 @@ import Observation
 ///     host.closeSoon()                                // 0.6s 后才置 nil
 /// }
 /// ```
+///
+/// 需要「被子页盖住时保留、真被 pop 才清」的页面改用 `closeIfPopped(pathCount:)`，
+/// 并且 **`depth:` 只在建 store 那一笔传**（2026-10-24）：
+/// ```swift
+/// .onAppear {
+///     if host.store == nil {
+///         host.keepAlive(depth: router.path.count)    // 只有这一笔是可信的（正常就是 0）
+///         host.store = FSValueStore(...)
+///     } else {
+///         host.keepAlive()                            // 重新出现只撤销在途清理，绝不改深度
+///     }
+/// }
+/// .onDisappear { host.closeIfPopped(pathCount: router.path.count) }
+/// ```
 @Observable
 public final class FSStoreHost<Store: AnyObject> {
 
@@ -60,6 +74,9 @@ public final class FSStoreHost<Store: AnyObject> {
 
     /// 本页在导航栈中的深度（`onAppear` 时由页面写入）。不参与观察，避免无谓重绘。
     @ObservationIgnored public var depth: Int = 0
+
+    /// 是否已经记过深度（用来区分「还没记过」和「记的就是 0」）
+    @ObservationIgnored private var depthRecorded = false
 
     /// 清理令牌：`keepAlive()` / `closeSoon()` 都 +1，迟到的清理发现令牌变了就跳过
     /// （防止「刚 pop 又立刻回来」时把刚建好的页面清成空白）
@@ -79,9 +96,28 @@ public final class FSStoreHost<Store: AnyObject> {
     }
 
     /// 页面出现（含被上层页盖住后又回来）：撤销尚未执行的清理，并记下本页栈深度
+    ///
+    /// ★★ 2026-10-24 加固：`depth` **只允许往「更浅」修正**。
+    ///
+    /// 页面自己在栈里的位置只会因为「本页被 pop 掉」而消失，绝不会真的变深；会让它看起来变深的，
+    /// 全是「被子页压着时又 onAppear」——tab 切回来、后台唤醒、多级 pop 的中间态。
+    /// 那种**假深度**一旦记下来，回到 root 时 `pathCount < depth` 就成立 ⇒ `closeIfPopped`
+    /// 误判成「本页被 pop 掉了」⇒ store 被清 ⇒ 重新出现是个空 store
+    /// （症状：表单/筛选被重置；首页「每日一温」按钮直接消失且当天不自愈）。
+    ///
+    /// 只在建 store 那一笔传 depth 是标准写法（见类型注释里的示例）；这里再兜一层，
+    /// 保证已存在的 16 处「每次 onAppear 都传 depth」的调用也不会被误清。
     public func keepAlive(depth: Int? = nil) {
         closeToken += 1
-        if let depth { self.depth = depth }
+        guard let depth else { return }
+
+        if depthRecorded {
+            // 往浅处修正（假深度 ⇒ 真位置），但永远不会被推深
+            self.depth = min(self.depth, depth)
+        } else {
+            self.depth = depth
+            depthRecorded = true
+        }
     }
 
     /// 页面离场：**只有真的被 pop 掉才放开重对象**。
@@ -89,6 +125,9 @@ public final class FSStoreHost<Store: AnyObject> {
     /// 自己 push 了子页时 `router.path` 反而更深，这时必须保留 store，
     /// 否则从子页返回后表单输入、筛选条件、展开状态会被重置。
     public func closeIfPopped(pathCount: Int) {
+        // 栈底页（tab 根）永远不可能被 pop 掉 ⇒ 一律不清理。
+        // 这条同时挡住了「depth 被记成 0 以外的东西」造成的误清（2026-10-24）。
+        guard depth > 0 else { return }
         guard pathCount < depth else { return }
         closeSoon()
     }
