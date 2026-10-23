@@ -224,46 +224,25 @@ private struct FSPageReturnPressStyle: ButtonStyle {
 
 // MARK: - 全 SwiftUI 导航栈（替代 UINavigationController）
 
-/// 历史上按「name + 闭包」写的页面。**兼容形态，新代码不要用**。
-///
-/// 它同样是一个 `FSPageTarget`，所以 `path` 里只有 `FSPageValue` 一种元素 ——
-/// 但页面内容对路由表不透明（不可序列化、不可深链）。
-/// 现存使用点用 `grep -rn "FSPageLegacy"` 可数；迁移一页就少一个。
-public struct FSPageLegacy: FSPageTarget {
-
-    public let name: String
-    private let content: () -> AnyView
-
-    public init<V: View>(_ name: String, @ViewBuilder content: @escaping () -> V) {
-        self.name = name
-        self.content = { AnyView(content()) }
-    }
-
-    public var fsPageName: String { name }
-
-    public static func fsMakeView(_ page: Self, router: FSNavRouter) -> AnyView { page.content() }
-}
-
-// MARK: - 数据通道（与闭包通道并存）
+// MARK: - 路由通道
 //
-// path 里可以放两种元素：
-//   `.view` = 旧通道，闭包直接持有页面视图（506 个调用点仍走它）
-//   `.data` = 新通道，只放 Hashable 值，视图由该类型自己的 `fsMakeView` 解析
-// 新通道的入参是纯值 ⇒ 可序列化、可深链、可做状态恢复；不带闭包与类实例。
+// path 里只有 `FSPageValue` 一种元素，元素身份由值类型的 `fsPageName` 决定，
+// 页面视图由该类型自己的 `fsMakeView(_:router:)` 解析 —— 栈里不再持有任何闭包。
+// ⇒ path 可读、可打点、可做深链；视图只在该页被真正渲染时构造一次。
 
 /// 可入栈的页面标识。实现者是**值类型**，只带本页需要的参数。
 ///
 /// ```
 /// struct FSConfigCOSPage: FSPageTarget {
 ///     let pwd: String
-///     var fsPageName: String { "FSConfigCOSScreen" }   // 必须与旧通道的 name 一致
+///     var fsPageName: String { "FSConfigCOSScreen" }   // `popTo(_:)` 与泄漏打点靠它定位
 ///     static func fsMakeView(_ page: Self, router: FSNavRouter) -> AnyView { AnyView(FSConfigCOSView(pwd: page.pwd)) }
 /// }
-/// router.push(FSConfigCOSPage(pwd: pwd))               // 新通道
+/// router.push(FSConfigCOSPage(pwd: pwd))
 /// ```
 nonisolated public protocol FSPageTarget: Hashable {
 
-    /// 页面名。`popTo(_:)` 定位与泄漏打点共用，**必须**与旧通道用的 name 完全一致。
+    /// 页面名。`popTo(_:)` 定位与泄漏打点共用，**必须**与页面自身的语义名一致。
     var fsPageName: String { get }
 
     /// 由值构造页面视图。放在本页文件里，避免 FSKit 反向依赖各业务 pod。
@@ -326,12 +305,7 @@ public final class FSNavRouter {
     public var topName: String? { path.last?.name }
     public var isAtRoot: Bool { path.isEmpty }
 
-    /// 等价 `pushViewController(_:animated:)`
-    public func push<V: View>(_ name: String, @ViewBuilder _ content: @escaping () -> V) {
-        path.append(FSPageValue(FSPageLegacy(name, content: content)))
-    }
-
-    /// 数据通道：压入一个纯值，视图由该类型自己的 `fsMakeView` 解析。
+    /// 压入一个页面值，视图由该类型自己的 `fsMakeView` 解析。
     public func push<T: FSPageTarget>(_ target: T) {
         path.append(FSPageValue(target))
     }
