@@ -177,12 +177,12 @@ private struct FSLeakWatchModifier<T: AnyObject>: ViewModifier {
 /// 对象层只要挂过 `debugWatch` 就会检查。
 struct FSLeakCheckOnPopModifier: ViewModifier {
 
-    let routes: [FSPageRoute]
+    let routes: [FSPathItem]
 
     func body(content: Content) -> some View {
         content.onChange(of: routes) { old, new in
-            let kept = Set(new.map(\.uid))
-            let removed = old.enumerated().filter { kept.contains($0.element.uid) == false }
+            let kept = Set(new.map(\.id))
+            let removed = old.enumerated().filter { kept.contains($0.element.id) == false }
             guard removed.isEmpty == false else { return }
             // onChange 在主线程回调；assumeIsolated 让编译器认可 MainActor 隔离
             MainActor.assumeIsolated {
@@ -216,7 +216,7 @@ private struct FSLeakCheckOnDismissModifier: ViewModifier {
 extension View {
 
     /// 导航栈专用：栈路径变化时自动为被弹出的页面打点
-    func fsLeakCheckOnPop(_ routes: [FSPageRoute]) -> some View {
+    func fsLeakCheckOnPop(_ routes: [FSPathItem]) -> some View {
         modifier(FSLeakCheckOnPopModifier(routes: routes))
     }
 

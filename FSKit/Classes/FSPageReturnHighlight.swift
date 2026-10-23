@@ -39,6 +39,7 @@
 //     参照 FSBirthRow 的写法：HStack{ content; Spacer() }。
 //
 
+import Observation
 import SwiftUI
 import UIKit
 
@@ -246,11 +247,88 @@ public struct FSPageRoute: Hashable, Identifiable {
     public func hash(into hasher: inout Hasher) { hasher.combine(uid) }
 }
 
+// MARK: - 数据通道（与闭包通道并存）
+//
+// path 里可以放两种元素：
+//   `.view` = 旧通道，闭包直接持有页面视图（506 个调用点仍走它）
+//   `.data` = 新通道，只放 Hashable 值，视图由该类型自己的 `fsMakeView` 解析
+// 新通道的入参是纯值 ⇒ 可序列化、可深链、可做状态恢复；不带闭包与类实例。
+
+/// 可入栈的页面标识。实现者是**值类型**，只带本页需要的参数。
+///
+/// ```
+/// struct FSConfigCOSPage: FSPageTarget {
+///     let pwd: String
+///     var fsPageName: String { "FSConfigCOSScreen" }   // 必须与旧通道的 name 一致
+///     static func fsMakeView(_ page: Self) -> AnyView { AnyView(FSConfigCOSView(pwd: page.pwd)) }
+/// }
+/// router.push(FSConfigCOSPage(pwd: pwd))               // 新通道
+/// ```
+nonisolated public protocol FSPageTarget: Hashable {
+
+    /// 页面名。`popTo(_:)` 定位与泄漏打点共用，**必须**与旧通道用的 name 完全一致。
+    var fsPageName: String { get }
+
+    /// 由值构造页面视图。放在本页文件里，避免 FSKit 反向依赖各业务 pod。
+    static func fsMakeView(_ page: Self) -> AnyView
+}
+
+/// 数据通道的栈元素。`uid` 只为「同一参数连续 push 两次」保留独立身份，
+/// 不参与语义 —— 页面语义完全由 `target` 决定。
+public struct FSPageValue: Hashable, Identifiable {
+
+    public let uid: UUID
+    public let name: String
+    public let target: AnyHashable
+
+    public var id: UUID { uid }
+
+    public init<T: FSPageTarget>(_ target: T) {
+        self.uid = UUID()
+        self.name = target.fsPageName
+        self.target = AnyHashable(target)
+    }
+
+    public func makeView() -> AnyView {
+        guard let anyTarget = target.base as? any FSPageTarget else {
+            assertionFailure("FSPageValue: \(name) 不是 FSPageTarget")
+            return AnyView(EmptyView())
+        }
+        return Self.open(anyTarget)
+    }
+
+    /// 打开存在类型：Swift 5.7+ 的隐式打开，静态派发到各自的 `fsMakeView`
+    private static func open<T: FSPageTarget>(_ page: T) -> AnyView { T.fsMakeView(page) }
+}
+
+/// 栈里的一项：两条通道的统一表示。
+public enum FSPathItem: Hashable, Identifiable {
+
+    case view(FSPageRoute)
+    case data(FSPageValue)
+
+    public var id: UUID {
+        switch self {
+        case .view(let route): return route.uid
+        case .data(let value): return value.uid
+        }
+    }
+
+    /// 页面名（`popTo(_:)` 跨通道通用）
+    public var name: String {
+        switch self {
+        case .view(let route): return route.name
+        case .data(let value): return value.name
+        }
+    }
+}
+
 /// 导航路由器：**每个 NavigationStack 一个实例**（每个 tab 一个；模态里另开栈则另建）。
 /// 对齐原 UINavigationController 的 push / pop / popTo / popToRoot 语义。
-public final class FSNavRouter: ObservableObject {
+@Observable
+public final class FSNavRouter {
 
-    @Published public var path: [FSPageRoute] = []
+    public var path: [FSPathItem] = []
 
     public init() {}
 
@@ -260,7 +338,12 @@ public final class FSNavRouter: ObservableObject {
 
     /// 等价 `pushViewController(_:animated:)`
     public func push<V: View>(_ name: String, @ViewBuilder _ content: @escaping () -> V) {
-        path.append(FSPageRoute(name, content: content))
+        path.append(.view(FSPageRoute(name, content: content)))
+    }
+
+    /// 数据通道：压入一个纯值，视图由该类型自己的 `fsMakeView` 解析。
+    public func push<T: FSPageTarget>(_ target: T) {
+        path.append(.data(FSPageValue(target)))
     }
 
     /// 等价 `popViewController(animated:)`
@@ -313,7 +396,7 @@ public extension EnvironmentValues {
 /// ```
 public struct FSPushStack<Content: View>: View {
 
-    @StateObject private var router = FSNavRouter()
+    @State private var router = FSNavRouter()
     private let tabIndex: Int
     private let content: Content
 
@@ -324,10 +407,16 @@ public struct FSPushStack<Content: View>: View {
     }
 
     public var body: some View {
-        NavigationStack(path: $router.path) {
+        // `@Observable` 下 `@State` 不产出 projectedValue ⇒ 用局部 @Bindable 取 `$router.path`
+        @Bindable var router = router
+
+        return NavigationStack(path: $router.path) {
             content
-                .navigationDestination(for: FSPageRoute.self) { route in
-                    route.makeView()
+                .navigationDestination(for: FSPathItem.self) { item in
+                    switch item {
+                    case .view(let route): route.makeView()
+                    case .data(let value): value.makeView()
+                    }
                 }
         }
         // 二级页隐藏 tab bar（对齐原 FSNavigationController 的 `hidesBottomBarWhenPushed` 行为）。
@@ -350,8 +439,9 @@ public struct FSPushStack<Content: View>: View {
 /// 屏幕锁（任一栈非根就要验手势；用户左滑时把所有栈弹回根）与剪切板角标这类**跨 tab** 逻辑，
 /// 原来靠遍历 `UITabBarController` 下的 `UINavigationController` 实现；
 /// 现在改为由 `FSPushStack` 向本注册表登记自己的 router。
+@Observable
 @MainActor
-public final class FSStackRegistry: ObservableObject {
+public final class FSStackRegistry {
 
     public static let shared = FSStackRegistry()
 
@@ -359,7 +449,7 @@ public final class FSStackRegistry: ObservableObject {
     public private(set) var routers: [FSNavRouter] = []
 
     /// 剪切板是否有内容（原 `tabBarItem.badgeValue = "1"`，清空时置 nil）——由根 TabView 的 `.badge` 呈现
-    @Published public var pasteboardHasContent = false
+    public var pasteboardHasContent = false
 
     public init() {}
 
