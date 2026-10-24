@@ -22,16 +22,19 @@ import SwiftUI
 ///
 /// 存在意义是让调用方不必手动转换：`FSColor` 里 `UIColor` 与 `Color` 混着定义，
 /// 有了这层协议，两种都能直接往 `color:` 里塞。
-public protocol FSTextColorConvertible {
+///
+/// ★ 2026-10-24：`nonisolated` —— 纯取值转换，无状态；后台执行器（首页年度数据的
+/// `@concurrent` 计算）里要 `FSColor.wechatGreen.fs_color`。
+public nonisolated protocol FSTextColorConvertible {
     var fs_color: UIColor { get }
 }
 
 extension UIColor: FSTextColorConvertible {
-    public var fs_color: UIColor { self }
+    public nonisolated var fs_color: UIColor { self }
 }
 
 extension Color: FSTextColorConvertible {
-    public var fs_color: UIColor { UIColor(self) }
+    public nonisolated var fs_color: UIColor { UIColor(self) }
 }
 
 // MARK: - UIKit 边界桥接

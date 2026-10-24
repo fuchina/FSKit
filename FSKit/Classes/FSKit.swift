@@ -173,7 +173,8 @@ public enum FSKit {
         return Float(string.trimmingCharacters(in: .whitespacesAndNewlines)) != nil
     }
     
-    public static func isValidateString(_ string: String?) -> Bool {
+    /// ★ 2026-10-24：`nonisolated` —— 纯字符串判空，无状态，供后台执行器调用。
+    public nonisolated static func isValidateString(_ string: String?) -> Bool {
         guard let string = string else { return false }
         return !string.isEmpty
     }
@@ -532,7 +533,7 @@ public enum FSKit {
     }
     
     // MARK: - Bank Style Formatting
-    public static func bankStyleFormatter() -> NumberFormatter {
+    public nonisolated static func bankStyleFormatter() -> NumberFormatter {
         let formatter = NumberFormatter()
         formatter.positiveFormat = "###,##0.00;"
         return formatter
@@ -543,9 +544,14 @@ public enum FSKit {
     /// ★ 2026-10-24：`bankStyleDataThree` / `bankStyleDataThreeForCents` 原来每次调用都新建一个
     /// `NumberFormatter` 并重设 `positiveFormat`（实测 48.8µs/次，复用同一实例仅 1.06µs，**46×**）。
     /// 这两个函数在列表 cell 的 `body` 里被反复调用，等于每帧白烧几十微秒。
-    /// 本类型在 Pod 统一的 `SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor` 下 ⇒ 静态实例只在主线程访问，无需加锁。
     /// （`bankStyleFormatter()` 本体保持原样：仍返回新实例，供需要独立配置的调用方使用。）
-    private static let bankStyleSharedFormatter: NumberFormatter = bankStyleFormatter()
+    ///
+    /// ★ 2026-10-24（二）：**不再依赖「默认主隔离」这个隐式约束**。首页年度数据已改到并发执行器上算
+    /// （`FSAccountDataModel.businessGlobal` 的 `@concurrent`），会在后台线程调用这两个函数，而
+    /// `NumberFormatter.string(from:)` 不是线程安全的 ⇒ 共享实例必须自己加锁：
+    /// `nonisolated(unsafe)` + `bankStyleLock`。加锁约 20ns，相对 1.06µs 的格式化开销可忽略。
+    nonisolated(unsafe) private static let bankStyleSharedFormatter: NumberFormatter = bankStyleFormatter()
+    nonisolated(unsafe) private static let bankStyleLock = NSLock()
     
     public static func bankStyleData(_ data: Double) -> String {
         let formatter = NumberFormatter()
@@ -553,12 +559,17 @@ public enum FSKit {
         return formatter.string(from: NSNumber(value: Double(data))) ?? ""
     }
     
-    public static func bankStyleDataThree(_ data: Double) -> String {
-        bankStyleSharedFormatter.string(from: NSNumber(value: Double(data))) ?? ""
+    public nonisolated static func bankStyleDataThree(_ data: Double) -> String {
+        bankStyleLock.lock()
+        defer { bankStyleLock.unlock() }
+        return bankStyleSharedFormatter.string(from: NSNumber(value: Double(data))) ?? ""
     }
     
-    public static func bankStyleDataThreeForCents(_ cents: Int) -> String {
-        bankStyleSharedFormatter.string(from: NSNumber(value: Double(cents) / 100.0)) ?? ""
+    /// 分（整数）转银行风格金额。**可能被后台线程调用**（见 `bankStyleSharedFormatter` 的注释）。
+    public nonisolated static func bankStyleDataThreeForCents(_ cents: Int) -> String {
+        bankStyleLock.lock()
+        defer { bankStyleLock.unlock() }
+        return bankStyleSharedFormatter.string(from: NSNumber(value: Double(cents) / 100.0)) ?? ""
     }
     
     // MARK: - Decimal Operations
@@ -752,7 +763,7 @@ public enum FSKit {
     }
     
     // MARK: - Growth Rate
-    public static func growthRate(_ number: Double, base: Double) -> Double {
+    public nonisolated static func growthRate(_ number: Double, base: Double) -> Double {
         if base > 0 {
             return number / base - 1
         } else if base < 0 {
@@ -1206,11 +1217,11 @@ public func fs_dispatch_global_queue_sync(_ block: @escaping @Sendable () -> Voi
 }
 
 // MARK: - Time Helpers
-public func fs_timeIntervalSince1970() -> TimeInterval {
+public nonisolated func fs_timeIntervalSince1970() -> TimeInterval {
     return Date().timeIntervalSince1970
 }
 
-public func fs_integerTimeIntervalSince1970() -> Int {
+public nonisolated func fs_integerTimeIntervalSince1970() -> Int {
     return Int(fs_timeIntervalSince1970())
 }
 

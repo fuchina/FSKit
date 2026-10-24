@@ -10,7 +10,10 @@ import UIKit
 import SwiftUI
 
 /// 用于处理颜色
-public struct FSColor {
+///
+/// ★ 2026-10-24：`nonisolated` —— 全静态色值（`Color` 是 Sendable 的值类型），
+/// 首页年度数据在后台执行器上算（`FSAccountDataModel.businessGlobal`），要读 `wechatGreen`。
+public nonisolated struct FSColor {
         
     /// 微信绿
     public static let wechatGreen = Color(red: 0x20 / 255.0, green: 0xbf / 255.0, blue: 0x66 / 255.0)

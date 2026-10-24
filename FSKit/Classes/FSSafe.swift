@@ -9,7 +9,8 @@ import Foundation
 
 open class FSSafe {
     
-    public static func bool(_ value: Any?) -> Bool {
+    /// ★ 2026-10-24：`nonisolated` —— 纯类型转换，无共享状态，供后台执行器调用。
+    public nonisolated static func bool(_ value: Any?) -> Bool {
         switch value {
         case let i as Int:
             return i != 0
@@ -76,7 +77,8 @@ open class FSSafe {
         }
     }
     
-    public static func int(_ value: Any?) -> Int {
+    /// ★ 2026-10-24：`nonisolated` —— 纯类型转换，无共享状态，供后台执行器调用。
+    public nonisolated static func int(_ value: Any?) -> Int {
         
         if value == nil {
             return 0
@@ -110,7 +112,9 @@ open class FSSafe {
         }
     }
     
-    public static func double(_ value: Any?) -> Double {
+    /// ★ 2026-10-24：`nonisolated` —— 纯类型转换（`Any?` → `Double`），无共享状态，
+    /// 供后台执行器调用（首页年度数据在 `FSAccountDataModel.businessGlobal` 的 `@concurrent` 里解析 SQL 行）。
+    public nonisolated static func double(_ value: Any?) -> Double {
         switch value {
 
         case let d as Double:
@@ -136,7 +140,8 @@ open class FSSafe {
         }
     }
     
-    public static func string(_ value: Any?) -> String {
+    /// ★ 2026-10-24：`nonisolated` —— 纯类型转换，无共享状态，供后台执行器调用。
+    public nonisolated static func string(_ value: Any?) -> String {
         if let str = value as? String {
             return str
         } else if let str = value as? NSString {

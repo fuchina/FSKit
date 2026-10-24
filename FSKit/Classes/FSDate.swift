@@ -9,7 +9,8 @@ import Foundation
 import UIKit
 
 // MARK: - FSLunarDate
-public class FSLunarDate {
+/// ★ 2026-10-24：`nonisolated` —— 纯农历换算（无 UI），`FSDate` 已整类 nonisolated 并在后台执行器上用。
+public nonisolated class FSLunarDate: @unchecked Sendable {
     public var year: Int = 0
     public var month: Int = 0
     public var day: Int = 0
@@ -34,7 +35,11 @@ public class FSLunarDate {
 }
 
 // MARK: - FSDate
-public enum FSDate {
+/// ★ 2026-10-24：整类 `nonisolated` —— 纯日期/日历计算，无 UI 依赖。
+/// 首页年度数据已改到后台执行器上算（`FSAccountDataModel.businessGlobal` 的 `@concurrent`），
+/// 里面密集调用本类的年间/月间/日间边界计算；若继承 Pod 默认主隔离，这些调用在后台全部不可用。
+/// 唯一的有状态成员 `formatters` 早已是 `nonisolated(unsafe)` + `formatterLock` 保护，线程安全。
+public nonisolated enum FSDate {
     
     // MARK: - Leap Year
     public static func isLeapYear(_ year: Int) -> Bool {
@@ -92,7 +97,8 @@ public enum FSDate {
         return cachedFormatter(for: formatter ?? "yyyy-MM-dd HH:mm:ss").date(from: str)
     }
     
-    public static func string(with date: Date?, formatter: String? = nil) -> String {
+    /// ★ 2026-10-24：`nonisolated` —— 每次新建 `DateFormatter`，不碰静态缓存，纯函数，供后台执行器调用。
+    public nonisolated static func string(with date: Date?, formatter: String? = nil) -> String {
         guard let date = date else { return "" }
         
         let dateFormatter = DateFormatter()
@@ -171,7 +177,7 @@ public enum FSDate {
         return Int(endOfDay.timeIntervalSince1970)
     }
     
-    public static func theLastSecondOfMonth(_ date: Date) -> Int {
+    public nonisolated static func theLastSecondOfMonth(_ date: Date) -> Int {
         var calendar = Calendar.current
         calendar.timeZone = .current
         
@@ -188,14 +194,14 @@ public enum FSDate {
     }
     
     // MARK: - First/Last Second of Day
-    public static func theFirstSecondOfDay(_ date: Date) -> Int {
+    public nonisolated static func theFirstSecondOfDay(_ date: Date) -> Int {
         var calendar = Calendar.current
         calendar.timeZone = .current
         let startOfDay = calendar.startOfDay(for: date)
         return Int(startOfDay.timeIntervalSince1970)
     }
     
-    public static func theLastSecondOfDay(_ date: Date) -> Int {
+    public nonisolated static func theLastSecondOfDay(_ date: Date) -> Int {
         var calendar = Calendar.current
         calendar.timeZone = .current
         
@@ -209,7 +215,9 @@ public enum FSDate {
     }
     
     // MARK: - First/Last Second of Year
-    public static func theFirstSecondOfYear(_ year: Int) -> Int {
+    /// ★ 2026-10-24：`nonisolated` —— 纯日历计算，无共享状态，供后台执行器调用
+    /// （首页年度数据在 `FSAccountDataModel.businessGlobal` 的 `@concurrent` 里算）。
+    public nonisolated static func theFirstSecondOfYear(_ year: Int) -> Int {
         var calendar = Calendar.current
         calendar.timeZone = .current
         
@@ -225,7 +233,8 @@ public enum FSDate {
         return Int(date.timeIntervalSince1970)
     }
     
-    public static func theLastSecondOfYear(_ year: Int) -> Int {
+    /// ★ 2026-10-24：`nonisolated`，同 `theFirstSecondOfYear`。
+    public nonisolated static func theLastSecondOfYear(_ year: Int) -> Int {
         var calendar = Calendar.current
         calendar.timeZone = .current
         
@@ -348,7 +357,8 @@ public enum FSDate {
     }
     
     // MARK: - Two Char
-    public static func twoChar(_ value: Int) -> String {
+    /// ★ 2026-10-24：`nonisolated` —— 纯字符串补零，供后台执行器调用。
+    public nonisolated static func twoChar(_ value: Int) -> String {
         return value < 10 ? "0\(value)" : "\(value)"
     }
     

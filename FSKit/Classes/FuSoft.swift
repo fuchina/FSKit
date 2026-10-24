@@ -16,7 +16,9 @@ public var HEIGHTFC: CGFloat {
 }
 
 // MARK: - Colors
-public let APPCOLOR = UIColor(red: 18/255.0, green: 152/255.0, blue: 233/255.0, alpha: 1)
+/// ★ 2026-10-24：`nonisolated` —— 常量色，`UIColor` 本身线程安全且构造后不可变，
+/// 允许后台执行器（首页年度数据的 `@concurrent` 计算）直接引用。
+public nonisolated let APPCOLOR = UIColor(red: 18/255.0, green: 152/255.0, blue: 233/255.0, alpha: 1)
 
 // MARK: - Debug Log
 public func FSLog(_ format: String, file: String = #file, function: String = #function, line: Int = #line) {
