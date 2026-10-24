@@ -63,7 +63,9 @@ public enum FSKit {
         return try? JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed)
     }
     
-    public static func jsonString(_ object: Any) -> String {
+    /// ★ 2026-10-24：`nonisolated` —— 纯 `JSONSerialization`，无共享可变状态，
+    /// 后台执行器上的建模（`FSAAModel` 等）需要它。
+    public nonisolated static func jsonString(_ object: Any) -> String {
         guard JSONSerialization.isValidJSONObject(object) else { return "" }
         
         guard let data = try? JSONSerialization.data(withJSONObject: object, options: []) else { return "" }
