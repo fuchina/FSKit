@@ -550,10 +550,18 @@ public enum FSKit {
     ///
     /// ★ 2026-10-24（二）：**不再依赖「默认主隔离」这个隐式约束**。首页年度数据已改到并发执行器上算
     /// （`FSAccountDataModel.businessGlobal` 的 `@concurrent`），会在后台线程调用这两个函数，而
-    /// `NumberFormatter.string(from:)` 不是线程安全的 ⇒ 共享实例必须自己加锁：
-    /// `nonisolated(unsafe)` + `bankStyleLock`。加锁约 20ns，相对 1.06µs 的格式化开销可忽略。
-    nonisolated(unsafe) private static let bankStyleSharedFormatter: NumberFormatter = bankStyleFormatter()
-    nonisolated(unsafe) private static let bankStyleLock = NSLock()
+    /// `NumberFormatter.string(from:)` 不是线程安全的 ⇒ 共享实例必须自己加锁：`bankStyleLock`。
+    /// 加锁约 20ns，相对 1.06µs 的格式化开销可忽略。
+    ///
+    /// ★ 2026-10-24（三）：**`nonisolated(unsafe)` 收窄为 `nonisolated`**。`NSLock` 与 `NumberFormatter`
+    /// 在新 SDK 里都符合 `Sendable` ⇒ `let` 常量不需要手动豁免，标 `(unsafe)` 会报
+    /// `'nonisolated(unsafe)' is unnecessary for a constant with 'Sendable' type ...`。
+    /// 但 `nonisolated` 本身**不能删**：本 Pod 开了 `-default-isolation MainActor`，
+    /// `static let` 会被推断成 MainActor 隔离，`nonisolated static func` 里一访问就报
+    /// `main actor-isolated static property ... can not be referenced from a nonisolated context`。
+    /// 锁也**不能删**：`NumberFormatter` 的 Sendable 只是 SDK 的乐观标注，`string(from:)` 实际不可重入。
+    nonisolated private static let bankStyleSharedFormatter: NumberFormatter = bankStyleFormatter()
+    nonisolated private static let bankStyleLock = NSLock()
     
     public static func bankStyleData(_ data: Double) -> String {
         let formatter = NumberFormatter()
