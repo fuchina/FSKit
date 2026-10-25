@@ -36,6 +36,17 @@ public nonisolated class FSDBMaster {
     nonisolated(unsafe) private static var currentMaster: FSDBMaster?
     private static let initQueue = DispatchQueue(label: "swiftdbmaster.sync")
 
+    /// 单例懒加载的互斥锁。
+    ///
+    /// ★★ 2026-10-25：上面两个缓存放任了多年的「无锁懒加载」，一直没出事是因为
+    /// **只有主线程会在首次访问**。现在首页数据开始从 `@concurrent` 读库，后台线程与主线程
+    /// 可能同时首访 ⇒ 两边各自 `sqlite3_open` 同一个文件，拿到**两个不同的 `OpaquePointer`**。
+    /// `queue.sync` 只保护「同一实例」的句柄，跨实例毫无保护 ⇒ 轻则 `SQLITE_BUSY`，重则写坏库。
+    ///
+    /// 这里用独立锁而不是复用 `initQueue`：`init` 内部本身就在 `initQueue` 上 `queue.sync`，
+    /// 复用它会在「首次打开」这条路径上自锁。
+    nonisolated(unsafe) private static let singletonLock = NSLock()
+
     // MARK: - 初始化
     deinit {
         
@@ -114,7 +125,13 @@ public nonisolated class FSDBMaster {
     }
     
     /// 获取共享实例（默认数据库）
+    ///
+    /// ★★ 2026-10-25：整段加锁，见 `singletonLock` 的说明。
+    /// 锁只有一把、临界区里最多一次 `sqlite3_open`，相比后续的 SQL 执行，`NSLock` 的开销可忽略。
     public static func sharedInstance2() -> FSDBMaster? {
+        singletonLock.lock()
+        defer { singletonLock.unlock() }
+
         if currentMaster == nil {
             currentMaster = openSQLite3(dbPath())
         }
