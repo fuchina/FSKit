@@ -66,4 +66,22 @@ public nonisolated struct FSColor {
     /// 页面背景颜色
     public static let backColor = Color(red: 0.95, green: 0.95, blue: 0.95)
 
+    // MARK: - 渐变
+
+    /// 封面 / 表头渐变终点色（米棕）
+    public static let coverBrown = Color(red: 0xb2 / 255.0, green: 0x96 / 255.0, blue: 0x7e / 255.0)
+
+    /// 表头 / 封面渐变：上→下，0.25 处纯蓝、0.75 处米棕（`alipayBlue` → `coverBrown`）
+    ///
+    /// 原本在 5 处各写一遍（旧版 `configGradientLayer` / `createTableHeaderView` 的复制品）：
+    /// 记账首页封面、年度账单、账单详情、预期表头、贷款结果页表头。白字压在这层上。
+    /// ★ 用计算属性而非 `static let`：`FSColor` 是 `nonisolated struct`，存储型静态属性在
+    ///   Swift 6 下要求 Sendable，`LinearGradient` 是否满足不该在这里赌；这层重建成本可忽略。
+    public static var headerGradient: LinearGradient {
+        LinearGradient(stops: [
+            .init(color: alipayBlue, location: 0.25),
+            .init(color: coverBrown, location: 0.75)
+        ], startPoint: .top, endPoint: .bottom)
+    }
+
 }
