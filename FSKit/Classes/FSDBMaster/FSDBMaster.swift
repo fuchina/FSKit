@@ -45,7 +45,8 @@ public nonisolated class FSDBMaster {
     ///
     /// 这里用独立锁而不是复用 `initQueue`：`init` 内部本身就在 `initQueue` 上 `queue.sync`，
     /// 复用它会在「首次打开」这条路径上自锁。
-    nonisolated(unsafe) private static let singletonLock = NSLock()
+    /// `NSLock` 本身是 `Sendable`，`let` 常量天然可在任意隔离域访问 ⇒ 不需要 `nonisolated(unsafe)`。
+    private static let singletonLock = NSLock()
 
     // MARK: - 初始化
     deinit {

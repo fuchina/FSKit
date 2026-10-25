@@ -204,7 +204,10 @@ open class FSSafe {
     }
     
     /// 快速转为 Int 数组
-    public static func intArray(_ value: Any?) -> [Int] {
+    ///
+    /// ★ 2026-10-25：`nonisolated` —— 纯转换。后台的「待办条数」计数要解析
+    /// `alerts` 列（JSON → `[Int]`），必须在并发执行器上调用。
+    public nonisolated static func intArray(_ value: Any?) -> [Int] {
         return convertToArray(from: value) { element in
             switch element {
             case let i as Int:
@@ -239,7 +242,8 @@ open class FSSafe {
     ///   - value: 任意类型的输入值（可能是数组、NSArray、nil、其他类型）
     ///   - transform: 元素转换闭包，将任意类型元素转为目标类型 T；转换失败返回 nil
     /// - Returns: 目标类型 T 的数组，非数组/转换失败的元素会被过滤，最终返回空数组或有效元素数组
-    static func convertToArray<T>(from value: Any?, transform: (Any) -> T?) -> [T] {
+    /// ★ 2026-10-25：`nonisolated` —— 配合 `intArray`，纯遍历 + 闭包转换，无共享状态。
+    static nonisolated func convertToArray<T>(from value: Any?, transform: (Any) -> T?) -> [T] {
         let rawArray: [Any] = {
             guard let value = value else { return [] } // 处理 nil
             if let swiftArray = value as? [Any] {

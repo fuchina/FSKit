@@ -8,17 +8,20 @@
 import Foundation
 import CommonCrypto
 
-public enum KRAes {
+/// ★ 2026-10-25：`nonisolated` —— 纯 `CommonCrypto` 计算，无共享状态。
+/// 上层 `FSCryptor.aes256DecryptString` 要在后台执行器上给生日/待办模型解密字段，
+/// 若这里仍是主隔离，标了 `nonisolated` 也没用（会在这里被拦）。
+public nonisolated enum KRAes {
 
-    public static func encryptAES256(with data: Data, password key: String) -> Data? {
+    public nonisolated static func encryptAES256(with data: Data, password key: String) -> Data? {
         aes256(with: data, key: key, isEncrypt: true)
     }
 
-    public static func decryptAES256(with data: Data, password key: String) -> Data? {
+    public nonisolated static func decryptAES256(with data: Data, password key: String) -> Data? {
         aes256(with: data, key: key, isEncrypt: false)
     }
 
-    private static func aes256(with data: Data, key password: String, isEncrypt: Bool) -> Data? {
+    private nonisolated static func aes256(with data: Data, key password: String, isEncrypt: Bool) -> Data? {
         var keyPattern = [CChar](repeating: 0, count: kCCKeySizeAES256 + 1)
         if let keyData = password.data(using: .utf8) {
             let copyCount = min(keyData.count, keyPattern.count - 1)

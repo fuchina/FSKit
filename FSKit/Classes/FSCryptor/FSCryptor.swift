@@ -14,7 +14,11 @@ public enum FSCryptor {
     // MARK: - AES256 加解密
     
     /// AES256 加密字符串
-    public static func aes256EncryptString(_ content: String?, password: String?) -> String {
+    ///
+    /// ★ 2026-10-25：`nonisolated` —— 纯计算（`CommonCrypto` 无共享状态），
+    /// 供后台执行器建模时解密字段（`FSABBirthModel.name` / `FSAlertModel.content` 等）。
+    /// 只标这两个公开入口，其余 3DES 等仍留主隔离，改动面最小。
+    public nonisolated static func aes256EncryptString(_ content: String?, password: String?) -> String {
         guard let content = content, let password = password else { return "" }
         guard let data = content.data(using: .utf8) else { return "" }
         guard let encryptData = KRAes.encryptAES256(with: data, password: password) else { return "" }
@@ -22,7 +26,8 @@ public enum FSCryptor {
     }
     
     /// AES256 解密字符串
-    public static func aes256DecryptString(_ str: String?, password: String?) -> String {
+    /// ★ 2026-10-25：`nonisolated` —— 见加密那条的说明；后台建模要用。
+    public nonisolated static func aes256DecryptString(_ str: String?, password: String?) -> String {
         guard let str = str, let password = password, str != "(null)" else { return "" }
         guard let data = Data(base64Encoded: str, options: .ignoreUnknownCharacters) else { return "" }
         guard let decryptData = KRAes.decryptAES256(with: data, password: password) else { return "" }
