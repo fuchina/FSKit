@@ -69,14 +69,17 @@ enum FSToastMotion {
     /// 基准存活时长范围（秒）
     static let lifeRange: ClosedRange<Double> = 0.72...0.86
 
-    /// 时长倍率。2× 是拍板的档位 —— 实际存活 1.44~1.72s
-    static let speed: Double = 2.0
+    /// 时长倍率。2026-10-26 从 2.0 收到 1.4 —— 原档实际存活 1.44~1.72s，用户反馈「消失时间有点长」。
+    /// 现在 1.01~1.20s，约 1.1s 为主。
+    static let speed: Double = 1.4
 
-    /// 上浮距离范围（pt）
-    static let riseRange: ClosedRange<CGFloat> = 200...235
+    /// 上浮距离范围（pt）。原 200~235 被反馈「距离有点大」，同比缩 30% 到 140~165。
+    /// 缩距离必须同步缩时长（见 `speed`），否则速度变快、观感是「嗖」一下冲走。
+    static let riseRange: ClosedRange<CGFloat> = 140...165
 
-    /// 横向偏移的理论上限（pt）。约等于 235 × tan(14°)
-    static let maxLateral: CGFloat = 58
+    /// 横向偏移的理论上限（pt）。约等于 165 × tan(14°)。
+    /// 跟着 `riseRange` 同比缩，保持斜线角度不变；不缩的话角度会张到 20°，飘得更歪。
+    static let maxLateral: CGFloat = 41
 
     /// 横向偏移取可用空间的比例范围。不取到 1.0，是给中途侧向鼓出留余量
     static let lateralRatio: ClosedRange<CGFloat> = 0.55...1.0
@@ -91,8 +94,11 @@ enum FSToastMotion {
     /// 飘到终点时的缩放
     static let shrink: CGFloat = 0.92
 
-    /// 前 30% 的行程保持完全不透明，之后才淡出
-    static let holdOpacityRatio: Double = 0.30
+    /// 起飞后保持完全不透明的行程占比。
+    /// 2026-10-26 从 0.30 改成 0：用户反馈「消失刚开始那一截 alpha 太慢」，
+    /// 也就是起飞后前 0.45s 完全没变化、看着像卡了一下才开始淡。
+    /// 现在第一帧就起淡，与「让位」同帧开始。
+    static let holdOpacityRatio: Double = 0
 
     /// 坐标空间名。中心点回填与飘飞定位必须共用同一套坐标，否则整体会偏掉
     nonisolated static let space = "fsToastSpace"
@@ -429,11 +435,13 @@ public struct FSToastOverlay: View {
         CGFloat(1 - pow(1 - progress, 2.2))
     }
 
-    /// 透明度：前 30% 不动，之后线性淡出
+    /// 透明度：从起飞第一帧就开始淡出（`holdOpacityRatio` 为 0，没有保持期）。
+    /// 曲线取 `(1 - progress)^1.25` —— 开头比线性更果断一点（起步就有可见变化），
+    /// 末期由 `pow` 收缓，配合 shrink 看起来是「散掉」，不是「被切掉」。
     private func fadeFraction(_ progress: Double) -> Double {
         if progress <= FSToastMotion.holdOpacityRatio { return 1 }
         let tail = (progress - FSToastMotion.holdOpacityRatio) / (1 - FSToastMotion.holdOpacityRatio)
-        return max(0, 1 - tail)
+        return pow(max(0, 1 - tail), 1.25)
     }
 
     // MARK: 外观
