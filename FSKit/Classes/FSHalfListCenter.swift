@@ -247,6 +247,16 @@ private struct FSHalfListPanel: View {
 
     private let background = Color(uiColor: .systemBackground)
 
+    /// 面板外形：**只圆左上角**。
+    /// 右缘贴着屏幕右边、下沿贴着屏幕底，圆其余三个角会在贴边处露出缝隙（底下是被压暗的页面）。
+    private var shape: UnevenRoundedRectangle {
+        UnevenRoundedRectangle(topLeadingRadius: 12,
+                               bottomLeadingRadius: 0,
+                               bottomTrailingRadius: 0,
+                               topTrailingRadius: 0,
+                               style: .continuous)
+    }
+
     var body: some View {
         ScrollView {
             LazyVStack(spacing: 0) {
@@ -263,8 +273,16 @@ private struct FSHalfListPanel: View {
             // 末尾留出底部安全区：最后一行能滚到 home indicator 之上，点击不被系统手势抢
             .padding(.bottom, spec.insets.bottom)
         }
-        // 行下方也要是白的：旧实现面板透明，最后一行之下会透出被压暗的页面
-        .background(background)
+        // 内容也裁到圆角内，否则第一行会从左上角方角处冒出去
+        .clipShape(shape)
+        .background {
+            // 阴影挂在**静态形状层**上，不要挂在滚动的 ScrollView 上：
+            // 带 shadow 的滚动视图每帧都要离屏合成，组多的时候滚动会掉帧。
+            // 行下方的空白同样由这层铺白（旧实现面板透明，会透出被压暗的页面）。
+            shape
+                .fill(background)
+                .shadow(color: .black.opacity(0.22), radius: 12, x: -4, y: 0)
+        }
     }
 
     private func rowLabel(_ row: FSHalfListRow) -> some View {
