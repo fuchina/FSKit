@@ -180,14 +180,26 @@ public extension FSKit {
     }
 
     /// 由「关键词列表」构造高亮规则：`colorStrings` 中的词着色、`fontStrings` 中的词换字体。
+    ///
+    /// - Parameter allMatches: 是否命中**所有**出现位置。
+    ///   默认 `false`（只改第一处）。2026-10-28 纠正：原来是「颜色规则 `false`、字体规则用
+    ///   `FSTextRule` 的默认 `true`」—— 同一关键词出现两次时，颜色只染第一处、字体却两处都换，
+    ///   典型症状是把「60  2460.43」里值中的「60」也缩成小字。
+    ///   颜色与字体必须成对命中，故此参数由两者共用。
+    ///
+    /// ★ 选用建议：真正“在自由文本里找关键词”（搜索高亮）才用它；
+    ///   若是**已知结构**（「标签 + 值」「比例 + 金额」这类自己拼出来的串），
+    ///   请直接用 `FSKit.attr([FSTextSegment(…), FSTextSegment(…)])` 分段 ——
+    ///   关键词搜索会把值里相同的数字/文字一起命中，位置也不受控。
     static func keywordRules(colorStrings: [String],
                              color: Color,
                              fontStrings: [String]? = nil,
-                             font: UIFont? = nil) -> [FSTextRule] {
-        var rules = colorStrings.map { FSTextRule($0, color: color, allMatches: false) }
+                             font: UIFont? = nil,
+                             allMatches: Bool = false) -> [FSTextRule] {
+        var rules = colorStrings.map { FSTextRule($0, color: color, allMatches: allMatches) }
         if let fontStrings = fontStrings {
             let resolvedFont = font ?? UIFont.systemFont(ofSize: 14)
-            rules += fontStrings.map { FSTextRule($0, font: resolvedFont) }
+            rules += fontStrings.map { FSTextRule($0, font: resolvedFont, allMatches: allMatches) }
         }
         return rules
     }
