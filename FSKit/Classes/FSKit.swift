@@ -484,38 +484,6 @@ public enum FSKit {
           return upperCase.lowercased()
       }
     
-    // MARK: - Color
-    public static func randomColor() -> UIColor {
-        let r = Double(arc4random_uniform(256)) / 255.0
-        let g = Double(arc4random_uniform(256)) / 255.0
-        let b = Double(arc4random_uniform(256)) / 255.0
-        return UIColor(red: r, green: g, blue: b, alpha: 1)
-    }
-    
-    public static func color(withHexString color: String) -> UIColor {
-        var cString = color.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
-        guard cString.count >= 6 else { return .clear }
-        
-        if cString.hasPrefix("0X") {
-            cString = String(cString.dropFirst(2))
-        }
-        if cString.hasPrefix("#") {
-            cString = String(cString.dropFirst())
-        }
-        guard cString.count == 6 else { return .clear }
-        
-        var rgbValue: UInt64 = 0
-        Scanner(string: cString).scanHexInt64(&rgbValue)
-        
-        return UIColor(
-            red: Double((rgbValue & 0xFF0000) >> 16) / 255.0,
-            green: Double((rgbValue & 0x00FF00) >> 8) / 255.0,
-            blue: Double(rgbValue & 0x0000FF) / 255.0,
-            alpha: 1.0
-        )
-    }
-
-    
     // MARK: - Font
     public static func angleFont(withRate rate: Double, fontSize: Int) -> UIFont {
         let matrix = CGAffineTransform(a: 1, b: 0, c: tan(rate * .pi / 180), d: 1, tx: 0, ty: 0)

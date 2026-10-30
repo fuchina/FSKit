@@ -399,17 +399,6 @@ public extension UIView {
         }
     }
     
-    func fs_shadow(color: UIColor?, offset: CGSize, opacity: Float) {
-        let shadowPath = UIBezierPath(rect: bounds)
-        layer.masksToBounds = false
-        if let color = color {
-            layer.shadowColor = color.cgColor
-        }
-        layer.shadowOffset = offset
-        layer.shadowOpacity = opacity
-        layer.shadowRadius = layer.cornerRadius
-        layer.shadowPath = shadowPath.cgPath
-    }
     
     func fs_corner(leftTop: CGFloat, rightTop: CGFloat, bottomLeft: CGFloat, bottomRight: CGFloat, frame: CGRect) {
         let width = frame.size.width
