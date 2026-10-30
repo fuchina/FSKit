@@ -814,7 +814,7 @@ private struct FSAlertDialog: View {
                                 } label: {
                                     Image(systemName: "xmark.circle.fill")
                                         .font(.system(size: 16))
-                                        .foregroundColor(Color(uiColor: .tertiaryLabel))
+                                        .foregroundColor(FSColor.tertiaryLabel)
                                 }
                                 .buttonStyle(.plain)
                             }
@@ -874,7 +874,7 @@ private struct FSAlertDialog: View {
     private var messageText: some View {
         Text(spec.message)
             .font(.system(size: spec.title.isEmpty ? 17 : 15))
-            .foregroundColor(spec.title.isEmpty ? Color.primary : Color(uiColor: .secondaryLabel))
+            .foregroundColor(spec.title.isEmpty ? Color.primary : FSColor.secondaryLabel)
             .lineSpacing(2)
             .fixedSize(horizontal: false, vertical: true)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -973,7 +973,7 @@ private struct FSAlertDialog: View {
 
     /// 图里默认按钮是黑字（iOS 26 的样式），只有 destructive 才是红字
     private func color(for style: FSAlertActionStyle) -> Color {
-        style == .destructive ? Color(uiColor: .systemRed) : Color.primary
+        style == .destructive ? FSColor.systemRed : Color.primary
     }
 }
 

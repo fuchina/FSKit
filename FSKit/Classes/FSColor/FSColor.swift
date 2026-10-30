@@ -50,8 +50,8 @@ public nonisolated struct FSColor {
     /// 灰色
     public static let gray = Color(red: 0x80 / 255.0, green: 0x80 / 255.0, blue: 0x80 / 255.0)
     
-    /// 轻灰色
-    public static let lightGray = Color(red: 0xaa / 255.0, green: 0xaa / 255.0, blue: 0xaa / 255.0)
+    /// 轻灰色 —— 复刻 `UIColor.lightGray`（#D3D3D3，非 #AAAAAA）
+    public static let lightGray = Color(red: 0xd3 / 255.0, green: 0xd3 / 255.0, blue: 0xd3 / 255.0)
         
     /// 深色文字
     public static let textDark = Color(red: 16 / 255.0, green: 16 / 255.0, blue: 16 / 255.0)
@@ -68,6 +68,43 @@ public nonisolated struct FSColor {
 
     /// 封面 / 表头渐变终点色（米棕）
     public static let coverBrown = Color(red: 0xb2 / 255.0, green: 0x96 / 255.0, blue: 0x7e / 255.0)
+
+    // MARK: - 系统语义色
+    //
+    // 与 `UIColor` 同名同值（`Color(uiColor:)` 包一层），视觉零变化。
+    // 存在意义：SwiftUI 里不再出现 `Color(UIColor.xxx)` 这种两层包装。
+    // ★ 与上面的品牌色区分：`red` / `yellow` 是自定义色板（#FA3169 / #FD6F37），
+    //   系统色一律带 `system` 前缀，避免色值被悄悄换掉。
+
+    public static let label = Color(uiColor: .label)
+    public static let secondaryLabel = Color(uiColor: .secondaryLabel)
+    public static let tertiaryLabel = Color(uiColor: .tertiaryLabel)
+    public static let placeholderText = Color(uiColor: .placeholderText)
+
+    public static let separator = Color(uiColor: .separator)
+    public static let darkText = Color(uiColor: .darkText)
+    public static let darkGray = Color(uiColor: .darkGray)
+
+    public static let systemBackground = Color(uiColor: .systemBackground)
+    public static let secondarySystemBackground = Color(uiColor: .secondarySystemBackground)
+    public static let systemGroupedBackground = Color(uiColor: .systemGroupedBackground)
+
+    public static let systemGray3 = Color(uiColor: .systemGray3)
+    public static let systemGray4 = Color(uiColor: .systemGray4)
+    public static let systemGray5 = Color(uiColor: .systemGray5)
+    public static let systemGray6 = Color(uiColor: .systemGray6)
+
+    public static let tintColor = Color(uiColor: .tintColor)
+
+    public static let systemRed = Color(uiColor: .systemRed)
+    public static let systemGreen = Color(uiColor: .systemGreen)
+    public static let systemBlue = Color(uiColor: .systemBlue)
+    public static let systemOrange = Color(uiColor: .systemOrange)
+    public static let systemYellow = Color(uiColor: .systemYellow)
+
+    public static let black = Color.black
+    public static let white = Color.white
+    public static let clear = Color.clear
 
     /// 表头 / 封面渐变：上→下，0.25 处纯蓝、0.75 处米棕（`alipayBlue` → `coverBrown`）
     ///

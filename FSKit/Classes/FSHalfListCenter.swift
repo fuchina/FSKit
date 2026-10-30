@@ -287,16 +287,16 @@ private struct FSHalfListPanel: View {
         HStack(spacing: 8) {
             Text(row.title)
                 .font(.system(size: 14))
-                .foregroundColor(Color(uiColor: .label))
+                .foregroundColor(FSColor.label)
             Spacer(minLength: 8)
             if row.detail.isEmpty == false {
                 Text(row.detail)
                     .font(.system(size: 12))
-                    .foregroundColor(Color(uiColor: .secondaryLabel))
+                    .foregroundColor(FSColor.secondaryLabel)
             }
             Image(systemName: "chevron.right")
                 .font(.system(size: 12, weight: .semibold))
-                .foregroundColor(Color(uiColor: .tertiaryLabel))
+                .foregroundColor(FSColor.tertiaryLabel)
         }
         .padding(.horizontal, 15)
         .frame(height: 50)
@@ -304,7 +304,7 @@ private struct FSHalfListPanel: View {
         .background(Color.white)
         .overlay(alignment: .bottom) {
             Rectangle()
-                .fill(Color(uiColor: .separator))
+                .fill(FSColor.separator)
                 .frame(height: 0.5)
         }
     }

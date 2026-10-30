@@ -51,7 +51,7 @@ public struct FSLikeCellClick<Content: View>: View {
 
     public init(id: AnyHashable,
                 fadeDuration: Double = 0.6,
-                pressedColor: Color = Color(UIColor.systemGray3),
+                pressedColor: Color = FSColor.systemGray3,
                 normalColor: Color = Color(.systemBackground),
                 autoDismiss: Bool = false,
                 autoDismissDelay: Double = 0.1,
