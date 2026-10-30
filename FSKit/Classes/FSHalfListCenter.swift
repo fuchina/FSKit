@@ -245,8 +245,6 @@ private struct FSHalfListPanel: View {
 
     let spec: FSHalfListSpec
 
-    private let background = Color(uiColor: .systemBackground)
-
     /// 面板外形：**只圆左上角**。
     /// 右缘贴着屏幕右边、下沿贴着屏幕底，圆其余三个角会在贴边处露出缝隙（底下是被压暗的页面）。
     private var shape: UnevenRoundedRectangle {
@@ -280,7 +278,7 @@ private struct FSHalfListPanel: View {
             // 带 shadow 的滚动视图每帧都要离屏合成，组多的时候滚动会掉帧。
             // 行下方的空白同样由这层铺白（旧实现面板透明，会透出被压暗的页面）。
             shape
-                .fill(background)
+                .fill(Color.white)
                 .shadow(color: .black.opacity(0.22), radius: 12, x: -4, y: 0)
         }
     }
@@ -303,7 +301,7 @@ private struct FSHalfListPanel: View {
         .padding(.horizontal, 15)
         .frame(height: 50)
         .frame(maxWidth: .infinity)
-        .background(background)
+        .background(Color.white)
         .overlay(alignment: .bottom) {
             Rectangle()
                 .fill(Color(uiColor: .separator))

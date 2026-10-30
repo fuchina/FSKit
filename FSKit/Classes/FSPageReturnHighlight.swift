@@ -166,7 +166,7 @@ public struct FSPageReturnRow<Content: View>: View {
     public init(id: AnyHashable,
                 fadeDuration: Double = 0.6,
                 pressedColor: Color = Color(UIColor.systemGray3),
-                normalColor: Color = Color(UIColor.systemBackground),
+                normalColor: Color = Color.white,
                 onTap: @escaping () -> Void,
                 @ViewBuilder content: () -> Content) {
         self.id = id

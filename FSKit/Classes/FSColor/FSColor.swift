@@ -9,11 +9,10 @@
 import UIKit
 import SwiftUI
 
-/// 用于处理颜色
-///
-/// ★ 2026-10-24：`nonisolated` —— 全静态色值（`Color` 是 Sendable 的值类型），
-/// 首页年度数据在后台执行器上算（`FSAccountDataModel.businessGlobal`），要读 `wechatGreen`。
 public nonisolated struct FSColor {
+    
+    /// app color
+    public static let APPCOLOR = Color(red: 18 / 255.0, green: 152 / 255.0, blue: 233 / 255.0)
         
     /// 微信绿
     public static let wechatGreen = Color(red: 0x20 / 255.0, green: 0xbf / 255.0, blue: 0x66 / 255.0)
@@ -39,8 +38,6 @@ public nonisolated struct FSColor {
     /// App Store 按钮背景色（淡蓝色）
     public static let appStoreButtonBackground = Color(red: 0xf0 / 255.0, green: 0xf0 / 255.0, blue: 0xf7 / 255.0)
     
-    // MARK: - 基础色
-    
     /// 红色
     public static let red = Color(red: 250 / 255.0, green: 49 / 255.0, blue: 105 / 255.0)
     
@@ -50,8 +47,12 @@ public nonisolated struct FSColor {
     /// 黄色
     public static let yellow = Color(red: 253 / 255.0, green: 111 / 255.0, blue: 55 / 255.0)
     
-    // MARK: - 文字颜色
+    /// 灰色
+    public static let gray = Color(red: 0x80 / 255.0, green: 0x80 / 255.0, blue: 0x80 / 255.0)
     
+    /// 轻灰色
+    public static let lightGray = Color(red: 0xaa / 255.0, green: 0xaa / 255.0, blue: 0xaa / 255.0)
+        
     /// 深色文字
     public static let textDark = Color(red: 16 / 255.0, green: 16 / 255.0, blue: 16 / 255.0)
     
@@ -60,13 +61,10 @@ public nonisolated struct FSColor {
     
     /// 浅色文字
     public static let textLight = Color(red: 169 / 255.0, green: 169 / 255.0, blue: 169 / 255.0)
-    
-    // MARK: - 其他
-    
+        
     /// 页面背景颜色
     public static let backColor = Color(red: 0.95, green: 0.95, blue: 0.95)
 
-    // MARK: - 渐变
 
     /// 封面 / 表头渐变终点色（米棕）
     public static let coverBrown = Color(red: 0xb2 / 255.0, green: 0x96 / 255.0, blue: 0x7e / 255.0)
