@@ -7,48 +7,48 @@
 
 import UIKit
 
-public var WIDTHFC: CGFloat {
-    FSApp.shared.width
-}
-
-public var HEIGHTFC: CGFloat {
-    FSApp.shared.height
-}
+//public var WIDTHFC: CGFloat {
+//    FSApp.shared.width
+//}
+//
+//public var HEIGHTFC: CGFloat {
+//    FSApp.shared.height
+//}
 
 // MARK: - Debug Log
-public func FSLog(_ format: String, file: String = #file, function: String = #function, line: Int = #line) {
-    #if DEBUG
-    print("\(function) - \(line)\n\(format)")
-    #endif
-}
+//public func FSLog(_ format: String, file: String = #file, function: String = #function, line: Int = #line) {
+//    #if DEBUG
+//    print("\(function) - \(line)\n\(format)")
+//    #endif
+//}
 
 // MARK: - System Helpers
-public func MININ<T: Comparable>(_ a: T, _ b: T) -> T {
-    return min(a, b)
-}
+//public func MININ<T: Comparable>(_ a: T, _ b: T) -> T {
+//    return min(a, b)
+//}
 
-public func IOSGE(_ version: Float) -> Bool {
-    return (UIDevice.current.systemVersion as NSString).floatValue >= version
-}
+//public func IOSGE(_ version: Float) -> Bool {
+//    return (UIDevice.current.systemVersion as NSString).floatValue >= version
+//}
 
-public var isIPAD: Bool {
-    let isPad = UIDevice.current.userInterfaceIdiom == .pad
-    return isPad
-}
+//public var isIPAD: Bool {
+//    let isPad = UIDevice.current.userInterfaceIdiom == .pad
+//    return isPad
+//}
+//
+//public var isIPHONE: Bool {
+//    let isPhone = UIDevice.current.userInterfaceIdiom == .phone
+//    return isPhone
+//}
 
-public var isIPHONE: Bool {
-    let isPhone = UIDevice.current.userInterfaceIdiom == .phone
-    return isPhone
-}
-
-public func RGB16(_ rgbValue: Int) -> UIColor {
-    return UIColor(
-        red: CGFloat((rgbValue & 0xFF0000) >> 16) / 255.0,
-        green: CGFloat((rgbValue & 0xFF00) >> 8) / 255.0,
-        blue: CGFloat(rgbValue & 0xFF) / 255.0,
-        alpha: 1.0
-    )
-}
+//public func RGB16(_ rgbValue: Int) -> UIColor {
+//    return UIColor(
+//        red: CGFloat((rgbValue & 0xFF0000) >> 16) / 255.0,
+//        green: CGFloat((rgbValue & 0xFF00) >> 8) / 255.0,
+//        blue: CGFloat(rgbValue & 0xFF) / 255.0,
+//        alpha: 1.0
+//    )
+//}
 
 //public struct FSTag {
 //    public static let view = 1000
