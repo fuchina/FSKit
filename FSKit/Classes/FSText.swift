@@ -41,8 +41,6 @@ extension Color: FSTextColorConvertible {
 
 public extension AttributedString {
 
-    /// 仅在 UIKit 边界使用（`UILabel.attributedText` / `UITextView` / `NSTextStorage`）。
-    /// 出现它的地方就是「还没 SwiftUI 化」的待办点。
     var fs_ns: NSAttributedString { NSAttributedString(self) }
 }
 
@@ -69,7 +67,7 @@ public extension Optional where Wrapped == AttributedString {
 public struct FSTextSegment {
 
     public var text: String
-    /// 文字颜色；nil 表示继承外层（UILabel / Text 自身）的颜色。
+
     public var color: UIColor?
     /// 底色；nil 表示不设底色。
     public var background: UIColor?
