@@ -439,57 +439,13 @@ public extension UIView {
 }
 
 
-// MARK: - 零尺寸生命周期探针（SwiftUI 拿不到 UIKit 导航通知的兜底，全项目共用）
+// MARK: - 零尺寸 UIKit 探针（只做事件源，不承担任何导航 / 视图承载）
 //
-// 背景：全 SwiftUI 化后导航由 `FSPushStack`(NavigationStack) 承担，
-// 原 `UINavigationController` 的 willAppear/didAppear 通知不再可用；
-// 而 SwiftUI 的 `.onAppear` 在 NavigationStack 的 push/pop 场景下并不保证成对触发。
-// 翻译成 SwiftUI 回调：它们只做事件源，不承担任何导航/视图承载。
-
-/// 回归探针承载：`viewWillAppear` → 回调
-private struct FSReturnProbe: UIViewControllerRepresentable {
-
-    let includeFirst: Bool
-    let onReturn: () -> Void
-
-    func makeUIViewController(context: Context) -> Probe {
-        Probe(includeFirst: includeFirst, onReturn: onReturn)
-    }
-
-    func updateUIViewController(_ uiViewController: Probe, context: Context) {
-        uiViewController.includeFirst = includeFirst
-        uiViewController.onReturn = onReturn
-    }
-
-    final class Probe: UIViewController {
-
-        var includeFirst: Bool
-        var onReturn: () -> Void
-        private var hasAppeared = false
-
-        init(includeFirst: Bool, onReturn: @escaping () -> Void) {
-            self.includeFirst = includeFirst
-            self.onReturn = onReturn
-            super.init(nibName: nil, bundle: nil)
-        }
-
-        required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
-
-        #if DEBUG
-        // 诊断用：`.fsOnReturn` 的闭包强引用页面 store 时，本 VC 不释放就会把 store 一起吊住。
-        deinit { print("FSReturnProbe deinit") }
-        #endif
-
-        override func viewWillAppear(_ animated: Bool) {
-            super.viewWillAppear(animated)
-            if hasAppeared || includeFirst {
-                onReturn()
-            } else {
-                hasAppeared = true
-            }
-        }
-    }
-}
+// 2026-10-31：原 `FSReturnProbe`（`viewWillAppear` → 返回回调）已删除 ——
+// 「本页返回」统一改用纯 SwiftUI 的 `fsOnPageReturn` / `fsOnReturn`（见 FSPageReturnRefresh.swift），
+// 只认 `router.path.count`，不再依赖 UIKit appearance（那条链在 NavigationStack pop 时不保证触发）。
+//
+// 本文件只剩「SwiftUI 至今没有对应 API」的平台能力缺口：摇一摇。
 
 /// 摇一摇探针承载：`becomeFirstResponder` + `motionEnded`
 private struct FSShakeProbe: UIViewControllerRepresentable {
@@ -537,13 +493,10 @@ private struct FSShakeProbe: UIViewControllerRepresentable {
 
 public extension View {
 
-    /// 本页被重新显示时回调（子页 pop 回来 / 从覆盖页切回）。
-    /// - Parameter includeFirstAppear: 是否连「首次出现」也回调（默认否，常见用法是首次已在 onAppear 取过数）
-    func fsOnReturn(includeFirstAppear: Bool = false, _ action: @escaping () -> Void) -> some View {
-        background(FSReturnProbe(includeFirst: includeFirstAppear, onReturn: action))
-    }
-
     /// 摇一摇回调（原 FSShakeBaseController 的 SwiftUI 等价物）
+    ///
+    /// 「本页返回 / 重新显示」请用 `fsOnPageReturn` / `fsOnReturn`（FSPageReturnRefresh.swift），
+    /// 纯 SwiftUI 实现，不含本探针。
     func fsOnShake(_ action: @escaping () -> Void) -> some View {
         background(FSShakeProbe(onShake: action).frame(width: 0, height: 0))
     }

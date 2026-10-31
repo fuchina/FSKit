@@ -110,40 +110,12 @@ public struct FSPageReturnList<Content: View>: View {
         content
             .environment(store)
             // 全 SwiftUI 化后 UINavigationController 通知不再可靠：
-            // 三路冗余触发同一个**幂等**复位（谁先到都行，重复调用无副作用）
+            // 多路冗余触发同一个**幂等**复位（谁先到都行，重复调用无副作用）
             .onAppear { store.resetIfReturning() }
-            .background(FSPageReturnLifecycleProbe { store.resetIfReturning() })
-    }
-}
-
-/// 零尺寸生命周期探针：把「所在页面被重新显示（pop 回来）」翻译成一次复位调用。
-/// 但**范围限定在本页**，不会像全局通知那样误伤其它页。
-private struct FSPageReturnLifecycleProbe: UIViewControllerRepresentable {
-
-    let onReturn: () -> Void
-
-    func makeUIViewController(context: Context) -> Probe {
-        Probe(onReturn: onReturn)
-    }
-
-    func updateUIViewController(_ uiViewController: Probe, context: Context) {
-        uiViewController.onReturn = onReturn
-    }
-
-    final class Probe: UIViewController {
-        var onReturn: () -> Void
-
-        init(onReturn: @escaping () -> Void) {
-            self.onReturn = onReturn
-            super.init(nibName: nil, bundle: nil)
-        }
-
-        required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
-
-        override func viewWillAppear(_ animated: Bool) {
-            super.viewWillAppear(animated)
-            onReturn()
-        }
+            // 2026-10-31：原 `FSPageReturnLifecycleProbe`（UIViewControllerRepresentable +
+            // viewWillAppear）已删除，改走纯 SwiftUI 的 `fsOnPageReturn`。
+            // delay: 0 ⇒ 下一帧复位，灰底淡出与 pop 转场**并行**（与探针时的视觉效果一致）。
+            .fsOnPageReturn(delay: 0) { store.resetIfReturning() }
     }
 }
 
