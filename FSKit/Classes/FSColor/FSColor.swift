@@ -50,8 +50,14 @@ public nonisolated struct FSColor {
     /// 灰色
     public static let gray = Color(red: 0x80 / 255.0, green: 0x80 / 255.0, blue: 0x80 / 255.0)
     
-    /// 轻灰色 —— 复刻 `UIColor.lightGray`（#D3D3D3，非 #AAAAAA）
-    public static let lightGray = Color(red: 0xd3 / 255.0, green: 0xd3 / 255.0, blue: 0xd3 / 255.0)
+    /// 轻灰色 —— 复刻 `UIColor.lightGray`（灰度 2/3 = #AAAAAA，白底对比度 2.32:1）
+    ///
+    /// ★ 2026-10-31：改回 #AAAAAA。10-30 13:51 的 9bfe3d7 曾把它改成 #D3D3D3，
+    ///   注释写的是「复刻 UIColor.lightGray」，但 #D3D3D3 是 CSS/网页的 lightgray，
+    ///   iOS 的 lightGray 是灰度 2/3。那次误改让全 App 的浅灰小字（资产页分隔符、
+    ///   「有」标记、仓位、禁用按钮等）对比度从 2.32:1 掉到 1.50:1，白底上 10pt 糊成一片。
+    ///   要更淡的灰请另起常量，不要动这里。
+    public static let lightGray = Color(red: 0xaa / 255.0, green: 0xaa / 255.0, blue: 0xaa / 255.0)
         
     /// 深色文字
     public static let textDark = Color(red: 16 / 255.0, green: 16 / 255.0, blue: 16 / 255.0)
