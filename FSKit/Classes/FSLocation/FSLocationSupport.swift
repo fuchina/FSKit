@@ -101,7 +101,6 @@ public enum FSLocationSupport {
     /// - Parameter controller: 已无作用（弹窗由根视图渲染），保留只为不破坏调用点。
     public static func navigationToMaps(
         destination coordinate: CLLocationCoordinate2D,
-        controller: UIViewController
     ) {
         var mapOptions: [String] = []
 
