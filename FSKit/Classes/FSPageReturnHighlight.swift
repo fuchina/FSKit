@@ -370,7 +370,7 @@ public struct FSPushStack<Content: View>: View {
 // MARK: - 跨 tab 栈注册表
 
 /// 全 SwiftUI 后每个 tab 各有一个 `FSNavRouter`。
-/// 屏幕锁（任一栈非根就要验手势；用户左滑时把所有栈弹回根）与剪切板角标这类**跨 tab** 逻辑，
+/// 剪切板角标、以及「把所有栈弹回根」这类**跨 tab** 逻辑，
 /// 原来靠遍历 `UITabBarController` 下的 `UINavigationController` 实现；
 /// 现在改为由 `FSPushStack` 向本注册表登记自己的 router。
 @Observable
