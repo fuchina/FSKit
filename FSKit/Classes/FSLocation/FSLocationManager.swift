@@ -15,7 +15,7 @@ import MapKit
  NSLocationWhenInUseUsageDescription
  NSLocationAlwaysAndWhenInUseUsageDescription
  字段
- 
+
  2.TARGETS - Capabilities - Background Modes - Location updates 勾上
  */
 
@@ -24,18 +24,18 @@ import MapKit
 // 2026-10-17：本类真跑在自己的串行 DispatchQueue 上（非主线程），故显式 nonisolated，
 // 保持「任意线程可调用、内部自行切主线程回调」的原设计。
 public nonisolated class FSLocationManager: NSObject, @unchecked Sendable {
-    
+
     public var serialManager: CLLocationManager
-    
+
     public var locationManagerDidChangeAuthorization: ((FSLocationManager) -> Void)?
-    
+
     /// 回调结果
     public var callback: ((FSLocationManager, FSLocationResult) -> Void)?
-    
+
     private var lastLocations: [CLLocation]?
     private let queue: DispatchQueue
     private var isSerialLocating: Bool = false
-    
+
     public override init() {
         queue = DispatchQueue(label: "FSLocationManager.queue.sync")
         serialManager = FSLocation.makeLocationManager(distanceFilter: kCLDistanceFilterNone)
@@ -43,7 +43,7 @@ public nonisolated class FSLocationManager: NSObject, @unchecked Sendable {
         serialManager.delegate = self
         serialManager.requestWhenInUseAuthorization()
     }
-    
+
     /// 连续定位
     /// - Parameters:
     ///   - accuracy: 定位精度，默认kCLLocationAccuracyBest
@@ -52,24 +52,24 @@ public nonisolated class FSLocationManager: NSObject, @unchecked Sendable {
         let status = serialManager.authorizationStatus
         let isAuthorization = status == .authorizedAlways || status == .authorizedWhenInUse
         guard isAuthorization else { return }
-        
+
         queue.async { [weak self] in
             guard let self else { return }
-            
+
             let systemAccuracy = FSLocation.locationAccuracy(for: accuracy)
             self.serialManager.desiredAccuracy = systemAccuracy
             self.serialManager.distanceFilter = distanceFilter
-            
+
             if self.isSerialLocating {
                 self.successCallback(locations: self.lastLocations)
                 return
             }
-            
+
             self.isSerialLocating = true
             self.serialManager.startUpdatingLocation()
         }
     }
-    
+
     /// 停止连续定位
     public func stopLocation() {
         queue.sync { [weak self] in
@@ -78,7 +78,7 @@ public nonisolated class FSLocationManager: NSObject, @unchecked Sendable {
             self.isSerialLocating = false
         }
     }
-    
+
     /// 最后定位的有效值，每次定位成功后会更新，在主线程返回
     public func fetchTheLastestLocations() -> [CLLocation]? {
         var values: [CLLocation]?
@@ -87,7 +87,7 @@ public nonisolated class FSLocationManager: NSObject, @unchecked Sendable {
         }
         return values
     }
-    
+
     private func successCallback(locations: [CLLocation]?) {
         queue.async { [weak self] in
             guard let self else { return }
@@ -103,7 +103,7 @@ public nonisolated class FSLocationManager: NSObject, @unchecked Sendable {
             }
         }
     }
-    
+
     /// 根据location获取地址
     ///
     /// - Note: iOS 26 起 `CLGeocoder` 已被废弃，内部改用 MapKit 的 `MKReverseGeocodingRequest`；
@@ -120,9 +120,9 @@ public nonisolated class FSLocationManager: NSObject, @unchecked Sendable {
             legacyAddress(with: location, completionHandler: completionHandler)
         }
     }
-    
+
     // MARK: - Reverse Geocoding
-    
+
     /// iOS 26+：MapKit 原生逆地理编码，回调在主线程
     @available(iOS 26.0, *)
     private static func reverseGeocodingMapItems(
@@ -141,7 +141,7 @@ public nonisolated class FSLocationManager: NSObject, @unchecked Sendable {
                 ))
                 return
             }
-            
+
             do {
                 completion.value(try await request.mapItems, nil)
             } catch {
@@ -149,7 +149,7 @@ public nonisolated class FSLocationManager: NSObject, @unchecked Sendable {
             }
         }
     }
-    
+
     /// iOS 26 以下：CLGeocoder
     ///
     /// - Note: 该方法内部使用了已废弃的 `CLGeocoder`，仅在 `#available` 的旧系统分支调用；
@@ -165,7 +165,7 @@ public nonisolated class FSLocationManager: NSObject, @unchecked Sendable {
             completion.value(placemarks, error)
         }
     }
-    
+
     /// MKMapItem -> CLPlacemark
     ///
     /// - Note: iOS 26 起 `MKMapItem.placemark` 与 `MKPlacemark` 类被标记废弃，而 `CLPlacemark`
@@ -174,7 +174,7 @@ public nonisolated class FSLocationManager: NSObject, @unchecked Sendable {
     ///         被移除，`responds(to:)` 会兜住并返回 nil。
     private static func mapItemPlacemarks(from mapItems: [MKMapItem]?) -> [CLPlacemark]? {
         guard let mapItems, !mapItems.isEmpty else { return nil }
-        
+
         let selector = NSSelectorFromString("placemark")
         let placemarks = mapItems.compactMap { item -> CLPlacemark? in
             guard item.responds(to: selector) else { return nil }
@@ -187,35 +187,35 @@ public nonisolated class FSLocationManager: NSObject, @unchecked Sendable {
 // MARK: - CLLocationManagerDelegate
 
 extension FSLocationManager: CLLocationManagerDelegate {
-    
+
     public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         successCallback(locations: locations)
     }
-    
+
     public func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         queue.async { [weak self] in
             guard let self else { return }
-            
+
             let result = FSLocationResult.result(
                 locations: nil,
                 lastLocation: nil,
                 sourceType: .serial,
                 error: error
             )
-            
+
             // 如果是权限问题，则停止定位
             let nsError = error as NSError
             if nsError.code == CLError.denied.rawValue ||
                nsError.code == CLError.regionMonitoringDenied.rawValue {
                 self.stopLocation()
             }
-            
+
             DispatchQueue.main.async {
                 self.callback?(self, result)
             }
         }
     }
-    
+
     public func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         locationManagerDidChangeAuthorization?(self)
     }

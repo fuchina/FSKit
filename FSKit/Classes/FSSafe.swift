@@ -8,110 +8,110 @@
 import Foundation
 
 open class FSSafe {
-    
+
     /// ★ 2026-10-24：`nonisolated` —— 纯类型转换，无共享状态，供后台执行器调用。
     public nonisolated static func bool(_ value: Any?) -> Bool {
         switch value {
         case let i as Int:
             return i != 0
-            
+
         case let i as Int64:
             return i != 0
-        
+
         case let f as Float:
             return f != 0
-            
+
         case let d as Double:
             return d != 0
-            
+
         case let n as NSNumber:
             return n.doubleValue != 0
-            
+
         case let s as String:
             let normalized = s.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
             if normalized.isEmpty {
                 return false
             }
-            
+
             if normalized == "0" || normalized == "false" || normalized == "no" || normalized == "n" || normalized == "off" {
                 return false
             }
-            
+
             if normalized == "1" || normalized == "true" || normalized == "yes" || normalized == "y" || normalized == "on" {
                 return true
             }
-            
+
             if let number = Double(normalized) {
                 return number != 0
             }
-            
+
             return true
-            
+
         default:
             return false
         }
     }
-    
+
     public static func float(_ value: Any?) -> Float {
         switch value {
         case let t as TimeInterval:
             return Float(t)
-            
+
         case let i as Int:
             return Float(i)
-            
+
         case let i as Int64:
             return Float(i)
-            
+
         case let d as Double:
             return Float(d)
-            
+
         case let n as NSNumber:
             return n.floatValue
-            
+
         case let s as String:
             return Float(s) ?? 0
-            
+
         default:
             return 0
         }
     }
-    
+
     /// ★ 2026-10-24：`nonisolated` —— 纯类型转换，无共享状态，供后台执行器调用。
     public nonisolated static func int(_ value: Any?) -> Int {
-        
+
         if value == nil {
             return 0
         }
-            
+
         switch value {
         case let t as TimeInterval:
             return Int(t)
-            
+
         case let i as Int:
             return i
-            
+
         case let i as Int64:
             return Int(i)
-            
+
         case let d as Double:
             return Int(d)
-            
+
         case let n as NSNumber:
             return n.intValue
-            
+
         case let s as String:
             let d = Double(s) ?? 0
             return Int(d)
-        
+
         case let f as Float:
             return Int(f)
-            
+
         default:
             return 0
         }
     }
-    
+
     /// ★ 2026-10-24：`nonisolated` —— 纯类型转换（`Any?` → `Double`），无共享状态，
     /// 供后台执行器调用（首页年度数据在 `FSAccountDataModel.businessGlobal` 的 `@concurrent` 里解析 SQL 行）。
     public nonisolated static func double(_ value: Any?) -> Double {
@@ -119,27 +119,27 @@ open class FSSafe {
 
         case let d as Double:
             return d
-            
+
         case let t as TimeInterval:
             return t
-            
+
         case let i as Int:
             return TimeInterval(i)
-            
+
         case let i as Int64:
             return TimeInterval(i)
-            
+
         case let n as NSNumber:
             return n.doubleValue
-            
+
         case let s as String:
             return Double(s) ?? 0
-            
+
         default:
             return 0
         }
     }
-    
+
     /// ★ 2026-10-24：`nonisolated` —— 纯类型转换，无共享状态，供后台执行器调用。
     public nonisolated static func string(_ value: Any?) -> String {
         if let str = value as? String {
@@ -147,7 +147,7 @@ open class FSSafe {
         } else if let str = value as? NSString {
             return str as String
         } else if let str = value as? NSNumber {
-            
+
 //            return str.stringValue
             return "\(str.doubleValue)"
         } else if let str = value as? Int {
@@ -155,10 +155,10 @@ open class FSSafe {
         } else if let str = value {
             return "\(str)"
         }
-        
+
         return ""
     }
-    
+
     public static func dictionary(_ value: Any?) -> [String: Any] {
         if let swiftDict = value as? [String: Any] {
             return swiftDict
@@ -176,7 +176,7 @@ open class FSSafe {
             return [:]
         }
     }
-    
+
     public static func array(_ value: Any?) -> [Any] {
         if let swiftArray = value as? [Any] {
             return swiftArray
@@ -186,7 +186,7 @@ open class FSSafe {
             return []
         }
     }
-    
+
     // MARK: - 便捷重载：常用类型的快速转换（可选，简化调用）
     // 快速转为 String 数组
     public static func stringArray(_ value: Any?) -> [String] {
@@ -194,15 +194,15 @@ open class FSSafe {
             if let str = element as? String {
                 return str
             }
-            
+
             if let str = element as? NSString {
                 return str as String
             }
-            
+
             return nil
         }
     }
-    
+
     /// 快速转为 Int 数组
     ///
     /// ★ 2026-10-25：`nonisolated` —— 纯转换。后台的「待办条数」计数要解析
@@ -212,31 +212,31 @@ open class FSSafe {
             switch element {
             case let i as Int:
                 return i
-                
+
             case let i as Int64:
                 return Int(i)
-                
+
             case let n as NSNumber:
                 return n.intValue
-                
+
             case let d as Double:
                 return Int(d)
-                
+
             case let f as Float:
                 return Int(f)
-                
+
             case let s as String:
                 let normalized = s.trimmingCharacters(in: .whitespacesAndNewlines)
                 guard !normalized.isEmpty, let d = Double(normalized) else { return nil }
                 return Int(d)
-                
+
             default:
                 return nil
             }
         }
     }
-    
-    
+
+
     // 通用数组转换工厂类
     /// - Parameters:
     ///   - value: 任意类型的输入值（可能是数组、NSArray、nil、其他类型）
@@ -254,7 +254,7 @@ open class FSSafe {
                 return [] // 非数组类型，返回空数组
             }
         }()
-        
+
         // 步骤2：遍历数组，用转换闭包将元素转为 T 类型，过滤转换失败的元素
         var resultArray = [T]()
         for element in rawArray {
@@ -265,43 +265,43 @@ open class FSSafe {
                 print("ArrayFactory: 元素 \(element) (类型: \(type(of: element))) 无法转为 \(T.self) 类型")
             }
         }
-        
+
         return resultArray
     }
-    
+
     /// 严谨判断是否为合法的HTTPS链接
     public static func isValidHttpsLink(_ urlString: String?) -> Bool {
         guard let urlString = urlString, !urlString.isEmpty else {
             return false
         }
-        
+
         // 步骤1：转为URL实例（自动处理首尾空格等小问题）
         guard let url = URL(string: urlString) else {
             return false
         }
-        
+
         // 步骤2：校验scheme是https（忽略大小写）
         guard let scheme = url.scheme, scheme.lowercased() == "https" else {
             return false
         }
-        
+
         // 步骤3（可选）：校验包含有效主机名（排除 https:// 这种空链接）
         guard let host = url.host, !host.isEmpty else {
             return false
         }
-        
+
         return true
     }
-    
+
     /**
      *  epsilon：精确到小数点后几位，如3位是 1e-3，6位是1e-6
      */
     public static func equald(a: Double, b: Double, epsilon: Double) -> Bool {
-        
+
         // let uplofOne = Double.ulpOfOne * tolerance  // 用 ulpOfOne 作为动态阈值（适配不同数值范围）,乘以 tolerance 扩大一点容错范围 这个值太小了，用不着
-        
+
         let v = abs(a - b) < epsilon
         return v
     }
-    
+
 }

@@ -20,7 +20,7 @@ public var UIScreenWidth: CGFloat {
 
 // MARK: - FSUIAdapterModel
 public class FSUIAdapterModel {
-    
+
     public let value0p5: CGFloat
     public let value1: CGFloat
     public let value2: CGFloat
@@ -96,7 +96,7 @@ public class FSUIAdapterModel {
     public let value400: CGFloat
     public let value500: CGFloat
     public let value650: CGFloat
-    
+
     public init(ratio: CGFloat) {
         value0p5 = 0.5 * ratio
         value1 = 1 * ratio
@@ -179,29 +179,29 @@ public class FSUIAdapterModel {
 
 // MARK: - FSUIAdapterManager
 public class FSUIAdapter {
-    
+
     // 2026-10-17：Pod 与主 App 统一为默认主隔离后，nonisolated(unsafe) 反而报错，故移除。
     public static let shared = FSUIAdapter()
-    
+
     public let isIPad: Bool
     public let isIPhone: Bool
     public let screenSmallerValue: CGFloat
     public let screenBiggerValue: CGFloat
-    
+
     private let originRatioForIPhone: CGFloat
     private let originRatioForIPad: CGFloat
-    
+
     public private(set) lazy var model: FSUIAdapterModel = modelForRatio(2.16)
     public private(set) lazy var model1p88: FSUIAdapterModel = modelForRatio(1.88)
     public private(set) lazy var model1p75: FSUIAdapterModel = modelForRatio(1.75)
     public private(set) lazy var model1p6: FSUIAdapterModel = modelForRatio(1.6)
     public private(set) lazy var model1p3: FSUIAdapterModel = modelForRatio(1.3)
     public private(set) lazy var model1p1: FSUIAdapterModel = modelForRatio(1.135)
-    
+
     public var iPadValue: FSUIAdapterModel? {
         return isIPad ? model1p6 : nil
     }
-    
+
     // Screen Height Ratios
     public private(set) var height05: CGFloat = 0
     public private(set) var height10: CGFloat = 0
@@ -222,7 +222,7 @@ public class FSUIAdapter {
     public private(set) var height85: CGFloat = 0
     public private(set) var height90: CGFloat = 0
     public private(set) var height95: CGFloat = 0
-    
+
     // Screen Width Ratios
     public private(set) var width05: CGFloat = 0
     public private(set) var width10: CGFloat = 0
@@ -243,7 +243,7 @@ public class FSUIAdapter {
     public private(set) var width85: CGFloat = 0
     public private(set) var width90: CGFloat = 0
     public private(set) var width95: CGFloat = 0
-    
+
     // Safe Area
     public var safeInsets: UIEdgeInsets = .zero {
         didSet {
@@ -253,11 +253,11 @@ public class FSUIAdapter {
     }
     public private(set) var safeWidth: CGFloat = 0
     public private(set) var safeHeight: CGFloat = 0
-    
+
     private init() {
         isIPad = UIDevice.current.userInterfaceIdiom == .pad
         isIPhone = UIDevice.current.userInterfaceIdiom == .phone
-        
+
         if WIDTHFC > HEIGHTFC {
             screenSmallerValue = HEIGHTFC
             screenBiggerValue = WIDTHFC
@@ -265,13 +265,13 @@ public class FSUIAdapter {
             screenSmallerValue = WIDTHFC
             screenBiggerValue = HEIGHTFC
         }
-        
+
         originRatioForIPhone = screenSmallerValue / 375.0
         originRatioForIPad = screenSmallerValue / 810.0
-        
+
         calculateScreenHeightRatios()
     }
-    
+
     private func modelForRatio(_ iPadToIPhone: CGFloat) -> FSUIAdapterModel {
         var ratio = originRatioForIPhone
         if isIPad {
@@ -279,7 +279,7 @@ public class FSUIAdapter {
         }
         return FSUIAdapterModel(ratio: ratio)
     }
-    
+
     private func calculateScreenHeightRatios() {
         height05 = ceil(screenSmallerValue * 0.05)
         height10 = ceil(screenSmallerValue * 0.10)
@@ -300,7 +300,7 @@ public class FSUIAdapter {
         height85 = ceil(screenSmallerValue * 0.85)
         height90 = ceil(screenSmallerValue * 0.90)
         height95 = ceil(screenSmallerValue * 0.95)
-        
+
         width05 = ceil(screenBiggerValue * 0.05)
         width10 = ceil(screenBiggerValue * 0.10)
         width15 = ceil(screenBiggerValue * 0.15)
@@ -330,7 +330,7 @@ public func differentValueForIPad(_ iPad: CGFloat, _ iPhone: CGFloat) -> CGFloat
 
 // MARK: - UIView Extension
 public extension UIView {
-    
+
     var fs_height: CGFloat {
         get { frame.size.height }
         set {
@@ -339,7 +339,7 @@ public extension UIView {
             frame = newFrame
         }
     }
-    
+
     var fs_width: CGFloat {
         get { frame.size.width }
         set {
@@ -348,7 +348,7 @@ public extension UIView {
             frame = newFrame
         }
     }
-    
+
     var fs_top: CGFloat {
         get { frame.origin.y }
         set {
@@ -357,7 +357,7 @@ public extension UIView {
             frame = newFrame
         }
     }
-    
+
     var fs_left: CGFloat {
         get { frame.origin.x }
         set {
@@ -366,7 +366,7 @@ public extension UIView {
             frame = newFrame
         }
     }
-    
+
     var fs_bottom: CGFloat {
         get { frame.origin.y + frame.size.height }
         set {
@@ -375,7 +375,7 @@ public extension UIView {
             frame = newFrame
         }
     }
-    
+
     var fs_right: CGFloat {
         get { frame.origin.x + frame.size.width }
         set {
@@ -385,7 +385,7 @@ public extension UIView {
             frame = newFrame
         }
     }
-    
+
     func fs_radius(radius: CGFloat, corner: UIRectCorner) {
         if #available(iOS 11.0, *) {
             layer.cornerRadius = radius
@@ -398,17 +398,17 @@ public extension UIView {
             layer.mask = maskLayer
         }
     }
-    
-    
+
+
     func fs_corner(leftTop: CGFloat, rightTop: CGFloat, bottomLeft: CGFloat, bottomRight: CGFloat, frame: CGRect) {
         let width = frame.size.width
         let height = frame.size.height
-        
+
         let maskPath = UIBezierPath()
         maskPath.lineWidth = 1.0
         maskPath.lineCapStyle = .round
         maskPath.lineJoinStyle = .round
-        
+
         maskPath.move(to: CGPoint(x: bottomRight, y: height))
         maskPath.addLine(to: CGPoint(x: width - bottomRight, y: height))
         maskPath.addQuadCurve(to: CGPoint(x: width, y: height - bottomRight), controlPoint: CGPoint(x: width, y: height))
@@ -418,13 +418,13 @@ public extension UIView {
         maskPath.addQuadCurve(to: CGPoint(x: 0, y: leftTop), controlPoint: .zero)
         maskPath.addLine(to: CGPoint(x: 0, y: height - bottomLeft))
         maskPath.addQuadCurve(to: CGPoint(x: bottomLeft, y: height), controlPoint: CGPoint(x: 0, y: height))
-        
+
         let maskLayer = CAShapeLayer()
         maskLayer.frame = frame
         maskLayer.path = maskPath.cgPath
         layer.mask = maskLayer
     }
-    
+
     @discardableResult
     static func fs_gradient(view: UIView, frame: CGRect, startPoint: CGPoint, endPoint: CGPoint, colors: [Any], locations: [NSNumber]) -> CAGradientLayer {
         let gradientLayer = CAGradientLayer()

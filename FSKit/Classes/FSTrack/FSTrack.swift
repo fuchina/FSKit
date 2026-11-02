@@ -11,9 +11,9 @@ import Foundation
 
 /// 友盟统计封装类
 public final class FSTrack {
-    
+
     // MARK: - 友盟统计配置
-    
+
     /// 配置友盟统计
     /// - Parameters:
     ///   - appKey: 友盟 App Key
@@ -35,16 +35,16 @@ public final class FSTrack {
         config?.appKey = appKey
         config?.channelId = channelId
         MobClick.start(withConfigure: config)
-        
+
         MobClick.setCrashReportEnabled(crashReportEnabled)
         MobClick.setAppVersion(appVersion)
         MobClick.profileSignIn(withPUID: puid)
         */
         #endif
     }
-    
+
     // MARK: - 事件统计
-    
+
     /// 记录事件
     /// - Parameter event: 事件名称
     public static func event(_ event: String) {
@@ -52,9 +52,9 @@ public final class FSTrack {
         // MobClick.event(event)
         #endif
     }
-    
+
     // MARK: - 页面统计
-    
+
     /// 页面开始
     /// - Parameter page: 页面名称
     public static func pageStart(_ page: String) {
@@ -62,7 +62,7 @@ public final class FSTrack {
         // MobClick.beginLogPageView(page)
         #endif
     }
-    
+
     /// 页面结束
     /// - Parameter page: 页面名称
     public static func pageEnd(_ page: String) {

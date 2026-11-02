@@ -16,21 +16,21 @@ import UIKit
  */
 
 public enum FSLocationSupport {
-    
+
     private static let earthRadius: Double = 6378245.0
     private static let ee: Double = 0.00669342162296594323
-    
+
     private static let mapApple = "苹果地图"
     private static let mapGaode = "高德地图"
     private static let mapBaidu = "百度地图"
-    
+
     // MARK: - Coordinate Conversion
-    
+
     /// GPS坐标转火星坐标 (从CLLocation)
     public static func marsCoordinate(from location: CLLocation) -> CLLocationCoordinate2D {
         return marsCoordinate(from: location.coordinate)
     }
-    
+
     /// 火星坐标转GPS坐标
     public static func gpsCoordinate(from marsCoordinate: CLLocationCoordinate2D) -> CLLocationCoordinate2D {
         // 参考自 http://blog.csdn.net/coolypf/article/details/8686588
@@ -41,13 +41,13 @@ public enum FSLocationSupport {
             longitude: marsCoordinate.longitude * 2 - gdiff.longitude
         )
     }
-    
+
     /// GPS坐标转火星坐标
     public static func marsCoordinate(from gpsCoordinate: CLLocationCoordinate2D) -> CLLocationCoordinate2D {
         if outOfChina(latitude: gpsCoordinate.latitude, longitude: gpsCoordinate.longitude) {
             return gpsCoordinate
         }
-        
+
         let longitude = gpsCoordinate.longitude
         let latitude = gpsCoordinate.latitude
         var dLat = transformLatitude(x: longitude - 105.0, y: latitude - 35.0)
@@ -62,7 +62,7 @@ public enum FSLocationSupport {
         let marsLongitude = longitude + dLon
         return CLLocationCoordinate2D(latitude: marsLatitude, longitude: marsLongitude)
     }
-    
+
     /// 是否在中国版图外，大概判断，边境不准
     public static func outOfChina(latitude: Double, longitude: Double) -> Bool {
         if longitude < 72.004 || longitude > 137.8347 {
@@ -73,9 +73,9 @@ public enum FSLocationSupport {
         }
         return false
     }
-    
+
     // MARK: - Private Transform Methods
-    
+
     private static func transformLatitude(x: Double, y: Double) -> Double {
         var ret = -100.0 + 2.0 * x + 3.0 * y + 0.2 * y * y + 0.1 * x * y + 0.2 * sqrt(abs(x))
         ret += (20.0 * sin(6.0 * x * .pi) + 20.0 * sin(2.0 * x * .pi)) * 2.0 / 3.0
@@ -83,7 +83,7 @@ public enum FSLocationSupport {
         ret += (160.0 * sin(y / 12.0 * .pi) + 320 * sin(y * .pi / 30.0)) * 2.0 / 3.0
         return ret
     }
-    
+
     private static func transformLongitude(x: Double, y: Double) -> Double {
         var ret = 300.0 + x + 2.0 * y + 0.1 * x * x + 0.1 * x * y + 0.1 * sqrt(abs(x))
         ret += (20.0 * sin(6.0 * x * .pi) + 20.0 * sin(2.0 * x * .pi)) * 2.0 / 3.0
@@ -91,9 +91,9 @@ public enum FSLocationSupport {
         ret += (150.0 * sin(x / 12.0 * .pi) + 300.0 * sin(x / 30.0 * .pi)) * 2.0 / 3.0
         return ret
     }
-    
+
     // MARK: - Navigation
-    
+
     /// 导航,coordinate为目的地
     ///
     /// 2026-10-17 收编：原来自己造 `UIAlertController` 再 `present`，与本模块的
@@ -104,7 +104,7 @@ public enum FSLocationSupport {
         controller: UIViewController
     ) {
         var mapOptions: [String] = []
-        
+
         if UIApplication.shared.canOpenURL(URL(string: "baidumap://")!) {
             mapOptions.append(mapBaidu)
         }
@@ -112,7 +112,7 @@ public enum FSLocationSupport {
             mapOptions.append(mapGaode)
         }
         mapOptions.append(mapApple)
-        
+
         var specs: [FSAlertActionSpec] = mapOptions.map { option in
             FSAlertActionSpec(title: option, style: .default) {
                 handleMapSelection(option, coordinate: coordinate)
@@ -123,7 +123,7 @@ public enum FSLocationSupport {
         FSAlertCenter.shared.show(FSAlertSpec(title: "选择导航方式",
                                               actions: specs))
     }
-    
+
     private static func handleMapSelection(_ mapName: String, coordinate: CLLocationCoordinate2D) {
         switch mapName {
         case mapApple:
@@ -136,7 +136,7 @@ public enum FSLocationSupport {
             break
         }
     }
-    
+
     private static func openAppleMaps(coordinate: CLLocationCoordinate2D) {
         let currentLocation = MKMapItem.forCurrentLocation()
         let toLocation: MKMapItem
@@ -156,7 +156,7 @@ public enum FSLocationSupport {
             ]
         )
     }
-    
+
     /// iOS 26 以下：用 MKPlacemark 构造目的地
     ///
     /// - Note: `MKMapItem(placemark:)` 与 `MKPlacemark` 在 iOS 26 已被废弃，仅在 `#available` 的
@@ -165,14 +165,14 @@ public enum FSLocationSupport {
     private static func legacyMapItem(coordinate: CLLocationCoordinate2D) -> MKMapItem {
         return MKMapItem(placemark: MKPlacemark(coordinate: coordinate))
     }
-    
+
     private static func openBaiduMaps(coordinate: CLLocationCoordinate2D) {
         let urlString = "baidumap://map/direction?origin={{我的位置}}&destination=latlng:\(coordinate.latitude),\(coordinate.longitude)|name=目的地&mode=driving&coord_type=gcj02"
         guard let encodedString = urlString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
               let url = URL(string: encodedString) else { return }
         UIApplication.shared.open(url)
     }
-    
+
     private static func openGaodeMaps(coordinate: CLLocationCoordinate2D) {
         let appName = Bundle.main.infoDictionary?["CFBundleDisplayName"] as? String ?? ""
         let urlScheme = "urlScheme"

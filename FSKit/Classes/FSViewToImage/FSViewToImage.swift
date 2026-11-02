@@ -9,30 +9,30 @@
 import UIKit
 
 public class FSViewToImage {
-    
+
     /// 将 UIView 转换为 UIImage
     public static func image(for view: UIView) -> UIImage? {
         UIGraphicsBeginImageContextWithOptions(view.bounds.size, false, 0)
         defer { UIGraphicsEndImageContext() }
-        
+
         guard let context = UIGraphicsGetCurrentContext() else { return nil }
         view.layer.render(in: context)
         return UIGraphicsGetImageFromCurrentImageContext()
     }
-    
+
     /// 屏幕截图（渲染 windowScene 内全部可见 window）
     public static func screenShot() -> UIImage? {
         if #available(iOS 13.0, *) {
             guard let windowScene = currentWindowScene else { return nil }
-            
+
             let s = FSKit.currentScene()?.screen ?? UIScreen()
 
             let screenSize = s.bounds.size
             UIGraphicsBeginImageContextWithOptions(screenSize, false, 0)
             defer { UIGraphicsEndImageContext() }
-            
+
             guard let context = UIGraphicsGetCurrentContext() else { return nil }
-            
+
             for window in windowScene.windows {
                 if window.screen == s {
                     context.saveGState()
@@ -46,15 +46,15 @@ public class FSViewToImage {
                     context.restoreGState()
                 }
             }
-            
+
             return UIGraphicsGetImageFromCurrentImageContext()
         }
-        
+
         return nil
     }
-    
+
     // MARK: - Private
-    
+
     @available(iOS 13.0, *)
     private static var currentWindowScene: UIWindowScene? {
         UIApplication.shared.connectedScenes

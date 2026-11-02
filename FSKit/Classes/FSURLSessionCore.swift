@@ -12,17 +12,17 @@
 import Foundation
 
 public enum FSURLSessionManager {
-    
+
     // MARK: - GET Request
     public static func sessionGet(_ urlString: String, success: ((Data?) -> Void)?, fail: (() -> Void)?) {
         guard !urlString.isEmpty, let url = URL(string: urlString) else {
             fail?()
             return
         }
-        
+
         let successBox = FSUncheckedSendable(success)
         let failBox = FSUncheckedSendable(fail)
-        
+
         let session = URLSession.shared
         let task = session.dataTask(with: url) { data, response, error in
             DispatchQueue.main.async {
@@ -38,25 +38,25 @@ public enum FSURLSessionManager {
         }
         task.resume()
     }
-    
+
     // MARK: - POST Request
     public static func sessionPost(_ urlString: String, parameters: [String: String]? = nil, success: ((Data?) -> Void)?, fail: (() -> Void)?) {
         guard !urlString.isEmpty, let url = URL(string: urlString) else {
             fail?()
             return
         }
-        
+
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        
+
         if let parameters = parameters {
             let bodyString = parameters.map { "\($0.key)=\($0.value)" }.joined(separator: "&")
             request.httpBody = bodyString.data(using: .utf8)
         }
-        
+
         let successBox = FSUncheckedSendable(success)
         let failBox = FSUncheckedSendable(fail)
-        
+
         let session = URLSession.shared
         let task = session.dataTask(with: request) { data, response, error in
             DispatchQueue.main.async {

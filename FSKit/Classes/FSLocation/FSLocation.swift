@@ -27,7 +27,7 @@ public enum FSLocationSourceType: Int {
 }
 
 public class FSLocation {
-    
+
     // 2026-10-17：由 nonisolated 的 FSLocationManager.init 调用，故 nonisolated。
     public nonisolated static func makeLocationManager(distanceFilter: CLLocationDistance) -> CLLocationManager {
         let manager = CLLocationManager()
@@ -36,7 +36,7 @@ public class FSLocation {
         manager.distanceFilter = distanceFilter
         return manager
     }
-    
+
     // 2026-10-17：纯数值映射，被 FSLocationManager 的后台队列调用，故 nonisolated。
     public nonisolated static func locationAccuracy(for accuracy: FSLocationAccuracy) -> CLLocationAccuracy {
         switch accuracy {
@@ -54,17 +54,17 @@ public class FSLocation {
             return kCLLocationAccuracyThreeKilometers
         }
     }
-    
+
     /// 转换为中国习惯的地址顺序
     public static func chineseAddress(with placemark: CLPlacemark) -> String {
         return "\(placemark.subLocality ?? "")\(placemark.name ?? "")"
     }
-    
+
     /// 两个CLLocation之间的距离
     public static func distance(from location: CLLocation, to another: CLLocation) -> CGFloat {
         return CGFloat(location.distance(from: another))
     }
-    
+
     /// 两个GPS坐标点间的距离（米）
     public static func distance(between coordinateA: CLLocationCoordinate2D, and coordinateB: CLLocationCoordinate2D) -> CGFloat {
         guard CLLocationCoordinate2DIsValid(coordinateA),
@@ -79,12 +79,12 @@ public class FSLocation {
 
 // 2026-10-17：纯数据模型，其工厂方法 result(...) 由定位回调在后台队列调用，故 nonisolated。
 public nonisolated class FSLocationResult {
-    
+
     public var locations: [CLLocation]?
     public var lastLocation: CLLocation?
     public var error: Error?
     public var sourceType: FSLocationSourceType = .unknown
-    
+
     public static func result(
         locations: [CLLocation]?,
         lastLocation: CLLocation?,

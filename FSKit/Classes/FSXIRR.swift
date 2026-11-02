@@ -133,7 +133,7 @@ open class FSXIRR {
         _ cashFlows: [CashFlow],
         options: Options = FSXIRR.transactionOptions
     ) -> Double? {
-        
+
         guard cashFlows.count >= 2 else { return nil }
 
         let sortedRaw = cashFlows.sorted { $0.date < $1.date }

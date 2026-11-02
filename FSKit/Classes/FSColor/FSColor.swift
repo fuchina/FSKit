@@ -10,46 +10,46 @@ import UIKit
 import SwiftUI
 
 public nonisolated struct FSColor {
-    
+
     /// app color
     public static let APPCOLOR = Color(red: 18 / 255.0, green: 152 / 255.0, blue: 233 / 255.0)
-        
+
     /// 微信绿
     public static let wechatGreen = Color(red: 0x20 / 255.0, green: 0xbf / 255.0, blue: 0x66 / 255.0)
-    
+
     /// 美团黄
     public static let meituanYellow = Color(red: 1, green: 195 / 255.0, blue: 0)
-    
+
     /// Apple News 红
     public static let appleNewsRed = Color(red: 250 / 255.0, green: 80 / 255.0, blue: 100 / 255.0)
-    
+
     /// 支付宝蓝
     public static let alipayBlue = Color(red: 18 / 255.0, green: 152 / 255.0, blue: 233 / 255.0)
-    
+
     /// 微信朋友圈蓝
     public static let wechatFriendsBlue = Color(red: 0x58 / 255.0, green: 0x6c / 255.0, blue: 0x93 / 255.0)
-    
+
     /// 微信朋友圈蓝（带透明度）
     public static let wechatFriendsBlueAlpha = Color(red: 0x58 / 255.0, green: 0x6c / 255.0, blue: 0x93 / 255.0)
-    
+
     /// iOS 系统蓝
     public static let iosSystemBlue = Color(red: 0, green: 0x7A / 255.0, blue: 0xFF / 255.0)
 
     /// App Store 按钮背景色（淡蓝色）
     public static let appStoreButtonBackground = Color(red: 0xf0 / 255.0, green: 0xf0 / 255.0, blue: 0xf7 / 255.0)
-    
+
     /// 红色
     public static let red = Color(red: 250 / 255.0, green: 49 / 255.0, blue: 105 / 255.0)
-    
+
     /// 紫色（UIColor.purple #800080）
     public static let purple = Color(red: 0x80 / 255.0, green: 0, blue: 0x80 / 255.0)
-    
+
     /// 黄色
     public static let yellow = Color(red: 253 / 255.0, green: 111 / 255.0, blue: 55 / 255.0)
-    
+
     /// 灰色
     public static let gray = Color(red: 0x80 / 255.0, green: 0x80 / 255.0, blue: 0x80 / 255.0)
-    
+
     /// 轻灰色 —— 复刻 `UIColor.lightGray`（灰度 2/3 = #AAAAAA，白底对比度 2.32:1）
     ///
     /// ★ 2026-10-31：改回 #AAAAAA。10-30 13:51 的 9bfe3d7 曾把它改成 #D3D3D3，
@@ -58,16 +58,16 @@ public nonisolated struct FSColor {
     ///   「有」标记、仓位、禁用按钮等）对比度从 2.32:1 掉到 1.50:1，白底上 10pt 糊成一片。
     ///   要更淡的灰请另起常量，不要动这里。
     public static let lightGray = Color(red: 0xaa / 255.0, green: 0xaa / 255.0, blue: 0xaa / 255.0)
-        
+
     /// 深色文字
     public static let textDark = Color(red: 16 / 255.0, green: 16 / 255.0, blue: 16 / 255.0)
-    
+
     /// 普通文字
     public static let textNormal = Color(red: 88 / 255.0, green: 88 / 255.0, blue: 88 / 255.0)
-    
+
     /// 浅色文字
     public static let textLight = Color(red: 169 / 255.0, green: 169 / 255.0, blue: 169 / 255.0)
-        
+
     /// 页面背景颜色
     public static let backColor = Color(red: 0.95, green: 0.95, blue: 0.95)
 
