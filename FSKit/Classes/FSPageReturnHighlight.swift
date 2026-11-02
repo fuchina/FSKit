@@ -337,7 +337,7 @@ public struct FSPushStack<Content: View>: View {
     private let tabIndex: Int
     private let content: Content
 
-    /// - Parameter tabIndex: 本栈在根 TabView 中的下标；用于向 `FSStackRegistry` 登记（跨 tab 的屏幕锁需要）
+    /// - Parameter tabIndex: 本栈在根 TabView 中的下标；用于向 `FSStackRegistry` 登记
     public init(tabIndex: Int = 0, @ViewBuilder content: () -> Content) {
         self.tabIndex = tabIndex
         self.content = content()
@@ -369,10 +369,11 @@ public struct FSPushStack<Content: View>: View {
 
 // MARK: - 跨 tab 栈注册表
 
-/// 全 SwiftUI 后每个 tab 各有一个 `FSNavRouter`。
-/// 剪切板角标、以及「把所有栈弹回根」这类**跨 tab** 逻辑，
-/// 原来靠遍历 `UITabBarController` 下的 `UINavigationController` 实现；
-/// 现在改为由 `FSPushStack` 向本注册表登记自己的 router。
+/// 全 SwiftUI 后每个 tab 各有一个 `FSNavRouter`。剪切板角标这类**跨 tab** 状态
+/// 原来挂 `UITabBarController` 上遍历取，现在收在这里，由 `FSPushStack` 登记。
+///
+/// ★ 2026-11-02：解锁门禁整体下线后，`anyPushed` / `popAllToRoot` 已无调用点，一并删除。
+/// `routers` / `register` 仍在（`FSPushStack.onAppear` 会登记），但当前**没有读取方**。
 @Observable
 @MainActor
 public final class FSStackRegistry {
@@ -392,12 +393,6 @@ public final class FSStackRegistry {
         while routers.count <= index { routers.append(FSNavRouter()) }
         routers[index] = router
     }
-
-    /// 原 `v.viewControllers.count > 1`
-    public var anyPushed: Bool { routers.contains { $0.path.isEmpty == false } }
-
-    /// 原 `for v in viewControllers { v.popToRootViewController(animated: true) }`
-    public func popAllToRoot() { routers.forEach { $0.popToRoot() } }
 }
 
 public struct FSPageBackground: ViewModifier {
