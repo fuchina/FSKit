@@ -11,7 +11,6 @@ import CryptoKit
 public nonisolated let FS_BE_DEBUG_NOTIFICATION  =   "FS_BE_DEBUG_NOTIFICATION"
 
 /// 疑似内存泄漏通知：基类检测到页面 pop/dismiss 后仍未释放时投递，object 为提示文案（String）。
-/// 由 App 层监听并按需（如 FSJZAPP.Fudon()）弹 toast，避免基类反向依赖上层。
 public nonisolated let FS_BE_LEAK_NOTIFICATION   =   "FS_BE_LEAK_NOTIFICATION"
 
 /// 一年的秒数
@@ -25,7 +24,6 @@ public nonisolated let FSDoubleFiveDecimalPlaces: Double = 100000.0
 public nonisolated let FSThreeDecimalPlaces: Int = 1000
 public nonisolated let FSDoubleThreeDecimalPlaces: Double = 1000.0
 
-// MARK: - FSKit
 public enum FSKit {
 
     public static func printArrayFirstJSON(_ list: [[String: Any]]) {
@@ -35,7 +33,6 @@ public enum FSKit {
 
     }
 
-    // MARK: - UserDefaults
     public static func userDefaultsSetObject(_ object: Any?, forKey key: String) {
         guard let object = object, isValidateString(key) else { return }
         let defaults = UserDefaults.standard
@@ -48,14 +45,6 @@ public enum FSKit {
         return UserDefaults.standard.object(forKey: key)
     }
 
-    public static func clearUserDefaults() {
-        let defaults = UserDefaults.standard
-        for key in defaults.dictionaryRepresentation().keys {
-            defaults.removeObject(forKey: key)
-        }
-    }
-
-    // MARK: - JSON
     /// nonisolated：无状态纯函数，需供网络回调等非隔离上下文调用
     public nonisolated static func object(fromJsonString jsonString: String?) -> Any? {
         guard let jsonString = jsonString, !jsonString.isEmpty else { return nil }
@@ -77,16 +66,6 @@ public enum FSKit {
         UIPasteboard.general.string = string
     }
 
-    public static func letScreenLock(_ lock: Bool) {
-        UIApplication.shared.isIdleTimerDisabled = !lock
-    }
-
-    public static func gotoAppCenterPage(withAppId appID: String) {
-        let urlString = "itms-apps://itunes.apple.com/WebObjects/MZStore.woa/wa/viewContentsUserReviews?type=Purple+Software&id=\(appID)"
-        guard let url = URL(string: urlString) else { return }
-        UIApplication.shared.open(url, options: [:], completionHandler: nil)
-    }
-
     public static func isValidateEmail(_ email: String) -> Bool {
         guard email.contains("@"), email.contains(".") else { return false }
         let emailRegex = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
@@ -100,59 +79,10 @@ public enum FSKit {
         return predicate.evaluate(with: string)
     }
 
-    public static func isValidateUserPasswd(_ str: String) -> Bool {
-        let regex = "^[a-zA-Z0-9]{6,16}$"
-        guard let regularExpression = try? NSRegularExpression(pattern: regex, options: .caseInsensitive) else { return false }
-        return regularExpression.numberOfMatches(in: str, options: .reportProgress, range: NSRange(location: 0, length: str.count)) > 0
-    }
-
-    public static func isChar(_ str: String) -> Bool {
-        let regex = "^[a-zA-Z]*$"
-        guard let regularExpression = try? NSRegularExpression(pattern: regex, options: .caseInsensitive) else { return false }
-        return regularExpression.numberOfMatches(in: str, options: .reportProgress, range: NSRange(location: 0, length: str.count)) > 0
-    }
-
     public static func isNumber(_ str: String) -> Bool {
         let regex = "^[0-9]*$"
         guard let regularExpression = try? NSRegularExpression(pattern: regex, options: .caseInsensitive) else { return false }
         return regularExpression.numberOfMatches(in: str, options: .reportProgress, range: NSRange(location: 0, length: str.count)) > 0
-    }
-
-    public static func isString(_ aString: String, containString bString: String) -> Bool {
-        return aString.contains(bString)
-    }
-
-    public static func isStringContainsStringAndNumber(_ sourceString: String) -> Bool {
-        guard !sourceString.isEmpty else { return false }
-        var containsNumber = false
-        var containsChar = false
-        for char in sourceString {
-            if char.isNumber {
-                containsNumber = true
-            } else {
-                containsChar = true
-            }
-        }
-        return containsChar && containsNumber
-    }
-
-    public static func isURLString(_ sourceString: String) -> Bool {
-        let regex = "((http[s]{0,1}|ftp)://[a-zA-Z0-9\\.\\-]+\\.([a-zA-Z]{2,4})(:\\d+)?(/[a-zA-Z0-9\\.\\-~!@#$%^&*+?:_/=<>]*)?)|(www.[a-zA-Z0-9\\.\\-]+\\.([a-zA-Z]{2,4})(:\\d+)?(/[a-zA-Z0-9\\.\\-~!@#$%^&*+?:_/=<>]*)?)"
-        let predicate = NSPredicate(format: "SELF MATCHES %@", regex)
-        return predicate.evaluate(with: sourceString)
-    }
-
-    public static func isHaveChinese(in string: String) -> Bool {
-        for scalar in string.unicodeScalars {
-            if scalar.value > 0x4e00 && scalar.value < 0x9fff {
-                return true
-            }
-        }
-        return false
-    }
-
-    public static func isAllNum(_ string: String) -> Bool {
-        return string.allSatisfy { $0.isNumber }
     }
 
     public static func isPureInt(_ string: String?) -> Bool {
@@ -175,7 +105,6 @@ public enum FSKit {
         return Float(string.trimmingCharacters(in: .whitespacesAndNewlines)) != nil
     }
 
-    /// ★ 2026-10-24：`nonisolated` —— 纯字符串判空，无状态，供后台执行器调用。
     public nonisolated static func isValidateString(_ string: String?) -> Bool {
         guard let string = string else { return false }
         return !string.isEmpty
@@ -184,11 +113,6 @@ public enum FSKit {
     public static func isValidateArray(_ array: [Any]?) -> Bool {
         guard let array = array else { return false }
         return !array.isEmpty
-    }
-
-    public static func isValidateDictionary(_ dictionary: [String: Any]?) -> Bool {
-        guard let dictionary = dictionary else { return false }
-        return !dictionary.isEmpty
     }
 
     public static func floatEqual(_ aNumber: Double, _ bNumber: Double) -> Bool {
@@ -201,14 +125,6 @@ public enum FSKit {
         return first == "zh-Hans-CN"
     }
 
-
-    // MARK: - Memory & Disk
-
-    /// 当前进程物理占用（footprint，字节）。
-    ///
-    /// 这与 Xcode Debug Navigator / Instruments 里显示的 Memory 是同一个数，也是系统 jetsam
-    /// （内存不足杀进程）的判定依据。**不要用 `MACH_TASK_BASIC_INFO.resident_size`**：
-    /// 那是 RSS，含可回收的 clean pages，通常比 Xcode 显示值大很多。
     public static func memoryFootprintBytes() -> UInt64 {
         var info = task_vm_info_data_t()
         var count = mach_msg_type_number_t(MemoryLayout<task_vm_info_data_t>.size / MemoryLayout<integer_t>.size)
@@ -226,8 +142,6 @@ public enum FSKit {
         Double(memoryFootprintBytes()) / 1024.0 / 1024.0
     }
 
-    /// 本进程还能申请多少（MB，iOS 13+）。
-    ///
     /// 这是「离被系统杀掉还有多远」的直接指标，比整机空闲内存更有参考价值。
     /// 模拟器上可能返回 0。
     public static func availableMemoryForApp() -> Double {
@@ -237,21 +151,6 @@ public enum FSKit {
     /// 形如 "128.4MB"，便于日志与 toast（内部先造字符串，避免多处重复 format）
     public static func memoryFootprintText() -> String {
         String(format: "%.1fMB", memoryFootprint())
-    }
-
-    /// resident_size（RSS，MB）。
-    ///
-    /// 与 Xcode 显示值不一致，仅保留用于和旧日志比对；新代码请用 `memoryFootprint()`。
-    public static func usedMemory() -> Double {
-        var taskInfo = mach_task_basic_info()
-        var count = mach_msg_type_number_t(MemoryLayout<mach_task_basic_info>.size) / 4
-        let result = withUnsafeMutablePointer(to: &taskInfo) {
-            $0.withMemoryRebound(to: integer_t.self, capacity: 1) {
-                task_info(mach_task_self_, task_flavor_t(MACH_TASK_BASIC_INFO), $0, &count)
-            }
-        }
-        guard result == KERN_SUCCESS else { return Double(NSNotFound) }
-        return Double(taskInfo.resident_size) / 1024.0 / 1024.0
     }
 
     /// 整机空闲内存（MB）。
@@ -271,18 +170,6 @@ public enum FSKit {
         // `sysconf(_SC_PAGESIZE)` 是等价的 POSIX 调用，不受此限制。
         let pageSize = Double(sysconf(_SC_PAGESIZE))
         return pageSize * Double(vmStats.free_count) / 1024.0 / 1024.0
-    }
-
-    public static func diskOfAllSizeBytes() -> Double {
-        guard let attrs = try? FileManager.default.attributesOfFileSystem(forPath: NSHomeDirectory()),
-              let size = attrs[.systemSize] as? NSNumber else { return 0 }
-        return Double(size.floatValue)
-    }
-
-    public static func diskOfFreeSizeBytes() -> Double {
-        guard let attrs = try? FileManager.default.attributesOfFileSystem(forPath: NSHomeDirectory()),
-              let size = attrs[.systemFreeSize] as? NSNumber else { return 0 }
-        return Double(size.floatValue)
     }
 
     public static func folderSize(atPath folderPath: String, extension ext: String? = nil) -> Int {
@@ -398,12 +285,6 @@ public enum FSKit {
         return address
     }
 
-    // MARK: - Path
-    public static func homeDirectoryPath(_ fileName: String?) -> String? {
-        guard let fileName = fileName, !fileName.isEmpty else { return nil }
-        return (NSHomeDirectory() as NSString).appendingPathComponent(fileName)
-    }
-
     public static func documentsPath(_ fileName: String?) -> String? {
         guard let fileName = fileName, !fileName.isEmpty else { return nil }
         guard let path = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).last else { return nil }
@@ -413,34 +294,6 @@ public enum FSKit {
     public static func temporaryDirectoryFile(_ fileName: String?) -> String? {
         guard let fileName = fileName, !fileName.isEmpty else { return nil }
         return (NSTemporaryDirectory() as NSString).appendingPathComponent(fileName)
-    }
-
-    // MARK: - Random
-    public static func randomNumber(withDigit digit: Int) -> String {
-        var result = ""
-        for _ in 0..<digit {
-            result += String(Int.random(in: 0...9))
-        }
-        return result
-    }
-
-    // MARK: - String Utilities
-    public static func blankInChars(_ string: String, byCellNo num: Int) -> String? {
-        guard !string.isEmpty else { return nil }
-        var result: [String] = []
-        var temp: [Character] = []
-
-        for char in string {
-            temp.append(char)
-            if temp.count == num {
-                result.append(String(temp))
-                temp.removeAll()
-            }
-        }
-        if !temp.isEmpty {
-            result.append(String(temp))
-        }
-        return result.joined(separator: " ")
     }
 
     public static func stringDeleteNewLineAndWhiteSpace(_ string: String) -> String {
@@ -477,19 +330,6 @@ public enum FSKit {
           // 转为大写 16 进制字符串（和你原代码输出格式完全一致）
           return digest.map { String(format: "%02X", $0) }.joined()
       }
-
-      /// 可选：小写输出版本（按需使用）
-      public static func md5Lowercase(_ str: String?) -> String? {
-          guard let upperCase = md5(str) else { return nil }
-          return upperCase.lowercased()
-      }
-
-    // MARK: - Font
-    public static func angleFont(withRate rate: Double, fontSize: Int) -> UIFont {
-        let matrix = CGAffineTransform(a: 1, b: 0, c: tan(rate * .pi / 180), d: 1, tx: 0, ty: 0)
-        let desc = UIFontDescriptor(name: UIFont.systemFont(ofSize: Double(fontSize)).fontName, matrix: matrix)
-        return UIFont(descriptor: desc, size: Double(fontSize))
-    }
 
     // MARK: - Unit Conversion
     public static func kmgUnit(_ size: Int) -> String {
@@ -550,74 +390,6 @@ public enum FSKit {
         return bankStyleSharedFormatter.string(from: NSNumber(value: Double(cents) / 100.0)) ?? ""
     }
 
-    // MARK: - Decimal Operations
-    public static func fourNoFiveYes(_ number: Float, afterPoint position: Int) -> String {
-        let handler = NSDecimalNumberHandler(
-            roundingMode: .up,
-            scale: Int16(position),
-            raiseOnExactness: false,
-            raiseOnOverflow: false,
-            raiseOnUnderflow: false,
-            raiseOnDivideByZero: false
-        )
-        let decimal = NSDecimalNumber(value: number)
-        let rounded = decimal.rounding(accordingToBehavior: handler)
-        return rounded.stringValue
-    }
-
-    public static func forwardValue(_ number: Double, afterPoint position: Int) -> Double {
-        let handler = NSDecimalNumberHandler(
-            roundingMode: .up,
-            scale: Int16(position),
-            raiseOnExactness: false,
-            raiseOnOverflow: false,
-            raiseOnUnderflow: false,
-            raiseOnDivideByZero: false
-        )
-        let decimal = NSDecimalNumber(value: number)
-        let rounded = decimal.rounding(accordingToBehavior: handler)
-        return rounded.doubleValue
-    }
-
-    public static func decimalNumberMultiply(_ multiplierValue: String, valueB multiplicandValue: String) -> String {
-        let multiplier = NSDecimalNumber(string: multiplierValue)
-        let multiplicand = NSDecimalNumber(string: multiplicandValue)
-        return multiplicand.multiplying(by: multiplier).stringValue
-    }
-
-    // MARK: - High Accuracy Math
-    public static func highAccuracyAdd(_ a: String, _ b: String) -> String {
-        let aNum = NSDecimalNumber(string: isPureFloat(a) ? a : "0")
-        let bNum = NSDecimalNumber(string: isPureFloat(b) ? b : "0")
-        return aNum.adding(bNum).stringValue
-    }
-
-    public static func highAccuracySubtract(_ a: String, _ b: String) -> String {
-        let aNum = NSDecimalNumber(string: isPureFloat(a) ? a : "0")
-        let bNum = NSDecimalNumber(string: isPureFloat(b) ? b : "0")
-        return aNum.subtracting(bNum).stringValue
-    }
-
-    public static func highAccuracyMultiply(_ a: String, _ b: String) -> String {
-        let aNum = NSDecimalNumber(string: isPureFloat(a) ? a : "0")
-        let bNum = NSDecimalNumber(string: isPureFloat(b) ? b : "0")
-        return aNum.multiplying(by: bNum).stringValue
-    }
-
-    public static func highAccuracyDivide(_ a: String, _ b: String) -> String {
-        let aNum = NSDecimalNumber(string: isPureFloat(a) ? a : "0")
-        let bNum = NSDecimalNumber(string: isPureFloat(b) ? b : "0")
-        return aNum.dividing(by: bNum).stringValue
-    }
-
-    public static func highAccuracyCompare(_ a: String, _ b: String) -> ComparisonResult {
-        let aNum = NSDecimalNumber(string: isPureFloat(a) ? a : "0")
-        let bNum = NSDecimalNumber(string: isPureFloat(b) ? b : "0")
-        return aNum.compare(bNum)
-    }
-
-    // MARK: - Number Conversion
-    /// 数值解析错误
     public enum FSNumberParseError: Error, CustomStringConvertible {
         case empty
         case invalidFormat
@@ -750,38 +522,6 @@ public enum FSKit {
         return 0
     }
 
-    // MARK: - Base64
-    public static func base64String(forText text: String?) -> String? {
-        guard let text = text, let data = text.data(using: .utf8) else { return nil }
-        return data.base64EncodedString(options: .lineLength64Characters)
-    }
-
-    public static func text(fromBase64String text: String?) -> String? {
-        guard let text = text, let data = Data(base64Encoded: text, options: .ignoreUnknownCharacters) else { return nil }
-        return String(data: data, encoding: .utf8)
-    }
-
-    public static func base64Code(_ data: Data) -> String {
-        return data.base64EncodedString()
-    }
-
-    // MARK: - Time Conversion
-    public static func countOverTime(_ time: TimeInterval) -> String {
-        let seconds = Int(time)
-        var result = ""
-
-        let day = seconds / (60 * 60 * 24)
-        if day > 0 { result += "\(day)天" }
-
-        let hour = (seconds - day * 60 * 60 * 24) / 3600
-        if hour > 0 { result += "\(hour)小时" }
-
-        let minute = (seconds - day * 60 * 60 * 24 - hour * 3600) / 60
-        if minute > 0 { result += "\(minute)分钟" }
-
-        return result
-    }
-
     public static func dayMonthYear(forNumber number: Double) -> String {
         if number > 365 {
             return String(format: "%.2f年", number / 365.0)
@@ -798,60 +538,6 @@ public enum FSKit {
         CFStringTransform(mutableString, nil, kCFStringTransformMandarinLatin, false)
         CFStringTransform(mutableString, nil, kCFStringTransformStripCombiningMarks, false)
         return mutableString as String
-    }
-
-    public static func pinyinForHansClear(_ chinese: String) -> String {
-        return cleanString(pinyin(forHans: chinese))
-    }
-
-    public static func convertNumbers(_ string: String) -> String? {
-        guard isValidateString(string) else { return nil }
-
-        let numbers = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
-        let chinese = ["零", "一", "二", "三", "四", "五", "六", "七", "八", "九"]
-
-        var result = ""
-        for char in string {
-            let charStr = String(char)
-            if let index = numbers.firstIndex(of: charStr) {
-                result += chinese[index]
-            }
-        }
-        return pinyinForHansClear(result)
-    }
-
-    // MARK: - String Reverse
-    public static func reverseWords(in str: String) -> String {
-        return String(str.reversed())
-    }
-
-    // MARK: - QR Code
-    public static func scanQRCode(_ image: UIImage) -> String? {
-        guard let ciImage = CIImage(image: image) else { return nil }
-        let detector = CIDetector(ofType: CIDetectorTypeQRCode, context: nil, options: [CIDetectorAccuracy: CIDetectorAccuracyHigh])
-        guard let features = detector?.features(in: ciImage) as? [CIQRCodeFeature] else { return nil }
-        return features.first?.messageString
-    }
-
-    // MARK: - Data Conversion
-    public static func dataToHex(_ data: Data) -> String {
-        return data.map { String(format: "%02x", $0) }.joined()
-    }
-
-    public static func convertHexStrToData(_ str: String) -> Data? {
-        guard !str.isEmpty else { return nil }
-        var data = Data()
-        var index = str.startIndex
-
-        while index < str.endIndex {
-            let nextIndex = str.index(index, offsetBy: 2, limitedBy: str.endIndex) ?? str.endIndex
-            let hexStr = String(str[index..<nextIndex])
-            if let byte = UInt8(hexStr, radix: 16) {
-                data.append(byte)
-            }
-            index = nextIndex
-        }
-        return data
     }
 
     // MARK: - Phone Call
@@ -877,12 +563,6 @@ public enum FSKit {
     public static func openApp(byURLString str: String) {
         guard let url = URL(string: "\(str)://://") else { return }
         UIApplication.shared.open(url, options: [:], completionHandler: nil)
-    }
-
-    // MARK: - Display Formatting
-    public static func showBetterFor2DigitFloat(_ value: Float) -> String {
-        let d = Int(value)
-        return self.showBetterFor2DigitInteger(d)
     }
 
     public static func showBetterFor2DigitDouble(_ value: Double) -> String {
@@ -931,57 +611,9 @@ public enum FSKit {
         }
     }
 
-    // MARK: - Array Utilities
-    public static func maxAndMinNumber(in array: [Any]) -> [NSNumber]? {
-        guard !array.isEmpty else { return nil }
-
-        var maxVal = (array[0] as? NSNumber)?.doubleValue ?? 0
-        var minVal = maxVal
-
-        for item in array {
-            let number = (item as? NSNumber)?.doubleValue ?? 0
-            if number > maxVal { maxVal = number }
-            if number < minVal { minVal = number }
-        }
-
-        return [NSNumber(value: maxVal), NSNumber(value: minVal)]
-    }
-
-    public static func maopaoArray(_ array: [Any]) -> [Any]? {
-        guard !array.isEmpty else { return nil }
-
-        var mArray = array.compactMap { ($0 as? NSNumber)?.doubleValue }
-
-        for x in 0..<(mArray.count - 1) {
-            for y in 0..<(mArray.count - 1 - x) {
-                if mArray[y] > mArray[y + 1] {
-                    mArray.swapAt(y, y + 1)
-                }
-            }
-        }
-
-        return mArray.map { NSNumber(value: $0) }
-    }
-
-    public static func arrayReverse(_ array: [Any]) -> [Any] {
-        return array.reversed()
-    }
-
     public static func arrayByOneChar(from string: String) -> [String]? {
         guard !string.isEmpty else { return nil }
         return string.map { String($0) }
-    }
-
-    // MARK: - URL Parameters
-    public static func urlParameters(from url: URL?) -> [String: String]? {
-        guard let url = url else { return nil }
-        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return nil }
-
-        var params: [String: String] = [:]
-        components.queryItems?.forEach { item in
-            params[item.name] = item.value ?? ""
-        }
-        return params
     }
 
     // MARK: - String Part Display
@@ -1002,15 +634,6 @@ public enum FSKit {
             }
         }
         return scenes.first as? UIWindowScene
-    }
-
-    public static func screenOf(_ view: UIView) -> UIScreen {
-        let screen = view.window?.windowScene?.screen
-        if let screen {
-            return screen
-        }
-
-        return UIScreen()
     }
 
     public static func digitalOnlyString(_ inputString: String?) -> String {
@@ -1064,28 +687,6 @@ public enum FSKit {
         case .full: return "电量已满"
         @unknown default: return "未知"
         }
-    }
-
-    // MARK: - Image Compression
-    public static func compressOriginalImage(_ image: UIImage, toMaxDataSizeKBytes size: Double) -> Data? {
-        var maxQuality: Double = 0.9
-        var data = image.jpegData(compressionQuality: 1.0)
-        var dataKBytes = Double(data?.count ?? 0) / 1000.0
-        var lastData = dataKBytes
-
-        while dataKBytes > size && maxQuality > 0.01 {
-            maxQuality -= 0.01
-            data = image.jpegData(compressionQuality: maxQuality)
-            dataKBytes = Double(data?.count ?? 0) / 1000.0
-            if lastData == dataKBytes { break }
-            lastData = dataKBytes
-        }
-        return data
-    }
-
-    public static func showBetterFor5DigitFloat(_ value: Float) -> String {
-        let d = Int(value)
-        return self.showBetterFor5DigitInteger(d)
     }
 
     public static func showBetterFor5DigitDouble(_ value: Double) -> String {
