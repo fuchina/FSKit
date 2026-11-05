@@ -8,7 +8,7 @@
 
 import UIKit
 
-public class FSViewToImage {
+public final class FSViewToImage {
 
     /// 将 UIView 转换为 UIImage
     public static func image(for view: UIView) -> UIImage? {

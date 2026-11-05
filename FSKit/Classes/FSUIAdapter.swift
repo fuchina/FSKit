@@ -19,7 +19,7 @@ public var UIScreenWidth: CGFloat {
 }
 
 // MARK: - FSUIAdapterModel
-public class FSUIAdapterModel {
+public final class FSUIAdapterModel {
 
     public let value0p5: CGFloat
     public let value1: CGFloat
@@ -178,7 +178,7 @@ public class FSUIAdapterModel {
 
 
 // MARK: - FSUIAdapterManager
-public class FSUIAdapter {
+public final class FSUIAdapter {
 
     // 2026-10-17：Pod 与主 App 统一为默认主隔离后，nonisolated(unsafe) 反而报错，故移除。
     public static let shared = FSUIAdapter()

@@ -23,7 +23,7 @@ import MapKit
 /// 需显式声明可跨隔离域传递（可变状态由内部串行 `queue` 保护），故补 `@unchecked Sendable`。
 // 2026-10-17：本类真跑在自己的串行 DispatchQueue 上（非主线程），故显式 nonisolated，
 // 保持「任意线程可调用、内部自行切主线程回调」的原设计。
-public nonisolated class FSLocationManager: NSObject, @unchecked Sendable {
+public nonisolated final class FSLocationManager: NSObject, @unchecked Sendable {
 
     public var serialManager: CLLocationManager
 

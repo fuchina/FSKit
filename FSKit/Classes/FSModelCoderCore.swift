@@ -15,7 +15,7 @@ public enum FSTriBool: Int {
 }
 
 // MARK: - FSModelCoder
-public class FSModelCoder: NSObject, NSSecureCoding {
+public final class FSModelCoder: NSObject, NSSecureCoding {
 
     public var dictionary: [String: Any]?
     public var list: [Any]?

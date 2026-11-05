@@ -20,7 +20,7 @@ import SQLite3
 /// 继承主隔离、却在自定义队列上执行 ⇒ 入口隔离断言失败：
 ///   `_dispatch_assert_queue_fail` → `_swift_task_checkIsolatedSwift`
 ///   （崩溃栈：`checkTableExist` ← `querySQL` ← `FSAlertAPI`）
-public nonisolated class FSDBMaster {
+public nonisolated final class FSDBMaster {
 
     // MARK: - 属性
     // 类已整体 nonisolated，实例属性无需 nonisolated(unsafe)（deinit 可直接访问）。

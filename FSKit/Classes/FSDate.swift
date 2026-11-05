@@ -10,7 +10,7 @@ import UIKit
 
 // MARK: - FSLunarDate
 /// ★ 2026-10-24：`nonisolated` —— 纯农历换算（无 UI），`FSDate` 已整类 nonisolated 并在后台执行器上用。
-public nonisolated class FSLunarDate: @unchecked Sendable {
+public nonisolated final class FSLunarDate: @unchecked Sendable {
     public var year: Int = 0
     public var month: Int = 0
     public var day: Int = 0
