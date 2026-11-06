@@ -70,6 +70,12 @@ public nonisolated func fsField<Model>(_ keyPath: WritableKeyPath<Model, Bool>) 
 /// 整个方法就是 @MainActor 的，后台查库建模用不了。
 /// 已验证：**主隔离类型满足 nonisolated 协议要求是合法的**（编译器生成 nonisolated witness），
 /// 所以全库 58 个 `: FSEntity` 实现一个都不用改；只有确实要在后台用的那几个类型自己标 `nonisolated`。
+///
+/// ★★ 2026-11-06 补充：上面说的是**满足协议要求**，不等于**可以任意使用一致性**。
+/// 主隔离类型（如 `FSABTrackModel`）对 `FSEntity` 的一致性同样是主隔离的，
+/// 在 `nonisolated` 上下文里调 `toms(from:)` 会报
+/// `Main actor-isolated conformance of 'X' to 'FSEntity' cannot be used in nonisolated context`。
+/// **实战规则：后台只取 `[[String: Any]]` 行；`toms` / 模型构造 / `processProperties` 一律回主线程。**
 public nonisolated protocol FSEntity: AnyObject, Equatable {
 
     init()
