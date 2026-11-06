@@ -187,7 +187,7 @@ private final class FSCellTouchRecognizer: UIGestureRecognizer {
     private var tracking = false          // 是否正在追踪单指
     private var invalidated = false       // 已判为滚动/取消 → 抬手不再算轻点
     private var highlighted = false       // 灰底是否已点亮
-    private var pendingHighlight: DispatchWorkItem?
+    private var pendingHighlight: Task<Void, Never>?
 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent) {
         super.touchesBegan(touches, with: event)
@@ -231,14 +231,17 @@ private final class FSCellTouchRecognizer: UIGestureRecognizer {
 
     // MARK: 内部
 
+    /// ★ 2026-11-06：`DispatchWorkItem` → `Task`；取消时 `Task.sleep` 抛出即返回
     private func scheduleHighlight() {
-        let work = DispatchWorkItem { [weak self] in
+        // 延时先拷出来：闭包里 `self` 是可选（`[weak self]`），
+        // 直接写 `highlightDelay` 会报「Explicit use of 'self' is required when 'self' is optional」。
+        let delay = highlightDelay
+        pendingHighlight = Task { @MainActor [weak self] in
+            do { try await Task.sleep(for: .seconds(delay)) } catch { return }
             guard let self, self.tracking, !self.invalidated else { return }
             self.highlighted = true
             self.onHighlightChange?(true)
         }
-        pendingHighlight = work
-        DispatchQueue.main.asyncAfter(deadline: .now() + highlightDelay, execute: work)
     }
 
     private func cancelPending() {

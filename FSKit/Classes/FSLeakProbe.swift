@@ -161,7 +161,7 @@ public enum FSLeakProbe {
     /// 带深度是为了区分「同名页面嵌套 push」：只用页面名会互相覆盖，导致误报或漏报。
     private static var boxes: [String: [FSWeakBox]] = [:]
 
-    private static var pending: [String: DispatchWorkItem] = [:]
+    private static var pending: [String: Task<Void, Never>] = [:]
 
     /// 首检延时。转场动画约 0.35s，一般异步回调节点也在这个量级内。
     private static let firstDelay: TimeInterval = 3.0
@@ -214,14 +214,11 @@ public enum FSLeakProbe {
     private static func scheduleFirst(key k: String, page: String) {
         pending[k]?.cancel()
 
-        let item = DispatchWorkItem { [k, page] in
-            // 本 block 由 `main.asyncAfter` 派发，必然在主线程执行
-            MainActor.assumeIsolated {
-                firstCheck(key: k, page: page)
-            }
+        // ★ 2026-11-06：`DispatchWorkItem` → `Task`（取消即抛、直接 return）
+        pending[k] = Task { @MainActor in
+            do { try await Task.sleep(for: .seconds(firstDelay)) } catch { return }
+            firstCheck(key: k, page: page)
         }
-        pending[k] = item
-        DispatchQueue.main.asyncAfter(deadline: .now() + firstDelay, execute: item)
     }
 
     private static func firstCheck(key k: String, page: String) {
@@ -237,13 +234,10 @@ public enum FSLeakProbe {
         // 仍有存活：可能是延迟释放，先不报，进入复检
         pending[k]?.cancel()
 
-        let item = DispatchWorkItem { [k, page] in
-            MainActor.assumeIsolated {
-                secondCheck(key: k, page: page)
-            }
+        pending[k] = Task { @MainActor in
+            do { try await Task.sleep(for: .seconds(secondDelay)) } catch { return }
+            secondCheck(key: k, page: page)
         }
-        pending[k] = item
-        DispatchQueue.main.asyncAfter(deadline: .now() + secondDelay, execute: item)
     }
 
     private static func secondCheck(key k: String, page: String) {

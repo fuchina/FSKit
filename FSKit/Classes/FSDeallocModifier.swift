@@ -20,7 +20,7 @@ import SwiftUI
 public final class FSLeakDetector {
 
     /// key = "页面名#栈深度"，避免同名页面嵌套 push 时互相覆盖
-    @MainActor private static var timers: [String: DispatchWorkItem] = [:]
+    @MainActor private static var timers: [String: Task<Void, Never>] = [:]
 
     /// 挂过 `debugDealloc` 的页面名（进程内累计）；未登记的页面不检测，避免误报
     @MainActor private static var registered: Set<String> = []
@@ -60,25 +60,24 @@ public final class FSLeakDetector {
         let key = FSLeakProbe.key(page: viewName, depth: depth)
         timers[key]?.cancel()
 
-        let item = DispatchWorkItem {
-            // 先确认「这一层真的还活着」。
-            // 本 block 由 `main.asyncAfter` 派发，必然在主线程执行 ⇒ 同步读静态表是安全的。
-            MainActor.assumeIsolated {
-                let stillAlive = live[key]?.isAlive ?? false
-                live.removeValue(forKey: key)
-                timers.removeValue(forKey: key)
-                guard stillAlive else { return }
+        // ★ 2026-11-06：`DispatchWorkItem` → `Task`。`Task.sleep` 被取消会抛，`catch` 直接返回，
+        // 语义与 `item.cancel()` 等价，同时少一层 `MainActor.assumeIsolated` 桥。
+        timers[key] = Task { @MainActor in
+            do { try await Task.sleep(for: .seconds(5)) } catch { return }
 
-                let msg = "疑似内存泄漏：\(viewName) 未释放（深度 \(depth)）"
-                NotificationCenter.default.post(
-                    name: NSNotification.Name(FS_BE_LEAK_NOTIFICATION),
-                    object: msg
-                )
-                print("\(msg)")
-            }
+            // 先确认「这一层真的还活着」
+            let stillAlive = live[key]?.isAlive ?? false
+            live.removeValue(forKey: key)
+            timers.removeValue(forKey: key)
+            guard stillAlive else { return }
+
+            let msg = "疑似内存泄漏：\(viewName) 未释放（深度 \(depth)）"
+            NotificationCenter.default.post(
+                name: NSNotification.Name(FS_BE_LEAK_NOTIFICATION),
+                object: msg
+            )
+            print("\(msg)")
         }
-        timers[key] = item
-        DispatchQueue.main.asyncAfter(deadline: .now() + 5.0, execute: item)
     }
 
     /// 取消泄漏检测：tracker deinit 时调用（按页面名，清理该页所有深度）

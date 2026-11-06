@@ -64,7 +64,7 @@ private struct FSPageReturnModifier: ViewModifier {
     /// 本页在栈中的深度（首次出现时记录；`path.count` 回到它 = 本页重新可见）
     @State private var depth = -1
     /// 待执行的延迟回调（重复触发时取消重排，保证只跑一次）
-    @State private var work: DispatchWorkItem?
+    @State private var work: Task<Void, Never>?
 
     func body(content: Content) -> some View {
         content
@@ -83,22 +83,25 @@ private struct FSPageReturnModifier: ViewModifier {
             .onDisappear { work?.cancel() }
     }
 
+    /// ★ 2026-11-06：`DispatchWorkItem` → `Task`；取消时 `Task.sleep` 抛出即返回，
+    /// 与 `item.cancel()` 语义一致，省掉 `MainActor.assumeIsolated` 这层桥。
     private func schedule() {
         work?.cancel()
 
-        // action 可能捕获页面 store（非 Sendable 闭包），装箱后跨 DispatchWorkItem 传递；
-        // 执行点固定在主队列（与本 App 全部 UI 刷新同一线程）。
+        // action 可能捕获页面 store（非 Sendable 闭包），装箱后跨隔离域传递
         let box = FSUncheckedSendable(action)
-        let item = DispatchWorkItem {
-            MainActor.assumeIsolated { box.value() }
-        }
-        work = item
 
-        if delay > 0 {
-            DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: item)
+        // 延时先拷出来：`Task` 闭包里直接写 `delay` 会要求显式 `self.`（struct 的实例属性）
+        let d = delay
+
+        if d > 0 {
+            work = Task { @MainActor in
+                do { try await Task.sleep(for: .seconds(d)) } catch { return }
+                box.value()
+            }
         } else {
             // 0 = 下一帧（与转场并行，用于高亮淡出这类动画）
-            DispatchQueue.main.async(execute: item)
+            work = Task { @MainActor in box.value() }
         }
     }
 }
