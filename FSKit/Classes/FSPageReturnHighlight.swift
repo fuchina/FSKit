@@ -295,6 +295,12 @@ public final class FSNavRouter {
         path.removeLast(path.count - idx - 1)
     }
 
+    /// 类型安全版 `popTo`：case 取自 `FSPageName`（由 `Scripts/gen-route-index.py --emit-names` 生成）。
+    /// 页面改名 / 删除后这里是**编译错误**，不会再退化成「字符串写错也编译通过、运行时静默不返回」。
+    public func popTo(_ name: FSPageName) {
+        popTo(name.rawValue)
+    }
+
     /// 等价 `popToRootViewController(animated:)`
     public func popToRoot() { path.removeAll() }
 
@@ -302,6 +308,16 @@ public final class FSNavRouter {
     public func pop(_ count: Int) {
         guard count > 0, !path.isEmpty else { return }
         path.removeLast(min(count, path.count))
+    }
+
+    /// 无声删除栈中**任意一层**（不动栈顶），对应「A → B → C 之后把 B 从历史里抹掉」的替换式跳转。
+    /// 与 `pop(_:)` 的区别：pop 只动栈顶且带转场，本方法可删中间层并关掉动画。
+    /// `name` 不存在、或它已经是栈顶时不做任何事（栈顶请用 `pop()`）。
+    public func removeHidden(_ name: String) {
+        guard let idx = path.lastIndex(where: { $0.name == name }), idx < path.count - 1 else { return }
+        var txn = Transaction()
+        txn.disablesAnimations = true
+        withTransaction(txn) { _ = path.remove(at: idx) }
     }
 }
 
@@ -334,12 +350,9 @@ public extension EnvironmentValues {
 public struct FSPushStack<Content: View>: View {
 
     @State private var router = FSNavRouter()
-    private let tabIndex: Int
     private let content: Content
 
-    /// - Parameter tabIndex: 本栈在根 TabView 中的下标；用于向 `FSStackRegistry` 登记
-    public init(tabIndex: Int = 0, @ViewBuilder content: () -> Content) {
-        self.tabIndex = tabIndex
+    public init(@ViewBuilder content: () -> Content) {
         self.content = content()
     }
 
@@ -361,38 +374,28 @@ public struct FSPushStack<Content: View>: View {
         // tab bar 就随转场一起滑入滑出。
         .toolbar(router.path.isEmpty ? .visible : .hidden, for: .tabBar)
         .environment(\.fsNavRouter, router)
-        .onAppear { FSStackRegistry.shared.register(router, at: tabIndex) }
         // pop 时自动对「挂过 debugDealloc 的页面」启动泄漏检测（见 FSDeallocModifier.swift）
         .fsLeakCheckOnPop(router.path)
     }
 }
 
-// MARK: - 跨 tab 栈注册表
+// MARK: - 跨 tab 界面状态
 
-/// 全 SwiftUI 后每个 tab 各有一个 `FSNavRouter`。剪切板角标这类**跨 tab** 状态
-/// 原来挂 `UITabBarController` 上遍历取，现在收在这里，由 `FSPushStack` 登记。
+/// 剪切板角标这类**跨 tab** 状态的宿主（原来挂 `UITabBarController` 上遍历取）。
 ///
 /// ★ 2026-11-02：解锁门禁整体下线后，`anyPushed` / `popAllToRoot` 已无调用点，一并删除。
-/// `routers` / `register` 仍在（`FSPushStack.onAppear` 会登记），但当前**没有读取方**。
+/// ★ 2026-11-06：`routers` / `register` 删除 —— 解锁门禁下线后已无任何读取方，
+///   `FSPushStack` 不再登记；各 tab 的 router 只活在各自的 `@State` 里。
 @Observable
 @MainActor
 public final class FSStackRegistry {
 
     public static let shared = FSStackRegistry()
 
-    /// 各 tab 的栈 router（下标 = tab 下标）。视图不读它，故不参与观察。
-    public private(set) var routers: [FSNavRouter] = []
-
     /// 剪切板是否有内容（原 `tabBarItem.badgeValue = "1"`，清空时置 nil）——由根 TabView 的 `.badge` 呈现
     public var pasteboardHasContent = false
 
     public init() {}
-
-    /// `FSPushStack` 在 `.onAppear` 时登记自己（tab 重建时覆盖同一下标）
-    public func register(_ router: FSNavRouter, at index: Int) {
-        while routers.count <= index { routers.append(FSNavRouter()) }
-        routers[index] = router
-    }
 }
 
 public struct FSPageBackground: ViewModifier {
