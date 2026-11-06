@@ -208,7 +208,7 @@ private struct FSPageReturnPressStyle: ButtonStyle {
 /// ```
 /// struct FSDemoPage: FSPageTarget {
 ///     let pwd: String
-///     var fsPageName: String { "FSDemoScreen" }        // `popTo(_:)` 与泄漏打点靠它定位
+///     static var fsPageName: String { "FSDemoScreen" }  // `popTo(_:)` 与泄漏打点靠它定位
 ///     static func fsMakeView(_ page: Self, router: FSNavRouter) -> AnyView { AnyView(FSDemoView(pwd: page.pwd)) }
 /// }
 /// router.push(FSDemoPage(pwd: pwd))
@@ -216,13 +216,19 @@ private struct FSPageReturnPressStyle: ButtonStyle {
 nonisolated public protocol FSPageTarget: Hashable {
 
     /// 页面名。`popTo(_:)` 定位与泄漏打点共用，**必须**与页面自身的语义名一致。
-    var fsPageName: String { get }
+    ///
+    /// 声明为 `static`：`router.popTo(CostPage.self)` 直接由类型提供名字，
+    /// 代码里不再出现页面名字面量，写错类型就是编译错误。
+    static var fsPageName: String { get }
 
     /// 由值构造页面视图。放在本页文件里，避免 FSKit 反向依赖各业务 pod。
     static func fsMakeView(_ page: Self, router: FSNavRouter) -> AnyView
 }
 
 nonisolated public extension FSPageTarget {
+
+    /// 实例读法（`FSPageValue` 与泄漏打点仍在用），值取自类型自己的静态声明
+    var fsPageName: String { Self.fsPageName }
 
     /// 路由值的身份由 `FSPageValue.uid` 承担，**不参与视图 diff** ——
     /// 因此这里只按页名比较，实现者不必让每个字段都 Hashable
@@ -295,10 +301,11 @@ public final class FSNavRouter {
         path.removeLast(path.count - idx - 1)
     }
 
-    /// 类型安全版 `popTo`：case 取自 `FSPageName`（由 `Scripts/gen-route-index.py --emit-names` 生成）。
-    /// 页面改名 / 删除后这里是**编译错误**，不会再退化成「字符串写错也编译通过、运行时静默不返回」。
-    public func popTo(_ name: FSPageName) {
-        popTo(name.rawValue)
+    /// 类型安全版 `popTo`：直接传页面类型 —— `router.popTo(CostPage.self)`。
+    /// 页面名由该类型自己的 `fsPageName` 提供，页面改名 / 删除后这里是**编译错误**，
+    /// 不会再退化成「字符串写错也编译通过、运行时静默不返回」。
+    public func popTo<T: FSPageTarget>(_ type: T.Type) {
+        popTo(T.fsPageName)
     }
 
     /// 等价 `popToRootViewController(animated:)`
