@@ -188,7 +188,7 @@ struct FSLeakCheckOnPopModifier: ViewModifier {
             MainActor.assumeIsolated {
                 for (index, route) in removed {
                     // route 在 old 数组中的下标 + 1 = 它当时在栈中的深度
-                    FSLeakDetector.startCheck(for: route.name, depth: index + 1)
+                    FSLeakDetector.startCheck(for: route.label, depth: index + 1)
                 }
             }
         }

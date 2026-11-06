@@ -199,27 +199,22 @@ private struct FSPageReturnPressStyle: ButtonStyle {
 
 // MARK: - 路由通道
 //
-// path 里只有 `FSPageValue` 一种元素，元素身份由值类型的 `fsPageName` 决定，
-// 页面视图由该类型自己的 `fsMakeView(_:router:)` 解析 —— 栈里不再持有任何闭包。
-// ⇒ path 可读、可打点、可做深链；视图只在该页被真正渲染时构造一次。
+// path 里只有 `FSPageValue` 一种元素，元素身份是**页面类型本身**（`ObjectIdentifier`），
+// 页面视图由该类型自己的 `fsMakeView(_:router:)` 解析 —— 栈里不再持有任何闭包，
+// 也不再有任何手写页面名字面量 ⇒ path 可读、可打点、可做深链；
+// 视图只在该页被真正渲染时构造一次。
 
 /// 可入栈的页面标识。实现者是**值类型**，只带本页需要的参数。
 ///
 /// ```
 /// struct FSDemoPage: FSPageTarget {
 ///     let pwd: String
-///     static var fsPageName: String { "FSDemoScreen" }  // `popTo(_:)` 与泄漏打点靠它定位
 ///     static func fsMakeView(_ page: Self, router: FSNavRouter) -> AnyView { AnyView(FSDemoView(pwd: page.pwd)) }
 /// }
 /// router.push(FSDemoPage(pwd: pwd))
+/// router.popTo(FSDemoPage.self)
 /// ```
 nonisolated public protocol FSPageTarget: Hashable {
-
-    /// 页面名。`popTo(_:)` 定位与泄漏打点共用，**必须**与页面自身的语义名一致。
-    ///
-    /// 声明为 `static`：`router.popTo(CostPage.self)` 直接由类型提供名字，
-    /// 代码里不再出现页面名字面量，写错类型就是编译错误。
-    static var fsPageName: String { get }
 
     /// 由值构造页面视图。放在本页文件里，避免 FSKit 反向依赖各业务 pod。
     static func fsMakeView(_ page: Self, router: FSNavRouter) -> AnyView
@@ -227,30 +222,37 @@ nonisolated public protocol FSPageTarget: Hashable {
 
 nonisolated public extension FSPageTarget {
 
-    /// 实例读法（`FSPageValue` 与泄漏打点仍在用），值取自类型自己的静态声明
-    var fsPageName: String { Self.fsPageName }
+    /// 页面身份 = **类型本身**。`popTo` / `removeHidden` / `contains` 全部比这个令牌，
+    /// 路由值里不存、不读任何页面名字符串；页面改名或删除后调用点直接是**编译错误**。
+    static var fsPageID: ObjectIdentifier { ObjectIdentifier(Self.self) }
 
-    /// 路由值的身份由 `FSPageValue.uid` 承担，**不参与视图 diff** ——
-    /// 因此这里只按页名比较，实现者不必让每个字段都 Hashable
-    /// （store 类、回调闭包都能直接放进路由值）。
-    static func == (lhs: Self, rhs: Self) -> Bool { lhs.fsPageName == rhs.fsPageName }
+    /// 仅供日志 / 泄漏打点展示，由运行时从类型名派生 —— 不手写，就不会写错、不会与类型脱节。
+    static var fsPageLabel: String { String(describing: Self.self) }
 
-    func hash(into hasher: inout Hasher) { hasher.combine(fsPageName) }
+    /// 同类型即相等：路由值的身份由 `FSPageValue.uid` 承担，**不参与视图 diff** ——
+    /// 因此实现者不必让每个字段都 Hashable（store 类、回调闭包都能直接放进路由值）。
+    static func == (lhs: Self, rhs: Self) -> Bool { true }
+
+    func hash(into hasher: inout Hasher) { hasher.combine(Self.fsPageID) }
 }
 
 /// 数据通道的栈元素。`uid` 只为「同一参数连续 push 两次」保留独立身份，
-/// 不参与语义 —— 页面语义完全由 `target` 决定。
+/// 不参与语义 —— 页面语义完全由 `target` 的**类型**决定。
 public struct FSPageValue: Hashable, Identifiable {
 
     public let uid: UUID
-    public let name: String
+    /// 页面类型令牌（取代原先的 `name: String`）
+    public let pageID: ObjectIdentifier
     public let target: AnyHashable
 
     public var id: UUID { uid }
 
+    /// 日志 / 泄漏打点用的页面名：**用到时现算**（取动态类型名），路由值里不存字符串
+    public var label: String { String(describing: type(of: target.base)) }
+
     public init<T: FSPageTarget>(_ target: T) {
         self.uid = UUID()
-        self.name = target.fsPageName
+        self.pageID = T.fsPageID
         self.target = AnyHashable(target)
     }
 
@@ -259,7 +261,7 @@ public struct FSPageValue: Hashable, Identifiable {
     /// 路由值持有 router 会和 `router.path` 形成引用环。
     public func makeView(router: FSNavRouter) -> AnyView {
         guard let anyTarget = target.base as? any FSPageTarget else {
-            assertionFailure("FSPageValue: \(name) 不是 FSPageTarget")
+            assertionFailure("FSPageValue: \(label) 不是 FSPageTarget")
             return AnyView(EmptyView())
         }
         return Self.open(anyTarget, router: router)
@@ -281,7 +283,6 @@ public final class FSNavRouter {
     public init() {}
 
     public var depth: Int { path.count }
-    public var topName: String? { path.last?.name }
     public var isAtRoot: Bool { path.isEmpty }
 
     /// 压入一个页面值，视图由该类型自己的 `fsMakeView` 解析。
@@ -295,17 +296,19 @@ public final class FSNavRouter {
         path.removeLast()
     }
 
-    /// 等价 `popToViewController(_:animated:)`（回退到名为 name 的页，该页保留）
-    public func popTo(_ name: String) {
-        guard let idx = path.lastIndex(where: { $0.name == name }) else { return }
+    /// 等价 `popToViewController(_:animated:)`（回退到该**类型**的页，该页保留）。
+    /// 传的是页面类型 —— `router.popTo(CostPage.self)`：页面改名 / 删除后这里是**编译错误**，
+    /// 不会再有「字符串写错也编译通过、运行时静默不返回」。
+    public func popTo<T: FSPageTarget>(_ type: T.Type) {
+        let id = ObjectIdentifier(type)
+        guard let idx = path.lastIndex(where: { $0.pageID == id }) else { return }
         path.removeLast(path.count - idx - 1)
     }
 
-    /// 类型安全版 `popTo`：直接传页面类型 —— `router.popTo(CostPage.self)`。
-    /// 页面名由该类型自己的 `fsPageName` 提供，页面改名 / 删除后这里是**编译错误**，
-    /// 不会再退化成「字符串写错也编译通过、运行时静默不返回」。
-    public func popTo<T: FSPageTarget>(_ type: T.Type) {
-        popTo(T.fsPageName)
+    /// 栈里是否存在该类型的页（不看参数）。用于「要不要再 push 一层」这类判断。
+    public func contains<T: FSPageTarget>(_ type: T.Type) -> Bool {
+        let id = ObjectIdentifier(type)
+        return path.contains { $0.pageID == id }
     }
 
     /// 等价 `popToRootViewController(animated:)`
@@ -319,9 +322,10 @@ public final class FSNavRouter {
 
     /// 无声删除栈中**任意一层**（不动栈顶），对应「A → B → C 之后把 B 从历史里抹掉」的替换式跳转。
     /// 与 `pop(_:)` 的区别：pop 只动栈顶且带转场，本方法可删中间层并关掉动画。
-    /// `name` 不存在、或它已经是栈顶时不做任何事（栈顶请用 `pop()`）。
-    public func removeHidden(_ name: String) {
-        guard let idx = path.lastIndex(where: { $0.name == name }), idx < path.count - 1 else { return }
+    /// 该类型不存在、或它已经是栈顶时不做任何事（栈顶请用 `pop()`）。
+    public func removeHidden<T: FSPageTarget>(_ type: T.Type) {
+        let id = ObjectIdentifier(type)
+        guard let idx = path.lastIndex(where: { $0.pageID == id }), idx < path.count - 1 else { return }
         var txn = Transaction()
         txn.disablesAnimations = true
         withTransaction(txn) { _ = path.remove(at: idx) }
