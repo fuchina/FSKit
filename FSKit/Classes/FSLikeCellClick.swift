@@ -159,7 +159,8 @@ public struct FSLikeCellClick<Content: View>: View {
         store.highlight(id)
         onTap()
         if autoDismiss {
-            DispatchQueue.main.asyncAfter(deadline: .now() + autoDismissDelay) {
+            Task { @MainActor in
+                try? await Task.sleep(for: .seconds(autoDismissDelay))
                 store.highlightedId = nil
             }
         }

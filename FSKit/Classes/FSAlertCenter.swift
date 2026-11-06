@@ -319,7 +319,8 @@ public final class FSAlertCenter: @unchecked Sendable {
         }
 
         sheetClosing = true
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) { [weak self] in
+        Task { @MainActor [weak self] in
+            try? await Task.sleep(for: .seconds(0.35))
             guard let self else { return }
             guard self.pendingSheets.isEmpty == false else {
                 self.sheetClosing = false
@@ -360,7 +361,10 @@ public final class FSAlertCenter: @unchecked Sendable {
     private func scheduleRetry() {
         guard retryCount < 100 else { retryCount = 0; return }   // 最多等 5 秒（50ms × 100）
         retryCount += 1
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { [weak self] in self?.pump() }
+        Task { @MainActor [weak self] in
+            try? await Task.sleep(for: .seconds(0.05))
+            self?.pump()
+        }
     }
 
     private func present(_ spec: FSAlertSpec, on host: UIViewController) {

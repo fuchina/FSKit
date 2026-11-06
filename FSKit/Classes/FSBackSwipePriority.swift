@@ -252,7 +252,8 @@ private final class FSBackSwipeProbeView: UIView {
             // 仍找不到就静默放弃（退回改动前的行为，不崩）
             guard retries < 12 else { return }
             retries += 1
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { [weak self] in
+            Task { @MainActor [weak self] in
+                try? await Task.sleep(for: .seconds(0.05))
                 self?.installIfNeeded()
             }
             return

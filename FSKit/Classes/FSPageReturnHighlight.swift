@@ -222,7 +222,7 @@ nonisolated public protocol FSPageTarget: Hashable {
 
 nonisolated public extension FSPageTarget {
 
-    /// 页面身份 = **类型本身**。`popTo` / `removeHidden` / `contains` 全部比这个令牌，
+    /// 页面身份 = **类型本身**。`popTo` / `removeSilently` / `contains` 全部比这个令牌，
     /// 路由值里不存、不读任何页面名字符串；页面改名或删除后调用点直接是**编译错误**。
     static var fsPageID: ObjectIdentifier { ObjectIdentifier(Self.self) }
 
@@ -323,7 +323,9 @@ public final class FSNavRouter {
     /// 无声删除栈中**任意一层**（不动栈顶），对应「A → B → C 之后把 B 从历史里抹掉」的替换式跳转。
     /// 与 `pop(_:)` 的区别：pop 只动栈顶且带转场，本方法可删中间层并关掉动画。
     /// 该类型不存在、或它已经是栈顶时不做任何事（栈顶请用 `pop()`）。
-    public func removeHidden<T: FSPageTarget>(_ type: T.Type) {
+    ///
+    /// 2026-11-06 改名：原名 `removeHidden` 读起来像「隐藏」，实际是**无转场地从栈里摘掉**。
+    public func removeSilently<T: FSPageTarget>(_ type: T.Type) {
         let id = ObjectIdentifier(type)
         guard let idx = path.lastIndex(where: { $0.pageID == id }), idx < path.count - 1 else { return }
         var txn = Transaction()
@@ -397,11 +399,14 @@ public struct FSPushStack<Content: View>: View {
 /// ★ 2026-11-02：解锁门禁整体下线后，`anyPushed` / `popAllToRoot` 已无调用点，一并删除。
 /// ★ 2026-11-06：`routers` / `register` 删除 —— 解锁门禁下线后已无任何读取方，
 ///   `FSPushStack` 不再登记；各 tab 的 router 只活在各自的 `@State` 里。
+/// ★ 2026-11-06：改名 `FSStackRegistry` → `FSTabBadgeCenter`。栈早已不在这里登记，
+///   当前唯一成员就是 tab 角标状态，旧名名不副实；也不并入 `FSApp`——它是**观察型状态**，
+///   需要 `@Observable` 让根 TabView 的 `.badge` 跟着刷新。
 @Observable
 @MainActor
-public final class FSStackRegistry {
+public final class FSTabBadgeCenter {
 
-    public static let shared = FSStackRegistry()
+    public static let shared = FSTabBadgeCenter()
 
     /// 剪切板是否有内容（原 `tabBarItem.badgeValue = "1"`，清空时置 nil）——由根 TabView 的 `.badge` 呈现
     public var pasteboardHasContent = false

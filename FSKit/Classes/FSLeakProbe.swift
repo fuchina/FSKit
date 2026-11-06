@@ -89,7 +89,8 @@ public final class FSStoreHost<Store: AnyObject> {
     public func closeSoon(after delay: TimeInterval = 0.6) {
         closeToken += 1
         let token = closeToken
-        DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
+        Task { @MainActor [weak self] in
+            try? await Task.sleep(for: .seconds(delay))
             guard let self, self.closeToken == token else { return }
             self.store = nil
         }
