@@ -11,7 +11,7 @@
 //  Screen 之后不再有壳页，唯一曾实现它的 `FSMoneyController` 也在 2026-10-15 重写时移除。
 // 全量 grep 确认已无任何实现者。
 //
-//  SwiftUI 等价物：`.debugDealloc("XxxScreen")` + `FSPageRoute` 持有页面
+//  SwiftUI 等价物：`.debugDealloc(FSSomePage.self)` + `FSPageRoute` 持有页面
 //  （pop 后自然释放），不再需要手动拆 hosting。
 //
 

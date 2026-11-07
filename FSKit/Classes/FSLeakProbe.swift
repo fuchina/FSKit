@@ -12,9 +12,11 @@
 //
 //  用法（页面 body 末尾，与 `.debugDealloc` 并存）：
 //  ```
-//  .debugDealloc("FSValueScreen")
-//  .debugWatch("FSValueScreen") { [store] }
+//  .debugDealloc(FSSomePage.self)
+//  .debugWatch(FSSomePage.self) { [store] }
 //  ```
+//  两处都传**同一个页面类型**：page 名由 `fsPageLabel` 派生，与触发端的
+//  `FSPageValue.label`（= 页面类型名）同源，不会像手写字符串那样错配。
 //  pop / dismiss 后由 `FSLeakDetector.startCheck(for:depth:)` 或
 //  `.fsLeakCheckOnDismiss(page, isPresented)` 触发检查：
 //  +3s 首检（转场动画、异步回调已结束）→ 仍存活则标记疑似

@@ -4,10 +4,11 @@
 //
 //  - deinit 时发送 FS_BE_DEBUG_NOTIFICATION（释放通知）
 //  - View 层泄漏检测由外部触发：FSLeakDetector.startCheck(for:depth:)（如 NavigationStack path 变短时）
-//  - 对象层泄漏检测（2026-10-21 新增）：`.debugWatch("XxxScreen") { [store] }` 登记业务对象，
+//  - 对象层泄漏检测（2026-10-21 新增）：`.debugWatch(FSSomePage.self) { [store] }` 登记业务对象，
 //    退出后 3s 首检 / 13s 复检，weak 仍非 nil 才报（实现见 FSLeakProbe.swift）
 //  - tracker deinit 自动取消对应的 View 层泄漏检测定时器
-//  用法：SomeView().debugDealloc("SomeView")
+//  用法：SomeView().debugDealloc(FSSomePage.self)      // 路由页：传页面类型令牌
+//        SomeView().debugDeallocUnrouted("SomeView")   // 非路由页（tab 根 / sheet）
 //        父视图 pop 时：fsLeakCheckOnPop 自动触发
 //
 
@@ -234,19 +235,45 @@ extension View {
 
     /// 泄漏检测由外部触发：在视图被 pop/dismiss 时调用 `FSLeakDetector.startCheck(for:depth:)`，
     /// tracker deinit 会自动取消检测。5 秒未释放则发送 FS_BE_LEAK_NOTIFICATION。
-    public func debugDealloc(_ viewName: String) -> some View {
+    ///
+    /// ★ 2026-11-07：入参从**手写字符串**改为**页面类型令牌**。
+    ///
+    /// 触发端 `FSLeakCheckOnPopModifier` 用的是 `FSPageValue.label`，而它等于
+    /// `String(describing: type(of: target.base))`——也就是页面**类型名**。
+    /// 所以这里的名字必须与类型名逐字相同，否则 `FSLeakDetector.registered` 永远命中不了，
+    /// 检测会在 `guard` 处静默 return。
+    ///
+    /// 实测（2026-11-07）：全仓 175 处调用无一处匹配——名字清一色 `*Screen`，
+    /// 页面类型清一色 `*Page`，View 层 5 秒检测从上线起就没跑过。
+    /// 现在传类型，改名 / 删页都是编译错误，标签与 `fsPageLabel` 同源，不可能再错配。
+    public func debugDealloc<P: FSPageTarget>(_ page: P.Type) -> some View {
+        modifier(_FSDeallocViewModifier(viewName: page.fsPageLabel))
+    }
+
+    /// **非路由页专用**：tab 根页、`sheet` / `fullScreenCover`、尚未纳入 `FSPageTarget` 的老页面。
+    ///
+    /// 这类页面没有 `router.pop` 事件，**不参与** View 层 5 秒检测，只剩 `deinit` 日志。
+    /// 名字故意写得刺眼，避免有人图省事又写回一个手写字符串——
+    /// 那样写出来的名字和页面类型对不上，检测会静默失效。
+    public func debugDeallocUnrouted(_ viewName: String) -> some View {
         modifier(_FSDeallocViewModifier(viewName: viewName))
     }
 
     /// 对象级泄漏探针：把页面里的 store / model 交给 `FSLeakProbe` 弱引用观察。
     ///
     /// ```
-    /// .debugDealloc("FSValueScreen")
-    /// .debugWatch("FSValueScreen") { [store] }
+    /// .debugDealloc(FSSomePage.self)
+    /// .debugWatch(FSSomePage.self) { [store] }
     /// ```
     ///
     /// 只有 pop / dismiss 后 3s + 13s 两次检查都不为空才报，避免延迟释放误报。
-    public func debugWatch<T: AnyObject>(_ page: String, _ objects: @escaping () -> [T]) -> some View {
+    public func debugWatch<P: FSPageTarget, T: AnyObject>(_ page: P.Type, _ objects: @escaping () -> [T]) -> some View {
+        modifier(FSLeakWatchModifier(page: page.fsPageLabel, objects: objects))
+    }
+
+    /// 非路由页的对象级探针，配合 `debugDeallocUnrouted` 使用。
+    /// 触发端只有 `fsLeakCheckOnDismiss`，且它拿不到类型名 —— 模态页要检测就传同一个字符串。
+    public func debugWatchUnrouted<T: AnyObject>(_ page: String, _ objects: @escaping () -> [T]) -> some View {
         modifier(FSLeakWatchModifier(page: page, objects: objects))
     }
 }
