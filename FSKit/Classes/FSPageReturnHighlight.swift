@@ -440,6 +440,27 @@ public extension UIApplication {
 
     static var fs_topView: UIView { fs_topVC.view }
 
+    /// 收起键盘：沿 responder 链发 `resignFirstResponder`。
+    ///
+    /// 与 `fs_topView.endEditing(true)` 等价，但不依赖任何视图层级 ——
+    /// 取不到 key window 时 `fs_topVC` 会返回一个游离的 `UIViewController()`，
+    /// 它的 `view` 不在窗口层级里，`endEditing` 会静默失效。
+    ///
+    /// 另外这些调用点全在 View body 之外（静态方法 / Store 闭包），
+    /// 而 `@FocusState` 只作用于 View 私有状态，那些位置根本拿不到。
+    static func fs_endEditing() {
+        shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+    }
+
+    /// 窗口高度（= 屏幕高度；本 App 单窗口全屏）。
+    ///
+    /// 键盘 `endFrame` 是屏幕坐标，算遮挡量只需要一个高度基准，
+    /// 没必要为此去取 `fs_topVC.view.window` —— 那条路径会递归
+    /// `presentedViewController`，SwiftUI 有弹层时拿到的可能不是本页窗口。
+    static var fs_screenHeight: CGFloat {
+        (shared.connectedScenes.first as? UIWindowScene)?.screen.bounds.height ?? 0
+    }
+
     private static func fs_topMost(from vc: UIViewController) -> UIViewController {
         if let presented = vc.presentedViewController { return fs_topMost(from: presented) }
         if let nav = vc as? UINavigationController, let top = nav.visibleViewController, top != vc {
