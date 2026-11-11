@@ -92,6 +92,9 @@ public struct FSAlertInputSpec: Identifiable {
     public var keyboardType: FSAlertKeyboard
     /// 初始文本（原 `UITextField.text`，改造时漏掉的预填，如记账弹窗的备注）
     public var text: String
+    /// 密码框（原 `UITextField.isSecureTextEntry`）：输入回显为圆点，键盘不自动大写/更正。
+    /// 2026-11-11 新增：此前全库没有安全输入框，密码只能明文显示在弹窗里。
+    public var isSecure: Bool
     /// 有内容时右侧显示清除按钮
     public var showsClearButton: Bool
     /// 自动大写（SwiftUI 原生类型，直接透传给 `.textInputAutocapitalization`)
@@ -104,6 +107,7 @@ public struct FSAlertInputSpec: Identifiable {
     public init(placeholder: String,
                 keyboardType: FSAlertKeyboard = .default,
                 text: String = "",
+                isSecure: Bool = false,
                 showsClearButton: Bool = false,
                 autocapitalization: TextInputAutocapitalization? = nil,
                 autocorrectionDisabled: Bool = false,
@@ -111,6 +115,7 @@ public struct FSAlertInputSpec: Identifiable {
         self.placeholder = placeholder
         self.keyboardType = keyboardType
         self.text = text
+        self.isSecure = isSecure
         self.showsClearButton = showsClearButton
         self.autocapitalization = autocapitalization
         self.autocorrectionDisabled = autocorrectionDisabled
@@ -379,6 +384,7 @@ public final class FSAlertCenter: @unchecked Sendable {
                 field.keyboardType = input.keyboardType.uiKeyboardType
                 field.autocorrectionType = input.autocorrectionDisabled ? .no : .default
                 field.clearButtonMode = input.showsClearButton ? .whileEditing : .never
+                field.isSecureTextEntry = input.isSecure
             }
         }
 
