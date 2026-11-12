@@ -7,15 +7,15 @@
 
 import UIKit
 
-public var WIDTHFC: CGFloat {
+public nonisolated var WIDTHFC: CGFloat {
     FSApp.shared.width
 }
 
-public var HEIGHTFC: CGFloat {
+public nonisolated var HEIGHTFC: CGFloat {
     FSApp.shared.height
 }
 
-public final class FSApp {
+public nonisolated final class FSApp {
 
     // 2026-10-17：Pod 与主 App 统一为默认主隔离后，nonisolated(unsafe) 反而报错，故移除。
     public static let shared = FSApp()

@@ -117,7 +117,7 @@ public enum FSCalculator {
     }
 
     /// 计算字符串放在label上需要的高度，font数字要和label的一样
-    public static func textHeight(_ text: String?, font: UIFont?, labelWidth: CGFloat) -> CGFloat {
+    public nonisolated static func textHeight(_ text: String?, font: UIFont?, labelWidth: CGFloat) -> CGFloat {
         guard let font = font, let text = text, !text.isEmpty else { return 0 }
 
         let attrStr = NSMutableAttributedString(string: text)
