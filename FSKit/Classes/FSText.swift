@@ -138,7 +138,7 @@ public extension FSKit {
     /// 单段富文本。这是绝大多数场景该用的入口 —— 给一段字上色 / 换字体 / 加删除线。
     ///
     /// `color` 传 `nil` 表示不加颜色（继承外层）；完全没有任何属性时等价 `AttributedString(text)`。
-    static func attr(_ text: String,
+    nonisolated static func attr(_ text: String,
                      color: (any FSTextColorConvertible)? = nil,
                      font: UIFont? = nil,
                      strikethrough: Bool = false,
@@ -151,14 +151,14 @@ public extension FSKit {
     }
 
     /// 涨跌着色：`up == true` 红、否则绿（A 股 / 港股口径，唯一出处，别在业务里各写一份三目）。
-    static func attr(_ text: String, up: Bool, font: UIFont? = nil) -> AttributedString {
+    nonisolated static func attr(_ text: String, up: Bool, font: UIFont? = nil) -> AttributedString {
         attr(text, color: up ? FSColor.red : FSColor.wechatGreen, font: font)
     }
 
     // MARK: 段数组
 
     /// 按数组顺序拼接各段文本，逐段套用各自的 color / font / 删除线 / 下划线。
-    static func attr(_ segments: [FSTextSegment]) -> AttributedString {
+    nonisolated static func attr(_ segments: [FSTextSegment]) -> AttributedString {
         var result = AttributedString()
         for segment in segments {
             result.append(build(segment))
@@ -179,7 +179,7 @@ public extension FSKit {
 
     /// 在整段文本中高亮命中的关键词；未命中的部分使用 `font` / `color`。
     /// - Parameter rules: 多个规则命中同一区间时，**数组中靠后的规则覆盖靠前的**。
-    static func attr(_ text: String,
+    nonisolated static func attr(_ text: String,
                      font: UIFont? = nil,
                      color: (any FSTextColorConvertible)? = nil,
                      rules: [FSTextRule]) -> AttributedString {
@@ -189,14 +189,14 @@ public extension FSKit {
     // MARK: 便捷
 
     /// 删除线文本
-    static func strikethrough(_ text: String,
+    nonisolated static func strikethrough(_ text: String,
                               font: UIFont? = nil,
                               color: (any FSTextColorConvertible)? = nil) -> AttributedString {
         attr([FSTextSegment(text, color: color, font: font, strikethrough: true)])
     }
 
     /// 下划线文本
-    static func underline(_ text: String,
+    nonisolated static func underline(_ text: String,
                           font: UIFont? = nil,
                           color: (any FSTextColorConvertible)? = nil) -> AttributedString {
         attr([FSTextSegment(text, color: color, font: font, underline: true)])
@@ -208,7 +208,7 @@ public extension FSKit {
 private extension FSKit {
 
     /// 单段 → AttributedString。用显式的 attribute scope 下标，避免 UIKit / SwiftUI 两个 scope 的同名属性歧义。
-    static func build(_ segment: FSTextSegment) -> AttributedString {
+    nonisolated static func build(_ segment: FSTextSegment) -> AttributedString {
         var piece = AttributedString(segment.text)
         if let color = segment.color {
             piece[AttributeScopes.UIKitAttributes.ForegroundColorAttribute.self] = color
@@ -233,7 +233,7 @@ private extension FSKit {
 
     /// 关键词 → 命中区间。
     /// 注意这里是**循环推进**地找，`NSString.range(of:)` 单次调用只返回第一处。
-    static func runs(in text: String,
+    nonisolated static func runs(in text: String,
                      baseFont: UIFont?,
                      baseColor: UIColor?,
                      rules: [FSTextRule]) -> [FSTextSegment] {
@@ -259,7 +259,7 @@ private extension FSKit {
 
     /// 把文本按所有命中区间的端点切开，逐片决定最终样式。
     /// 顺带把越界的 NSRange 夹到合法范围 —— 越界 range 交给 `addAttribute` 会抛 NSRangeException，直接崩。
-    static func segments(in full: NSString,
+    nonisolated static func segments(in full: NSString,
                          baseFont: UIFont?,
                          baseColor: UIColor?,
                          hits: [(range: NSRange, color: UIColor?, background: UIColor?, font: UIFont?)]) -> [FSTextSegment] {

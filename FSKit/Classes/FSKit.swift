@@ -565,12 +565,12 @@ public enum FSKit {
         UIApplication.shared.open(url, options: [:], completionHandler: nil)
     }
 
-    public static func showBetterFor2DigitDouble(_ value: Double) -> String {
+    public nonisolated static func showBetterFor2DigitDouble(_ value: Double) -> String {
         let d = Int(value)
         return self.showBetterFor2DigitInteger(d)
     }
 
-    public static func showBetterFor2DigitInteger(_ value: Int) -> String {
+    public nonisolated static func showBetterFor2DigitInteger(_ value: Int) -> String {
         guard value != 0 else { return "0" }
 
         if value % 100 == 0 {
@@ -636,7 +636,7 @@ public enum FSKit {
         return scenes.first as? UIWindowScene
     }
 
-    public static func digitalOnlyString(_ inputString: String?) -> String {
+    public nonisolated static func digitalOnlyString(_ inputString: String?) -> String {
         guard let inputString = inputString, !inputString.isEmpty else { return "" }
         return inputString.replacingOccurrences(of: "\\D", with: "", options: .regularExpression)
     }
