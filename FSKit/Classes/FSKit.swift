@@ -285,7 +285,7 @@ public enum FSKit {
         return address
     }
 
-    public static func documentsPath(_ fileName: String?) -> String? {
+    public nonisolated static func documentsPath(_ fileName: String?) -> String? {
         guard let fileName = fileName, !fileName.isEmpty else { return nil }
         guard let path = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).last else { return nil }
         return (path as NSString).appendingPathComponent(fileName)
@@ -321,7 +321,7 @@ public enum FSKit {
         return String(Character(scalar))
     }
 
-    public static func md5(_ str: String?) -> String? {
+    public nonisolated static func md5(_ str: String?) -> String? {
           guard let str = str, let data = str.data(using: .utf8) else { return nil }
 
           // 使用 CryptoKit 计算 MD5 摘要（iOS 13+ 推荐方式）
