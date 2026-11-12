@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct Tuple2<A,B> {
+public nonisolated struct Tuple2<A,B> {
     public var v1: A
     public var v2: B
 
@@ -17,7 +17,7 @@ public struct Tuple2<A,B> {
     }
 }
 
-public struct Tuple3<A,B,C> {
+public nonisolated struct Tuple3<A,B,C> {
     public var v1: A
     public var v2: B
     public var v3: C
@@ -29,7 +29,7 @@ public struct Tuple3<A,B,C> {
     }
 }
 
-public struct Tuple4<A,B,C,D> {
+public nonisolated struct Tuple4<A,B,C,D> {
     public var v1: A
     public var v2: B
     public var v3: C
@@ -43,7 +43,7 @@ public struct Tuple4<A,B,C,D> {
     }
 }
 
-public struct Tuple5<A,B,C,D,E> {
+public nonisolated struct Tuple5<A,B,C,D,E> {
     public var v1: A
     public var v2: B
     public var v3: C
