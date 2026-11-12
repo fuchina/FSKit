@@ -64,7 +64,7 @@ public extension Optional where Wrapped == AttributedString {
 ///     FSTextSegment("¥88", color: FSColor.red, font: .boldSystemFont(ofSize: 16), strikethrough: true),
 /// ])
 /// ```
-public struct FSTextSegment {
+public nonisolated struct FSTextSegment {
 
     public var text: String
 
@@ -103,7 +103,7 @@ public struct FSTextSegment {
 // MARK: - 关键词规则
 
 /// 在整段文本里把命中的关键词改成指定样式。
-public struct FSTextRule {
+public nonisolated struct FSTextRule {
 
     /// 关键词，按字面量匹配。
     public var keyword: String
