@@ -14,54 +14,6 @@
 
 import SwiftUI
 
-// MARK: - 展示名
-
-/// 页面标识 → **给人看、能直接定位文件的名字**。
-///
-/// 2026-11-13：页面类型一律叫 `*Page`，而实际视图与文件叫 `*Screen`
-/// （`FSWeaponPage` 定义在 `FSWeaponScreen.swift` 里）。toast 只给 `FSWeaponPage` 时，
-/// 排查还得再 grep 一次才知道该改哪个文件 —— 直接把 `#fileID` 的末段顶上去。
-///
-/// **只影响展示**：`FSLeakDetector.registered`、`FSLeakProbe` 的 key、
-/// 以及 `FSLeakCheckOnPopModifier` 用 `FSPageValue.label` 做的匹配，仍然是页面类型名，
-/// 一个字节都没动 —— 而那边必须与类型名逐字相同，改不得。
-///
-/// ★ 2026-11-13（二）：文件名**追加**在页面名后面，不取代它。
-/// 页面名是「哪一页」的身份，文件名只是「去哪个文件改」的定位 —— 两者都不能少。
-/// 一个文件可能挂多个非路由页（tab 根 / sheet），只有文件名会分不清是哪一页。
-enum FSLeakDisplay {
-
-    @MainActor private static var names: [String: String] = [:]
-
-    /// 各 `debug*` 修饰器在自己的 `onAppear` 里登记；`file` 取自**调用点**的 `#fileID`
-    @MainActor
-    static func remember(page: String, file: String) {
-        names[page] = fileName(file)
-    }
-
-    /// 查不到就原样返回页面类型名 —— 任何情况下都还能拿它去 grep
-    @MainActor
-    static func of(_ page: String) -> String {
-        names[page] ?? page
-    }
-
-    /// 塞进**已有括号**里的定位尾巴：` · FSWeaponScreen.swift`。
-    ///
-    /// 查不到、或文件名恰好就是页面名时返回空串 —— 不制造 `（深度 2 · FSSetPage）` 这种废话。
-    @MainActor
-    static func fileNote(_ page: String) -> String {
-        let name = of(page)
-        return name == page ? "" : " · \(name)"
-    }
-
-    /// `#fileID`（`模块/目录/文件.swift`）→ 末段文件名；异常输入原样返回
-    nonisolated static func fileName(_ fileID: String) -> String {
-        guard let slash = fileID.lastIndex(of: "/") else { return fileID }
-        let name = String(fileID[fileID.index(after: slash)...])
-        return name.isEmpty ? fileID : name
-    }
-}
-
 // MARK: - FSLeakDetector
 
 /// View 层泄漏检测器：外部触发（如 NavigationStack path 变短、sheet dismiss）启动 5 秒定时器，
@@ -120,7 +72,7 @@ public final class FSLeakDetector {
             timers.removeValue(forKey: key)
             guard stillAlive else { return }
 
-            let msg = "疑似内存泄漏：\(viewName) 未释放（深度 \(depth)\(FSLeakDisplay.fileNote(viewName))）"
+            let msg = "疑似内存泄漏：\(viewName) 未释放（深度 \(depth)）"
             NotificationCenter.default.post(
                 name: NSNotification.Name(FS_BE_LEAK_NOTIFICATION),
                 object: msg
@@ -153,34 +105,23 @@ final class _FSDeallocTracker {
 
     let viewName: String
 
-    /// 展示用的源文件名（`FSWeaponScreen.swift`），**追加**在页面名后面做定位，
-    /// 不取代页面名 —— toast 前半段仍是 `FSWeaponPage`，那是「哪一页」的身份。
-    ///
-    /// `deinit` 不保证在主线程，而 `FSLeakDisplay` 是主隔离的 ⇒ **init 时取好存下来**，
-    /// `deinit` 里只读这个字符串，不跨隔离域、也不加锁。
-    let display: String
-
     /// 登记时的导航栈深度，用于精确取消本层定时器
     let key: String
 
-    init(viewName: String, depth: Int, display: String) {
+    init(viewName: String, depth: Int) {
         self.viewName = viewName
-        self.display = display
         self.key = FSLeakProbe.key(page: viewName, depth: depth)
     }
 
     deinit {
         let name = viewName
-        let shown = display
         let k = key
-        // 纯字符串拼接，不碰任何隔离域状态
-        let text = (shown == name) ? "\(name) deinit" : "\(name) deinit (\(shown))"
         DispatchQueue.main.async {
             FSLeakDetector.cancelCheck(key: k)
         }
         NotificationCenter.default.post(
             name: NSNotification.Name(FS_BE_DEBUG_NOTIFICATION),
-            object: text
+            object: "\(name) deinit"
         )
     }
 }
@@ -191,9 +132,6 @@ private struct _FSDeallocViewModifier: ViewModifier {
 
     let viewName: String
 
-    /// 调用点所在文件（`#fileID`，由公开 API 的默认参数从**调用方**取值），仅用于展示
-    let file: String
-
     @State private var tracker: _FSDeallocTracker?
 
     @Environment(\.fsNavRouter) private var router
@@ -202,12 +140,9 @@ private struct _FSDeallocViewModifier: ViewModifier {
         content.onAppear {
             // push 完成时 path 已包含本页，故 count 即本页深度（从 1 开始；根页为 0）
             let depth = router.path.count
-            FSLeakDisplay.remember(page: viewName, file: file)
             FSLeakDetector.register(viewName)
             if tracker == nil {
-                let newTracker = _FSDeallocTracker(viewName: viewName,
-                                                   depth: depth,
-                                                   display: FSLeakDisplay.of(viewName))
+                let newTracker = _FSDeallocTracker(viewName: viewName, depth: depth)
                 tracker = newTracker
                 // 登记弱引用：5 秒到点时以「它还在不在」为判据（见 FSLeakDetector.live）
                 FSLeakDetector.track(newTracker)
@@ -222,9 +157,6 @@ private struct FSLeakWatchModifier<T: AnyObject>: ViewModifier {
 
     let page: String
 
-    /// 调用点所在文件（`#fileID`），只用来让泄漏报告显示文件名
-    let file: String
-
     /// 延迟求值：onAppear 时才取 store 引用
     let objects: () -> [T]
 
@@ -233,7 +165,6 @@ private struct FSLeakWatchModifier<T: AnyObject>: ViewModifier {
     func body(content: Content) -> some View {
         content.onAppear {
             let depth = router.path.count
-            FSLeakDisplay.remember(page: page, file: file)
             FSLeakProbe.watch(objects(), page: page, depth: depth)
         }
     }
@@ -315,10 +246,8 @@ extension View {
     /// 实测（2026-11-07）：全仓 175 处调用无一处匹配——名字清一色 `*Screen`，
     /// 页面类型清一色 `*Page`，View 层 5 秒检测从上线起就没跑过。
     /// 现在传类型，改名 / 删页都是编译错误，标签与 `fsPageLabel` 同源，不可能再错配。
-    /// - Parameter file: 由 `#fileID` 默认参数从**调用点**取值，只作为 toast / 日志里的定位尾巴
-    ///   （`FSWeaponPage deinit (FSWeaponScreen.swift)`）。不需要、也不应该手动传。
-    public func debugDealloc<P: FSPageTarget>(_ page: P.Type, file: String = #fileID) -> some View {
-        modifier(_FSDeallocViewModifier(viewName: page.fsPageLabel, file: file))
+    public func debugDealloc<P: FSPageTarget>(_ page: P.Type) -> some View {
+        modifier(_FSDeallocViewModifier(viewName: page.fsPageLabel))
     }
 
     /// **非路由页专用**：tab 根页、`sheet` / `fullScreenCover`、尚未纳入 `FSPageTarget` 的老页面。
@@ -326,8 +255,8 @@ extension View {
     /// 这类页面没有 `router.pop` 事件，**不参与** View 层 5 秒检测，只剩 `deinit` 日志。
     /// 名字故意写得刺眼，避免有人图省事又写回一个手写字符串——
     /// 那样写出来的名字和页面类型对不上，检测会静默失效。
-    public func debugDeallocUnrouted(_ viewName: String, file: String = #fileID) -> some View {
-        modifier(_FSDeallocViewModifier(viewName: viewName, file: file))
+    public func debugDeallocUnrouted(_ viewName: String) -> some View {
+        modifier(_FSDeallocViewModifier(viewName: viewName))
     }
 
     /// 对象级泄漏探针：把页面里的 store / model 交给 `FSLeakProbe` 弱引用观察。
@@ -338,17 +267,13 @@ extension View {
     /// ```
     ///
     /// 只有 pop / dismiss 后 3s + 13s 两次检查都不为空才报，避免延迟释放误报。
-    public func debugWatch<P: FSPageTarget, T: AnyObject>(_ page: P.Type,
-                                                          file: String = #fileID,
-                                                          _ objects: @escaping () -> [T]) -> some View {
-        modifier(FSLeakWatchModifier(page: page.fsPageLabel, file: file, objects: objects))
+    public func debugWatch<P: FSPageTarget, T: AnyObject>(_ page: P.Type, _ objects: @escaping () -> [T]) -> some View {
+        modifier(FSLeakWatchModifier(page: page.fsPageLabel, objects: objects))
     }
 
     /// 非路由页的对象级探针，配合 `debugDeallocUnrouted` 使用。
     /// 触发端只有 `fsLeakCheckOnDismiss`，且它拿不到类型名 —— 模态页要检测就传同一个字符串。
-    public func debugWatchUnrouted<T: AnyObject>(_ page: String,
-                                                 file: String = #fileID,
-                                                 _ objects: @escaping () -> [T]) -> some View {
-        modifier(FSLeakWatchModifier(page: page, file: file, objects: objects))
+    public func debugWatchUnrouted<T: AnyObject>(_ page: String, _ objects: @escaping () -> [T]) -> some View {
+        modifier(FSLeakWatchModifier(page: page, objects: objects))
     }
 }
