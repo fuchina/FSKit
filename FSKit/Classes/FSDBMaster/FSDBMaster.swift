@@ -140,13 +140,8 @@ public nonisolated final class FSDBMaster {
     }
 
     /// 获取共享实例（默认数据库）
-    ///
-    /// ★ 2026-11-14：调试用日志，带**调用栈**。只想看「谁最先碰数据库」，
-    ///   所以前 12 次打印栈，之后静默。验完把 `logDBAccess()` 和 `dbAccessSeq` 一起删掉。
     public static func sharedInstance() -> FSDBMaster {
         let m = self.sharedInstance2()
-
-        logDBAccess()
 
         if let m {
             return m
@@ -154,39 +149,6 @@ public nonisolated final class FSDBMaster {
 
         fatalError()
     }
-
-    // MARK: - 调试：数据库访问来源（★ 临时，验完删）
-    //
-    // ⚠️ 2026-11-14：**不要用 `#if DEBUG` 包这段**。
-    // Pods 工程的 `SWIFT_ACTIVE_COMPILATION_CONDITIONS` 全是 `$(inherited)`
-    // （36 处、0 处含 DEBUG），只有主 target 是 `DEBUG $(inherited)`。
-    // 所以 Pod 里 `#if DEBUG` 恒假 —— 第一版写成 DEBUG 分支，结果实际跑的是
-    // `#else` 那句 `print("FSLog here")`，一行栈都打不出来。
-    nonisolated(unsafe) private static var dbAccessSeq = 0
-    private static let dbAccessSeqLock = NSLock()
-
-    private static func logDBAccess() {
-
-        dbAccessSeqLock.lock()
-        dbAccessSeq += 1
-        let seq = dbAccessSeq
-        dbAccessSeqLock.unlock()
-
-        guard seq <= 12 else { return }
-
-        let t = String(format: "%.3f", CFAbsoluteTimeGetCurrent())
-        let thread = Thread.isMainThread ? "main" : "bg"
-
-        // 首次给足 16 层，后面 8 层够定位。
-        let depth = seq == 1 ? 16 : 8
-        let stack = Thread.callStackSymbols
-            .dropFirst(2)
-            .prefix(depth)
-            .joined(separator: "\n           ")
-
-        print("[DB] FSLog here #\(seq) \(thread) t=\(t)\n           \(stack)")
-    }
-
 
     /// 默认数据库路径
     public static func dbPath() -> String {
