@@ -15,7 +15,16 @@ public enum FSTriBool: Int {
 }
 
 // MARK: - FSModelCoder
-public final class FSModelCoder: NSObject, NSSecureCoding {
+
+/// 磁盘上的「小对象」归档（UserDefaults 的替身，能存字典 / 数组 / 字符串 / 三态布尔）。
+///
+/// ★ 2026-11-14：整个类型标 `nonisolated`。
+///   本 Pod 有 `SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor`（Podfile post_install），
+///   不标的话 `init` / `fetch` 全是主隔离 —— 后台想读一次这个标记文件就会编译不过。
+///   安全性依据：本类**没有任何 `static let/var`**，只有实例属性 + 静态函数，
+///   `filePath()` 也只读系统路径、必要时建目录，没有共享可变状态 ⇒ 跨线程无数据竞争面。
+///   `init?(coder:)` 由 `NSKeyedUnarchiver` 反射调用，标了 nonisolated 才能在后台真跑。
+public nonisolated final class FSModelCoder: NSObject, NSSecureCoding {
 
     public var dictionary: [String: Any]?
     public var list: [Any]?
