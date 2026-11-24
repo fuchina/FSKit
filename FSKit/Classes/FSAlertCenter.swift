@@ -455,7 +455,7 @@ public final class FSAlertCenter: @unchecked Sendable {
             let texts = alert.textFields?.map { $0.text ?? "" } ?? []
             self.inputTexts = texts
             if let can = spec.tapOutsideCanDismiss, !can(texts) { return }
-            self.dismiss()
+            self.dismissByTappingOutside(spec)
         }
 
         let tap = UITapGestureRecognizer(target: proxy, action: #selector(FSAlertTapOutside.handle(_:)))
@@ -463,6 +463,24 @@ public final class FSAlertCenter: @unchecked Sendable {
         tap.delegate = proxy
         container.addGestureRecognizer(tap)
         tapProxy = proxy
+    }
+
+    /// 点空白区关闭：**语义等同点「取消」**。
+    ///
+    /// 2026-11-24：原先这里直接 `dismiss()` —— 只关弹窗、不执行 `.cancel` 的 handler，
+    /// 于是调用方写在 `cancel` 里的重置/回滚被静默跳过，界面停在「弹窗没了、选中还留着」的半截状态
+    /// （FSOneMinusPage 的确认框即此：点空白关掉后合计与底部「先减记…」条仍在）。
+    /// 现在只要这条弹窗带 `.cancel` 按钮，就顺手把它的 handler 跑一遍。
+    ///
+    /// 只改 `.alert` 这一条路：actionSheet 由系统 `confirmationDialog` 管，
+    /// 关的时候分不清「点按钮后的自然关闭」和「点遮罩关闭」，无条件跑 cancel 会重复执行。
+    ///
+    /// 顺序与按钮点击路径一致（`finish` 清状态 → handler → pump）：`dismiss()` 内同步收尾，
+    /// 之后 handler 里即便再 `show` 一条也会进队列，由 `pump` 等宿主空出来后呈现。
+    private func dismissByTappingOutside(_ spec: FSAlertSpec) {
+        let cancelAction = spec.actions.first { $0.style == .cancel }
+        dismiss()
+        cancelAction?.handler?()
     }
 
     // MARK: 宿主
